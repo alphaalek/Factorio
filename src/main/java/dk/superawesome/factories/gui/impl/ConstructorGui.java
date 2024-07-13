@@ -8,6 +8,8 @@ import dk.superawesome.factories.util.mappings.ItemMappings;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.*;
@@ -39,6 +41,22 @@ public class ConstructorGui extends MechanicGui<Constructor> {
     public ConstructorGui(Constructor constructor) {
         super(constructor, new InitCallbackHolder());
         initCallback.call();
+
+        registerListener(InventoryDragEvent.class, InventoryDragEvent.getHandlerList(), e -> {
+            if (e.getInventory().getHolder() == this) {
+                e.setCancelled(onDrag(e));
+            }
+        });
+
+        registerListener(InventoryClickEvent.class, InventoryClickEvent.getHandlerList(), e -> {
+            if (e.getClick() == ClickType.DOUBLE_CLICK
+                    && e.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
+                Inventory topInv = e.getWhoClicked().getOpenInventory().getTopInventory();
+                if (topInv.getHolder() == this) {
+                    Bukkit.getScheduler().runTask(Factories.get(), this::updateCrafting);
+                }
+            }
+        });
     }
 
     @Override
@@ -82,7 +100,6 @@ public class ConstructorGui extends MechanicGui<Constructor> {
         return false;
     }
 
-    @Override
     public boolean onDrag(InventoryDragEvent event) {
         if (event.getInventorySlots().stream().anyMatch(i -> !CRAFTING_SLOTS.contains(i))) {
             return true;
@@ -167,6 +184,7 @@ public class ConstructorGui extends MechanicGui<Constructor> {
     }
 
     private void updateCrafting() {
+        // TODO tick limit
         if (getOffer(CRAFTING_SLOTS.get(0)).stream().allMatch(Objects::isNull)) {
             craft = EMPTY_CRAFT;
             getInventory().setItem(47, craft);

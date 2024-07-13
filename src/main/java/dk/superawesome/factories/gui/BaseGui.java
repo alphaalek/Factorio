@@ -4,15 +4,18 @@ import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.util.Callback;
 import dk.superawesome.factories.util.mappings.ItemMappings;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.EventExecutor;
 
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class BaseGui implements InventoryHolder, Listener {
@@ -24,6 +27,7 @@ public abstract class BaseGui implements InventoryHolder, Listener {
     protected boolean loaded = false;
     protected final Callback initCallback;
     protected final Inventory inventory;
+    protected final List<HandlerList> listeners = new ArrayList<>();
 
     public BaseGui(Supplier<Callback> initCallback, int size, String title) {
         this.inventory = Bukkit.createInventory(this, size, title);
@@ -31,31 +35,35 @@ public abstract class BaseGui implements InventoryHolder, Listener {
         this.initCallback.add(this::loadItems);
         loaded = true;
 
-        Bukkit.getPluginManager().registerEvent(InventoryCloseEvent.class, this, EventPriority.LOW, (listener, event) -> {
-            InventoryCloseEvent.getHandlerList().unregister(BaseGui.this);
-            InventoryClickEvent.getHandlerList().unregister(BaseGui.this);
-            InventoryDragEvent.getHandlerList().unregister(BaseGui.this);
+        registerListener(InventoryCloseEvent.class, InventoryCloseEvent.getHandlerList(), e -> {
+            for (HandlerList registered : listeners) {
+                registered.unregister(BaseGui.this);
+            }
 
             onClose();
-        }, Factories.get());
+        });
 
-        Bukkit.getPluginManager().registerEvent(InventoryClickEvent.class, this, EventPriority.LOW, (listener, event) -> {
-            InventoryClickEvent inv = (InventoryClickEvent) event;
-            if (inv.getClickedInventory() != null && inv.getClickedInventory().getHolder() == this) {
-                Bukkit.broadcastMessage(inv.getSlot() + "");
-                inv.setCancelled(onClick(inv));
+        registerListener(InventoryClickEvent.class, InventoryClickEvent.getHandlerList(), e -> {
+            if (e.getClickedInventory() != null && e.getClickedInventory().getHolder() == this) {
+                Bukkit.broadcastMessage(e.getSlot() + "");
+                e.setCancelled(onClick(e));
+            }
+        });
+    }
+
+    protected <E extends Event> void registerListener(Class<E> clazz, HandlerList handlerList, Consumer<E> listener) {
+        Bukkit.getPluginManager().registerEvent(clazz, this, EventPriority.LOW, new EventExecutor() {
+            @Override
+            public void execute(@Nonnull Listener l, @Nonnull Event event) throws EventException {
+                listener.accept((E) event);
             }
         }, Factories.get());
 
-        Bukkit.getPluginManager().registerEvent(InventoryDragEvent.class, this, EventPriority.LOW, (listener, event) -> {
-            InventoryDragEvent inv = (InventoryDragEvent) event;
-            if (inv.getInventory().getHolder() == this) {
-                inv.setCancelled(onDrag(inv));
-            }
-        }, Factories.get());
+        listeners.add(handlerList);
     }
 
     @Override
+    @Nonnull
     public Inventory getInventory() {
         return inventory;
     }
@@ -65,8 +73,4 @@ public abstract class BaseGui implements InventoryHolder, Listener {
     public abstract void onClose();
 
     public abstract boolean onClick(InventoryClickEvent event);
-
-    public boolean onDrag(InventoryDragEvent event) {
-        return true;
-    }
 }
