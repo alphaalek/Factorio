@@ -8,13 +8,28 @@ import dk.superawesome.factories.mehcanics.Profiles;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class Constructor implements Mechanic<Constructor> {
 
+    private final ItemStack[] craftingGridItems = new ItemStack[9];
+    private ItemStack recipeResult;
     private final Location loc;
 
     public Constructor(Location loc) {
         this.loc = loc;
+    }
+
+    public ItemStack[] getCraftingGridItems() {
+        return craftingGridItems;
+    }
+
+    public ItemStack getRecipeResult() {
+        return recipeResult;
+    }
+
+    public void setRecipeResult(ItemStack result) {
+        this.recipeResult = result;
     }
 
     @Override
