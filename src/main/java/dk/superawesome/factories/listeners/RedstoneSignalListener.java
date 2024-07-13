@@ -11,6 +11,7 @@ public class RedstoneSignalListener implements Listener {
 
     @EventHandler
     public void onRedstoneSignal(BlockRedstoneEvent event) {
+        // TODO work only from power central
         if (event.getOldCurrent() == 0) {
             Block block = event.getBlock();
             if (BlockUtil.diode.is(block)) {

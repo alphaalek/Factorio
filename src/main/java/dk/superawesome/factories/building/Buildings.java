@@ -12,10 +12,12 @@ public class Buildings {
     public static Building CONSTRUCTOR;
 
     static {
+        buildings = new Array<>();
+
         CONSTRUCTOR = loadBuilding(new Constructor());
     }
 
-    private static final Array<Building> buildings = new Array<>();
+    private static final Array<Building> buildings;
 
     public static Building loadBuilding(Building building) {
         buildings.set(building, building);

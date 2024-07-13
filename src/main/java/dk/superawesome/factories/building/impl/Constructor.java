@@ -16,7 +16,7 @@ public class Constructor implements Building {
     private final List<BlockVector> relatives = Arrays.asList(
             new BlockVector(),
             new BlockVector(0, 1, 0),
-            new BlockVector(0, 0, 1)
+            new BlockVector(-1, 0, 0)
     );
 
     private final List<Consumer<Location>> blocks = Arrays.asList(

@@ -48,6 +48,8 @@ public class ChunkLoadListener implements Listener {
                     continue;
                 }
 
+                // TODO doesn't always load
+
                 // load this mechanic
                 Factories.get().getMechanicManager(world).load(productionTypeOptional.get(), on.getLocation());
             }

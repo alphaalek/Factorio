@@ -18,7 +18,8 @@ public class InteractListener implements Listener {
             MechanicManager manager = Factories.get().getMechanicManager(clicked.getWorld());
             Mechanic<?> mechanic = manager.getMechanicPartially(clicked.getLocation());
             if (mechanic != null) {
-                Bukkit.getLogger().info("Clicked at " + mechanic.getProfile().getName());
+                event.setCancelled(true);
+                mechanic.openInventory(event.getPlayer());
             }
         }
     }
