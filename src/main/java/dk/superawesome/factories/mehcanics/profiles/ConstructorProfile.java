@@ -1,5 +1,7 @@
 package dk.superawesome.factories.mehcanics.profiles;
 
+import dk.superawesome.factories.building.Building;
+import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.mehcanics.MechanicFactory;
 import dk.superawesome.factories.mehcanics.MechanicProfile;
 import dk.superawesome.factories.mehcanics.impl.Constructor;
@@ -20,6 +22,11 @@ public class ConstructorProfile implements MechanicProfile<Constructor> {
     }
 
     @Override
+    public Building getBuilding() {
+        return Buildings.CONSTRUCTOR;
+    }
+
+    @Override
     public MechanicFactory<Constructor> getFactory() {
         return factory;
     }
@@ -28,7 +35,7 @@ public class ConstructorProfile implements MechanicProfile<Constructor> {
 
         @Override
         public Constructor create(Location loc) {
-            return null;
+            return new Constructor(loc);
         }
     }
 }

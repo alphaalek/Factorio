@@ -9,10 +9,12 @@ public class Profiles {
     public static MechanicProfile<Constructor> CONSTRUCTOR;
 
     static {
+        profiles = new Array<>();
+
         CONSTRUCTOR = loadProfile(new ConstructorProfile());
     }
 
-    private static final Array<MechanicProfile<?>> profiles = new Array<>();
+    private static final Array<MechanicProfile<?>> profiles;
 
     public static <M extends Mechanic<M>> MechanicProfile<M> loadProfile(MechanicProfile<M> production) {
         profiles.set(production, production);

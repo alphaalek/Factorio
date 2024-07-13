@@ -1,7 +1,11 @@
 package dk.superawesome.factories.building;
 
 import dk.superawesome.factories.building.impl.Constructor;
+import dk.superawesome.factories.mehcanics.Mechanic;
 import dk.superawesome.factories.util.Array;
+import dk.superawesome.factories.util.statics.BlockUtil;
+import org.bukkit.Location;
+import org.bukkit.util.BlockVector;
 
 public class Buildings {
 
@@ -20,5 +24,16 @@ public class Buildings {
 
     public static Array<Building> getBuildings() {
         return buildings;
+    }
+
+    public static boolean intersect(Location loc, Mechanic<?> mechanic) {
+        for (BlockVector relVec : mechanic.getProfile().getBuilding().getRelatives()) {
+            Location relLoc = BlockUtil.getRel(mechanic.getLocation(), relVec);
+            if (BlockUtil.blockEquals(loc, relLoc)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -4,14 +4,19 @@ import dk.superawesome.factories.util.Array;
 import dk.superawesome.factories.util.BlockValidator;
 import dk.superawesome.factories.util.LazyInit;
 import dk.superawesome.factories.util.NetProtocol;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.material.Directional;
+import org.bukkit.material.Sign;
 import org.bukkit.util.BlockVector;
+import org.bukkit.util.Vector;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 @SuppressWarnings("deprecation")
@@ -45,14 +50,12 @@ public class BlockUtil {
             )), 95);
 
     public static Block getPointingBlock(Block block, boolean opposite) {
-        Function<BlockFace, BlockFace> face = f -> opposite ? f.getOppositeFace() : f;
-
         if (LEGACY) {
             BlockState state = block.getState();
             if (state instanceof Directional) {
                 return block.getRelative(
-                        face.apply(
-                            ((Directional)state).getFacing()
+                        doOpposite(
+                            ((Directional)state).getFacing(), opposite
                         )
                 );
             }
@@ -61,8 +64,8 @@ public class BlockUtil {
             BlockData data = block.getBlockData();
             if (data instanceof org.bukkit.block.data.Directional) {
                 return block.getRelative(
-                        face.apply(
-                            ((org.bukkit.block.data.Directional)data).getFacing()
+                        doOpposite(
+                            ((org.bukkit.block.data.Directional)data).getFacing(), opposite
                         )
                 );
             }
@@ -76,6 +79,63 @@ public class BlockUtil {
     }
 
     public static BlockVector getVec(Block block) {
-        return new BlockVector(block.getX(), block.getY(), block.getZ());
+        return getVec(block.getLocation());
+    }
+
+    public static BlockVector getVec(Location loc) {
+        return new BlockVector(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+    }
+
+    public static Location getRel(Location loc, Vector vec) {
+        return new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getYaw(), loc.getPitch())
+                .add(vec);
+    }
+
+    public static boolean blockEquals(Location loc1, Location loc2) {
+        return loc1.getBlockX() == loc2.getBlockX()
+                && loc1.getBlockY() == loc2.getBlockY()
+                && loc1.getBlockZ() == loc2.getBlockZ()
+                && Objects.equals(loc1.getWorld(), loc2.getWorld());
+    }
+
+    private static BlockFace doOpposite(BlockFace face, boolean opposite) {
+        return opposite ? face.getOppositeFace() : face;
+    }
+
+    public static BlockFace getFaceBetween(Block from, Block to) {
+        Vector vec = new Vector(
+                from.getX() - to.getX(),
+                from.getY() - to.getY(),
+                from.getZ() - to.getZ()
+        );
+        if (vec.getX() != 0 || vec.getY() != 0 || vec.getZ() != 0) {
+            vec.normalize();
+        }
+
+        for (BlockFace face : BlockFace.values()) {
+            if (face.getDirection().equals(vec)) {
+                return face;
+            }
+        }
+
+        throw new IllegalStateException();
+    }
+
+    public static void setSignFacing(Block block, Block towards, boolean opposite) {
+        if (BlockUtil.LEGACY) {
+            Sign sign = (org.bukkit.material.Sign) block.getState();
+            sign.setFacingDirection(
+                    doOpposite(
+                            getFaceBetween(block, towards), opposite
+                    )
+            );
+        } else {
+            org.bukkit.block.data.type.Sign sign = (org.bukkit.block.data.type.Sign) block.getBlockData();
+            sign.setRotation(
+                    doOpposite(
+                            getFaceBetween(block, towards), opposite
+                    )
+            );
+        }
     }
 }
