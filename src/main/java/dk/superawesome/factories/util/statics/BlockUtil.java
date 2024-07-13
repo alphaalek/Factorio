@@ -6,10 +6,13 @@ import dk.superawesome.factories.util.LazyInit;
 import dk.superawesome.factories.util.NetProtocol;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.material.Directional;
 import org.bukkit.util.BlockVector;
+
+import java.util.function.Function;
 
 @SuppressWarnings("deprecation")
 public class BlockUtil {
@@ -17,8 +20,8 @@ public class BlockUtil {
     public static final boolean LEGACY = NetProtocol.getProtocol().isOlderThan(NetProtocol.v1_13);
 
     public static BlockValidator diode = BlockValidator.fromIn(LazyInit.of(() -> Material.REPEATER), 93, 94);
-    public static BlockValidator stickyPiston = BlockValidator.fromIn(LazyInit.of(() -> Material.REPEATER), 29);
-    public static BlockValidator piston = BlockValidator.fromIn(LazyInit.of(() -> Material.REPEATER), 33);
+    public static BlockValidator stickyPiston = BlockValidator.fromIn(LazyInit.of(() -> Material.STICKY_PISTON), 29);
+    public static BlockValidator piston = BlockValidator.fromIn(LazyInit.of(() -> Material.PISTON), 33);
 
     public static BlockValidator anyStainedGlass = BlockValidator.fromOut(
             LazyInit.of(() -> Array.fromData(
@@ -41,17 +44,27 @@ public class BlockUtil {
                     Material.YELLOW_STAINED_GLASS
             )), 95);
 
-    public static Block getPointingBlock(Block block) {
+    public static Block getPointingBlock(Block block, boolean opposite) {
+        Function<BlockFace, BlockFace> face = f -> opposite ? f.getOppositeFace() : f;
+
         if (LEGACY) {
             BlockState state = block.getState();
             if (state instanceof Directional) {
-                return block.getRelative(((Directional)state).getFacing());
+                return block.getRelative(
+                        face.apply(
+                            ((Directional)state).getFacing()
+                        )
+                );
             }
 
         } else {
             BlockData data = block.getBlockData();
             if (data instanceof org.bukkit.block.data.Directional) {
-                return block.getRelative(((org.bukkit.block.data.Directional)data).getFacing());
+                return block.getRelative(
+                        face.apply(
+                            ((org.bukkit.block.data.Directional)data).getFacing()
+                        )
+                );
             }
         }
 

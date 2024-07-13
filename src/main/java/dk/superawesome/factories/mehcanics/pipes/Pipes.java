@@ -1,7 +1,7 @@
-package dk.superawesome.factories.production.pipes;
+package dk.superawesome.factories.mehcanics.pipes;
 
 import dk.superawesome.factories.items.ItemCollection;
-import dk.superawesome.factories.production.pipes.events.PipeSuckEvent;
+import dk.superawesome.factories.mehcanics.pipes.events.PipeSuckEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -18,7 +18,9 @@ public class Pipes {
             return;
         }
 
-        Block from = BlockUtil.getPointingBlock(start);
+        // we will suck items out of the block that the sticky piston is pointing towards
+        // if it's neither a mechanic
+        Block from = BlockUtil.getPointingBlock(start, false);
         if (from == null) {
             return;
         }
@@ -38,6 +40,7 @@ public class Pipes {
             }
         }
 
+        // start the pipe route
         startRoute(start, event.getItems());
     }
 
@@ -51,7 +54,7 @@ public class Pipes {
             PipeRoute.addRouteToCache(route);
         }
 
-        route.start(start, collection);
+        route.start(collection);
     }
 
     public static PipeRoute createNewRoute(Block start) {
@@ -65,24 +68,31 @@ public class Pipes {
     public static void expandRoute(PipeRoute route, Block from) {
         BlockVector fromVec = BlockUtil.getVec(from);
         Material fromMat = from.getType();
-        for (int x = 0; x <= 1; x++) {
-            for (int y = 0; y <= 1; y++) {
-                for (int z = 0; z <= 1; z++) {
+
+        // iterate over all blocks around this block
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
                     if (Math.abs(x) == 1 && Math.abs(y) == 1
                             || Math.abs(x) == 1 && Math.abs(z) == 1
                             || Math.abs(z) == 1 && Math.abs(y) == 1) {
                         continue;
                     }
+                    // we're left with the blocks that is directly next to the relative block
 
-                    BlockVector relVec = (BlockVector) fromVec.add(new Vector(x, y, z));
-                    if (route.hasLocation(relVec)) {
+                    // generate a world block-vector and check if the pipe route has already
+                    // came across this vector in the search
+                    BlockVector relVec = (BlockVector) new BlockVector(fromVec).add(new Vector(x, y, z));
+                    if (route.has(relVec)) {
                         continue;
                     }
 
                     Block rel = from.getRelative(x, y, z);
                     Material mat = rel.getType();
-                    if (BlockUtil.piston.is(mat, (byte) 0)) {
-                        route.addOutputLocation(from.getWorld(), fromVec, relVec);
+                    // piston = pipe output
+                    if (BlockUtil.piston.is(mat, BlockUtil.getData(rel))) {
+                        route.addOutput(from.getWorld(), relVec);
+                    // glass = pipe expand
                     } else if (
                             mat == Material.GLASS
                             ||
@@ -92,7 +102,7 @@ public class Pipes {
                                     || BlockUtil.stickyPiston.is(fromMat, BlockUtil.getData(from))
                                 )
                     ) {
-                        route.addLocation(from.getWorld(), fromVec, relVec);
+                        route.add(relVec);
                         expandRoute(route, rel);
                     }
                 }

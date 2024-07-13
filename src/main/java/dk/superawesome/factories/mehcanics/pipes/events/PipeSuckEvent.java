@@ -1,13 +1,9 @@
-package dk.superawesome.factories.production.pipes.events;
+package dk.superawesome.factories.mehcanics.pipes.events;
 
 import dk.superawesome.factories.items.ItemCollection;
 import org.bukkit.block.Block;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PipeSuckEvent extends BlockEvent {
 

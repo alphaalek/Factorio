@@ -1,8 +1,10 @@
 package dk.superawesome.factories.listeners;
 
 import dk.superawesome.factories.Factories;
-import dk.superawesome.factories.production.ProductionType;
-import dk.superawesome.factories.production.ProductionTypes;
+import dk.superawesome.factories.mehcanics.MechanicProfile;
+import dk.superawesome.factories.mehcanics.Profiles;
+import dk.superawesome.factories.util.statics.BlockUtil;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
@@ -13,11 +15,12 @@ import java.util.Optional;
 
 public class ChunkLoadListener implements Listener {
 
+    @SuppressWarnings("deprecation")
     @EventHandler
-
     public void onChunkLoad(ChunkLoadEvent event) {
         for (BlockState state : event.getChunk().getTileEntities()) {
-            if (state instanceof Sign) {
+            if (state instanceof Sign) { // TODO: kun wall signs?
+                // check if this sign is related to a mechanic
                 Sign sign = (Sign) state;
                 if (!sign.getLine(0).startsWith("[")
                         || !sign.getLine(1).startsWith("]")) {
@@ -25,7 +28,7 @@ public class ChunkLoadListener implements Listener {
                 }
 
                 String type = sign.getLine(0).substring(1, sign.getLine(0).length() - 1);
-                Optional<ProductionType> productionTypeOptional = ProductionTypes.getProductions()
+                Optional<MechanicProfile<?>> productionTypeOptional = Profiles.getProfiles()
                         .stream()
                         .filter(b -> b.getName().equals(type))
                         .findFirst();
@@ -33,7 +36,14 @@ public class ChunkLoadListener implements Listener {
                     continue;
                 }
 
-                Factories.get().getProductionHandler().load(productionTypeOptional.get(), state.getLocation());
+                // get the block which the sign is hanging on, because this block is the root of the mechanic
+                Block on = BlockUtil.getPointingBlock(state.getBlock(), false);
+                if (on == null) {
+                    continue;
+                }
+
+                // load this mechanic
+                Factories.get().getMechanicManager().load(productionTypeOptional.get(), on.getLocation());
             }
         }
     }
