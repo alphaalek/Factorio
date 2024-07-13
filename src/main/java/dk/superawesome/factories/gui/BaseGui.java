@@ -45,7 +45,7 @@ public abstract class BaseGui implements InventoryHolder, Listener {
 
         registerListener(InventoryClickEvent.class, InventoryClickEvent.getHandlerList(), e -> {
             if (e.getClickedInventory() != null && e.getClickedInventory().getHolder() == this) {
-                Bukkit.broadcastMessage(e.getSlot() + "");
+                Bukkit.getLogger().info(e.getSlot() + "");
                 e.setCancelled(onClick(e));
             }
         });

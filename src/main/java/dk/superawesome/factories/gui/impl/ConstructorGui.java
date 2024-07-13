@@ -21,20 +21,10 @@ public class ConstructorGui extends MechanicGui<Constructor> {
 
     private static final int GRID_WIDTH = 3;
     private static final int GRID_HEIGHT = 3;
-
     private static final ItemStack EMPTY_CRAFT = new ItemStack(Material.AIR);
-
-    private static final List<Integer> GRAY = Arrays.asList(
-            0, 1, 2, 3, 5, 6, 7, 8, 9, 18, 27, 36, 45, 46, 48, 49, 50, 51, 53
-    );
-
-    private static final List<Integer> BLACK = Arrays.asList(
-            4, 13, 22, 31, 40, 41, 42, 43, 44
-    );
-
-    private static final List<Integer> CRAFTING_SLOTS = Arrays.asList(
-        10, 11, 12, 19, 20, 21, 28, 29, 30
-    );
+    private static final List<Integer> GRAY = Arrays.asList(0, 1, 2, 3, 5, 6, 7, 8, 9, 18, 27, 36, 45, 46, 48, 49, 50, 51, 53);
+    private static final List<Integer> BLACK = Arrays.asList(4, 13, 22, 31, 40, 41, 42, 43, 44);
+    private static final List<Integer> CRAFTING_SLOTS = Arrays.asList(10, 11, 12, 19, 20, 21, 28, 29, 30);
 
     private ItemStack craft;
 
@@ -129,6 +119,7 @@ public class ConstructorGui extends MechanicGui<Constructor> {
             for (int i = slot; CRAFTING_SLOTS.contains(i); i += 9) {
                 if (getInventory().getItem(i) != null) {
                     emptyColumn = false;
+                    break;
                 }
             }
 
@@ -258,16 +249,14 @@ public class ConstructorGui extends MechanicGui<Constructor> {
                     while (offerIterator.hasNext()) {
                         ItemStack at = offerIterator.next();
 
-                        if (at != null) {
-                            Iterator<ItemStack> ingredientsIterator = ingredients.iterator();
-                            while (ingredientsIterator.hasNext()) {
-                                ItemStack ingredient = ingredientsIterator.next();
+                        Iterator<ItemStack> ingredientsIterator = ingredients.iterator();
+                        while (ingredientsIterator.hasNext()) {
+                            ItemStack ingredient = ingredientsIterator.next();
 
-                                if (ingredient.isSimilar(at) || handleUnspecific(ingredient, at)) {
-                                    ingredientsIterator.remove();
-                                    offerIterator.remove();
-                                    break;
-                                }
+                            if (ingredient.isSimilar(at) || handleUnspecific(ingredient, at)) {
+                                ingredientsIterator.remove();
+                                offerIterator.remove();
+                                break;
                             }
                         }
                     }
