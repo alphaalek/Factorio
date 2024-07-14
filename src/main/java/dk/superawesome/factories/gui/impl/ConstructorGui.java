@@ -137,7 +137,7 @@ public class ConstructorGui extends MechanicGui<Constructor> {
 
             if (moveRight >= GRID_WIDTH
                     || moveDown >= GRID_HEIGHT) {
-                return initial + Math.min(moveRight, 2) + Math.min(moveDown, 2) * 9;
+                return initial + Math.min(moveRight, GRID_WIDTH - 1) + Math.min(moveDown, GRID_HEIGHT - 1) * 9;
             }
         }
     }
@@ -175,18 +175,24 @@ public class ConstructorGui extends MechanicGui<Constructor> {
     }
 
     private void updateCrafting() {
-        // TODO tick limit
-        if (getOffer(CRAFTING_SLOTS.get(0)).stream().allMatch(Objects::isNull)) {
-            craft = EMPTY_CRAFT;
-            getInventory().setItem(47, craft);
-            return;
+        this.craft = EMPTY_CRAFT;
+
+        // check if the crafting grid contains any items, if we find any, search for a recipe matching the items
+        if (getOffer(CRAFTING_SLOTS.get(0)).stream().anyMatch(Objects::nonNull)) {
+            searchRecipe();
         }
+
+        // set the crafting slot to the recipe result
+        getInventory().setItem(47, this.craft);
+    }
+
+    private void searchRecipe() {
+        // TODO tick limit
 
         // iterate over all bukkit recipes and find the recipe matching the one in the crafting grid (if any)
         Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
-        boolean found = false;
         while (recipeIterator.hasNext()) {
-            Recipe recipe = recipeIterator.next(); // TODO cache crafting recipes
+            Recipe recipe = recipeIterator.next(); // TODO cache common recipes
 
             // only check for crafting recipes
             if (recipe instanceof CraftingRecipe) {
@@ -259,6 +265,11 @@ public class ConstructorGui extends MechanicGui<Constructor> {
                                 break;
                             }
                         }
+
+                        // if either we have checked all the ingredients or items in the crafting grid, we will break the search
+                        if (offer.isEmpty() || ingredients.isEmpty()) {
+                            break;
+                        }
                     }
 
                     // notify a match success if no required ingredients are left and no more items are inserted into
@@ -269,19 +280,10 @@ public class ConstructorGui extends MechanicGui<Constructor> {
                 }
 
                 if (match) {
-                    found = true;
-                    craft = recipe.getResult();
+                    this.craft = recipe.getResult();
                     break;
                 }
             }
         }
-
-        // we didn't find any recipe, so just place an empty crafting slot
-        if (!found) {
-            craft = EMPTY_CRAFT;
-        }
-
-        // set the crafting slot to the recipe result
-        getInventory().setItem(47, craft);
     }
 }
