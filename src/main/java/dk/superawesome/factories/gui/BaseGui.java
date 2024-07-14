@@ -8,6 +8,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -20,6 +21,13 @@ public abstract class BaseGui implements InventoryHolder, Listener {
     static {
         Factories.get().registerEvent(InventoryCloseEvent.class, EventPriority.LOWEST, e -> {
             InventoryHolder holder = e.getInventory().getHolder();
+            if (holder instanceof BaseGui) {
+                ((BaseGui)holder).onClose();
+            }
+        });
+
+        Factories.get().registerEvent(PlayerQuitEvent.class, EventPriority.LOWEST, e -> {
+            InventoryHolder holder = e.getPlayer().getOpenInventory().getTopInventory().getHolder();
             if (holder instanceof BaseGui) {
                 ((BaseGui)holder).onClose();
             }
