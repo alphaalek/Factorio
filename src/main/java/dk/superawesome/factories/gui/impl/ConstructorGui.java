@@ -8,16 +8,24 @@ import dk.superawesome.factories.util.mappings.ItemMappings;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConstructorGui extends MechanicGui<Constructor> {
+
+    static {
+        Factories.get().registerEvent(InventoryDragEvent.class, EventPriority.LOWEST, e -> {
+            InventoryHolder holder = e.getInventory().getHolder();
+            if (holder instanceof ConstructorGui) {
+                boolean cancelled = ((ConstructorGui)holder).onDrag(e);
+                e.setCancelled(cancelled);
+            }
+        });
+    }
 
     private static final int GRID_WIDTH = 3;
     private static final int GRID_HEIGHT = 3;
@@ -31,22 +39,6 @@ public class ConstructorGui extends MechanicGui<Constructor> {
     public ConstructorGui(Constructor constructor) {
         super(constructor, new InitCallbackHolder());
         initCallback.call();
-
-        registerListener(InventoryDragEvent.class, InventoryDragEvent.getHandlerList(), e -> {
-            if (e.getInventory().getHolder() == this) {
-                e.setCancelled(onDrag(e));
-            }
-        });
-
-        registerListener(InventoryClickEvent.class, InventoryClickEvent.getHandlerList(), e -> {
-            if (e.getClick() == ClickType.DOUBLE_CLICK
-                    && e.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
-                Inventory topInv = e.getWhoClicked().getOpenInventory().getTopInventory();
-                if (topInv.getHolder() == this) {
-                    Bukkit.getScheduler().runTask(Factories.get(), this::updateCrafting);
-                }
-            }
-        });
     }
 
     @Override
@@ -79,7 +71,7 @@ public class ConstructorGui extends MechanicGui<Constructor> {
     }
 
     @Override
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClickIn(InventoryClickEvent event) {
         if (!CRAFTING_SLOTS.contains(event.getSlot())) {
             return true;
         }
@@ -87,6 +79,19 @@ public class ConstructorGui extends MechanicGui<Constructor> {
         if (event.getCurrentItem() != null || event.getCursor() != null) {
             Bukkit.getScheduler().runTask(Factories.get(), this::updateCrafting);
         }
+        return false;
+    }
+
+    @Override
+    public boolean onClickOpen(InventoryClickEvent event) {
+        if (event.getClick() == ClickType.DOUBLE_CLICK
+                && event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
+            Inventory topInv = event.getWhoClicked().getOpenInventory().getTopInventory();
+            if (topInv.getHolder() == this) {
+                Bukkit.getScheduler().runTask(Factories.get(), this::updateCrafting);
+            }
+        }
+
         return false;
     }
 
