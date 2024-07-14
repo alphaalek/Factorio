@@ -10,6 +10,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 public class Constructor implements Mechanic<Constructor> {
 
     private final ItemStack[] craftingGridItems = new ItemStack[9];
@@ -55,6 +57,22 @@ public class Constructor implements Mechanic<Constructor> {
 
     @Override
     public void pipePut(ItemCollection collection) {
+        for (ItemStack craft : craftingGridItems) {
+            // check if this slot contains anything and can hold more
+            if (craft == null || craft.getAmount() == craft.getMaxStackSize()) {
+                continue;
+            }
+
+            // poll the item for this crafting slot from the item collection
+            ItemStack req = craft.clone();
+            req.setAmount(1);
+
+            List<ItemStack> stacks = collection.take(req);
+            if (!stacks.isEmpty() && stacks.get(0).isSimilar(craft)) {
+                craft.setAmount(craft.getAmount() + stacks.get(0).getAmount());
+            }
+        }
+
         Bukkit.getLogger().info("Putting items into " + getProfile().getName() + " " + collection);
     }
 }
