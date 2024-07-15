@@ -1,6 +1,8 @@
 package dk.superawesome.factories.mehcanics;
 
+import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.building.Buildings;
+import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.mehcanics.pipes.events.PipePutEvent;
 import dk.superawesome.factories.mehcanics.pipes.events.PipeSuckEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
@@ -21,6 +23,8 @@ public class MechanicManager implements Listener {
 
     public MechanicManager(World world) {
         this.world = world;
+
+        Bukkit.getPluginManager().registerEvents(this, Factories.get());
     }
 
     private final Map<BlockVector, Mechanic<?>> mechanics = new HashMap<>();
@@ -67,7 +71,12 @@ public class MechanicManager implements Listener {
 
     @EventHandler
     public void onPipeSuck(PipeSuckEvent event) {
-
+        if (event.getBlock().getWorld().equals(this.world)) {
+            Mechanic<?> mechanic = getMechanicAt(event.getBlock().getLocation());
+            if (mechanic instanceof ItemCollection) {
+                event.setItems((ItemCollection) mechanic);
+            }
+        }
     }
 
     @EventHandler

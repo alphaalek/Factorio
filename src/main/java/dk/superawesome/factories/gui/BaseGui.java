@@ -6,8 +6,7 @@ import dk.superawesome.factories.util.mappings.ItemMappings;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -33,23 +32,31 @@ public abstract class BaseGui implements InventoryHolder, Listener {
             }
         });
 
-        Factories.get().registerEvent(InventoryClickEvent.class, EventPriority.LOWEST, e -> {
-            boolean cancelled = false;
+        Factories.get().registerEvent(InventoryDragEvent.class, EventPriority.LOWEST, e -> {
+            InventoryHolder holder = e.getInventory().getHolder();
+            if (holder instanceof BaseGui) {
+                boolean cancelled = ((BaseGui)holder).onDrag(e);
+                e.setCancelled(cancelled);
+            }
+        });
 
+        Factories.get().registerEvent(InventoryClickEvent.class, EventPriority.LOWEST, e -> {
             Inventory inv = e.getClickedInventory();
             if (inv != null) {
                 InventoryHolder holder = inv.getHolder();
                 if (holder instanceof BaseGui) {
-                    cancelled = ((BaseGui)holder).onClickIn(e);
+                    boolean cancelled = ((BaseGui)holder).onClickIn(e);
+                    e.setCancelled(cancelled);
                 }
             }
 
             InventoryHolder holder = e.getWhoClicked().getOpenInventory().getTopInventory().getHolder();
             if (holder instanceof BaseGui) {
-                cancelled = ((BaseGui)holder).onClickOpen(e);
+                boolean cancelled = ((BaseGui)holder).onClickOpen(e);
+                if (!e.isCancelled()) {
+                    e.setCancelled(cancelled);
+                }
             }
-
-            e.setCancelled(cancelled);
         });
     }
 
@@ -68,6 +75,21 @@ public abstract class BaseGui implements InventoryHolder, Listener {
         loaded = true;
     }
 
+    protected boolean movedFromOtherInventory(InventoryClickEvent event) {
+        if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR
+                || event.getAction() == InventoryAction.HOTBAR_SWAP
+                || event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD
+                || event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+            Inventory topInv = event.getWhoClicked().getOpenInventory().getTopInventory();
+            return topInv.getHolder() == this;
+        }
+
+        return false;
+    }
+
+
+    // TODO limit guis to one player at a time
+
     @Override
     @Nonnull
     public Inventory getInventory() {
@@ -77,6 +99,8 @@ public abstract class BaseGui implements InventoryHolder, Listener {
     public abstract void loadItems();
 
     public abstract void onClose();
+
+    public abstract boolean onDrag(InventoryDragEvent event);
 
     public abstract boolean onClickIn(InventoryClickEvent event);
 

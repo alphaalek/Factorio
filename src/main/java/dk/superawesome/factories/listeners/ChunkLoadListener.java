@@ -21,6 +21,7 @@ public class ChunkLoadListener implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
+        // TODO loader nogen gange ikke når man pender join ved server boot
         World world = event.getChunk().getWorld();
         for (BlockState state : event.getChunk().getTileEntities()) {
             if (state instanceof Sign) { // TODO: kun wall signs?

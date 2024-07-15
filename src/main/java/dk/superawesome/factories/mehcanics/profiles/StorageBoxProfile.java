@@ -4,38 +4,38 @@ import dk.superawesome.factories.building.Building;
 import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.mehcanics.MechanicFactory;
 import dk.superawesome.factories.mehcanics.MechanicProfile;
-import dk.superawesome.factories.mehcanics.impl.Constructor;
+import dk.superawesome.factories.mehcanics.impl.StorageBox;
 import org.bukkit.Location;
 
-public class ConstructorProfile implements MechanicProfile<Constructor> {
+public class StorageBoxProfile implements MechanicProfile<StorageBox> {
 
-    private final MechanicFactory<Constructor> factory = new Factory();
+    private final MechanicFactory<StorageBox> factory = new StorageBoxFactory();
 
     @Override
     public String getName() {
-        return "Constructor";
+        return "Storage Box";
     }
 
     @Override
     public Building getBuilding() {
-        return Buildings.CONSTRUCTOR;
+        return Buildings.STORAGE_BOX;
     }
 
     @Override
-    public MechanicFactory<Constructor> getFactory() {
+    public MechanicFactory<StorageBox> getFactory() {
         return factory;
     }
 
     @Override
     public int getID() {
-        return 0;
+        return 1;
     }
 
-    public static class Factory implements MechanicFactory<Constructor> {
+    private static class StorageBoxFactory implements MechanicFactory<StorageBox> {
 
         @Override
-        public Constructor create(Location loc) {
-            return new Constructor(loc);
+        public StorageBox create(Location loc) {
+            return new StorageBox(loc);
         }
     }
 }

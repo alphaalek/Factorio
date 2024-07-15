@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Constructor implements Building {
+public class StorageBox implements Building {
 
     private final List<BlockVector> relatives = Arrays.asList(
             new BlockVector(),
@@ -21,8 +21,8 @@ public class Constructor implements Building {
     );
 
     private final List<Consumer<Location>> blocks = Arrays.asList(
-            l -> l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(0))).setType(ItemMappings.get("oak_planks").getMaterial()),
-            l -> l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(1))).setType(ItemMappings.get("crafting_table").getMaterial()),
+            l -> l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(0))).setType(ItemMappings.get("oak_log").getMaterial()),
+            l -> l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(1))).setType(ItemMappings.get("chest").getMaterial()),
             l -> {
                 Block block = l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(2)));
                 block.setType(ItemMappings.get("oak_wall_sign").getMaterial());
@@ -42,6 +42,6 @@ public class Constructor implements Building {
 
     @Override
     public int getID() {
-        return Profiles.CONSTRUCTOR.getID();
+        return Profiles.STORAGE_BOX.getID();
     }
 }
