@@ -1,17 +1,16 @@
 package dk.superawesome.factories.mehcanics.impl;
 
-import dk.superawesome.factories.gui.impl.ConstructorGui;
 import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.mehcanics.AbstractMechanic;
-import dk.superawesome.factories.mehcanics.Mechanic;
 import dk.superawesome.factories.mehcanics.MechanicProfile;
 import dk.superawesome.factories.mehcanics.Profiles;
-import dk.superawesome.factories.util.Tick;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Constructor extends AbstractMechanic<Constructor> {
@@ -41,14 +40,8 @@ public class Constructor extends AbstractMechanic<Constructor> {
     }
 
     @Override
-    public void openInventory(Player player) {
-        ConstructorGui gui = new ConstructorGui(this);
-        player.openInventory(gui.getInventory());
-    }
-
-    @Override
     public void pipePut(ItemCollection collection) {
-        if (getTickThrottle().isThrottled()) {
+        if (tickThrottle.isThrottled()) {
             return;
         }
 
@@ -62,12 +55,17 @@ public class Constructor extends AbstractMechanic<Constructor> {
             ItemStack req = craft.clone();
             req.setAmount(1);
 
-            List<ItemStack> stacks = collection.take(req);
-            if (!stacks.isEmpty() && stacks.get(0).isSimilar(craft)) {
-                craft.setAmount(Math.min(craft.getMaxStackSize(), craft.getAmount() + stacks.get(0).getAmount()));
+            if (collection.has(req)) {
+                List<ItemStack> stacks = collection.take(req.getAmount());
+                if (!stacks.isEmpty() && stacks.get(0).isSimilar(craft)) {
+                    craft.setAmount(Math.min(craft.getMaxStackSize(), craft.getAmount() + stacks.get(0).getAmount()));
+                }
+            }
+
+            Bukkit.getLogger().info("Updated " + craft);
+            if (inUse.get() != null) {
+                Bukkit.getLogger().info(inUse.get().getInventory().getItem(10) + " " + (inUse.get().getInventory().getItem(10) == craft));
             }
         }
-
-        Bukkit.getLogger().info("Putting items into " + getProfile().getName() + " " + collection);
     }
 }

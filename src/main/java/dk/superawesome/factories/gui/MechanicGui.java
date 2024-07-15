@@ -4,6 +4,7 @@ import dk.superawesome.factories.mehcanics.Mechanic;
 import dk.superawesome.factories.util.Callback;
 import dk.superawesome.factories.util.mappings.ItemMappings;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public abstract class MechanicGui<M extends Mechanic<M>> extends BaseGui {
@@ -20,8 +21,8 @@ public abstract class MechanicGui<M extends Mechanic<M>> extends BaseGui {
 
     private final M mechanic;
 
-    public MechanicGui(M mechanic, Supplier<Callback> initCallback) {
-        super(initCallback, BaseGui.DOUBLE_CHEST, mechanic.getProfile().getName() + " (Lvl " + mechanic.getLevel() + ")");
+    public MechanicGui(M mechanic, AtomicReference<BaseGui> inUseReference, Supplier<Callback> initCallback) {
+        super(initCallback, inUseReference, BaseGui.DOUBLE_CHEST, mechanic.getProfile().getName() + " (Lvl " + mechanic.getLevel() + ")");
         this.mechanic = mechanic;
     }
 

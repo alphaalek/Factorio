@@ -13,6 +13,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class ConstructorGui extends MechanicGui<Constructor> {
@@ -26,8 +27,8 @@ public class ConstructorGui extends MechanicGui<Constructor> {
 
     private ItemStack craft;
 
-    public ConstructorGui(Constructor constructor) {
-        super(constructor, new InitCallbackHolder());
+    public ConstructorGui(Constructor constructor, AtomicReference<BaseGui> inUseReference) {
+        super(constructor, inUseReference, new InitCallbackHolder());
         initCallback.call();
     }
 
@@ -49,15 +50,19 @@ public class ConstructorGui extends MechanicGui<Constructor> {
         getInventory().setItem(47, this.craft = getMechanic().getRecipeResult());
         for (int i = 0; i < 9; i++) {
             getInventory().setItem(CRAFTING_SLOTS.get(i), getMechanic().getCraftingGridItems()[i]);
+            // to ensure we also modify the stored crafting grid items as the bukkit stack, we do this hack,
+            // which is a seemingly unnecessary inventory operation.
+
+            // this is because CraftInventory#setItem makes a nms copy, so we can't modify the bukkit item
+            // and the showed item in the crafting grid at the same time. However, CraftInventory#getItem makes
+            // a bukkit mirror, and THEN, we can modify them at the same time!
+            getMechanic().getCraftingGridItems()[i] = getInventory().getItem(CRAFTING_SLOTS.get(i));
         }
     }
 
     @Override
     public void onClose() {
-        for (int i = 0; i < 9; i++) {
-            getMechanic().getCraftingGridItems()[i] = getInventory().getItem(CRAFTING_SLOTS.get(i));
-        }
-        getMechanic().setRecipeResult(this.craft);
+
     }
 
     @Override
@@ -67,8 +72,10 @@ public class ConstructorGui extends MechanicGui<Constructor> {
         }
 
         if (event.getCurrentItem() != null || event.getCursor() != null) {
+            getMechanic().getTickThrottle().throttle();
             Bukkit.getScheduler().runTask(Factories.get(), this::updateCrafting);
         }
+
         return false;
     }
 
@@ -84,6 +91,11 @@ public class ConstructorGui extends MechanicGui<Constructor> {
         }
 
         return false;
+    }
+
+    @Override
+    public void onClickPost(InventoryClickEvent event) {
+
     }
 
     @Override
@@ -145,7 +157,7 @@ public class ConstructorGui extends MechanicGui<Constructor> {
         int diff = from - CRAFTING_SLOTS.get(0);
         for (int i : CRAFTING_SLOTS) {
             int slot = i + diff;
-            items.add(CRAFTING_SLOTS.contains(slot) ? getInventory().getItem(slot) : null);
+            items.add(CRAFTING_SLOTS.contains(slot) ? Optional.ofNullable(getInventory().getItem(slot)).map(ItemStack::clone).orElse(null) : null);
         }
 
         return items;
@@ -173,6 +185,10 @@ public class ConstructorGui extends MechanicGui<Constructor> {
     }
 
     private void updateCrafting() {
+        for (int i = 0; i < 9; i++) {
+            getMechanic().getCraftingGridItems()[i] = getInventory().getItem(CRAFTING_SLOTS.get(i));
+        }
+
         this.craft = EMPTY_CRAFT;
 
         // check if the crafting grid contains any items, if we find any, search for a recipe matching the items

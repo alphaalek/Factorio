@@ -28,16 +28,7 @@ public class Pipes {
         PipeSuckEvent event = new PipeSuckEvent(from);
         Bukkit.getPluginManager().callEvent(event);
         if (event.getItems() == null) {
-            // check world containers
-            BlockState state = from.getState();
-            if (state instanceof Container) {
-                Container container = (Container) state;
-                event.setItems(ItemCollection.from(container.getInventory()));
-            }
-
-            if (event.getItems() == null) {
-                return;
-            }
+            return;
         }
 
         // start the pipe route

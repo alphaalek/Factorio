@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -26,8 +27,8 @@ public class StorageBoxGui extends MechanicGui<StorageBox> {
         BLACK.addAll(Arrays.asList(48, 50));
     }
 
-    public StorageBoxGui(StorageBox mechanic) {
-        super(mechanic, new InitCallbackHolder());
+    public StorageBoxGui(StorageBox mechanic, AtomicReference<BaseGui> inUseReference) {
+        super(mechanic, inUseReference, new InitCallbackHolder());
         initCallback.call();
     }
 
@@ -77,24 +78,22 @@ public class StorageBoxGui extends MechanicGui<StorageBox> {
     }
 
     private void updateAmount() {
-        if (!getMechanic().getTickThrottle().isThrottled()) {
-            getMechanic().getTickThrottle().throttle();
+        getMechanic().getTickThrottle().throttle();
 
-            int before = findItems().stream()
+        int before = findItems().stream()
+                .mapToInt(ItemStack::getAmount).sum();
+        Bukkit.getScheduler().runTask(Factories.get(), () -> {
+            int after = findItems().stream()
                     .mapToInt(ItemStack::getAmount).sum();
-            Bukkit.getScheduler().runTask(Factories.get(), () -> {
-                int after = findItems().stream()
-                        .mapToInt(ItemStack::getAmount).sum();
 
-                // get the difference in the items of the current inventory view of the storage box
-                int diff = before - after;
-                getMechanic().setAmount(getMechanic().getAmount() - diff);
+            // get the difference in the items of the current inventory view of the storage box
+            int diff = before - after;
+            getMechanic().setAmount(getMechanic().getAmount() - diff);
 
-                if (getMechanic().getAmount() == 0) {
-                    getMechanic().setStored(null);
-                }
-            });
-        }
+            if (getMechanic().getAmount() == 0) {
+                getMechanic().setStored(null);
+            }
+        });
     }
 
     private boolean handleInteract(ItemStack cursor) {
@@ -131,6 +130,10 @@ public class StorageBoxGui extends MechanicGui<StorageBox> {
                 }
             }
 
+            if (getMechanic().getTickThrottle().isThrottled()) {
+                return true;
+            }
+
             updateAmount();
             return false;
         }
@@ -145,8 +148,7 @@ public class StorageBoxGui extends MechanicGui<StorageBox> {
                 return true;
             }
 
-            updateAmount();
-            return false;
+            return getMechanic().getTickThrottle().isThrottled();
         }
 
         return true;
@@ -167,9 +169,16 @@ public class StorageBoxGui extends MechanicGui<StorageBox> {
                 return true;
             }
 
-            updateAmount();
+            return getMechanic().getTickThrottle().isThrottled();
         }
 
         return false;
+    }
+
+    @Override
+    public void onClickPost(InventoryClickEvent event) {
+        if (!event.isCancelled()) {
+            updateAmount();
+        }
     }
 }
