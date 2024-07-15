@@ -88,6 +88,7 @@ public class ConstructorGui extends MechanicGui<Constructor> {
                     && event.getClickedInventory() != null
                     && event.getClickedInventory() != getInventory()
                     && event.getCurrentItem() != null) {
+                // find all the crafting grid items where the item can be added to
                 int left = event.getCurrentItem().getAmount();
                 int i = 0;
                 while (left > 0 && i < 9) {
@@ -109,6 +110,8 @@ public class ConstructorGui extends MechanicGui<Constructor> {
                     rawItem.setAmount(left);
                 }
 
+                // we still have some items left, iterate over the crafting grid slots again
+                // and check if any of them are empty
                 if (left > 0) {
                     i = 0;
                     while (i < 9) {
