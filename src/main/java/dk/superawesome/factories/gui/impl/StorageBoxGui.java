@@ -47,15 +47,15 @@ public class StorageBoxGui extends MechanicGui<StorageBox> {
 
         if (getMechanic().getStored() != null) {
             int a = getMechanic().getAmount();
-            int i = -1;
-            while (a > 0 && i++ < 35) {
+            int i = 0;
+            while (a > 0 && i < 35) {
                 ItemStack item = getMechanic().getStored().clone();
                 int amount = Math.min(item.getMaxStackSize(), a);
 
                 item.setAmount(amount);
                 a -= amount;
 
-                getInventory().setItem(i, item);
+                getInventory().setItem(i++, item);
             }
         }
     }

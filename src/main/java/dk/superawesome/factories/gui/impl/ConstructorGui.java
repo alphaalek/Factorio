@@ -8,6 +8,7 @@ import dk.superawesome.factories.util.mappings.ItemMappings;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.*;
@@ -82,7 +83,51 @@ public class ConstructorGui extends MechanicGui<Constructor> {
     @Override
     public boolean onClickOpen(InventoryClickEvent event) {
         if (movedFromOtherInventory(event)) {
-            if (!CRAFTING_SLOTS.contains(event.getSlot())) {
+
+            if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY
+                    && event.getClickedInventory() != null
+                    && event.getClickedInventory() != getInventory()
+                    && event.getCurrentItem() != null) {
+                int left = event.getCurrentItem().getAmount();
+                int i = 0;
+                while (left > 0 && i < 9) {
+                    int slot = CRAFTING_SLOTS.get(i++);
+                    ItemStack crafting = getInventory().getItem(slot);
+
+                    if (crafting != null
+                            && crafting.isSimilar(event.getCurrentItem())
+                            && crafting.getAmount() < crafting.getMaxStackSize()) {
+                        int add = Math.min(left, crafting.getMaxStackSize() - crafting.getAmount());
+
+                        left -= add;
+                        crafting.setAmount(crafting.getAmount() + add);
+                    }
+                }
+
+                ItemStack rawItem = event.getClickedInventory().getItem(event.getSlot());
+                if (rawItem != null) {
+                    rawItem.setAmount(left);
+                }
+
+                if (left > 0) {
+                    i = 0;
+                    while (i < 9) {
+                        int slot = CRAFTING_SLOTS.get(i++);
+                        ItemStack crafting = getInventory().getItem(slot);
+
+                        if (crafting == null) {
+                            getInventory().setItem(slot, event.getCurrentItem());
+                            event.getClickedInventory().setItem(event.getSlot(), null);
+                            break;
+                        }
+                    }
+                }
+
+                return true;
+            }
+
+            if (!CRAFTING_SLOTS.contains(event.getSlot())
+                    && event.getClickedInventory() == getInventory()) {
                 return true;
             }
 
@@ -163,6 +208,10 @@ public class ConstructorGui extends MechanicGui<Constructor> {
         return items;
     }
 
+    private List<ItemStack> getOffer() {
+        return getOffer(getUpperCorner());
+    }
+
     private boolean handleUnspecific(ItemStack ingredient, ItemStack offer) {
         if (ingredient != null && offer != null && ingredient.hasItemMeta()) {
             Material mat = ingredient.getType();
@@ -230,7 +279,7 @@ public class ConstructorGui extends MechanicGui<Constructor> {
                             .map(c -> shapedRecipe.getIngredientMap().get(c))
                             .collect(Collectors.toList());
 
-                    List<ItemStack> offer = getOffer(getUpperCorner());
+                    List<ItemStack> offer = getOffer();
 
                     // check if the ingredients for the recipe matches the items in the crafting grid
                     for (int i = 0; i < ingredients.size(); i++) {

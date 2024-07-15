@@ -87,7 +87,6 @@ public class PipeRoute {
 
     public void start(ItemCollection collection) {
         int runId = currentId++;
-        Bukkit.getLogger().info(outputs + " " + runId);
 
         for (OutputPipeEntry entry : outputs) {
             entry.handle(runId, collection);

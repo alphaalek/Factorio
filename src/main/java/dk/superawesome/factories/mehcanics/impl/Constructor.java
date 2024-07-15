@@ -61,11 +61,6 @@ public class Constructor extends AbstractMechanic<Constructor> {
                     craft.setAmount(Math.min(craft.getMaxStackSize(), craft.getAmount() + stacks.get(0).getAmount()));
                 }
             }
-
-            Bukkit.getLogger().info("Updated " + craft);
-            if (inUse.get() != null) {
-                Bukkit.getLogger().info(inUse.get().getInventory().getItem(10) + " " + (inUse.get().getInventory().getItem(10) == craft));
-            }
         }
     }
 }
