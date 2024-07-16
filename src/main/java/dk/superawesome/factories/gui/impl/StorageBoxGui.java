@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import java.util.stream.IntStream;
 
 public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
+    private static final int STORED_SIZE = 35;
     private static final List<Integer> GRAY = Arrays.asList(45, 46, 47, 51, 53);
     private static final List<Integer> BLACK = IntStream.range(36, 45).boxed().collect(Collectors.toList());
 
@@ -46,14 +48,14 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         getInventory().setItem(49, new ItemStack(Material.MINECART));
 
         if (getMechanic().getStored() != null) {
-            int a = getMechanic().getAmount();
+            int left = getMechanic().getAmount();
             int i = 0;
-            while (a > 0 && i < 35) {
+            while (left > 0 && i < STORED_SIZE) {
                 ItemStack item = getMechanic().getStored().clone();
-                int amount = Math.min(item.getMaxStackSize(), a);
+                int amount = Math.min(item.getMaxStackSize(), left);
 
                 item.setAmount(amount);
-                a -= amount;
+                left -= amount;
 
                 getInventory().setItem(i++, item);
             }
@@ -62,7 +64,7 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     public List<ItemStack> findItems(boolean asc) {
         List<ItemStack> items = new ArrayList<>();
-        for (int i = asc ? 0 : 34; asc ? i < 35 : i > -1; i += asc ? 1 : -1) {
+        for (int i = asc ? 0 : STORED_SIZE - 1; asc ? i < STORED_SIZE : i > -1; i += asc ? 1 : -1) {
             ItemStack item = getInventory().getItem(i);
             if (item != null) {
                 items.add(item);
@@ -77,43 +79,18 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
     }
 
     public void updateAddedItems(int amount) {
-        int left = amount;
-        for (ItemStack item : findItems()) {
-            int add = Math.min(left, item.getMaxStackSize() - item.getAmount());
-
-            left -= add;
-            item.setAmount(item.getAmount() + add);
-
-            if (left == 0) {
-                break;
-            }
-        }
-
-        if (left > 0) {
-            for (int i = 0; i < 35; i++) {
-                ItemStack item = getInventory().getItem(i);
-                if (item == null) {
-                    ItemStack added = getMechanic().getStored().clone();
-                    added.setAmount(left);
-                    getInventory().setItem(i, added);
-                    break;
-                }
-            }
-        }
+        updateAddedItems(amount, getMechanic().getStored(),
+                IntStream.range(0, STORED_SIZE)
+                        .boxed()
+                        .collect(Collectors.toList()));
     }
 
     public void updateRemovedItems(int amount) {
-        int left = amount;
-        for (ItemStack item : findItems(false)) {
-            int remove = Math.min(left, item.getAmount());
-
-            left -= remove;
-            item.setAmount(item.getAmount() - remove);
-
-            if (left == 0) {
-                break;
-            }
-        }
+        updateRemovedItems(amount,
+                IntStream.range(0, STORED_SIZE)
+                        .boxed()
+                        .sorted(Collections.reverseOrder())
+                        .collect(Collectors.toList()));
     }
 
     @Override

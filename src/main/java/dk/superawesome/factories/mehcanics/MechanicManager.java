@@ -14,8 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MechanicManager implements Listener {
 
@@ -25,12 +24,27 @@ public class MechanicManager implements Listener {
         this.world = world;
 
         Bukkit.getPluginManager().registerEvents(this, Factories.get());
+
+        Bukkit.getScheduler().runTaskTimer(Factories.get(), this::handleThinking, 0L, 1L);
     }
 
     private final Map<BlockVector, Mechanic<?, ?>> mechanics = new HashMap<>();
+    private final Queue<ThinkingMechanic<?, ?>> thinkingMechanics = new LinkedList<>();
+
+    public void handleThinking() {
+        for (ThinkingMechanic<?, ?> thinking : thinkingMechanics) {
+            if (!thinking.getTickThrottle().isThrottled() && thinking.getDelayHandler().ready()) {
+                thinking.think();
+            }
+        }
+    }
 
     public void load(MechanicProfile<?, ?> profile, Location loc) {
         Mechanic<?, ?> mechanic = profile.getFactory().create(loc);
+        if (mechanic instanceof ThinkingMechanic) {
+            thinkingMechanics.add((ThinkingMechanic<?, ?>) mechanic);
+        }
+
         // TODO load from db
         mechanics.put(BlockUtil.getVec(loc), mechanic);
     }
