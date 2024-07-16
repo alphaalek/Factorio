@@ -2,7 +2,6 @@ package dk.superawesome.factories.gui;
 
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.util.Callback;
-import dk.superawesome.factories.util.mappings.ItemMappings;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventPriority;
@@ -14,7 +13,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicReference;
@@ -76,9 +74,6 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
     }
 
     protected static int DOUBLE_CHEST = 54;
-    protected static ItemStack GRAY = ItemMappings.get("gray_stained_glass_pane").generateItem();
-    protected static ItemStack BLACK = ItemMappings.get("black_stained_glass_pane").generateItem();
-
     protected boolean loaded = false;
     protected final Callback initCallback;
     protected final Inventory inventory;

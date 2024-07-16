@@ -6,15 +6,11 @@ import dk.superawesome.factories.listeners.PistonExtendListener;
 import dk.superawesome.factories.listeners.RedstoneSignalListener;
 import dk.superawesome.factories.mehcanics.MechanicManager;
 import dk.superawesome.factories.util.Tick;
-import dk.superawesome.factories.util.mappings.ItemMappings;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventException;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.EventExecutor;
-import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -34,8 +30,6 @@ public final class Factories extends JavaPlugin implements Listener {
             MechanicManager mm = new MechanicManager(world);
             mechanicManagers.put(world, mm);
         }
-
-        ItemMappings.load();
 
         Bukkit.getPluginManager().registerEvents(new RedstoneSignalListener(), this);
         Bukkit.getPluginManager().registerEvents(new ChunkLoadListener(), this);

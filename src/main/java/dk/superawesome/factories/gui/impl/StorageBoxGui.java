@@ -39,10 +39,10 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         super.loadItems();
 
         for (int i : GRAY) {
-            getInventory().setItem(i, BaseGui.GRAY);
+            getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
         for (int i : BLACK) {
-            getInventory().setItem(i, BaseGui.BLACK);
+            getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
         }
         getInventory().setItem(35, new ItemStack(Material.FEATHER));
         getInventory().setItem(49, new ItemStack(Material.MINECART));

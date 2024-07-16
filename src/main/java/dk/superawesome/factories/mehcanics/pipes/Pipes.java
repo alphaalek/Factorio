@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
 public class Pipes {
 
     public static void suckItems(Block start) {
-        if (!BlockUtil.stickyPiston.is(start)) {
+        if (!BlockUtil.stickyPiston.test(start.getType())) {
             return;
         }
 
@@ -66,7 +66,7 @@ public class Pipes {
                             || Math.abs(x) == 1 && Math.abs(z) == 1
                             || Math.abs(z) == 1 && Math.abs(y) == 1
                             || x == 0 && y == 0 && z == 0) {
-                        continue;
+                        continue; // can be simplified?
                     }
                     // we're left with the blocks that is directly next to the relative block
 
@@ -89,16 +89,16 @@ public class Pipes {
                 Material mat = rel.getType();
 
                 // piston = pipe output
-                if (BlockUtil.piston.is(mat, BlockUtil.getData(rel))) {
+                if (BlockUtil.piston.test(mat)) {
                     route.addOutput(from.getWorld(), relVec);
                 // glass = pipe expand
                 } else if (
                         mat == Material.GLASS
                                 ||
-                                BlockUtil.anyStainedGlass.is(mat, BlockUtil.getData(rel))
+                                BlockUtil.anyStainedGlass.test(mat)
                                         && (fromMat == mat
                                         || fromMat == Material.GLASS
-                                        || BlockUtil.stickyPiston.is(fromMat, BlockUtil.getData(from))
+                                        || BlockUtil.stickyPiston.test(fromMat)
                                 )
                 ) {
                     route.add(relVec);

@@ -2,7 +2,6 @@ package dk.superawesome.factories.mehcanics.profiles;
 
 import dk.superawesome.factories.building.Building;
 import dk.superawesome.factories.building.Buildings;
-import dk.superawesome.factories.gui.BaseGui;
 import dk.superawesome.factories.gui.GuiFactory;
 import dk.superawesome.factories.gui.impl.StorageBoxGui;
 import dk.superawesome.factories.mehcanics.MechanicFactory;
@@ -39,7 +38,7 @@ public class StorageBoxProfile implements MechanicProfile<StorageBox, StorageBox
 
     @Override
     public int getID() {
-        return 1;
+        return 2;
     }
 
     private static class StorageBoxMechanicFactory implements MechanicFactory<StorageBox> {

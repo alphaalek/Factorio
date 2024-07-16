@@ -14,8 +14,6 @@ import java.util.*;
 
 public class PipeRoute {
 
-    // TODO: cleanup cached routes when modified
-
     private static final Map<World, Map<BlockVector, PipeRoute>> cachedRoutes = new HashMap<>();
 
     public static PipeRoute getCachedRoute(World world, BlockVector vec) {

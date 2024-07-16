@@ -2,7 +2,7 @@ package dk.superawesome.factories.gui;
 
 import dk.superawesome.factories.mehcanics.Mechanic;
 import dk.superawesome.factories.util.Callback;
-import dk.superawesome.factories.util.mappings.ItemMappings;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
 
     @Override
     public void loadItems() {
-        getInventory().setItem(52, ItemMappings.get("writable_book").generateItem());
+        getInventory().setItem(52, new ItemStack(Material.WRITABLE_BOOK));
     }
 
     public M getMechanic() {

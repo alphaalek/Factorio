@@ -14,10 +14,10 @@ public class RedstoneSignalListener implements Listener {
         // TODO work only from power central
         if (event.getOldCurrent() == 0) {
             Block block = event.getBlock();
-            if (BlockUtil.diode.is(block)) {
+            if (BlockUtil.diode.test(block.getType())) {
                 Block pointingBlock = BlockUtil.getPointingBlock(block, true);
                 if (pointingBlock != null
-                        && BlockUtil.stickyPiston.is(pointingBlock)) {
+                        && BlockUtil.stickyPiston.test(pointingBlock.getType())) {
                     Pipes.suckItems(pointingBlock);
                 }
             }

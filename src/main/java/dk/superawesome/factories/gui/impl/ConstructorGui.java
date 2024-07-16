@@ -1,10 +1,8 @@
 package dk.superawesome.factories.gui.impl;
 
 import dk.superawesome.factories.Factories;
-import dk.superawesome.factories.gui.BaseGui;
 import dk.superawesome.factories.gui.MechanicGui;
 import dk.superawesome.factories.mehcanics.impl.Constructor;
-import dk.superawesome.factories.util.mappings.ItemMappings;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -39,13 +37,13 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         super.loadItems();
 
         for (int i : GRAY) {
-            getInventory().setItem(i, BaseGui.GRAY);
+            getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
         for (int i : BLACK) {
-            getInventory().setItem(i, BaseGui.BLACK);
+            getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
         }
         for (int i = 37; i <= 39; i++) {
-            getInventory().setItem(i, ItemMappings.get("crafting_table").generateItem());
+            getInventory().setItem(i, new ItemStack(Material.CRAFTING_TABLE));
         }
         getInventory().setItem(35, new ItemStack(Material.FEATHER, 1));
 

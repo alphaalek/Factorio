@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Constructor implements Building {
+public class Smelter implements Building {
 
     private final List<BlockVector> relatives = Arrays.asList(
             new BlockVector(),
@@ -21,8 +21,8 @@ public class Constructor implements Building {
     );
 
     private final List<Consumer<Location>> blocks = Arrays.asList(
-            l -> l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(0))).setType(Material.OAK_WOOD),
-            l -> l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(1))).setType(Material.CRAFTING_TABLE),
+            l -> l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(0))).setType(Material.COBBLESTONE),
+            l -> l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(1))).setType(Material.BLAST_FURNACE),
             l -> {
                 Block block = l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(2)));
                 block.setType(Material.OAK_WALL_SIGN);
@@ -42,6 +42,6 @@ public class Constructor implements Building {
 
     @Override
     public int getID() {
-        return Profiles.CONSTRUCTOR.getID();
+        return Profiles.SMELTER.getID();
     }
 }
