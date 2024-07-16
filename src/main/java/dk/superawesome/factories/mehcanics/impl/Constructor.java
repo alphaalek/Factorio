@@ -104,7 +104,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
             if (crafting != null && crafting.getAmount() == 1) {
                 // re-set the amounts if the constructor did not have enough items for the recipe
                 for (int j = 0; j < i; j++) {
-                    ItemStack reSetCrafting = craftingGridItems[i];
+                    ItemStack reSetCrafting = craftingGridItems[j];
                     if (reSetCrafting != null) {
                         reSetCrafting.setAmount(reSetCrafting.getAmount() + 1);
                     }

@@ -22,7 +22,6 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     private static final int GRID_WIDTH = 3;
     private static final int GRID_HEIGHT = 3;
-    private static final ItemStack EMPTY_CRAFT = new ItemStack(Material.AIR);
     private static final List<Integer> GRAY = Arrays.asList(0, 1, 2, 3, 5, 6, 7, 8, 9, 18, 27, 36, 45, 46, 48, 49, 50, 51, 53);
     private static final List<Integer> BLACK = Arrays.asList(4, 13, 22, 31, 40, 41, 42, 43, 44);
     private static final List<Integer> CRAFTING_SLOTS = Arrays.asList(10, 11, 12, 19, 20, 21, 28, 29, 30);
@@ -274,7 +273,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             getMechanic().getCraftingGridItems()[i] = getInventory().getItem(CRAFTING_SLOTS.get(i));
         }
 
-        this.craft = EMPTY_CRAFT;
+        this.craft = null;
 
         // check if the crafting grid contains any items, if we find any, search for a recipe matching the items
         if (getOffer(CRAFTING_SLOTS.get(0)).stream().anyMatch(Objects::nonNull)) {
