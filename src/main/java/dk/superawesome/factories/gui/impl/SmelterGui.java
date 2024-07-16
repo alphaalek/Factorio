@@ -160,8 +160,6 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             // get the difference in the items of the current inventory view of the storage box
             int diff = before - after;
             applyDiff.accept(diff);
-
-            Bukkit.getLogger().info("Ingredients " + getMechanic().getIngredient() + " " + getMechanic().getIngredientAmount() + ", Fuel: " + getMechanic().getFuelAmount());
         });
     }
 
