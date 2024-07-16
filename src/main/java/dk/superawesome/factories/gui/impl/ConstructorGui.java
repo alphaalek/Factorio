@@ -72,7 +72,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                 item.setAmount(amount);
                 left -= amount;
 
-                getInventory().setItem(i++, item);
+                getInventory().setItem(STORED_SLOTS.get(i++), item);
             }
         }
     }
