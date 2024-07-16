@@ -5,6 +5,7 @@ import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.mehcanics.AbstractMechanic;
 import dk.superawesome.factories.mehcanics.MechanicProfile;
 import dk.superawesome.factories.mehcanics.Profiles;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,11 +48,17 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> {
             return;
         }
 
-        if (collection.has(stored)) {
+        if (stored == null || collection.has(stored)) {
             List<ItemStack> items = collection.take(64);
             int add = 0;
             for (ItemStack item : items) {
                 add += item.getAmount();
+
+                if (this.stored == null) {
+                    ItemStack type = item.clone();
+                    type.setAmount(1);
+                    this.stored = type;
+                }
             }
 
             if (add > 0) {
