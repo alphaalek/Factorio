@@ -9,14 +9,16 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
@@ -49,6 +51,16 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             getInventory().setItem(i, new ItemStack(Material.FURNACE));
         }
         getInventory().setItem(35, new ItemStack(Material.FEATHER));
+
+        if (getMechanic().getIngredient() != null) {
+            loadStorageTypes(getMechanic().getIngredient(), getMechanic().getIngredientAmount(), INGREDIENT_SLOTS);
+        }
+        if (getMechanic().getFuel() != null) {
+            loadStorageTypes(new ItemStack(getMechanic().getFuel().getMaterial()), getMechanic().getFuelAmount(), FUEL_SLOTS);
+        }
+        if (getMechanic().getStorageType() != null) {
+            loadStorageTypes(getMechanic().getStorageType(), getMechanic().getStorageAmount(), STORAGE_SLOTS);
+        }
     }
 
     @Override
@@ -66,7 +78,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
         for (ItemStack item : event.getNewItems().values()) {
             if (modifyIngredients
-                    && (Fuel.isFuel(item.getType()) || handleInteractIngredient(item))) {
+                    && (!canSmelt(item.getType()) || handleInteractIngredient(item))) {
                 return true;
             }
 
@@ -74,6 +86,14 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                     && (!Fuel.isFuel(item.getType()) || handleInteractFuel(item))) {
                 return true;
             }
+        }
+
+        if (modifyIngredients) {
+            updateIngredients();
+        }
+
+        if (modifyFuel) {
+            updateFuel();
         }
 
         return false;
@@ -100,9 +120,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     }
 
     private boolean handleInteractIngredient(ItemStack cursor) {
-        return handleInteract(cursor,
-                () -> getMechanic().getIngredient(),
-                i -> getMechanic().setIngredient(i));
+        return handleInteract(cursor, () -> getMechanic().getIngredient(), i -> getMechanic().setIngredient(i));
     }
 
     private boolean handleInteractFuel(ItemStack cursor) {
@@ -125,14 +143,35 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             int diff = before - after;
             applyDiff.accept(diff);
 
-            Bukkit.getLogger().info("Fuel " + getMechanic().getFuelAmount() + ", Ingredient " + getMechanic().getIngredient() + " " + getMechanic().getIngredientAmount());
+            Bukkit.getLogger().info("Ingredients " + getMechanic().getIngredient() + " " + getMechanic().getIngredientAmount() + ", Fuel: " + getMechanic().getFuelAmount());
         });
+    }
+
+    public void updateAddedStorage(int amount) {
+        updateAddedItems(amount, getMechanic().getStorageType(), STORAGE_SLOTS);
+    }
+
+    public void updateRemovedStorage(int amount) {
+        updateRemovedItems(amount,
+                IntStream.range(0, STORAGE_SLOTS.size())
+                        .boxed()
+                        .map(STORAGE_SLOTS::get)
+                        .sorted(Collections.reverseOrder())
+                        .collect(Collectors.toList()));
+    }
+
+    public void updateRemovedIngredients(int amount) {
+        updateRemovedItems(amount, INGREDIENT_SLOTS);
+    }
+
+    public void updateRemovedFuel(int amount) {
+        updateRemovedItems(amount, FUEL_SLOTS);
     }
 
     @Override
     public boolean onClickIn(InventoryClickEvent event) {
         if (INGREDIENT_SLOTS.contains(event.getSlot())) {
-            if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR && Fuel.isFuel(event.getCursor().getType()))
+            if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR && !canSmelt(event.getCursor().getType()))
                     || handleInteractIngredient(event.getCursor())) {
                 return true;
             }
@@ -169,7 +208,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     @Override
     public boolean onClickOpen(InventoryClickEvent event) {
         if (movedFromOtherInventory(event)) {
-            if (event.getClickedInventory() != null && event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+            if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY && event.getClickedInventory() != null) {
 
                 if (event.getClickedInventory() == getInventory()) {
                     if (INGREDIENT_SLOTS.contains(event.getSlot())) {
@@ -181,7 +220,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                     ItemStack item = event.getClickedInventory().getItem(event.getSlot());
                     if (item != null) {
                         int a = item.getAmount();
-                        if (!Fuel.isFuel(item.getType())
+                        if (canSmelt(item.getType())
                                 && !handleInteractIngredient(item)) {
                             addItemsToSlots(item, INGREDIENT_SLOTS);
 
@@ -201,22 +240,29 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                 }
             }
 
+            if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR && event.getCursor() != null) {
+                if (getMechanic().getIngredient() != null && event.getCursor().isSimilar(getMechanic().getIngredient())) {
+                    updateIngredientsPost = true;
+                }
+
+                if (getMechanic().getFuel() != null && event.getCursor().getType() == getMechanic().getFuel().getMaterial()) {
+                    updateFuelPost = true;
+                }
+            }
+
             if ((event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD || event.getAction() == InventoryAction.HOTBAR_SWAP)) {
                 ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
 
-                // TODO fix
                 if ((updateIngredientsPost = INGREDIENT_SLOTS.contains(event.getSlot()))
-                        && (event.getCurrentItem() == null || find(INGREDIENT_SLOTS).size() > 1)
-                        && (hotbarItem == null || Fuel.isFuel(hotbarItem.getType()))
+                        && (find(INGREDIENT_SLOTS).size() > 1 || (hotbarItem != null && canSmelt(hotbarItem.getType())))
                         && handleInteractIngredient(hotbarItem)) {
                     updateIngredientsPost = false;
                     return true;
                 }
 
                 if ((updateFuelPost = FUEL_SLOTS.contains(event.getSlot()))
-                        && (event.getCurrentItem() == null || find(FUEL_SLOTS).size() > 1)
-                        && (hotbarItem == null || !Fuel.isFuel(hotbarItem.getType()))
-                        && handleInteractFuel(event.getWhoClicked().getInventory().getItem(event.getHotbarButton()))) {
+                        && (find(FUEL_SLOTS).size() > 1 || (hotbarItem != null && !Fuel.isFuel(hotbarItem.getType())))
+                        && handleInteractFuel(hotbarItem)) {
                     updateFuelPost = false;
                     return true;
                 }
@@ -228,27 +274,57 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         return false;
     }
 
+    private boolean canSmelt(Material type) {
+        if (getMechanic().getSmeltResult() != null && getMechanic().getSmeltResult().getType() == type) {
+            return true;
+        }
+
+        Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
+        while (recipeIterator.hasNext()) {
+            Recipe recipe = recipeIterator.next();
+
+            if (recipe instanceof FurnaceRecipe) {
+                FurnaceRecipe furnaceRecipe = (FurnaceRecipe) recipe;
+                if (furnaceRecipe.getInput().getType() == type) {
+                    getMechanic().setSmeltResult(furnaceRecipe.getResult());
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void updateIngredients() {
+        updateAmount(INGREDIENT_SLOTS, diff -> {
+            getMechanic().setIngredientAmount(getMechanic().getIngredientAmount() - diff);
+
+            if (getMechanic().getIngredientAmount() == 0) {
+                getMechanic().setIngredient(null);
+                getMechanic().setSmeltResult(null);
+            }
+        });
+    }
+
+    private void updateFuel() {
+        updateAmount(FUEL_SLOTS, diff -> {
+            getMechanic().setFuelAmount(getMechanic().getFuelAmount() - diff);
+
+            if (getMechanic().getFuelAmount() == 0) {
+                getMechanic().setFuel(null);
+            }
+        });
+    }
+
     private boolean updateIngredientsPost;
     private boolean updateFuelPost;
 
     @Override
     public void onClickPost(InventoryClickEvent event) {
-        if (updateIngredientsPost && !getMechanic().getTickThrottle().isThrottled()) {
-            updateAmount(INGREDIENT_SLOTS, diff -> {
-                getMechanic().setIngredientAmount(getMechanic().getIngredientAmount() - diff);
-
-                if (getMechanic().getIngredientAmount() == 0) {
-                    getMechanic().setIngredient(null);
-                }
-            });
-        } else if (updateFuelPost && !getMechanic().getTickThrottle().isThrottled()) {
-            updateAmount(FUEL_SLOTS, diff -> {
-                getMechanic().setFuelAmount(getMechanic().getFuelAmount() - diff);
-
-                if (getMechanic().getFuelAmount() == 0) {
-                    getMechanic().setFuel(null);
-                }
-            });
+        if (updateIngredientsPost) {
+            updateIngredients();
+        } else if (updateFuelPost) {
+            updateFuel();
         }
 
         updateIngredientsPost = false;

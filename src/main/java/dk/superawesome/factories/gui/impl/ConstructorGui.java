@@ -60,17 +60,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         }
 
         if (getMechanic().getStorageType() != null) {
-            int left = getMechanic().getStorageAmount();
-            int i = 0;
-            while (left > 0 && i < STORAGE_SLOTS.size()) {
-                ItemStack item = getMechanic().getStorageType().clone();
-                int amount = Math.min(item.getMaxStackSize(), left);
-
-                item.setAmount(amount);
-                left -= amount;
-
-                getInventory().setItem(STORAGE_SLOTS.get(i++), item);
-            }
+            loadStorageTypes(getMechanic().getStorageType(), getMechanic().getStorageAmount(), STORAGE_SLOTS);
         }
     }
 
@@ -181,11 +171,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     }
 
     public void updateAddedItems(int amount) {
-        updateAddedItems(amount, getMechanic().getStorageType(),
-                IntStream.range(0, STORAGE_SLOTS.size())
-                        .boxed()
-                        .map(STORAGE_SLOTS::get)
-                        .collect(Collectors.toList()));
+        updateAddedItems(amount, getMechanic().getStorageType(), STORAGE_SLOTS);
     }
 
     public void updateRemovedItems(int amount) {

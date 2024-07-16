@@ -47,17 +47,7 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         getInventory().setItem(49, new ItemStack(Material.MINECART));
 
         if (getMechanic().getStored() != null) {
-            int left = getMechanic().getAmount();
-            int i = 0;
-            while (left > 0 && i < STORED_SIZE) {
-                ItemStack item = getMechanic().getStored().clone();
-                int amount = Math.min(item.getMaxStackSize(), left);
-
-                item.setAmount(amount);
-                left -= amount;
-
-                getInventory().setItem(i++, item);
-            }
+            loadStorageTypes(getMechanic().getStored(), getMechanic().getAmount(), IntStream.range(0, STORED_SIZE).boxed().collect(Collectors.toList()));
         }
     }
 
