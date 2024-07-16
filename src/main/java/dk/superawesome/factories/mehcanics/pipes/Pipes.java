@@ -1,5 +1,6 @@
 package dk.superawesome.factories.mehcanics.pipes;
 
+import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.mehcanics.pipes.events.PipeSuckEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
@@ -110,19 +111,23 @@ public class Pipes {
     public static void updateNearbyRoutes(Block block) {
         BlockVector fromVec = BlockUtil.getVec(block);
 
-        // iterate over all blocks around this block
-        for (BlockVector relVec : getRelativeVecs(fromVec)) {
-            PipeRoute route = PipeRoute.getCachedRoute(block.getWorld(), relVec);
-            if (route != null) {
-                if (block.getType() == Material.AIR) {
-                    // the pipe was broken
-                    route.clear();
-                    expandRoute(route, BlockUtil.getBlock(block.getWorld(), relVec));
-                } else {
-                    // the pipe was expanded
-                    expandRoute(route, block);
+        // check blocks in next tick, because we are calling this in a block/break event
+        Bukkit.getScheduler().runTask(Factories.get(), () -> {
+            // iterate over all blocks around this block
+            for (BlockVector relVec : getRelativeVecs(fromVec)) {
+
+                PipeRoute route = PipeRoute.getCachedRoute(block.getWorld(), relVec);
+                if (route != null) {
+                    if (block.getType() == Material.AIR) {
+                        // the pipe was broken
+                        route.clear();
+                        expandRoute(route, BlockUtil.getBlock(block.getWorld(), relVec));
+                    } else {
+                        // the pipe was expanded
+                        expandRoute(route, block);
+                    }
                 }
             }
-        }
+        });
     }
 }
