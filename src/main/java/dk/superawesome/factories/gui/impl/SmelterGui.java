@@ -9,11 +9,13 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -44,9 +46,6 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         for (int i : BLACK) {
             getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
         }
-        for (int i : RED) {
-            getInventory().setItem(i, new ItemStack(Material.RED_STAINED_GLASS_PANE));
-        }
         for (int i = 3; i < 5; i++) {
             getInventory().setItem(i, new ItemStack(Material.FURNACE));
         }
@@ -61,6 +60,8 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         if (getMechanic().getStorageType() != null) {
             loadStorageTypes(getMechanic().getStorageType(), getMechanic().getStorageAmount(), STORAGE_SLOTS);
         }
+
+        updateFuelState();
     }
 
     @Override
@@ -117,6 +118,23 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         }
 
         return false;
+    }
+
+    public void updateFuelState() {
+        int blaze = Math.round(getMechanic().getCurrentFuelAmount() * 5f);
+        AtomicInteger times = new AtomicInteger();
+        IntStream.range(0, RED.size())
+                .boxed()
+                .map(RED::get)
+                .sorted(Collections.reverseOrder())
+                .forEach(i -> {
+                     if (times.incrementAndGet() > blaze) {
+                         getInventory().setItem(i, new ItemStack(Material.RED_STAINED_GLASS_PANE));
+                         return;
+                     }
+
+                     getInventory().setItem(i, new ItemStack(Material.BLAZE_POWDER));
+                });
     }
 
     private boolean handleInteractIngredient(ItemStack cursor) {

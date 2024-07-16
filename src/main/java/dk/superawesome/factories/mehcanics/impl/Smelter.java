@@ -161,6 +161,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         if (gui != null) {
             gui.updateRemovedIngredients(1);
             gui.updateAddedStorage(smeltResult.getAmount());
+            gui.updateFuelState();
         }
     }
 
@@ -241,5 +242,9 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
     public void setStorageAmount(int amount) {
         this.storageAmount = amount;
+    }
+
+    public float getCurrentFuelAmount() {
+        return currentFuelAmount;
     }
 }
