@@ -4,7 +4,7 @@ import dk.superawesome.factories.mehcanics.Mechanic;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public interface GuiFactory<M extends Mechanic<M>, G extends BaseGui> {
+public interface GuiFactory<M extends Mechanic<M, G>, G extends BaseGui<G>> {
 
-    G create(M mechanic, AtomicReference<BaseGui> inUseReference);
+    G create(M mechanic, AtomicReference<G> inUseReference);
 }

@@ -5,7 +5,7 @@ import dk.superawesome.factories.gui.BaseGui;
 import dk.superawesome.factories.gui.GuiFactory;
 import dk.superawesome.factories.util.Identifiable;
 
-public interface MechanicProfile<M extends Mechanic<M>> extends Identifiable {
+public interface MechanicProfile<M extends Mechanic<M, G>, G extends BaseGui<G>> extends Identifiable {
 
     String getName();
 
@@ -13,5 +13,5 @@ public interface MechanicProfile<M extends Mechanic<M>> extends Identifiable {
 
     MechanicFactory<M> getFactory();
 
-    GuiFactory<M, ? extends BaseGui> getGuiFactory();
+    GuiFactory<M, G> getGuiFactory();
 }

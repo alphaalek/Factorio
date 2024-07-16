@@ -35,11 +35,11 @@ public class ChunkLoadListener implements Listener {
                         .replaceAll("]", "")
                         .replaceAll("\\[", "");
 
-                Optional<MechanicProfile<?>> productionTypeOptional = Profiles.getProfiles()
+                Optional<MechanicProfile<?, ?>> mechanicProfile = Profiles.getProfiles()
                         .stream()
                         .filter(b -> b.getName().equals(type))
                         .findFirst();
-                if (!productionTypeOptional.isPresent()) {
+                if (!mechanicProfile.isPresent()) {
                     continue;
                 }
 
@@ -52,7 +52,7 @@ public class ChunkLoadListener implements Listener {
                 // TODO doesn't always load
 
                 // load this mechanic
-                Factories.get().getMechanicManager(world).load(productionTypeOptional.get(), on.getLocation());
+                Factories.get().getMechanicManager(world).load(mechanicProfile.get(), on.getLocation());
             }
         }
     }

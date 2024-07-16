@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public class ConstructorGui extends MechanicGui<Constructor> {
+public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     private static final int GRID_WIDTH = 3;
     private static final int GRID_HEIGHT = 3;
@@ -28,7 +28,7 @@ public class ConstructorGui extends MechanicGui<Constructor> {
 
     private ItemStack craft;
 
-    public ConstructorGui(Constructor constructor, AtomicReference<BaseGui> inUseReference) {
+    public ConstructorGui(Constructor constructor, AtomicReference<ConstructorGui> inUseReference) {
         super(constructor, inUseReference, new InitCallbackHolder());
         initCallback.call();
     }
@@ -119,7 +119,7 @@ public class ConstructorGui extends MechanicGui<Constructor> {
                         ItemStack crafting = getInventory().getItem(slot);
 
                         if (crafting == null) {
-                            getInventory().setItem(slot, event.getCurrentItem());
+                            getInventory().setItem(slot, rawItem);
                             event.getClickedInventory().setItem(event.getSlot(), null);
                             break;
                         }

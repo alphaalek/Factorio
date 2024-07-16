@@ -16,7 +16,7 @@ public class InteractListener implements Listener {
         Block clicked = event.getClickedBlock();
         if (clicked != null) {
             MechanicManager manager = Factories.get().getMechanicManager(clicked.getWorld());
-            Mechanic<?> mechanic = manager.getMechanicPartially(clicked.getLocation());
+            Mechanic<?, ?> mechanic = manager.getMechanicPartially(clicked.getLocation());
             if (mechanic != null) {
                 event.setCancelled(true);
                 mechanic.openInventory(event.getPlayer());

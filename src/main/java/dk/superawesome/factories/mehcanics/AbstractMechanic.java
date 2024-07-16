@@ -3,7 +3,6 @@ package dk.superawesome.factories.mehcanics;
 import dk.superawesome.factories.gui.BaseGui;
 import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.util.TickThrottle;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -12,9 +11,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechanic<M>, ItemCollection {
+public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseGui<G>> implements Mechanic<M, G>, ItemCollection {
 
-    protected final AtomicReference<BaseGui> inUse = new AtomicReference<>();
+    protected final AtomicReference<G> inUse = new AtomicReference<>();
     protected final TickThrottle tickThrottle = new TickThrottle();
     protected final Location loc;
 
@@ -38,13 +37,13 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     @Override
     public void openInventory(Player player) {
-        BaseGui inUse = this.inUse.get();
+        G inUse = this.inUse.get();
         if (inUse != null) {
             player.openInventory(inUse.getInventory());
             return;
         }
 
-        BaseGui gui = getProfile().getGuiFactory().create((M) this, this.inUse);
+        G gui = getProfile().getGuiFactory().create((M) this, this.inUse);
         player.openInventory(gui.getInventory());
     }
 

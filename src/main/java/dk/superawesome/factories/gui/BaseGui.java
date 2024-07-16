@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-public abstract class BaseGui implements InventoryHolder, Listener {
+public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, Listener {
 
     static {
         Factories.get().registerEvent(InventoryCloseEvent.class, EventPriority.LOWEST, e -> {
@@ -34,25 +34,25 @@ public abstract class BaseGui implements InventoryHolder, Listener {
         Factories.get().registerEvent(InventoryDragEvent.class, EventPriority.LOWEST, e -> {
             InventoryHolder holder = e.getInventory().getHolder();
             if (holder instanceof BaseGui) {
-                boolean cancelled = ((BaseGui)holder).onDrag(e);
+                boolean cancelled = ((BaseGui<?>)holder).onDrag(e);
                 e.setCancelled(cancelled);
             }
         });
 
         Factories.get().registerEvent(InventoryClickEvent.class, EventPriority.LOWEST, e -> {
-            BaseGui gui = null;
+            BaseGui<?> gui = null;
             Inventory inv = e.getClickedInventory();
             if (inv != null) {
                 InventoryHolder holder = inv.getHolder();
                 if (holder instanceof BaseGui) {
-                    boolean cancelled = (gui = ((BaseGui)holder)).onClickIn(e);
+                    boolean cancelled = (gui = ((BaseGui<?>)holder)).onClickIn(e);
                     e.setCancelled(cancelled);
                 }
             }
 
             InventoryHolder holder = e.getWhoClicked().getOpenInventory().getTopInventory().getHolder();
             if (holder instanceof BaseGui) {
-                boolean cancelled = (gui = ((BaseGui)holder)).onClickOpen(e);
+                boolean cancelled = (gui = ((BaseGui<?>)holder)).onClickOpen(e);
                 if (!e.isCancelled()) {
                     e.setCancelled(cancelled);
                 }
@@ -66,7 +66,7 @@ public abstract class BaseGui implements InventoryHolder, Listener {
 
     private static void closeGui(InventoryHolder holder, HumanEntity player) {
         if (holder instanceof BaseGui) {
-            BaseGui gui = (BaseGui) holder;
+            BaseGui<?> gui = (BaseGui<?>) holder;
             gui.onClose();
 
             if (holder.getInventory().getViewers().stream().noneMatch(p -> p != player)) {
@@ -83,15 +83,15 @@ public abstract class BaseGui implements InventoryHolder, Listener {
     protected final Callback initCallback;
     protected final Inventory inventory;
 
-    private final AtomicReference<BaseGui> inUseReference;
+    private final AtomicReference<G> inUseReference;
 
-    public BaseGui(Supplier<Callback> initCallback, AtomicReference<BaseGui> inUseReference, int size, String title) {
+    public BaseGui(Supplier<Callback> initCallback, AtomicReference<G> inUseReference, int size, String title) {
         this.inventory = Bukkit.createInventory(this, size, title);
         this.initCallback = initCallback.get();
         this.initCallback.add(this::loadItems);
         this.loaded = true;
         this.inUseReference = inUseReference;
-        this.inUseReference.set(this);
+        this.inUseReference.set((G) this);
     }
 
     private void clearInUse() {

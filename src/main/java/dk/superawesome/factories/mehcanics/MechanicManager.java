@@ -27,15 +27,15 @@ public class MechanicManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, Factories.get());
     }
 
-    private final Map<BlockVector, Mechanic<?>> mechanics = new HashMap<>();
+    private final Map<BlockVector, Mechanic<?, ?>> mechanics = new HashMap<>();
 
-    public void load(MechanicProfile<?> profile, Location loc) {
-        Mechanic<?> mechanic = profile.getFactory().create(loc);
+    public void load(MechanicProfile<?, ?> profile, Location loc) {
+        Mechanic<?, ?> mechanic = profile.getFactory().create(loc);
         // TODO load from db
         mechanics.put(BlockUtil.getVec(loc), mechanic);
     }
 
-    public Mechanic<?> getNearbyMechanic(Location loc) {
+    public Mechanic<?, ?> getNearbyMechanic(Location loc) {
 
         BlockVector ori = BlockUtil.getVec(loc);
 
@@ -54,10 +54,10 @@ public class MechanicManager implements Listener {
         return null;
     }
 
-    public Mechanic<?> getMechanicPartially(Location loc) {
-        Mechanic<?> nearby = getNearbyMechanic(loc);
+    public Mechanic<?, ?> getMechanicPartially(Location loc) {
+        Mechanic<?, ?> nearby = getNearbyMechanic(loc);
         if (nearby != null) {
-            if (Buildings.intersect(loc, nearby)) {
+            if (Buildings.intersects(loc, nearby)) {
                 return nearby;
             }
         }
@@ -65,14 +65,14 @@ public class MechanicManager implements Listener {
         return null;
     }
 
-    public Mechanic<?> getMechanicAt(Location loc) {
+    public Mechanic<?, ?> getMechanicAt(Location loc) {
         return mechanics.get(BlockUtil.getVec(loc));
     }
 
     @EventHandler
     public void onPipeSuck(PipeSuckEvent event) {
         if (event.getBlock().getWorld().equals(this.world)) {
-            Mechanic<?> mechanic = getMechanicAt(event.getBlock().getLocation());
+            Mechanic<?, ?> mechanic = getMechanicAt(event.getBlock().getLocation());
             if (mechanic instanceof ItemCollection) {
                 event.setItems((ItemCollection) mechanic);
             }
@@ -82,7 +82,7 @@ public class MechanicManager implements Listener {
     @EventHandler
     public void onPipePut(PipePutEvent event) {
         if (event.getBlock().getWorld().equals(this.world)) {
-            Mechanic<?> mechanic = getMechanicAt(event.getBlock().getLocation());
+            Mechanic<?, ?> mechanic = getMechanicAt(event.getBlock().getLocation());
             if (mechanic != null) {
                 mechanic.pipePut(event.getItems());
             }

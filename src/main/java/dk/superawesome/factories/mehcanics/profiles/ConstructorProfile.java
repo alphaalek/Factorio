@@ -12,7 +12,7 @@ import org.bukkit.Location;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ConstructorProfile implements MechanicProfile<Constructor> {
+public class ConstructorProfile implements MechanicProfile<Constructor, ConstructorGui> {
 
     private final MechanicFactory<Constructor> factory = new ConstructorMechanicFactory();
     private final GuiFactory<Constructor, ConstructorGui> guiFactory = new ConstructorGuiFactory();
@@ -53,7 +53,7 @@ public class ConstructorProfile implements MechanicProfile<Constructor> {
     private static class ConstructorGuiFactory implements GuiFactory<Constructor, ConstructorGui> {
 
         @Override
-        public ConstructorGui create(Constructor constructor, AtomicReference<BaseGui> inUseReference) {
+        public ConstructorGui create(Constructor constructor, AtomicReference<ConstructorGui> inUseReference) {
             return new ConstructorGui(constructor, inUseReference);
         }
     }

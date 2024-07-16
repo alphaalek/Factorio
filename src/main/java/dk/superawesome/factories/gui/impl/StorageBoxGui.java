@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class StorageBoxGui extends MechanicGui<StorageBox> {
+public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     private static final List<Integer> GRAY = Arrays.asList(45, 46, 47, 51, 53);
     private static final List<Integer> BLACK = IntStream.range(36, 45).boxed().collect(Collectors.toList());
@@ -27,7 +27,7 @@ public class StorageBoxGui extends MechanicGui<StorageBox> {
         BLACK.addAll(Arrays.asList(48, 50));
     }
 
-    public StorageBoxGui(StorageBox mechanic, AtomicReference<BaseGui> inUseReference) {
+    public StorageBoxGui(StorageBox mechanic, AtomicReference<StorageBoxGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder());
         initCallback.call();
     }
@@ -60,9 +60,9 @@ public class StorageBoxGui extends MechanicGui<StorageBox> {
         }
     }
 
-    public List<ItemStack> findItems() {
+    public List<ItemStack> findItems(boolean asc) {
         List<ItemStack> items = new ArrayList<>();
-        for (int i = 0; i < 35; i++) {
+        for (int i = asc ? 0 : 34; asc ? i < 35 : i > -1; i += asc ? 1 : -1) {
             ItemStack item = getInventory().getItem(i);
             if (item != null) {
                 items.add(item);
@@ -70,6 +70,50 @@ public class StorageBoxGui extends MechanicGui<StorageBox> {
         }
 
         return items;
+    }
+
+    public List<ItemStack> findItems() {
+        return findItems(true);
+    }
+
+    public void updateAddedItems(int amount) {
+        int left = amount;
+        for (ItemStack item : findItems()) {
+            int add = Math.min(left, item.getMaxStackSize() - item.getAmount());
+
+            left -= add;
+            item.setAmount(item.getAmount() + add);
+
+            if (left == 0) {
+                break;
+            }
+        }
+
+        if (left > 0) {
+            for (int i = 0; i < 35; i++) {
+                ItemStack item = getInventory().getItem(i);
+                if (item == null) {
+                    ItemStack added = getMechanic().getStored().clone();
+                    added.setAmount(left);
+                    getInventory().setItem(i, added);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void updateRemovedItems(int amount) {
+        int left = amount;
+        for (ItemStack item : findItems(false)) {
+            int remove = Math.min(left, item.getAmount());
+
+            left -= remove;
+            item.setAmount(item.getAmount() - remove);
+
+            if (left == 0) {
+                break;
+            }
+        }
     }
 
     @Override

@@ -1,5 +1,8 @@
 package dk.superawesome.factories.mehcanics;
 
+import dk.superawesome.factories.gui.BaseGui;
+import dk.superawesome.factories.gui.impl.ConstructorGui;
+import dk.superawesome.factories.gui.impl.StorageBoxGui;
 import dk.superawesome.factories.mehcanics.impl.Constructor;
 import dk.superawesome.factories.mehcanics.impl.StorageBox;
 import dk.superawesome.factories.mehcanics.profiles.ConstructorProfile;
@@ -8,8 +11,8 @@ import dk.superawesome.factories.util.Array;
 
 public class Profiles {
 
-    public static MechanicProfile<Constructor> CONSTRUCTOR;
-    public static MechanicProfile<StorageBox> STORAGE_BOX;
+    public static MechanicProfile<Constructor, ConstructorGui> CONSTRUCTOR;
+    public static MechanicProfile<StorageBox, StorageBoxGui> STORAGE_BOX;
 
     static {
         profiles = new Array<>();
@@ -18,14 +21,14 @@ public class Profiles {
         STORAGE_BOX = loadProfile(new StorageBoxProfile());
     }
 
-    private static final Array<MechanicProfile<?>> profiles;
+    private static final Array<MechanicProfile<?, ?>> profiles;
 
-    public static <M extends Mechanic<M>> MechanicProfile<M> loadProfile(MechanicProfile<M> production) {
+    public static <M extends Mechanic<M, G>, G extends BaseGui<G>> MechanicProfile<M, G> loadProfile(MechanicProfile<M, G> production) {
         profiles.set(production, production);
         return production;
     }
 
-    public static Array<MechanicProfile<?>> getProfiles() {
+    public static Array<MechanicProfile<?, ?>> getProfiles() {
         return profiles;
     }
 }

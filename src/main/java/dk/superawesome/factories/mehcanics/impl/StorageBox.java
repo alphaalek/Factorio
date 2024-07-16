@@ -1,5 +1,6 @@
 package dk.superawesome.factories.mehcanics.impl;
 
+import dk.superawesome.factories.gui.impl.StorageBoxGui;
 import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.mehcanics.AbstractMechanic;
 import dk.superawesome.factories.mehcanics.MechanicProfile;
@@ -10,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StorageBox extends AbstractMechanic<StorageBox> {
+public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> {
 
     private ItemStack stored;
     private int amount;
@@ -36,13 +37,31 @@ public class StorageBox extends AbstractMechanic<StorageBox> {
     }
 
     @Override
-    public MechanicProfile<StorageBox> getProfile() {
+    public MechanicProfile<StorageBox, StorageBoxGui> getProfile() {
         return Profiles.STORAGE_BOX;
     }
 
     @Override
     public void pipePut(ItemCollection collection) {
+        if (tickThrottle.isThrottled()) {
+            return;
+        }
 
+        if (collection.has(stored)) {
+            List<ItemStack> items = collection.take(64);
+            int add = 0;
+            for (ItemStack item : items) {
+                add += item.getAmount();
+            }
+
+            if (add > 0) {
+                this.amount += add;
+                StorageBoxGui gui = inUse.get();
+                if (gui != null) {
+                    gui.updateAddedItems(add);
+                }
+            }
+        }
     }
 
     @Override
@@ -65,7 +84,12 @@ public class StorageBox extends AbstractMechanic<StorageBox> {
             item.setAmount(a);
             items.add(item);
         }
+
         this.amount -= taken;
+        StorageBoxGui gui = inUse.get();
+        if (gui != null) {
+            gui.updateRemovedItems(taken);
+        }
 
         return items;
     }

@@ -31,7 +31,7 @@ public class Buildings {
         return buildings;
     }
 
-    public static boolean intersect(Location loc, Mechanic<?> mechanic) {
+    public static boolean intersects(Location loc, Mechanic<?, ?> mechanic) {
         for (BlockVector relVec : mechanic.getProfile().getBuilding().getRelatives()) {
             Location relLoc = BlockUtil.getRel(mechanic.getLocation(), relVec);
             if (BlockUtil.blockEquals(loc, relLoc)) {

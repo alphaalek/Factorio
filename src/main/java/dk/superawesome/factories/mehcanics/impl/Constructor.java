@@ -1,19 +1,16 @@
 package dk.superawesome.factories.mehcanics.impl;
 
+import dk.superawesome.factories.gui.impl.ConstructorGui;
 import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.mehcanics.AbstractMechanic;
 import dk.superawesome.factories.mehcanics.MechanicProfile;
 import dk.superawesome.factories.mehcanics.Profiles;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
 import java.util.List;
 
-public class Constructor extends AbstractMechanic<Constructor> {
+public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> {
 
     private final ItemStack[] craftingGridItems = new ItemStack[9];
     private ItemStack recipeResult;
@@ -35,7 +32,7 @@ public class Constructor extends AbstractMechanic<Constructor> {
     }
 
     @Override
-    public MechanicProfile<Constructor> getProfile() {
+    public MechanicProfile<Constructor, ConstructorGui> getProfile() {
         return Profiles.CONSTRUCTOR;
     }
 
