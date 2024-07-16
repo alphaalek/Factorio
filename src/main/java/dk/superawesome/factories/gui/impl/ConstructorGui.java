@@ -23,7 +23,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     private static final List<Integer> GRAY = Arrays.asList(0, 1, 2, 3, 5, 6, 7, 8, 9, 18, 27, 36, 45, 46, 48, 49, 50, 51, 53);
     private static final List<Integer> BLACK = Arrays.asList(4, 13, 22, 31, 40, 41, 42, 43, 44);
     private static final List<Integer> CRAFTING_SLOTS = Arrays.asList(10, 11, 12, 19, 20, 21, 28, 29, 30);
-    private static final List<Integer> STORED_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34);
+    private static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34);
 
     private ItemStack craft;
 
@@ -62,14 +62,14 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         if (getMechanic().getStorageType() != null) {
             int left = getMechanic().getStorageAmount();
             int i = 0;
-            while (left > 0 && i < STORED_SLOTS.size()) {
+            while (left > 0 && i < STORAGE_SLOTS.size()) {
                 ItemStack item = getMechanic().getStorageType().clone();
                 int amount = Math.min(item.getMaxStackSize(), left);
 
                 item.setAmount(amount);
                 left -= amount;
 
-                getInventory().setItem(STORED_SLOTS.get(i++), item);
+                getInventory().setItem(STORAGE_SLOTS.get(i++), item);
             }
         }
     }
@@ -101,42 +101,9 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                     && event.getClickedInventory() != null
                     && event.getClickedInventory() != getInventory()
                     && event.getCurrentItem() != null) {
-                // find all the crafting grid items where the item can be added to
-                int left = event.getCurrentItem().getAmount();
-                int i = 0;
-                while (left > 0 && i < 9) {
-                    int slot = CRAFTING_SLOTS.get(i++);
-                    ItemStack crafting = getInventory().getItem(slot);
-
-                    if (crafting != null
-                            && crafting.isSimilar(event.getCurrentItem())
-                            && crafting.getAmount() < crafting.getMaxStackSize()) {
-                        int add = Math.min(left, crafting.getMaxStackSize() - crafting.getAmount());
-
-                        left -= add;
-                        crafting.setAmount(crafting.getAmount() + add);
-                    }
-                }
-
-                ItemStack rawItem = event.getClickedInventory().getItem(event.getSlot());
-                if (rawItem != null) {
-                    rawItem.setAmount(left);
-                }
-
-                // we still have some items left, iterate over the crafting grid slots again
-                // and check if any of them are empty
-                if (left > 0) {
-                    i = 0;
-                    while (i < 9) {
-                        int slot = CRAFTING_SLOTS.get(i++);
-                        ItemStack crafting = getInventory().getItem(slot);
-
-                        if (crafting == null) {
-                            getInventory().setItem(slot, rawItem);
-                            event.getClickedInventory().setItem(event.getSlot(), null);
-                            break;
-                        }
-                    }
+                ItemStack stack = event.getClickedInventory().getItem(event.getSlot());
+                if (stack != null) {
+                    addItemsToSlots(stack, CRAFTING_SLOTS);
                 }
 
                 return true;
@@ -215,17 +182,17 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     public void updateAddedItems(int amount) {
         updateAddedItems(amount, getMechanic().getStorageType(),
-                IntStream.range(0, STORED_SLOTS.size())
+                IntStream.range(0, STORAGE_SLOTS.size())
                         .boxed()
-                        .map(STORED_SLOTS::get)
+                        .map(STORAGE_SLOTS::get)
                         .collect(Collectors.toList()));
     }
 
     public void updateRemovedItems(int amount) {
         updateRemovedItems(amount,
-                IntStream.range(0, STORED_SLOTS.size())
+                IntStream.range(0, STORAGE_SLOTS.size())
                         .boxed()
-                        .map(STORED_SLOTS::get)
+                        .map(STORAGE_SLOTS::get)
                         .sorted(Collections.reverseOrder())
                         .collect(Collectors.toList()));
     }

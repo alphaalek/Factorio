@@ -82,4 +82,42 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
             }
         }
     }
+
+    protected void addItemsToSlots(ItemStack item, List<Integer> slots) {
+        // find all the crafting grid items where the item can be added to
+
+        int left = item.getAmount();
+        int i = 0;
+        while (left > 0 && i < slots.size()) {
+            int slot = slots.get(i++);
+            ItemStack crafting = getInventory().getItem(slot);
+
+            if (crafting != null
+                    && crafting.isSimilar(item)
+                    && crafting.getAmount() < crafting.getMaxStackSize()) {
+                int add = Math.min(left, crafting.getMaxStackSize() - crafting.getAmount());
+
+                left -= add;
+                crafting.setAmount(crafting.getAmount() + add);
+            }
+        }
+
+        item.setAmount(left);
+
+        // we still have some items left, iterate over the crafting grid slots again
+        // and check if any of them are empty
+        if (left > 0) {
+            i = 0;
+            while (i < slots.size()) {
+                int slot = slots.get(i++);
+                ItemStack crafting = getInventory().getItem(slot);
+
+                if (crafting == null) {
+                    getInventory().setItem(slot, item.clone());
+                    item.setAmount(0);
+                    break;
+                }
+            }
+        }
+    }
 }

@@ -1,7 +1,6 @@
 package dk.superawesome.factories.gui.impl;
 
 import dk.superawesome.factories.Factories;
-import dk.superawesome.factories.gui.BaseGui;
 import dk.superawesome.factories.gui.MechanicGui;
 import dk.superawesome.factories.mehcanics.impl.StorageBox;
 import org.bukkit.Bukkit;
@@ -119,17 +118,17 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     private boolean handleInteract(ItemStack cursor) {
         // check if a player tries to add an item to the storage box which is not the one currently being stored
-        if (cursor != null
+        if (getMechanic().getStored() != null
+                && cursor != null
                 && cursor.getType() != Material.AIR
-                && getMechanic().getStored() != null
                 && !cursor.isSimilar(getMechanic().getStored())) {
             return true;
         }
 
         // update stored stack
-        if (cursor != null
-                && cursor.getType() != Material.AIR
-                && getMechanic().getStored() == null) {
+        if (getMechanic().getStored() == null
+                && cursor != null
+                && cursor.getType() != Material.AIR) {
             ItemStack stored = cursor.clone();
             stored.setAmount(1);
             getMechanic().setStored(stored);
