@@ -141,6 +141,11 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
         AtomicInteger taken = new AtomicInteger();
         List<ItemStack> items = take(amount, storageType, storageAmount, taken, g -> g.updateRemovedItems(amount));
         this.storageAmount -= taken.get();
+
+        if (this.storageAmount == 0) {
+            this.storageType = null;
+        }
+
         return items;
     }
 }

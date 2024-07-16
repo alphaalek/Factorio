@@ -83,6 +83,11 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> {
         AtomicInteger taken = new AtomicInteger();
         List<ItemStack> items = take(amount, stored, this.amount, taken, g -> g.updateRemovedItems(amount));
         this.amount -= taken.get();
+
+        if (this.amount == 0) {
+            this.stored = null;
+        }
+
         return items;
     }
 }
