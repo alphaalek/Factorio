@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> implements ThinkingMechanic<Constructor, ConstructorGui> {
 
@@ -22,30 +23,6 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     public Constructor(Location loc) {
         super(loc);
-    }
-
-    public ItemStack[] getCraftingGridItems() {
-        return craftingGridItems;
-    }
-
-    public ItemStack getRecipeResult() {
-        return recipeResult;
-    }
-
-    public void setRecipeResult(ItemStack result) {
-        this.recipeResult = result;
-    }
-
-    public ItemStack getStorageType() {
-        return storageType;
-    }
-
-    public void setStorageType(ItemStack stack) {
-        this.storageType = stack;
-    }
-
-    public int getStorageAmount() {
-        return storageAmount;
     }
 
     @Override
@@ -72,6 +49,15 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
             if (collection.has(req)) {
                 List<ItemStack> stacks = collection.take(req.getAmount());
                 if (!stacks.isEmpty() && stacks.get(0).isSimilar(craft)) {
+                    // find an item which has a lower amount than the currently checked item
+                    // this is done to ensure evenly distribution among the items in the crafting grid
+                    for (ItemStack oCraft : craftingGridItems) {
+                        if (oCraft != craft && oCraft.isSimilar(craft) && oCraft.getAmount() < craft.getAmount()) {
+                            craft = oCraft;
+                            break;
+                        }
+                    }
+
                     craft.setAmount(Math.min(craft.getMaxStackSize(), craft.getAmount() + stacks.get(0).getAmount()));
                 }
             }
@@ -133,7 +119,12 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     @Override
     public boolean has(ItemStack stack) {
-        return storageType != null && storageType.isSimilar(stack);
+        return has(i -> i.isSimilar(stack) && storageAmount >= stack.getAmount());
+    }
+
+    @Override
+    public boolean has(Predicate<ItemStack> stack) {
+        return storageType != null && stack.test(storageType);
     }
 
     @Override
@@ -147,5 +138,29 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
         }
 
         return items;
+    }
+
+    public ItemStack[] getCraftingGridItems() {
+        return craftingGridItems;
+    }
+
+    public ItemStack getRecipeResult() {
+        return recipeResult;
+    }
+
+    public void setRecipeResult(ItemStack result) {
+        this.recipeResult = result;
+    }
+
+    public ItemStack getStorageType() {
+        return storageType;
+    }
+
+    public void setStorageType(ItemStack stack) {
+        this.storageType = stack;
+    }
+
+    public int getStorageAmount() {
+        return storageAmount;
     }
 }

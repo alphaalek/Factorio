@@ -78,7 +78,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
         for (ItemStack item : event.getNewItems().values()) {
             if (modifyIngredients
-                    && (!canSmelt(item.getType()) || handleInteractIngredient(item))) {
+                    && (!getMechanic().canSmelt(item.getType()) || handleInteractIngredient(item))) {
                 return true;
             }
 
@@ -151,6 +151,14 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         updateAddedItems(amount, getMechanic().getStorageType(), STORAGE_SLOTS);
     }
 
+    public void updateAddedIngredients(int amount) {
+        updateAddedItems(amount, getMechanic().getIngredient(), INGREDIENT_SLOTS);
+    }
+
+    public void updateAddedFuel(int amount) {
+        updateAddedItems(amount, new ItemStack(getMechanic().getFuel().getMaterial()), FUEL_SLOTS);
+    }
+
     public void updateRemovedStorage(int amount) {
         updateRemovedItems(amount,
                 IntStream.range(0, STORAGE_SLOTS.size())
@@ -171,7 +179,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     @Override
     public boolean onClickIn(InventoryClickEvent event) {
         if (INGREDIENT_SLOTS.contains(event.getSlot())) {
-            if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR && !canSmelt(event.getCursor().getType()))
+            if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR && !getMechanic().canSmelt(event.getCursor().getType()))
                     || handleInteractIngredient(event.getCursor())) {
                 return true;
             }
@@ -220,7 +228,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                     ItemStack item = event.getClickedInventory().getItem(event.getSlot());
                     if (item != null) {
                         int a = item.getAmount();
-                        if (canSmelt(item.getType())
+                        if (getMechanic().canSmelt(item.getType())
                                 && !handleInteractIngredient(item)) {
                             addItemsToSlots(item, INGREDIENT_SLOTS);
 
@@ -254,7 +262,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                 ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
 
                 if ((updateIngredientsPost = INGREDIENT_SLOTS.contains(event.getSlot()))
-                        && (find(INGREDIENT_SLOTS).size() > 1 || (hotbarItem != null && canSmelt(hotbarItem.getType())))
+                        && (find(INGREDIENT_SLOTS).size() > 1 || (hotbarItem != null && getMechanic().canSmelt(hotbarItem.getType())))
                         && handleInteractIngredient(hotbarItem)) {
                     updateIngredientsPost = false;
                     return true;
@@ -269,27 +277,6 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             }
 
             return getMechanic().getTickThrottle().isThrottled();
-        }
-
-        return false;
-    }
-
-    private boolean canSmelt(Material type) {
-        if (getMechanic().getSmeltResult() != null && getMechanic().getSmeltResult().getType() == type) {
-            return true;
-        }
-
-        Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
-        while (recipeIterator.hasNext()) {
-            Recipe recipe = recipeIterator.next();
-
-            if (recipe instanceof FurnaceRecipe) {
-                FurnaceRecipe furnaceRecipe = (FurnaceRecipe) recipe;
-                if (furnaceRecipe.getInput().getType() == type) {
-                    getMechanic().setSmeltResult(furnaceRecipe.getResult());
-                    return true;
-                }
-            }
         }
 
         return false;

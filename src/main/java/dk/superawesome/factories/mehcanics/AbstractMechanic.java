@@ -1,8 +1,6 @@
 package dk.superawesome.factories.mehcanics;
 
 import dk.superawesome.factories.gui.BaseGui;
-import dk.superawesome.factories.gui.MechanicGui;
-import dk.superawesome.factories.gui.impl.StorageBoxGui;
 import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.util.TickThrottle;
 import org.bukkit.Location;
@@ -13,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseGui<G>> implements Mechanic<M, G>, ItemCollection {
@@ -38,6 +37,13 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
     @Override
     public Location getLocation() {
         return loc;
+    }
+
+    protected interface Storage {
+
+        ItemStack get();
+
+        void set(ItemStack stack);
     }
 
     @Override
@@ -71,5 +77,28 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
         }
 
         return items;
+    }
+
+    protected int takeItemsFrom(ItemCollection collection, BiConsumer<G, Integer> doGui, Storage storage) {
+        List<ItemStack> items = collection.take(64);
+        int add = 0;
+        for (ItemStack item : items) {
+            add += item.getAmount();
+
+            if (storage.get() == null) {
+                ItemStack type = item.clone();
+                type.setAmount(1);
+                storage.set(type);
+            }
+        }
+
+        if (add > 0) {
+            G gui = inUse.get();
+            if (gui != null) {
+                doGui.accept(gui, add);
+            }
+        }
+
+        return add;
     }
 }
