@@ -5,6 +5,7 @@ import dk.superawesome.factories.mehcanics.pipes.events.PipePutEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.BlockVector;
@@ -15,25 +16,19 @@ public class PipeRoute {
 
     // TODO: cleanup cached routes when modified
 
-    private static final Map<BlockVector, PipeRoute> cachedRoutes = new HashMap<>();
+    private static final Map<World, Map<BlockVector, PipeRoute>> cachedRoutes = new HashMap<>();
 
-    public static PipeRoute getCachedRote(Block block) {
-        return cachedRoutes.get(new BlockVector(block.getX(), block.getY(), block.getZ()));
+    public static PipeRoute getCachedRoute(World world, BlockVector vec) {
+        return cachedRoutes.computeIfAbsent(world, d -> new HashMap<>())
+                .get(new BlockVector(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ()));
     }
 
-    public static void addRouteToCache(PipeRoute route) {
+    public static void addRouteToCache(World world, PipeRoute route) {
         for (BlockVector loc : route.getLocations()) {
-            cachedRoutes.put(loc, route);
+            cachedRoutes.computeIfAbsent(world, d -> new HashMap<>())
+                    .put(loc, route);
         }
         route.cached = true;
-    }
-
-    public static void removeRoutesFromCache(Chunk chunk) {
-        // TODO
-    }
-
-    public static void removeRouteFromCache(Block block) {
-        // TODO
     }
 
     private static class OutputPipeEntry {
@@ -53,7 +48,7 @@ public class PipeRoute {
             }
             this.lastRunId = runId;
 
-            Block block = world.getBlockAt(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ());
+            Block block = BlockUtil.getBlock(world, vec);
             PipePutEvent event = new PipePutEvent(BlockUtil.getPointingBlock(block, false), collection);
             Bukkit.getPluginManager().callEvent(event);
         }
@@ -66,6 +61,11 @@ public class PipeRoute {
 
     public boolean isCached() {
         return cached;
+    }
+
+    public void clear() {
+        outputs.clear();
+        locations.clear();
     }
 
     public boolean has(BlockVector vec) {

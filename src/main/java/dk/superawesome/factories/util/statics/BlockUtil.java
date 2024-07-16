@@ -78,6 +78,10 @@ public class BlockUtil {
         return LEGACY ? block.getData() : (byte) 0;
     }
 
+    public static Block getBlock(World world, BlockVector vec) {
+        return world.getBlockAt(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ());
+    }
+
     public static BlockVector getVec(Block block) {
         return getVec(block.getLocation());
     }
