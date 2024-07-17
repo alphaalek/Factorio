@@ -43,7 +43,6 @@ public final class Factories extends JavaPlugin implements Listener {
         // add more fuel types
         // buildings
         // power central
-        // test coloured glass pipes
         // thinking mechanic put into storage declined (barrier in gui)
     }
 

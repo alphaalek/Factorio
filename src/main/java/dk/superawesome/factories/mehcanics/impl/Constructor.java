@@ -1,16 +1,12 @@
 package dk.superawesome.factories.mehcanics.impl;
 
 import dk.superawesome.factories.gui.impl.ConstructorGui;
-import dk.superawesome.factories.gui.impl.StorageBoxGui;
 import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.mehcanics.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> implements ThinkingMechanic<Constructor, ConstructorGui> {
@@ -20,6 +16,8 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     private ItemStack recipeResult;
     private ItemStack storageType;
     private int storageAmount;
+
+    private boolean declinedState;
 
     public Constructor(Location loc) {
         super(loc);
@@ -81,7 +79,25 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
         // if it has any, we can't craft the new recipe until all the previously crafted items are removed
         // from the storage.
         if (storageType != null && !storageType.isSimilar(recipeResult)) {
+            // set declined state and notify the user that this crafting is not possible yet
+            if (!declinedState) {
+                declinedState = true;
+                ConstructorGui gui = inUse.get();
+                if (gui != null) {
+                    gui.updateDeclinedState(true);
+                }
+            }
+
             return;
+        }
+
+        // remove declined state if set and crafting is available
+        if (declinedState) {
+            declinedState = false;
+            ConstructorGui gui = inUse.get();
+            if (gui != null) {
+                gui.updateDeclinedState(false);
+            }
         }
 
         // remove one amount from all items in the crafting grid and simulate the crafting
@@ -129,9 +145,17 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     @Override
     public List<ItemStack> take(int amount) {
-        AtomicInteger taken = new AtomicInteger();
-        List<ItemStack> items = take(amount, storageType, storageAmount, taken, g -> g.updateRemovedItems(amount));
-        this.storageAmount -= taken.get();
+        List<ItemStack> items = take(amount, storageType, storageAmount, g -> g.updateRemovedItems(amount), new Updater<Integer>() {
+            @Override
+            public Integer get() {
+                return storageAmount;
+            }
+
+            @Override
+            public void set(Integer val) {
+                storageAmount -= val;
+            }
+        });
 
         if (this.storageAmount == 0) {
             this.storageType = null;
@@ -143,6 +167,10 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     @Override
     public boolean isEmpty() {
         return storageType == null;
+    }
+
+    public boolean isDeclined() {
+        return declinedState;
     }
 
     public ItemStack[] getCraftingGridItems() {

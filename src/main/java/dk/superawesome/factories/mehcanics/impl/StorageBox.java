@@ -33,7 +33,7 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> {
         }
 
         if (stored == null || collection.has(stored)) {
-            amount += takeItemsFrom(collection, StorageBoxGui::updateAddedItems, new Storage() {
+            amount += takeItemsFrom(collection, StorageBoxGui::updateAddedItems, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return stored;
@@ -59,9 +59,17 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> {
 
     @Override
     public List<ItemStack> take(int amount) {
-        AtomicInteger taken = new AtomicInteger();
-        List<ItemStack> items = take(amount, stored, this.amount, taken, g -> g.updateRemovedItems(amount));
-        this.amount -= taken.get();
+        List<ItemStack> items = take(amount, stored, amount, g -> g.updateRemovedItems(amount), new Updater<Integer>() {
+            @Override
+            public Integer get() {
+                return StorageBox.this.amount;
+            }
+
+            @Override
+            public void set(Integer val) {
+                StorageBox.this.amount -= val;
+            }
+        });
 
         if (this.amount == 0) {
             this.stored = null;

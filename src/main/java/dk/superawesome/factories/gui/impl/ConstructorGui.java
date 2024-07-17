@@ -22,6 +22,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     private static final int GRID_HEIGHT = 3;
     private static final List<Integer> GRAY = Arrays.asList(0, 1, 2, 3, 5, 6, 7, 8, 9, 18, 27, 36, 45, 46, 48, 49, 50, 51, 53);
     private static final List<Integer> BLACK = Arrays.asList(4, 13, 22, 31, 40, 41, 42, 43, 44);
+    private static final List<Integer> DECLINE = Arrays.asList(13, 22, 31);
     private static final List<Integer> CRAFTING_SLOTS = Arrays.asList(10, 11, 12, 19, 20, 21, 28, 29, 30);
     private static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34);
 
@@ -57,6 +58,10 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             // and the showed item in the crafting grid at the same time. However, CraftInventory#getItem makes
             // a bukkit mirror, and THEN, we can modify them at the same time!
             getMechanic().getCraftingGridItems()[i] = getInventory().getItem(CRAFTING_SLOTS.get(i));
+        }
+
+        if (getMechanic().isDeclined()) {
+            updateDeclinedState(true);
         }
     }
 
@@ -133,6 +138,18 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         getMechanic().getTickThrottle().throttle();
         Bukkit.getScheduler().runTask(Factories.get(), this::updateCrafting);
         return false;
+    }
+
+    public void updateDeclinedState(boolean declined) {
+        if (declined) {
+            for (int i : DECLINE) {
+                getInventory().setItem(i, new ItemStack(Material.BARRIER));
+            }
+        } else {
+            for (int i : DECLINE) {
+                getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
+            }
+        }
     }
 
     private int getUpperCorner() {

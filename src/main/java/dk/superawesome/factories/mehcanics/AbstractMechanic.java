@@ -39,11 +39,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
         return loc;
     }
 
-    protected interface Storage {
+    protected interface Updater<T> {
 
-        ItemStack get();
+        T get();
 
-        void set(ItemStack stack);
+        void set(T val);
     }
 
     @Override
@@ -58,7 +58,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
         player.openInventory(gui.getInventory());
     }
 
-    protected List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicInteger takenUpdate, Consumer<G> doGui) {
+    protected List<ItemStack> take(int amount, ItemStack stored, int storedAmount, Consumer<G> doGui, Updater<Integer> updater) {
         List<ItemStack> items = new ArrayList<>();
         int taken = 0;
         while (taken < amount && taken < storedAmount) {
@@ -70,7 +70,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
             items.add(item);
         }
 
-        takenUpdate.addAndGet(taken);
+        updater.set(taken);
         G gui = inUse.get();
         if (gui != null) {
             doGui.accept(gui);
@@ -79,16 +79,16 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
         return items;
     }
 
-    protected int takeItemsFrom(ItemCollection collection, BiConsumer<G, Integer> doGui, Storage storage) {
+    protected int takeItemsFrom(ItemCollection collection, BiConsumer<G, Integer> doGui, Updater<ItemStack> updater) {
         List<ItemStack> items = collection.take(64);
         int add = 0;
         for (ItemStack item : items) {
             add += item.getAmount();
 
-            if (storage.get() == null) {
+            if (updater.get() == null) {
                 ItemStack type = item.clone();
                 type.setAmount(1);
-                storage.set(type);
+                updater.set(type);
             }
         }
 

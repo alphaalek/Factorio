@@ -1,5 +1,6 @@
 package dk.superawesome.factories.mehcanics.impl;
 
+import dk.superawesome.factories.gui.impl.ConstructorGui;
 import dk.superawesome.factories.gui.impl.SmelterGui;
 import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.mehcanics.*;
@@ -12,7 +13,6 @@ import org.bukkit.inventory.Recipe;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements ThinkingMechanic<Smelter, SmelterGui> {
@@ -28,6 +28,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     private Fuel currentFuel;
     private float currentFuelAmount;
 
+    private boolean declinedState;
     private ItemStack storageType;
     private int storageAmount;
 
@@ -47,7 +48,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         }
 
         if ((ingredient == null && collection.has(i -> canSmelt(i.getType()))) || ingredient != null && collection.has(ingredient)) {
-            ingredientAmount += takeItemsFrom(collection, SmelterGui::updateAddedIngredients, new Storage() {
+            ingredientAmount += takeItemsFrom(collection, SmelterGui::updateAddedIngredients, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return ingredient;
@@ -61,7 +62,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         }
 
         if ((fuel == null && collection.has(i -> Fuel.get(i.getType()) != null)) || fuel != null && collection.has(new ItemStack(fuel.getMaterial()))) {
-            fuelAmount += takeItemsFrom(collection, SmelterGui::updateAddedFuel, new Storage() {
+            fuelAmount += takeItemsFrom(collection, SmelterGui::updateAddedFuel, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return fuel == null ? null : new ItemStack(fuel.getMaterial());
@@ -118,7 +119,25 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
         // if there are no fuel left, don't continue
         if (currentFuelAmount == 0 && fuelAmount == 0) {
+            // set declined state and notify the user that this smelting is not possible yet
+            if (!declinedState) {
+                declinedState = true;
+                SmelterGui gui = inUse.get();
+                if (gui != null) {
+                    gui.updateDeclinedState(true);
+                }
+            }
+
             return;
+        }
+
+        // remove declined state if set and smelting is available
+        if (declinedState) {
+            declinedState = false;
+            SmelterGui gui = inUse.get();
+            if (gui != null) {
+                gui.updateDeclinedState(false);
+            }
         }
 
         // use fuel
@@ -177,9 +196,17 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
     @Override
     public List<ItemStack> take(int amount) {
-        AtomicInteger taken = new AtomicInteger();
-        List<ItemStack> items = take(amount, storageType, storageAmount, taken, g -> g.updateRemovedStorage(amount));
-        this.storageAmount -= taken.get();
+        List<ItemStack> items = take(amount, storageType, storageAmount, g -> g.updateRemovedStorage(amount), new Updater<Integer>() {
+            @Override
+            public Integer get() {
+                return storageAmount;
+            }
+
+            @Override
+            public void set(Integer val) {
+                storageAmount -= val;
+            }
+        });
 
         if (this.storageAmount == 0) {
             this.storageType = null;
@@ -251,5 +278,9 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
     public float getCurrentFuelAmount() {
         return currentFuelAmount;
+    }
+
+    public boolean isDeclined() {
+        return declinedState;
     }
 }
