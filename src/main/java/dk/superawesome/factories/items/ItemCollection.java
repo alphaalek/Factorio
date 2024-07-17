@@ -12,4 +12,6 @@ public interface ItemCollection {
     boolean has(Predicate<ItemStack> stack);
 
     List<ItemStack> take(int amount);
+
+    boolean isEmpty();
 }

@@ -58,7 +58,10 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             // a bukkit mirror, and THEN, we can modify them at the same time!
             getMechanic().getCraftingGridItems()[i] = getInventory().getItem(CRAFTING_SLOTS.get(i));
         }
+    }
 
+    @Override
+    public void loadInputOutputItems() {
         if (getMechanic().getStorageType() != null) {
             loadStorageTypes(getMechanic().getStorageType(), getMechanic().getStorageAmount(), STORAGE_SLOTS);
         }
@@ -72,6 +75,11 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     @Override
     public boolean onClickIn(InventoryClickEvent event) {
         if (!CRAFTING_SLOTS.contains(event.getSlot())) {
+
+            if (event.getSlot() == 35) {
+                loadInputOutputItems();
+            }
+
             return true;
         }
 
@@ -171,11 +179,11 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     }
 
     public void updateAddedItems(int amount) {
-        updateAddedItems(amount, getMechanic().getStorageType(), STORAGE_SLOTS);
+        updateAddedItems(getInventory(), amount, getMechanic().getStorageType(), STORAGE_SLOTS);
     }
 
     public void updateRemovedItems(int amount) {
-        updateRemovedItems(amount,
+        updateRemovedItems(getInventory(), amount, getMechanic().getStorageType(),
                 IntStream.range(0, STORAGE_SLOTS.size())
                         .boxed()
                         .map(STORAGE_SLOTS::get)

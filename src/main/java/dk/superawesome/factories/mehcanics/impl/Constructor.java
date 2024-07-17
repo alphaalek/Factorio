@@ -140,6 +140,11 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
         return items;
     }
 
+    @Override
+    public boolean isEmpty() {
+        return storageType == null;
+    }
+
     public ItemStack[] getCraftingGridItems() {
         return craftingGridItems;
     }

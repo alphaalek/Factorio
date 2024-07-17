@@ -188,6 +188,11 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         return items;
     }
 
+    @Override
+    public boolean isEmpty() {
+        return storageType == null;
+    }
+
     public ItemStack getIngredient() {
         return ingredient;
     }

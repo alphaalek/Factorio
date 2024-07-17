@@ -26,7 +26,7 @@ public class Pipes {
 
         PipeSuckEvent event = new PipeSuckEvent(from);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.getItems() == null) {
+        if (event.getItems() == null || event.getItems().isEmpty()) {
             return;
         }
 

@@ -37,6 +37,14 @@ public final class Factories extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new PistonExtendListener(), this);
 
         Tick.start();
+
+        // TODO
+
+        // add more fuel types
+        // buildings
+        // power central
+        // test coloured glass pipes
+        // thinking mechanic put into storage declined (barrier in gui)
     }
 
     @Override

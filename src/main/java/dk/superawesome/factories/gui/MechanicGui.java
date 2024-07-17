@@ -3,6 +3,7 @@ package dk.superawesome.factories.gui;
 import dk.superawesome.factories.mehcanics.Mechanic;
 import dk.superawesome.factories.util.Callback;
 import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -31,17 +32,22 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
     @Override
     public void loadItems() {
         getInventory().setItem(52, new ItemStack(Material.WRITABLE_BOOK));
+
+        loadInputOutputItems();
     }
+
+    public abstract void loadInputOutputItems();
 
     public M getMechanic() {
         return mechanic;
     }
 
-    protected void updateAddedItems(int amount, ItemStack stored, List<Integer> slots) {
+    protected int updateAddedItems(Inventory inventory, int amount, ItemStack stored, List<Integer> slots) {
+        // find all the slots with items similar to the stored item and add to these slots
         int left = amount;
         for (int i : slots) {
-            ItemStack item = getInventory().getItem(i);
-            if (item != null) {
+            ItemStack item = inventory.getItem(i);
+            if (item != null && item.isSimilar(stored)) {
                 int add = Math.min(left, item.getMaxStackSize() - item.getAmount());
 
                 left -= add;
@@ -53,24 +59,34 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
             }
         }
 
+        // we still have some items left to be added, find the empty slots and add to them
         if (left > 0) {
             for (int i : slots) {
-                ItemStack item = getInventory().getItem(i);
+                ItemStack item = inventory.getItem(i);
                 if (item == null) {
+                    int add = Math.min(left, stored.getMaxStackSize());
+
+                    left -= add;
                     ItemStack added = stored.clone();
-                    added.setAmount(left);
-                    getInventory().setItem(i, added);
+                    added.setAmount(add);
+
+                    inventory.setItem(i, added);
+                }
+
+                if (left == 0) {
                     break;
                 }
             }
         }
+
+        return left;
     }
 
-    protected void updateRemovedItems(int amount, List<Integer> slots) {
+    protected int updateRemovedItems(Inventory inventory, int amount, ItemStack stored, List<Integer> slots) {
         int left = amount;
         for (int i : slots) {
-            ItemStack item = getInventory().getItem(i);
-            if (item != null) {
+            ItemStack item = inventory.getItem(i);
+            if (item != null && item.isSimilar(stored)) {
                 int remove = Math.min(left, item.getAmount());
 
                 left -= remove;
@@ -81,6 +97,8 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
                 }
             }
         }
+
+        return left;
     }
 
     protected void addItemsToSlots(ItemStack item, List<Integer> slots) {

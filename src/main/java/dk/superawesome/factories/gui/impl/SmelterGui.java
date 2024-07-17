@@ -51,6 +51,11 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         }
         getInventory().setItem(35, new ItemStack(Material.FEATHER));
 
+        updateFuelState();
+    }
+
+    @Override
+    public void loadInputOutputItems() {
         if (getMechanic().getIngredient() != null) {
             loadStorageTypes(getMechanic().getIngredient(), getMechanic().getIngredientAmount(), INGREDIENT_SLOTS);
         }
@@ -60,8 +65,6 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         if (getMechanic().getStorageType() != null) {
             loadStorageTypes(getMechanic().getStorageType(), getMechanic().getStorageAmount(), STORAGE_SLOTS);
         }
-
-        updateFuelState();
     }
 
     @Override
@@ -164,19 +167,19 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     }
 
     public void updateAddedStorage(int amount) {
-        updateAddedItems(amount, getMechanic().getStorageType(), STORAGE_SLOTS);
+        updateAddedItems(getInventory(), amount, getMechanic().getStorageType(), STORAGE_SLOTS);
     }
 
     public void updateAddedIngredients(int amount) {
-        updateAddedItems(amount, getMechanic().getIngredient(), INGREDIENT_SLOTS);
+        updateAddedItems(getInventory(), amount, getMechanic().getIngredient(), INGREDIENT_SLOTS);
     }
 
     public void updateAddedFuel(int amount) {
-        updateAddedItems(amount, new ItemStack(getMechanic().getFuel().getMaterial()), FUEL_SLOTS);
+        updateAddedItems(getInventory(), amount, new ItemStack(getMechanic().getFuel().getMaterial()), FUEL_SLOTS);
     }
 
     public void updateRemovedStorage(int amount) {
-        updateRemovedItems(amount,
+        updateRemovedItems(getInventory(), amount, getMechanic().getStorageType(),
                 IntStream.range(0, STORAGE_SLOTS.size())
                         .boxed()
                         .map(STORAGE_SLOTS::get)
@@ -185,11 +188,11 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     }
 
     public void updateRemovedIngredients(int amount) {
-        updateRemovedItems(amount, INGREDIENT_SLOTS);
+        updateRemovedItems(getInventory(), amount, getMechanic().getIngredient(), INGREDIENT_SLOTS);
     }
 
     public void updateRemovedFuel(int amount) {
-        updateRemovedItems(amount, FUEL_SLOTS);
+        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getFuel().getMaterial()), FUEL_SLOTS);
     }
 
     @Override
@@ -212,6 +215,10 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
             updateFuelPost = true;
             return getMechanic().getTickThrottle().isThrottled();
+        }
+
+        if (event.getSlot() == 35) {
+            loadInputOutputItems();
         }
 
         return true;

@@ -70,6 +70,11 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> {
         return items;
     }
 
+    @Override
+    public boolean isEmpty() {
+        return stored == null;
+    }
+
     public ItemStack getStored() {
         return stored;
     }

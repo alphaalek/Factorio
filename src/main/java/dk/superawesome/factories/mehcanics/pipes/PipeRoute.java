@@ -88,6 +88,10 @@ public class PipeRoute {
 
         for (OutputPipeEntry entry : outputs) {
             entry.handle(runId, collection);
+
+            if (collection.isEmpty()) {
+                break;
+            }
         }
     }
 }
