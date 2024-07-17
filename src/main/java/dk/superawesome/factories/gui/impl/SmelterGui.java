@@ -301,7 +301,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                 ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
 
                 if ((updateIngredientsPost = INGREDIENT_SLOTS.contains(event.getSlot()))
-                        && (find(INGREDIENT_SLOTS).size() > 1 || (hotbarItem != null && getMechanic().canSmelt(hotbarItem.getType())))
+                        && (find(INGREDIENT_SLOTS).size() > 1 || (hotbarItem != null && !getMechanic().canSmelt(hotbarItem.getType())))
                         && handleInteractIngredient(hotbarItem)) {
                     updateIngredientsPost = false;
                     return true;
