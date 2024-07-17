@@ -27,7 +27,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     private static final List<Integer> GRAY = Arrays.asList(0, 1, 2, 6, 7, 8, 42, 43, 44, 51, 53);
     private static final List<Integer> BLACK = Arrays.asList(5, 14, 23, 32, 41, 50);
     private static final List<Integer> RED = Arrays.asList(11, 20, 29, 38, 47);
-    private static final List<Integer> DECLINE = Arrays.asList(13, 22, 31);
+    private static final List<Integer> DECLINE = Arrays.asList(14, 23, 32);
     private static final List<Integer> INGREDIENT_SLOTS = Arrays.asList(9, 10, 18, 19, 27, 28, 36, 37, 45, 46);
     private static final List<Integer> FUEL_SLOTS = Arrays.asList(12, 13, 21, 22, 30, 31, 39, 40, 48, 49);
     private static final List<Integer> STORAGE_SLOTS = Arrays.asList(15, 16, 17, 24, 25, 26, 33, 34);
