@@ -1,6 +1,5 @@
 package dk.superawesome.factories.mehcanics.impl;
 
-import dk.superawesome.factories.gui.impl.ConstructorGui;
 import dk.superawesome.factories.gui.impl.SmelterGui;
 import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.mehcanics.*;
@@ -22,6 +21,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     private ItemStack ingredient;
     private int ingredientAmount;
 
+    private ItemStack cachedSmeltResult;
     private ItemStack smeltResult;
     private Fuel fuel;
     private int fuelAmount;
@@ -77,10 +77,6 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     }
 
     public boolean canSmelt(Material type) {
-        if (smeltResult != null && smeltResult.getType() == type) {
-            return true;
-        }
-
         Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
         while (recipeIterator.hasNext()) {
             Recipe recipe = recipeIterator.next();
@@ -88,7 +84,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
             if (recipe instanceof FurnaceRecipe) {
                 FurnaceRecipe furnaceRecipe = (FurnaceRecipe) recipe;
                 if (furnaceRecipe.getInput().getType() == type) {
-                    smeltResult = furnaceRecipe.getResult();
+                    cachedSmeltResult = furnaceRecipe.getResult();
                     return true;
                 }
             }
@@ -104,16 +100,11 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
     @Override
     public void think() {
-        // if there are no ingredients ready to be smelted, don't continue;
-        if (ingredient == null || smeltResult == null) {
-            return;
-        }
-
         // check if the smelters storage has any previously smelted items which is not the
         // same as the current smelting result.
         // if it has any, we can't smelt the new items until all the previously smelted items are removed
         // from the storage.
-        if (storageType != null && !storageType.isSimilar(smeltResult)) {
+        if (storageType != null && smeltResult != null && !storageType.isSimilar(smeltResult)) {
             // set declined state and notify the user that this smelting is not possible yet
             if (!declinedState) {
                 declinedState = true;
@@ -135,8 +126,10 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
             }
         }
 
-        // if there are no fuel left, don't continue
-        if (currentFuelAmount == 0 && fuelAmount == 0) {
+        // if there are no ingredients ready to be smelted, don't continue
+        if (ingredient == null || smeltResult == null
+                // if there are no fuel left, don't continue
+                || (currentFuelAmount == 0 && fuelAmount == 0)) {
             return;
         }
 
@@ -172,15 +165,17 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         ingredientAmount -= 1;
         storageAmount += smeltResult.getAmount();
 
-        if (ingredientAmount == 0) {
-            ingredient = null;
-        }
-
         SmelterGui gui = inUse.get();
         if (gui != null) {
             gui.updateRemovedIngredients(1);
             gui.updateAddedStorage(smeltResult.getAmount());
             gui.updateFuelState();
+        }
+
+        // the smelter does not have any ingredients left, clear up
+        if (ingredientAmount == 0) {
+            ingredient = null;
+            smeltResult = null;
         }
     }
 
@@ -282,5 +277,9 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
     public boolean isDeclined() {
         return declinedState;
+    }
+
+    public ItemStack getCachedSmeltResult() {
+        return cachedSmeltResult;
     }
 }

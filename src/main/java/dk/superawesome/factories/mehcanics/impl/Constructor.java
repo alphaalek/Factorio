@@ -50,7 +50,10 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
                     // find an item which has a lower amount than the currently checked item
                     // this is done to ensure evenly distribution among the items in the crafting grid
                     for (ItemStack oCraft : craftingGridItems) {
-                        if (oCraft != craft && oCraft.isSimilar(craft) && oCraft.getAmount() < craft.getAmount()) {
+                        if (oCraft != craft
+                                && oCraft != null
+                                && oCraft.isSimilar(craft)
+                                && oCraft.getAmount() < craft.getAmount()) {
                             craft = oCraft;
                             break;
                         }
@@ -69,16 +72,12 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     @Override
     public void think() {
-        // if there are not any recipe in the crafting grid, don't continue
-        if (recipeResult == null) {
-            return;
-        }
 
         // check if the constructors storage has any previously crafted items which is not the that are
         // not the same as the current recipe.
         // if it has any, we can't craft the new recipe until all the previously crafted items are removed
         // from the storage.
-        if (storageType != null && !storageType.isSimilar(recipeResult)) {
+        if (storageType != null && recipeResult != null && !storageType.isSimilar(recipeResult)) {
             // set declined state and notify the user that this crafting is not possible yet
             if (!declinedState) {
                 declinedState = true;
@@ -98,6 +97,11 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
             if (gui != null) {
                 gui.updateDeclinedState(false);
             }
+        }
+
+        // if there are not any recipe in the crafting grid, don't continue
+        if (recipeResult == null) {
+            return;
         }
 
         // remove one amount from all items in the crafting grid and simulate the crafting
