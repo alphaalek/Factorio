@@ -114,11 +114,6 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         // if it has any, we can't smelt the new items until all the previously smelted items are removed
         // from the storage.
         if (storageType != null && !storageType.isSimilar(smeltResult)) {
-            return;
-        }
-
-        // if there are no fuel left, don't continue
-        if (currentFuelAmount == 0 && fuelAmount == 0) {
             // set declined state and notify the user that this smelting is not possible yet
             if (!declinedState) {
                 declinedState = true;
@@ -138,6 +133,11 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
             if (gui != null) {
                 gui.updateDeclinedState(false);
             }
+        }
+
+        // if there are no fuel left, don't continue
+        if (currentFuelAmount == 0 && fuelAmount == 0) {
+            return;
         }
 
         // use fuel
