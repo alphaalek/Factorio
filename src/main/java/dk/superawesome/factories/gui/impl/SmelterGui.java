@@ -391,7 +391,6 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         updateAmount(INGREDIENT_SLOTS, diff -> {
             getMechanic().setIngredientAmount(getMechanic().getIngredientAmount() - diff);
             updateIngredientsPost();
-            Bukkit.getLogger().info("Updated ingredients " + diff + " " + getMechanic().getIngredientAmount() + " " + getMechanic().getIngredient() + " " + getMechanic().getSmeltResult());
         });
     }
 
