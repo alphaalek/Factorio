@@ -1,15 +1,15 @@
-package dk.superawesome.factories.mehcanics;
+package dk.superawesome.factories.mechanics;
 
 import dk.superawesome.factories.gui.BaseGui;
 import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.util.TickThrottle;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -19,9 +19,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
     protected final AtomicReference<G> inUse = new AtomicReference<>();
     protected final TickThrottle tickThrottle = new TickThrottle();
     protected final Location loc;
+    protected final BlockFace rotation;
 
-    public AbstractMechanic(Location loc) {
+    public AbstractMechanic(Location loc, BlockFace rotation) {
         this.loc = loc;
+        this.rotation = rotation;
     }
 
     @Override
@@ -37,6 +39,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
     @Override
     public Location getLocation() {
         return loc;
+    }
+
+    @Override
+    public BlockFace getRotation() {
+        return rotation;
     }
 
     protected interface Updater<T> {

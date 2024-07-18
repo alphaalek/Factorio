@@ -1,6 +1,6 @@
 package dk.superawesome.factories.gui;
 
-import dk.superawesome.factories.mehcanics.Mechanic;
+import dk.superawesome.factories.mechanics.Mechanic;
 
 import java.util.concurrent.atomic.AtomicReference;
 

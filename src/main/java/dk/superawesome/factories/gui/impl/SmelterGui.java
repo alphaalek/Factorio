@@ -2,8 +2,8 @@ package dk.superawesome.factories.gui.impl;
 
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.gui.MechanicGui;
-import dk.superawesome.factories.mehcanics.Fuel;
-import dk.superawesome.factories.mehcanics.impl.Smelter;
+import dk.superawesome.factories.mechanics.Fuel;
+import dk.superawesome.factories.mechanics.impl.Smelter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;
@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 

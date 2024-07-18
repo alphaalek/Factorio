@@ -1,13 +1,14 @@
-package dk.superawesome.factories.mehcanics.profiles;
+package dk.superawesome.factories.mechanics.profiles;
 
 import dk.superawesome.factories.building.Building;
 import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.gui.GuiFactory;
 import dk.superawesome.factories.gui.impl.StorageBoxGui;
-import dk.superawesome.factories.mehcanics.MechanicFactory;
-import dk.superawesome.factories.mehcanics.MechanicProfile;
-import dk.superawesome.factories.mehcanics.impl.StorageBox;
+import dk.superawesome.factories.mechanics.MechanicFactory;
+import dk.superawesome.factories.mechanics.MechanicProfile;
+import dk.superawesome.factories.mechanics.impl.StorageBox;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -44,8 +45,8 @@ public class StorageBoxProfile implements MechanicProfile<StorageBox, StorageBox
     private static class StorageBoxMechanicFactory implements MechanicFactory<StorageBox> {
 
         @Override
-        public StorageBox create(Location loc) {
-            return new StorageBox(loc);
+        public StorageBox create(Location loc, BlockFace rotation) {
+            return new StorageBox(loc, rotation);
         }
     }
 

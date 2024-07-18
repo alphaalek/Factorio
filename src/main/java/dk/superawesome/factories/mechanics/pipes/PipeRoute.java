@@ -1,11 +1,9 @@
-package dk.superawesome.factories.mehcanics.pipes;
+package dk.superawesome.factories.mechanics.pipes;
 
 import dk.superawesome.factories.items.ItemCollection;
-import dk.superawesome.factories.mehcanics.pipes.events.PipePutEvent;
+import dk.superawesome.factories.mechanics.pipes.events.PipePutEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.BlockVector;

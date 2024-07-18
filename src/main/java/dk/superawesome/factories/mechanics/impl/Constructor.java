@@ -1,9 +1,10 @@
-package dk.superawesome.factories.mehcanics.impl;
+package dk.superawesome.factories.mechanics.impl;
 
 import dk.superawesome.factories.gui.impl.ConstructorGui;
 import dk.superawesome.factories.items.ItemCollection;
-import dk.superawesome.factories.mehcanics.*;
+import dk.superawesome.factories.mechanics.*;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -19,8 +20,8 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     private boolean declinedState;
 
-    public Constructor(Location loc) {
-        super(loc);
+    public Constructor(Location loc, BlockFace rotation) {
+        super(loc, rotation);
     }
 
     @Override

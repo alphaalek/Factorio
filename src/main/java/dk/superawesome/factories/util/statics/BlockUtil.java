@@ -1,6 +1,7 @@
 package dk.superawesome.factories.util.statics;
 
 import dk.superawesome.factories.util.BlockValidator;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -69,6 +70,50 @@ public class BlockUtil {
                 .add(vec);
     }
 
+    public static Vector rotateVec(Vector vec, BlockFace ori, BlockFace rot) {
+        int angle = calculateRotationAngle(ori.getDirection(), rot.getDirection());
+
+        Vector newVec = vec.clone();
+        // apply the rotation based on the angle between the original and rotated directions
+        switch (angle) {
+            case 90:
+                newVec.setX(vec.getZ());
+                newVec.setZ(-vec.getX());
+                break;
+            case -90:
+                newVec.setX(-vec.getZ());
+                newVec.setZ(vec.getX());
+                break;
+            case 180:
+                newVec.setX(-vec.getX());
+                newVec.setZ(-vec.getZ());
+                break;
+            default:
+                break; // no rotation needed
+        }
+
+        return newVec;
+    }
+
+    private static int calculateRotationAngle(Vector oriVec, Vector rotVec) {
+        int oriX = oriVec.getBlockX();
+        int oriZ = oriVec.getBlockZ();
+        int rotX = rotVec.getBlockX();
+        int rotZ = rotVec.getBlockZ();
+
+        if (oriX == rotX && oriZ == rotZ) {
+            return 0; // no rotation
+        } else if (oriX == -rotZ && oriZ == rotX) {
+            return 90; // 90 degrees clockwise
+        } else if (oriX == rotZ && oriZ == -rotX) {
+            return -90; // 90 degrees counterclockwise
+        } else if (oriX == -rotX && oriZ == -rotZ) {
+            return 180; // 180 degrees
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
     public static boolean blockEquals(Location loc1, Location loc2) {
         return loc1.getBlockX() == loc2.getBlockX()
                 && loc1.getBlockY() == loc2.getBlockY()
@@ -81,11 +126,7 @@ public class BlockUtil {
     }
 
     public static BlockFace getFaceBetween(Block from, Block to) {
-        Vector vec = new Vector(
-                from.getX() - to.getX(),
-                from.getY() - to.getY(),
-                from.getZ() - to.getZ()
-        );
+        Vector vec = new Vector(from.getX() - to.getX(), from.getY() - to.getY(), from.getZ() - to.getZ());
         if (vec.getX() != 0 || vec.getY() != 0 || vec.getZ() != 0) {
             vec.normalize();
         }

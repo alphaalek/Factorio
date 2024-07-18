@@ -1,14 +1,14 @@
-package dk.superawesome.factories.mehcanics.profiles;
+package dk.superawesome.factories.mechanics.profiles;
 
 import dk.superawesome.factories.building.Building;
 import dk.superawesome.factories.building.Buildings;
-import dk.superawesome.factories.gui.BaseGui;
 import dk.superawesome.factories.gui.GuiFactory;
 import dk.superawesome.factories.gui.impl.ConstructorGui;
-import dk.superawesome.factories.mehcanics.MechanicFactory;
-import dk.superawesome.factories.mehcanics.MechanicProfile;
-import dk.superawesome.factories.mehcanics.impl.Constructor;
+import dk.superawesome.factories.mechanics.MechanicFactory;
+import dk.superawesome.factories.mechanics.MechanicProfile;
+import dk.superawesome.factories.mechanics.impl.Constructor;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -45,8 +45,8 @@ public class ConstructorProfile implements MechanicProfile<Constructor, Construc
     private static class ConstructorMechanicFactory implements MechanicFactory<Constructor> {
 
         @Override
-        public Constructor create(Location loc) {
-            return new Constructor(loc);
+        public Constructor create(Location loc, BlockFace rotation) {
+            return new Constructor(loc, rotation);
         }
     }
 

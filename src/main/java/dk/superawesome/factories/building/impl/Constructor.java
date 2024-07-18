@@ -1,16 +1,15 @@
 package dk.superawesome.factories.building.impl;
 
 import dk.superawesome.factories.building.Building;
-import dk.superawesome.factories.mehcanics.Profiles;
-import dk.superawesome.factories.util.statics.BlockUtil;
-import org.bukkit.Location;
+import dk.superawesome.factories.mechanics.Profiles;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public class Constructor implements Building {
 
@@ -20,18 +19,14 @@ public class Constructor implements Building {
             new BlockVector(-1, 0, 0)
     );
 
-    private final List<Consumer<Location>> blocks = Arrays.asList(
-            l -> l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(0))).setType(Material.OAK_WOOD),
-            l -> l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(1))).setType(Material.CRAFTING_TABLE),
-            l -> {
-                Block block = l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(2)));
-                block.setType(Material.OAK_WALL_SIGN);
-                BlockUtil.setSignFacing(block, l.getWorld().getBlockAt(BlockUtil.getRel(l, relatives.get(0))), true);
-            }
+    private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
+            (b, r) -> b.setType(Material.OAK_LOG),
+            (b, r) -> b.setType(Material.CRAFTING_TABLE),
+            (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */
     );
 
     @Override
-    public List<Consumer<Location>> getBlocks() {
+    public List<BiConsumer<Block, BlockFace>> getBlocks() {
         return blocks;
     }
 

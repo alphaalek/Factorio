@@ -1,14 +1,17 @@
-package dk.superawesome.factories.mehcanics;
+package dk.superawesome.factories.mechanics;
 
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.items.ItemCollection;
-import dk.superawesome.factories.mehcanics.pipes.events.PipePutEvent;
-import dk.superawesome.factories.mehcanics.pipes.events.PipeSuckEvent;
+import dk.superawesome.factories.mechanics.pipes.events.PipePutEvent;
+import dk.superawesome.factories.mechanics.pipes.events.PipeSuckEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.BlockVector;
@@ -39,18 +42,29 @@ public class MechanicManager implements Listener {
         }
     }
 
-    public void load(MechanicProfile<?, ?> profile, Location loc) {
-        Mechanic<?, ?> mechanic = profile.getFactory().create(loc);
+    public Mechanic<?, ?> load(MechanicProfile<?, ?> profile, Location loc, BlockFace rotation) {
+        Mechanic<?, ?> mechanic = profile.getFactory().create(loc, rotation);
         if (mechanic instanceof ThinkingMechanic) {
             thinkingMechanics.add((ThinkingMechanic<?, ?>) mechanic);
         }
 
         // TODO load from db
         mechanics.put(BlockUtil.getVec(loc), mechanic);
+
+        return mechanic;
     }
 
-    public Mechanic<?, ?> getNearbyMechanic(Location loc) {
+    public void unload(Mechanic<?, ?> mechanic) {
+        mechanics.remove(BlockUtil.getVec(mechanic.getLocation()));
 
+        if (mechanic instanceof ThinkingMechanic) {
+            thinkingMechanics.removeIf(m -> mechanic == m);
+        }
+    }
+
+    public List<Mechanic<?, ?>> getNearbyMechanics(Location loc) {
+
+        List<Mechanic<?, ?>> mechanics = new ArrayList<>();
         BlockVector ori = BlockUtil.getVec(loc);
 
         // iterate over the nearby blocks and check if there is any root mechanic block
@@ -58,19 +72,18 @@ public class MechanicManager implements Listener {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
                     BlockVector rel = (BlockVector) new BlockVector(ori).add(new Vector(x, y, z));
-                    if (mechanics.containsKey(rel)) {
-                        return mechanics.get(rel);
+                    if (this.mechanics.containsKey(rel)) {
+                        mechanics.add(this.mechanics.get(rel));
                     }
                 }
             }
         }
 
-        return null;
+        return mechanics;
     }
 
     public Mechanic<?, ?> getMechanicPartially(Location loc) {
-        Mechanic<?, ?> nearby = getNearbyMechanic(loc);
-        if (nearby != null) {
+        for (Mechanic<?, ?> nearby : getNearbyMechanics(loc)) {
             if (Buildings.intersects(loc, nearby)) {
                 return nearby;
             }
@@ -101,5 +114,45 @@ public class MechanicManager implements Listener {
                 mechanic.pipePut(event.getItems());
             }
         }
+    }
+
+    public void buildMechanic(Sign sign) {
+        Mechanic<?, ?> mechanic = loadMechanicFromSign(sign);
+        Bukkit.getLogger().info("Mehcanic " + mechanic + " " + mechanic.getRotation());
+
+        if (!Buildings.hasSpaceFor(sign.getWorld(), sign.getBlock(), mechanic)) {
+            unload(mechanic);
+            return;
+        }
+
+        Buildings.build(sign.getWorld(), mechanic);
+    }
+
+    @SuppressWarnings("deprecation")
+    public Mechanic<?, ?> loadMechanicFromSign(Sign sign) {
+        // check if this sign is related to a mechanic
+        if (!sign.getLine(0).startsWith("[")
+                || !sign.getLine(0).endsWith("]")) {
+            return null;
+        }
+        String type = sign.getLine(0).substring(1, sign.getLine(0).length() - 1);
+
+        Optional<MechanicProfile<?, ?>> mechanicProfile = Profiles.getProfiles()
+                .stream()
+                .filter(b -> b.getName().equals(type))
+                .findFirst();
+        if (!mechanicProfile.isPresent()) {
+            return null;
+        }
+
+        // get the block which the sign is hanging on, because this block is the root of the mechanic
+        Block on = BlockUtil.getPointingBlock(sign.getBlock(), true);
+        if (on == null) {
+            return null;
+        }
+
+        // load this mechanic
+        BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
+        return load(mechanicProfile.get(), on.getLocation(), rotation);
     }
 }

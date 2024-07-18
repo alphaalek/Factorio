@@ -1,8 +1,8 @@
-package dk.superawesome.factories.mehcanics.pipes;
+package dk.superawesome.factories.mechanics.pipes;
 
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.items.ItemCollection;
-import dk.superawesome.factories.mehcanics.pipes.events.PipeSuckEvent;
+import dk.superawesome.factories.mechanics.pipes.events.PipeSuckEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

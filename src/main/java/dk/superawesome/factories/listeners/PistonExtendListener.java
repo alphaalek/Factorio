@@ -1,7 +1,7 @@
 package dk.superawesome.factories.listeners;
 
 import dk.superawesome.factories.Factories;
-import dk.superawesome.factories.mehcanics.MechanicManager;
+import dk.superawesome.factories.mechanics.MechanicManager;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

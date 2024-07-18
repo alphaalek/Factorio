@@ -1,6 +1,6 @@
 package dk.superawesome.factories.gui;
 
-import dk.superawesome.factories.mehcanics.Mechanic;
+import dk.superawesome.factories.mechanics.Mechanic;
 import dk.superawesome.factories.util.Callback;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;

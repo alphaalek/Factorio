@@ -1,10 +1,7 @@
 package dk.superawesome.factories;
 
-import dk.superawesome.factories.listeners.ChunkLoadListener;
-import dk.superawesome.factories.listeners.InteractListener;
-import dk.superawesome.factories.listeners.PistonExtendListener;
-import dk.superawesome.factories.listeners.RedstoneSignalListener;
-import dk.superawesome.factories.mehcanics.MechanicManager;
+import dk.superawesome.factories.listeners.*;
+import dk.superawesome.factories.mechanics.MechanicManager;
 import dk.superawesome.factories.util.Tick;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -35,12 +32,13 @@ public final class Factories extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new ChunkLoadListener(), this);
         Bukkit.getPluginManager().registerEvents(new InteractListener(), this);
         Bukkit.getPluginManager().registerEvents(new PistonExtendListener(), this);
+        Bukkit.getPluginManager().registerEvents(new SignChangeListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
 
         Tick.start();
 
         // TODO
 
-        // add more fuel types
         // buildings
         // power central
     }

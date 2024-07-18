@@ -1,11 +1,12 @@
-package dk.superawesome.factories.mehcanics.impl;
+package dk.superawesome.factories.mechanics.impl;
 
 import dk.superawesome.factories.gui.impl.SmelterGui;
 import dk.superawesome.factories.items.ItemCollection;
-import dk.superawesome.factories.mehcanics.*;
+import dk.superawesome.factories.mechanics.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -32,8 +33,8 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     private ItemStack storageType;
     private int storageAmount;
 
-    public Smelter(Location loc) {
-        super(loc);
+    public Smelter(Location loc, BlockFace rotation) {
+        super(loc, rotation);
     }
 
     @Override
@@ -141,16 +142,17 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
             }
         }
         if (currentFuelAmount == 0 && fuelAmount > 0) {
+            SmelterGui gui = inUse.get();
+            if (gui != null) {
+                gui.updateRemovedFuel(1);
+            }
+
+            // remove the fuel internally after we updated to gui
             fuelAmount--;
             currentFuelAmount = 1;
             currentFuel = fuel;
             if (fuelAmount == 0) {
                 fuel = null;
-            }
-
-            SmelterGui gui = inUse.get();
-            if (gui != null) {
-                gui.updateRemovedFuel(1);
             }
         }
 

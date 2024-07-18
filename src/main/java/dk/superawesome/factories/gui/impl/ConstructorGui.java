@@ -2,7 +2,7 @@ package dk.superawesome.factories.gui.impl;
 
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.gui.MechanicGui;
-import dk.superawesome.factories.mehcanics.impl.Constructor;
+import dk.superawesome.factories.mechanics.impl.Constructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;

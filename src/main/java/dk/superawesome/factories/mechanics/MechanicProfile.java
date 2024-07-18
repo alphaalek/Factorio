@@ -1,4 +1,4 @@
-package dk.superawesome.factories.mehcanics;
+package dk.superawesome.factories.mechanics;
 
 import dk.superawesome.factories.building.Building;
 import dk.superawesome.factories.gui.BaseGui;

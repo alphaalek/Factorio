@@ -1,15 +1,15 @@
-package dk.superawesome.factories.mehcanics.impl;
+package dk.superawesome.factories.mechanics.impl;
 
 import dk.superawesome.factories.gui.impl.StorageBoxGui;
 import dk.superawesome.factories.items.ItemCollection;
-import dk.superawesome.factories.mehcanics.AbstractMechanic;
-import dk.superawesome.factories.mehcanics.MechanicProfile;
-import dk.superawesome.factories.mehcanics.Profiles;
+import dk.superawesome.factories.mechanics.AbstractMechanic;
+import dk.superawesome.factories.mechanics.MechanicProfile;
+import dk.superawesome.factories.mechanics.Profiles;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> {
@@ -17,8 +17,8 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> {
     private ItemStack stored;
     private int amount;
 
-    public StorageBox(Location location) {
-        super(location);
+    public StorageBox(Location location, BlockFace rotation) {
+        super(location, rotation);
     }
 
     @Override

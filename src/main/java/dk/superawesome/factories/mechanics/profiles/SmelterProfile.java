@@ -1,13 +1,14 @@
-package dk.superawesome.factories.mehcanics.profiles;
+package dk.superawesome.factories.mechanics.profiles;
 
 import dk.superawesome.factories.building.Building;
 import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.gui.GuiFactory;
 import dk.superawesome.factories.gui.impl.SmelterGui;
-import dk.superawesome.factories.mehcanics.MechanicFactory;
-import dk.superawesome.factories.mehcanics.MechanicProfile;
-import dk.superawesome.factories.mehcanics.impl.Smelter;
+import dk.superawesome.factories.mechanics.MechanicFactory;
+import dk.superawesome.factories.mechanics.MechanicProfile;
+import dk.superawesome.factories.mechanics.impl.Smelter;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -44,8 +45,8 @@ public class SmelterProfile implements MechanicProfile<Smelter, SmelterGui> {
     private static class SmelterMechanicFactory implements MechanicFactory<Smelter> {
 
         @Override
-        public Smelter create(Location loc) {
-            return new Smelter(loc);
+        public Smelter create(Location loc, BlockFace rotation) {
+            return new Smelter(loc, rotation);
         }
     }
 

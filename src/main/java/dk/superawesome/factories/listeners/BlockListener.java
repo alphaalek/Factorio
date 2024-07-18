@@ -1,6 +1,6 @@
 package dk.superawesome.factories.listeners;
 
-import dk.superawesome.factories.mehcanics.pipes.Pipes;
+import dk.superawesome.factories.mechanics.pipes.Pipes;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;

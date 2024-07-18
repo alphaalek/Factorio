@@ -2,7 +2,7 @@ package dk.superawesome.factories.gui.impl;
 
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.gui.MechanicGui;
-import dk.superawesome.factories.mehcanics.impl.StorageBox;
+import dk.superawesome.factories.mechanics.impl.StorageBox;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.ClickType;

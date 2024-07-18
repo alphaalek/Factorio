@@ -1,15 +1,15 @@
-package dk.superawesome.factories.mehcanics;
+package dk.superawesome.factories.mechanics;
 
 import dk.superawesome.factories.gui.BaseGui;
 import dk.superawesome.factories.gui.impl.ConstructorGui;
 import dk.superawesome.factories.gui.impl.SmelterGui;
 import dk.superawesome.factories.gui.impl.StorageBoxGui;
-import dk.superawesome.factories.mehcanics.impl.Constructor;
-import dk.superawesome.factories.mehcanics.impl.Smelter;
-import dk.superawesome.factories.mehcanics.impl.StorageBox;
-import dk.superawesome.factories.mehcanics.profiles.ConstructorProfile;
-import dk.superawesome.factories.mehcanics.profiles.SmelterProfile;
-import dk.superawesome.factories.mehcanics.profiles.StorageBoxProfile;
+import dk.superawesome.factories.mechanics.impl.Constructor;
+import dk.superawesome.factories.mechanics.impl.Smelter;
+import dk.superawesome.factories.mechanics.impl.StorageBox;
+import dk.superawesome.factories.mechanics.profiles.ConstructorProfile;
+import dk.superawesome.factories.mechanics.profiles.SmelterProfile;
+import dk.superawesome.factories.mechanics.profiles.StorageBoxProfile;
 import dk.superawesome.factories.util.Array;
 
 public class Profiles {
