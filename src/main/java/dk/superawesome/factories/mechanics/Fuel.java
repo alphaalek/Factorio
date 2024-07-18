@@ -13,7 +13,8 @@ public class Fuel {
         COAL(Material.COAL, 1f / 8f),
         CHARCOAL(Material.CHARCOAL, 1f / 8f),
         BLAZE_ROD(Material.BLAZE_ROD, 1f / 16f),
-        LAVA_BUCKET(Material.LAVA_BUCKET, 1f / 64f),
+        COAL_BLOCK(Material.COAL_BLOCK, 1f / 72),
+        LAVA_BUCKET(Material.LAVA_BUCKET, 1f / 100f),
         WOOD(Tag.PLANKS::isTagged, 1f / 2f),
         LOG(Tag.LOGS::isTagged, 1f / 5f),
         ;

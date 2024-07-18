@@ -118,11 +118,17 @@ public class MechanicManager implements Listener {
 
     public void buildMechanic(Sign sign) {
         Mechanic<?, ?> mechanic = loadMechanicFromSign(sign);
+        if (mechanic == null) {
+            return;
+        }
+
+        // check if we can build this mechanic in the world
         if (!Buildings.hasSpaceFor(sign.getWorld(), sign.getBlock(), mechanic)) {
             unload(mechanic);
             return;
         }
 
+        // place the blocks for this mechanic
         Buildings.build(sign.getWorld(), mechanic);
     }
 

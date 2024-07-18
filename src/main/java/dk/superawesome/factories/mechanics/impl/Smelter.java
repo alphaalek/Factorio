@@ -139,12 +139,6 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         }
 
         // use fuel
-        if (currentFuelAmount > 0) {
-            currentFuelAmount -= currentFuel.getFuelAmount();
-            if (currentFuelAmount == 0) {
-                currentFuel = null;
-            }
-        }
         if (currentFuelAmount == 0 && fuelAmount > 0) {
             SmelterGui gui = inUse.get();
             if (gui != null) {
@@ -155,8 +149,17 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
             fuelAmount--;
             currentFuelAmount = 1;
             currentFuel = fuel;
-            if (fuelAmount == 0) {
+            if (fuelAmount <= 0) {
                 fuel = null;
+            }
+        }
+        if (currentFuelAmount > 0) {
+            currentFuelAmount -= currentFuel.getFuelAmount();
+            // due to working with floats, there can be calculation errors due to java binary encoding
+            // this means that we can possibly end up with a number slightly above zero
+            if (currentFuelAmount <= .001) {
+                currentFuel = null;
+                currentFuelAmount = 0; // ensure zero value (related problem mentioned above)
             }
         }
 

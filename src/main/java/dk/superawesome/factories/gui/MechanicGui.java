@@ -6,9 +6,12 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>> extends BaseGui<G> {
 
@@ -151,5 +154,13 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
 
             getInventory().setItem(slots.get(i++), item);
         }
+    }
+
+    protected List<Integer> reverseSlots(List<Integer> slots) {
+        return IntStream.range(0, slots.size())
+                .boxed()
+                .map(slots::get)
+                .sorted(Collections.reverseOrder())
+                .collect(Collectors.toList());
     }
 }

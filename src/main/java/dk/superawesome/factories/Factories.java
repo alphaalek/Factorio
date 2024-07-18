@@ -36,11 +36,6 @@ public final class Factories extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
 
         Tick.start();
-
-        // TODO
-
-        // buildings
-        // power central
     }
 
     @Override

@@ -188,20 +188,15 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     }
 
     public void updateRemovedStorage(int amount) {
-        updateRemovedItems(getInventory(), amount, getMechanic().getStorageType(),
-                IntStream.range(0, STORAGE_SLOTS.size())
-                        .boxed()
-                        .map(STORAGE_SLOTS::get)
-                        .sorted(Collections.reverseOrder())
-                        .collect(Collectors.toList()));
+        updateRemovedItems(getInventory(), amount, getMechanic().getStorageType(), reverseSlots(STORAGE_SLOTS));
     }
 
     public void updateRemovedIngredients(int amount) {
-        updateRemovedItems(getInventory(), amount, getMechanic().getIngredient(), INGREDIENT_SLOTS);
+        updateRemovedItems(getInventory(), amount, getMechanic().getIngredient(), reverseSlots(INGREDIENT_SLOTS));
     }
 
     public void updateRemovedFuel(int amount) {
-        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getFuel().getMaterial()), FUEL_SLOTS);
+        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getFuel().getMaterial()), reverseSlots(FUEL_SLOTS));
     }
 
     @Override
