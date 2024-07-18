@@ -48,7 +48,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
             return;
         }
 
-        if ((ingredient == null && collection.has(i -> canSmelt(i.getType()))) || ingredient != null && collection.has(ingredient)) {
+        if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(i -> canSmelt(i.getType()))) {
             ingredientAmount += takeItemsFrom(collection, SmelterGui::updateAddedIngredients, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
@@ -60,9 +60,13 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
                     ingredient = stack;
                 }
             });
+
+            if (smeltResult == null) {
+                smeltResult = cachedSmeltResult;
+            }
         }
 
-        if ((fuel == null && collection.has(i -> Fuel.get(i.getType()) != null)) || fuel != null && collection.has(new ItemStack(fuel.getMaterial()))) {
+        if (fuel != null && collection.has(new ItemStack(fuel.getMaterial())) || fuel == null && collection.has(i -> Fuel.get(i.getType()) != null)) {
             fuelAmount += takeItemsFrom(collection, SmelterGui::updateAddedFuel, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {

@@ -118,8 +118,6 @@ public class MechanicManager implements Listener {
 
     public void buildMechanic(Sign sign) {
         Mechanic<?, ?> mechanic = loadMechanicFromSign(sign);
-        Bukkit.getLogger().info("Mehcanic " + mechanic + " " + mechanic.getRotation());
-
         if (!Buildings.hasSpaceFor(sign.getWorld(), sign.getBlock(), mechanic)) {
             unload(mechanic);
             return;

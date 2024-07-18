@@ -1,7 +1,6 @@
 package dk.superawesome.factories.util.statics;
 
 import dk.superawesome.factories.util.BlockValidator;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -71,7 +70,7 @@ public class BlockUtil {
     }
 
     public static Vector rotateVec(Vector vec, BlockFace ori, BlockFace rot) {
-        int angle = calculateRotationAngle(ori.getDirection(), rot.getDirection());
+        int angle = getXZAngle(ori.getDirection(), rot.getDirection());
 
         Vector newVec = vec.clone();
         // apply the rotation based on the angle between the original and rotated directions
@@ -95,7 +94,7 @@ public class BlockUtil {
         return newVec;
     }
 
-    private static int calculateRotationAngle(Vector oriVec, Vector rotVec) {
+    private static int getXZAngle(Vector oriVec, Vector rotVec) {
         int oriX = oriVec.getBlockX();
         int oriZ = oriVec.getBlockZ();
         int rotX = rotVec.getBlockX();
