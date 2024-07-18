@@ -1,6 +1,6 @@
 package dk.superawesome.factories.mechanics.pipes;
 
-import dk.superawesome.factories.items.ItemCollection;
+import dk.superawesome.factories.mechanics.ItemCollection;
 import dk.superawesome.factories.mechanics.pipes.events.PipePutEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
 import org.bukkit.Bukkit;

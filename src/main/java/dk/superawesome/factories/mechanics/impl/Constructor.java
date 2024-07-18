@@ -1,7 +1,6 @@
 package dk.superawesome.factories.mechanics.impl;
 
 import dk.superawesome.factories.gui.impl.ConstructorGui;
-import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.mechanics.*;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -10,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> implements ThinkingMechanic<Constructor, ConstructorGui> {
+public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> implements ThinkingMechanic, ItemCollection, Puttable {
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
     private final ItemStack[] craftingGridItems = new ItemStack[9];
@@ -73,7 +72,6 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     @Override
     public void think() {
-
         // check if the constructors storage has any previously crafted items which is not the that are
         // not the same as the current recipe.
         // if it has any, we can't craft the new recipe until all the previously crafted items are removed

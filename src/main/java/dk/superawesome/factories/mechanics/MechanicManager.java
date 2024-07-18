@@ -2,7 +2,6 @@ package dk.superawesome.factories.mechanics;
 
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.building.Buildings;
-import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.mechanics.pipes.events.PipePutEvent;
 import dk.superawesome.factories.mechanics.pipes.events.PipeSuckEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
@@ -32,10 +31,10 @@ public class MechanicManager implements Listener {
     }
 
     private final Map<BlockVector, Mechanic<?, ?>> mechanics = new HashMap<>();
-    private final Queue<ThinkingMechanic<?, ?>> thinkingMechanics = new LinkedList<>();
+    private final Queue<ThinkingMechanic> thinkingMechanics = new LinkedList<>();
 
     public void handleThinking() {
-        for (ThinkingMechanic<?, ?> thinking : thinkingMechanics) {
+        for (ThinkingMechanic thinking : thinkingMechanics) {
             if (!thinking.getTickThrottle().isThrottled() && thinking.getDelayHandler().ready()) {
                 thinking.think();
             }
@@ -45,7 +44,7 @@ public class MechanicManager implements Listener {
     public Mechanic<?, ?> load(MechanicProfile<?, ?> profile, Location loc, BlockFace rotation) {
         Mechanic<?, ?> mechanic = profile.getFactory().create(loc, rotation);
         if (mechanic instanceof ThinkingMechanic) {
-            thinkingMechanics.add((ThinkingMechanic<?, ?>) mechanic);
+            thinkingMechanics.add((ThinkingMechanic) mechanic);
         }
 
         // TODO load from db
@@ -63,10 +62,9 @@ public class MechanicManager implements Listener {
     }
 
     public List<Mechanic<?, ?>> getNearbyMechanics(Location loc) {
-
         List<Mechanic<?, ?>> mechanics = new ArrayList<>();
-        BlockVector ori = BlockUtil.getVec(loc);
 
+        BlockVector ori = BlockUtil.getVec(loc);
         // iterate over the nearby blocks and check if there is any root mechanic block
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
@@ -110,8 +108,8 @@ public class MechanicManager implements Listener {
     public void onPipePut(PipePutEvent event) {
         if (event.getBlock().getWorld().equals(this.world)) {
             Mechanic<?, ?> mechanic = getMechanicAt(event.getBlock().getLocation());
-            if (mechanic != null) {
-                mechanic.pipePut(event.getItems());
+            if (mechanic instanceof Puttable) {
+                ((Puttable)mechanic).pipePut(event.getItems());
             }
         }
     }

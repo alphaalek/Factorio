@@ -1,7 +1,6 @@
 package dk.superawesome.factories.mechanics;
 
 import dk.superawesome.factories.gui.BaseGui;
-import dk.superawesome.factories.items.ItemCollection;
 import dk.superawesome.factories.util.TickThrottle;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -14,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseGui<G>> implements Mechanic<M, G>, ItemCollection {
+public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseGui<G>> implements Mechanic<M, G> {
 
     protected final AtomicReference<G> inUse = new AtomicReference<>();
     protected final TickThrottle tickThrottle = new TickThrottle();
@@ -86,8 +85,8 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
         return items;
     }
 
-    protected int takeItemsFrom(ItemCollection collection, BiConsumer<G, Integer> doGui, Updater<ItemStack> updater) {
-        List<ItemStack> items = collection.take(64);
+    protected int put(ItemCollection from, BiConsumer<G, Integer> doGui, Updater<ItemStack> updater) {
+        List<ItemStack> items = from.take(64);
         int add = 0;
         for (ItemStack item : items) {
             add += item.getAmount();

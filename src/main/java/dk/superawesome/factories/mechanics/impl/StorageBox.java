@@ -1,10 +1,7 @@
 package dk.superawesome.factories.mechanics.impl;
 
 import dk.superawesome.factories.gui.impl.StorageBoxGui;
-import dk.superawesome.factories.items.ItemCollection;
-import dk.superawesome.factories.mechanics.AbstractMechanic;
-import dk.superawesome.factories.mechanics.MechanicProfile;
-import dk.superawesome.factories.mechanics.Profiles;
+import dk.superawesome.factories.mechanics.*;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -12,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> {
+public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> implements ItemCollection, Puttable {
 
     private ItemStack stored;
     private int amount;
@@ -33,7 +30,7 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> {
         }
 
         if (stored == null || collection.has(stored)) {
-            amount += takeItemsFrom(collection, StorageBoxGui::updateAddedItems, new Updater<ItemStack>() {
+            amount += put(collection, StorageBoxGui::updateAddedItems, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return stored;

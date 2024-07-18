@@ -1,7 +1,7 @@
 package dk.superawesome.factories.mechanics.impl;
 
 import dk.superawesome.factories.gui.impl.SmelterGui;
-import dk.superawesome.factories.items.ItemCollection;
+import dk.superawesome.factories.mechanics.ItemCollection;
 import dk.superawesome.factories.mechanics.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements ThinkingMechanic<Smelter, SmelterGui> {
+public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements ThinkingMechanic, ItemCollection, Puttable {
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
 
@@ -49,7 +49,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         }
 
         if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(i -> canSmelt(i.getType()))) {
-            ingredientAmount += takeItemsFrom(collection, SmelterGui::updateAddedIngredients, new Updater<ItemStack>() {
+            ingredientAmount += put(collection, SmelterGui::updateAddedIngredients, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return ingredient;
@@ -67,7 +67,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         }
 
         if (fuel != null && collection.has(new ItemStack(fuel.getMaterial())) || fuel == null && collection.has(i -> Fuel.get(i.getType()) != null)) {
-            fuelAmount += takeItemsFrom(collection, SmelterGui::updateAddedFuel, new Updater<ItemStack>() {
+            fuelAmount += put(collection, SmelterGui::updateAddedFuel, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return fuel == null ? null : new ItemStack(fuel.getMaterial());

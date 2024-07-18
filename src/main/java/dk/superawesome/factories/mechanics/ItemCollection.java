@@ -1,4 +1,4 @@
-package dk.superawesome.factories.items;
+package dk.superawesome.factories.mechanics;
 
 import org.bukkit.inventory.ItemStack;
 

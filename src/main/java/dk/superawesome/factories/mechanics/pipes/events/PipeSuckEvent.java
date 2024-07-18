@@ -1,6 +1,6 @@
 package dk.superawesome.factories.mechanics.pipes.events;
 
-import dk.superawesome.factories.items.ItemCollection;
+import dk.superawesome.factories.mechanics.ItemCollection;
 import org.bukkit.block.Block;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;
