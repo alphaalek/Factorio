@@ -1,6 +1,7 @@
 package dk.superawesome.factories.building;
 
 import dk.superawesome.factories.building.impl.Constructor;
+import dk.superawesome.factories.building.impl.PowerCentral;
 import dk.superawesome.factories.building.impl.Smelter;
 import dk.superawesome.factories.building.impl.StorageBox;
 import dk.superawesome.factories.mechanics.Mechanic;
@@ -22,13 +23,15 @@ public class Buildings {
     public static Building CONSTRUCTOR;
     public static Building SMELTER;
     public static Building STORAGE_BOX;
+    public static Building POWER_CENTRAL;
 
     static {
         buildings = new Array<>();
 
-        CONSTRUCTOR = loadBuilding(new Constructor());
-        SMELTER =     loadBuilding(new Smelter());
-        STORAGE_BOX = loadBuilding(new StorageBox());
+        CONSTRUCTOR   = loadBuilding(new Constructor());
+        SMELTER       = loadBuilding(new Smelter());
+        STORAGE_BOX   = loadBuilding(new StorageBox());
+        POWER_CENTRAL = loadBuilding(new PowerCentral());
     }
 
     private static final Array<Building> buildings;

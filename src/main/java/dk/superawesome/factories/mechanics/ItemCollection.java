@@ -14,4 +14,6 @@ public interface ItemCollection {
     List<ItemStack> take(int amount);
 
     boolean isEmpty();
+
+    double getEnergyCost();
 }

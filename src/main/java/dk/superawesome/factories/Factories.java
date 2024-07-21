@@ -28,7 +28,6 @@ public final class Factories extends JavaPlugin implements Listener {
             mechanicManagers.put(world, mm);
         }
 
-        Bukkit.getPluginManager().registerEvents(new RedstoneSignalListener(), this);
         Bukkit.getPluginManager().registerEvents(new ChunkLoadListener(), this);
         Bukkit.getPluginManager().registerEvents(new InteractListener(), this);
         Bukkit.getPluginManager().registerEvents(new PistonExtendListener(), this);

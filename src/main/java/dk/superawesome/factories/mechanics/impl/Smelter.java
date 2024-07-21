@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements ThinkingMechanic, ItemCollection, Puttable {
+public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements ThinkingMechanic, ItemCollection, Container {
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
 
@@ -222,6 +222,11 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     @Override
     public boolean isEmpty() {
         return storageType == null;
+    }
+
+    @Override
+    public double getEnergyCost() {
+        return 1d / 2d;
     }
 
     public ItemStack getIngredient() {

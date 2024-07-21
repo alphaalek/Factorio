@@ -19,7 +19,7 @@ public class ChunkLoadListener implements Listener {
         for (BlockState state : event.getChunk().getTileEntities()) {
             if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())) {
                 // load this mechanic
-                Bukkit.getScheduler().runTask(Factories.get(), () -> Factories.get().getMechanicManager(world).loadMechanicFromSign((Sign) state));
+                Bukkit.getScheduler().runTask(Factories.get(), () -> Factories.get().getMechanicManager(world).loadMechanic((Sign) state));
             }
         }
     }

@@ -1,6 +1,6 @@
 package dk.superawesome.factories.mechanics;
 
-public interface Puttable {
+public interface Container {
 
     void pipePut(ItemCollection collection);
 }

@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> implements ThinkingMechanic, ItemCollection, Puttable {
+public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> implements ThinkingMechanic, ItemCollection, Container {
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
     private final ItemStack[] craftingGridItems = new ItemStack[9];
@@ -170,6 +170,11 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     @Override
     public boolean isEmpty() {
         return storageType == null;
+    }
+
+    @Override
+    public double getEnergyCost() {
+        return 2d / 3d;
     }
 
     public boolean isDeclined() {

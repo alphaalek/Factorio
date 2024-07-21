@@ -2,8 +2,8 @@ package dk.superawesome.factories.mechanics;
 
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.building.Buildings;
-import dk.superawesome.factories.mechanics.pipes.events.PipePutEvent;
-import dk.superawesome.factories.mechanics.pipes.events.PipeSuckEvent;
+import dk.superawesome.factories.mechanics.routes.events.PipePutEvent;
+import dk.superawesome.factories.mechanics.routes.events.PipeSuckEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,7 +47,6 @@ public class MechanicManager implements Listener {
             thinkingMechanics.add((ThinkingMechanic) mechanic);
         }
 
-        // TODO load from db
         mechanics.put(BlockUtil.getVec(loc), mechanic);
 
         return mechanic;
@@ -108,8 +107,8 @@ public class MechanicManager implements Listener {
     public void onPipePut(PipePutEvent event) {
         if (event.getBlock().getWorld().equals(this.world)) {
             Mechanic<?, ?> mechanic = getMechanicAt(event.getBlock().getLocation());
-            if (mechanic instanceof Puttable) {
-                ((Puttable)mechanic).pipePut(event.getItems());
+            if (mechanic instanceof Container) {
+                ((Container)mechanic).pipePut(event.getItems());
             }
         }
     }
@@ -128,10 +127,20 @@ public class MechanicManager implements Listener {
 
         // place the blocks for this mechanic
         Buildings.build(sign.getWorld(), mechanic);
+        mechanic.blocksLoaded();
+    }
+
+    public void loadMechanic(Sign sign) {
+        Mechanic<?, ?> mechanic = loadMechanicFromSign(sign);
+        if (mechanic != null) {
+            // TODO db load
+
+            mechanic.blocksLoaded();
+        }
     }
 
     @SuppressWarnings("deprecation")
-    public Mechanic<?, ?> loadMechanicFromSign(Sign sign) {
+    private Mechanic<?, ?> loadMechanicFromSign(Sign sign) {
         // check if this sign is related to a mechanic
         if (!sign.getLine(0).startsWith("[")
                 || !sign.getLine(0).endsWith("]")) {
@@ -141,7 +150,7 @@ public class MechanicManager implements Listener {
 
         Optional<MechanicProfile<?, ?>> mechanicProfile = Profiles.getProfiles()
                 .stream()
-                .filter(b -> b.getName().equals(type))
+                .filter(b -> b.getName().equalsIgnoreCase(type))
                 .findFirst();
         if (!mechanicProfile.isPresent()) {
             return null;

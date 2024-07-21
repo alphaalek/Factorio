@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> implements ItemCollection, Puttable {
+public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> implements ItemCollection, Container {
 
     private ItemStack stored;
     private int amount;
@@ -78,6 +78,11 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
     @Override
     public boolean isEmpty() {
         return stored == null;
+    }
+
+    @Override
+    public double getEnergyCost() {
+        return 1d / 4d;
     }
 
     public ItemStack getStored() {

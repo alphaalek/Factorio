@@ -26,6 +26,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
     }
 
     @Override
+    public void blocksLoaded() {
+
+    }
+
+    @Override
     public TickThrottle getTickThrottle() {
         return tickThrottle;
     }

@@ -1,4 +1,4 @@
-package dk.superawesome.factories.mechanics.pipes.events;
+package dk.superawesome.factories.mechanics.routes.events;
 
 import dk.superawesome.factories.mechanics.ItemCollection;
 import org.bukkit.block.Block;

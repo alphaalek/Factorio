@@ -2,6 +2,7 @@ package dk.superawesome.factories.building;
 
 import dk.superawesome.factories.util.Identifiable;
 import dk.superawesome.factories.util.statics.BlockUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlastFurnace;
 import org.bukkit.block.Block;
@@ -10,6 +11,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Furnace;
 import org.bukkit.util.BlockVector;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -17,9 +19,11 @@ import java.util.function.Consumer;
 
 public interface Building extends Identifiable {
 
-    default void setPointingSign(Block block, BlockVector rel, BlockFace rotation) {
-        BlockUtil.setSignFacing(block,
-                block.getWorld().getBlockAt(BlockUtil.getRel(block.getLocation(), BlockUtil.rotateVec(rel, BlockFace.EAST, rotation))), true);
+    default Location getOri(Location loc, Vector vec, BlockFace rotation) {
+        Vector rotated = BlockUtil.rotateVec(vec, rotation, BlockFace.WEST);
+        rotated.setY(-vec.getY());
+
+        return BlockUtil.getRel(loc, rotated);
     }
 
     default void rotate(Block block, BlockFace rotation) {

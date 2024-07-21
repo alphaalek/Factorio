@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 
 public interface Mechanic<M extends Mechanic<M, G>, G extends BaseGui<G>> {
 
+    void blocksLoaded();
+
     TickThrottle getTickThrottle();
 
     Location getLocation();

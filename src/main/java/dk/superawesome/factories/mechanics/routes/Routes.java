@@ -1,8 +1,9 @@
-package dk.superawesome.factories.mechanics.pipes;
+package dk.superawesome.factories.mechanics.routes;
 
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.mechanics.ItemCollection;
-import dk.superawesome.factories.mechanics.pipes.events.PipeSuckEvent;
+import dk.superawesome.factories.mechanics.impl.PowerCentral;
+import dk.superawesome.factories.mechanics.routes.events.PipeSuckEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -10,15 +11,17 @@ import org.bukkit.block.Block;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
-public class Pipes {
+public class Routes {
 
-    public static void suckItems(Block start) {
-        if (!BlockUtil.stickyPiston.test(start.getType())) {
+    private static final RouteFactory<AbstractRoute.Pipe, AbstractRoute.ItemsOutputEntry> itemsRouteFactory = new RouteFactory.PipeRouteFactory();
+    private static final RouteFactory<AbstractRoute.Signal, AbstractRoute.SignalOutputEntry> signalRouteFactory = new RouteFactory.SignalRouteFactory();
+
+    public static void suckItems(Block start, PowerCentral source) {
+        if (start.getType() != Material.STICKY_PISTON) {
             return;
         }
 
-        // we will suck items out of the block that the sticky piston is pointing towards
-        // if it's neither a mechanic
+        // we will suck items out of the mechanic that the sticky piston is pointing towards
         Block from = BlockUtil.getPointingBlock(start, false);
         if (from == null) {
             return;
@@ -26,29 +29,43 @@ public class Pipes {
 
         PipeSuckEvent event = new PipeSuckEvent(from);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.getItems() == null || event.getItems().isEmpty()) {
+        if (event.getItems() == null
+                || event.getItems().isEmpty()
+                || source.getEnergy() < event.getItems().getEnergyCost()) {
             return;
         }
 
+        source.setEnergy(source.getEnergy() - event.getItems().getEnergyCost());
+
         // start the pipe route
-        startRoute(start, event.getItems());
+        startItemsRoute(start, event.getItems());
     }
 
-    public static void startRoute(Block start, ItemCollection collection) {
-        PipeRoute route = PipeRoute.getCachedRoute(start.getWorld(), BlockUtil.getVec(start));
+    private static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R, P> factory) {
+        R route = AbstractRoute.getCachedRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
-            route = createNewRoute(start);
+            route = createNewRoute(start, factory);
         }
 
         if (!route.isCached()) {
-            PipeRoute.addRouteToCache(start.getWorld(), route);
+            AbstractRoute.addRouteToCache(start, route);
         }
 
-        route.start(collection);
+        return route;
     }
 
-    public static PipeRoute createNewRoute(Block start) {
-        PipeRoute route = new PipeRoute();
+    public static void startItemsRoute(Block start, ItemCollection collection) {
+        setupRoute(start, itemsRouteFactory)
+                .start(collection);
+    }
+
+    public static void startSignalRoute(Block start, PowerCentral source) {
+        setupRoute(start, signalRouteFactory)
+                .start(source);
+    }
+
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R, P> factory) {
+        R route = factory.create();
 
         expandRoute(route, start);
 
@@ -78,7 +95,7 @@ public class Pipes {
         return vecs;
     }
 
-    public static void expandRoute(PipeRoute route, Block from) {
+    public static void expandRoute(AbstractRoute<?, ?> route, Block from) {
         BlockVector fromVec = BlockUtil.getVec(from);
         Material fromMat = from.getType();
 
@@ -86,24 +103,7 @@ public class Pipes {
         for (BlockVector relVec : getRelativeVecs(fromVec)) {
             if (!route.has(relVec)) {
                 Block rel = BlockUtil.getBlock(from.getWorld(), relVec);
-                Material mat = rel.getType();
-
-                // piston = pipe output
-                if (BlockUtil.piston.test(mat)) {
-                    route.addOutput(from.getWorld(), relVec);
-                // glass = pipe expand
-                } else if (
-                        mat == Material.GLASS
-                                ||
-                                BlockUtil.anyStainedGlass.test(mat)
-                                        && (fromMat == mat
-                                        || fromMat == Material.GLASS
-                                        || BlockUtil.stickyPiston.test(fromMat)
-                                )
-                ) {
-                    route.add(relVec);
-                    expandRoute(route, rel);
-                }
+                route.search(from, fromMat, relVec, rel);
             }
         }
     }
@@ -116,15 +116,16 @@ public class Pipes {
             // iterate over all blocks around this block
             for (BlockVector relVec : getRelativeVecs(fromVec)) {
 
-                PipeRoute route = PipeRoute.getCachedRoute(block.getWorld(), relVec);
+                AbstractRoute<?, ?> route = AbstractRoute.getCachedRoute(block.getWorld(), relVec);
                 if (route != null) {
                     if (block.getType() == Material.AIR) {
-                        // the pipe was broken
-                        route.clear();
-                        expandRoute(route, BlockUtil.getBlock(block.getWorld(), relVec));
+                        // the route was broken
+                        AbstractRoute.removeRouteFromCache(block.getWorld(), route);
+                        setupRoute(BlockUtil.getRel(block.getLocation(), relVec).getBlock(), route.getFactory());
                     } else {
-                        // the pipe was expanded
+                        // the route was expanded
                         expandRoute(route, block);
+                        break;
                     }
                 }
             }

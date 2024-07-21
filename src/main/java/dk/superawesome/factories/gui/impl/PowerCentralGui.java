@@ -2,6 +2,7 @@ package dk.superawesome.factories.gui.impl;
 
 import dk.superawesome.factories.gui.MechanicGui;
 import dk.superawesome.factories.mechanics.impl.PowerCentral;
+import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 
@@ -17,6 +18,8 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
     @Override
     public void loadItems() {
         super.loadItems();
+
+        getMechanic().setEnergy(getMechanic().getEnergy() + 10);
     }
 
     @Override

@@ -16,10 +16,6 @@ import java.util.Objects;
 @SuppressWarnings("deprecation")
 public class BlockUtil {
 
-    public static BlockValidator diode = BlockValidator.from(Material.REPEATER);
-    public static BlockValidator stickyPiston = BlockValidator.from(Material.STICKY_PISTON);
-    public static BlockValidator piston = BlockValidator.from(Material.PISTON);
-
     public static BlockValidator anyStainedGlass = BlockValidator.from(
             Material.LEGACY_STAINED_GLASS,
             Material.BLACK_STAINED_GLASS,
@@ -146,5 +142,6 @@ public class BlockUtil {
                         getFaceBetween(block, towards), opposite
                 )
         );
+        block.setBlockData(sign);
     }
 }

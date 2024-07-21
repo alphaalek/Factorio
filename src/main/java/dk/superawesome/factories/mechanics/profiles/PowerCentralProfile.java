@@ -1,6 +1,7 @@
 package dk.superawesome.factories.mechanics.profiles;
 
 import dk.superawesome.factories.building.Building;
+import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.gui.GuiFactory;
 import dk.superawesome.factories.gui.impl.PowerCentralGui;
 import dk.superawesome.factories.mechanics.MechanicFactory;
@@ -23,7 +24,7 @@ public class PowerCentralProfile implements MechanicProfile<PowerCentral, PowerC
 
     @Override
     public Building getBuilding() {
-        return null;
+        return Buildings.POWER_CENTRAL;
     }
 
     @Override
