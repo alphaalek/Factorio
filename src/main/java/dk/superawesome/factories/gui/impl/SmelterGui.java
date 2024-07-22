@@ -151,12 +151,12 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                 .map(RED::get)
                 .sorted(Collections.reverseOrder())
                 .forEach(i -> {
-                     if (times.incrementAndGet() > blaze) {
-                         getInventory().setItem(i, new ItemStack(Material.RED_STAINED_GLASS_PANE));
-                         return;
-                     }
+                    if (times.incrementAndGet() > blaze) {
+                        getInventory().setItem(i, new ItemStack(Material.RED_STAINED_GLASS_PANE));
+                        return;
+                    }
 
-                     getInventory().setItem(i, new ItemStack(Material.BLAZE_POWDER));
+                    getInventory().setItem(i, new ItemStack(Material.BLAZE_POWDER));
                 });
     }
 

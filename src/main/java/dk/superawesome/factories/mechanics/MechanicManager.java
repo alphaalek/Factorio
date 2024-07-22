@@ -5,12 +5,11 @@ import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factories.mechanics.routes.events.PipeSuckEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.BlockVector;
@@ -128,6 +127,10 @@ public class MechanicManager implements Listener {
         // place the blocks for this mechanic
         Buildings.build(sign.getWorld(), mechanic);
         mechanic.blocksLoaded();
+
+        // world stuff
+        sign.getWorld().playSound(sign.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 0.8f);
+        sign.getWorld().playSound(sign.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 0.9f, 1f);
     }
 
     public void loadMechanic(Sign sign) {
@@ -139,14 +142,13 @@ public class MechanicManager implements Listener {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private Mechanic<?, ?> loadMechanicFromSign(Sign sign) {
         // check if this sign is related to a mechanic
-        if (!sign.getLine(0).startsWith("[")
-                || !sign.getLine(0).endsWith("]")) {
+        if (!sign.getSide(Side.FRONT).getLine(0).startsWith("[")
+                || !sign.getSide(Side.FRONT).getLine(0).endsWith("]")) {
             return null;
         }
-        String type = sign.getLine(0).substring(1, sign.getLine(0).length() - 1);
+        String type = sign.getSide(Side.FRONT).getLine(0).substring(1, sign.getSide(Side.FRONT).getLine(0).length() - 1);
 
         Optional<MechanicProfile<?, ?>> mechanicProfile = Profiles.getProfiles()
                 .stream()
@@ -155,6 +157,8 @@ public class MechanicManager implements Listener {
         if (!mechanicProfile.isPresent()) {
             return null;
         }
+        // fix lowercase/uppercase and my headache
+        sign.getSide(Side.FRONT).setLine(0, "[" + mechanicProfile.get().getName() + "]");
 
         // get the block which the sign is hanging on, because this block is the root of the mechanic
         Block on = BlockUtil.getPointingBlock(sign.getBlock(), true);

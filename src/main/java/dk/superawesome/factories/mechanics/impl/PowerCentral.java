@@ -46,7 +46,6 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
         if (energy > 0) {
             Routes.startSignalRoute(lever, this);
 
-            // TODO looks like calling both? (repeater signals)
             if (!turnedOn && energy < prev) {
                 turnedOn = true;
                 update();
