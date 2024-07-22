@@ -63,7 +63,9 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
             }
             this.states = states;
 
-            double diff = (max - min) / 5 + .1; // adding .1 so we are bound to lower value
+            // evaluating the grade difference by the average between min and max values
+            // adding 0.1, so we are bound to lower value when rounding to nearest grade
+            double diff = (max - min) / 5 + .1;
 
             for (int i = 0; i < 9; i++) {
                 double state = states[i];
@@ -81,7 +83,6 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                     if (i > 0 && columns[i - 1] != grade) {
                         int g = 0;
                         for (int j = grade; j < grade + Math.abs((columns[i - 1] & GRADE_SHIFT) - grade); j++) {
-                            Bukkit.getLogger().info(j + "       " + grade + " " + Math.abs((columns[i - 1] & GRADE_SHIFT) - grade));
                             g = (g << 4) | j;
 
                             // fix cluster graph
