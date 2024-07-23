@@ -48,7 +48,7 @@ public class Buildings {
     private static List<Location> getLocations(Mechanic<?, ?> mechanic) {
         List<Location> locs = new ArrayList<>();
         for (BlockVector relVec : mechanic.getProfile().getBuilding().getRelatives()) {
-            Location loc = BlockUtil.getRel(mechanic.getLocation(), BlockUtil.rotateVec(relVec, BlockFace.WEST, mechanic.getRotation()));
+            Location loc = BlockUtil.getRel(mechanic.getLocation(), BlockUtil.rotateVec(relVec, Building.DEFAULT_ROTATION, mechanic.getRotation()));
             locs.add(loc);
         }
 

@@ -38,8 +38,6 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
         });
 
         Factories.get().registerEvent(InventoryClickEvent.class, EventPriority.LOWEST, e -> {
-            Bukkit.broadcastMessage(e.getSlot() + "");
-
             BaseGui<?> gui = null;
             Inventory inv = e.getClickedInventory();
             if (inv != null) {

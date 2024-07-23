@@ -19,12 +19,7 @@ import java.util.function.Consumer;
 
 public interface Building extends Identifiable {
 
-    default Location getOri(Location loc, Vector vec, BlockFace rotation) {
-        Vector rotated = BlockUtil.rotateVec(vec, rotation, BlockFace.WEST);
-        rotated.setY(-vec.getY());
-
-        return BlockUtil.getRel(loc, rotated);
-    }
+    BlockFace DEFAULT_ROTATION = BlockFace.WEST;
 
     default void rotate(Block block, BlockFace rotation) {
         BlockData data = block.getBlockData();

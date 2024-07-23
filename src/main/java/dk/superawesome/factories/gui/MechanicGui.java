@@ -27,9 +27,13 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
 
     private final M mechanic;
 
-    public MechanicGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback) {
-        super(initCallback, inUseReference, BaseGui.DOUBLE_CHEST, mechanic.getProfile().getName() + " (Lvl " + mechanic.getLevel() + ")");
+    public MechanicGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback, String title) {
+        super(initCallback, inUseReference, BaseGui.DOUBLE_CHEST, title);
         this.mechanic = mechanic;
+    }
+
+    public MechanicGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback) {
+        this(mechanic, inUseReference, initCallback, mechanic.getProfile().getName() + " (Lvl " + mechanic.getLevel() + ")");
     }
 
     @Override

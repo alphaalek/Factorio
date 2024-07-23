@@ -135,6 +135,12 @@ public class BlockUtil {
         throw new IllegalStateException();
     }
 
+    public static BlockFace getRotationRelative(BlockFace def, BlockFace rel, BlockFace rot) {
+        int diff = Math.abs(def.ordinal() - rel.ordinal());
+        int ord = (rot.ordinal() + diff) % 4;
+        return BlockFace.values()[ord];
+    }
+
     public static void setSignFacing(Block block, Block towards, boolean opposite) {
         Sign sign = (Sign) block.getBlockData();
         sign.setRotation(

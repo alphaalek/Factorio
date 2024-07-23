@@ -18,6 +18,11 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
 
+    private boolean hasGraph;
+    private double recentProduction;
+    private double recentConsumption;
+
+    private double capacity;
     private Block lever;
     private double energy;
     private boolean turnedOn;
@@ -28,7 +33,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
 
     @Override
     public void blocksLoaded() {
-        lever = getLocation().getBlock().getRelative(getRotation());
+        lever = getLocation().getBlock().getRelative(getRotation().getOppositeFace());
         if (lever.getType() != Material.LEVER) {
             // invalid power central
             Factories.get().getMechanicManager(getLocation().getWorld()).unload(this);
@@ -83,6 +88,48 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
     }
 
     public void setEnergy(double energy) {
+        if (this.hasGraph && energy > this.energy) {
+            this.recentProduction += energy - this.energy;
+        } else if (this.hasGraph && energy < this.energy) {
+            this.recentConsumption += this.energy - energy;
+        }
+
         this.energy = energy;
+    }
+
+    public double pollRecentProduction() {
+        if (!hasGraph) {
+            throw new UnsupportedOperationException();
+        }
+
+        double production = this.recentProduction;
+        this.recentConsumption = 0;
+        return production;
+    }
+
+    public double pollRecentConsumption() {
+        if (!hasGraph) {
+            throw new UnsupportedOperationException();
+        }
+
+        double consumption = this.recentConsumption;
+        this.recentConsumption = 0;
+        return consumption;
+    }
+
+    public double getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(double capacity) {
+        this.capacity = capacity;
+    }
+
+    public void setHasGraph(boolean hasGraph) {
+        this.hasGraph = hasGraph;
+    }
+
+    public boolean hasGraph() {
+        return hasGraph;
     }
 }

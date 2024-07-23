@@ -23,42 +23,27 @@ public class PowerCentral implements Building {
             new BlockVector(),
             new BlockVector(0, 1, 0),
             new BlockVector(0, 2, 0),
-            new BlockVector(-1, 1, 0),
-            new BlockVector(-1, 0, 0)
+            new BlockVector(-1, 0, 0),
+            new BlockVector(1, 0, 0)
     );
 
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
             (b, r) -> b.setType(Material.NETHER_QUARTZ_ORE),
             (b, r) -> b.setType(Material.REDSTONE_LAMP),
             (b, r) -> b.setType(Material.REDSTONE_TORCH),
-            (b, r) -> {
-                // get the sign (the block below) by using some rotation magic
-                Block sign = BlockUtil.getRel(
-                                getOri(b.getLocation(), relatives.get(3), r), BlockUtil.rotateVec(relatives.get(4), BlockFace.WEST, r)
-                ).getBlock();
-
-                // apply same data, simulating a copy
-                b.setType(sign.getType());
-                b.setBlockData(sign.getBlockData());
-
-                Sign signState = (Sign) sign.getState();
-                Sign newSignState = (Sign) b.getState();
-                int i = 0;
-                for (String line : signState.getSide(Side.FRONT).getLines()) {
-                    newSignState.getSide(Side.FRONT).setLine(i++, line);
-                }
-                newSignState.update();
-            },
-            (b, r) -> {
-                b.setType(Material.LEVER, false); // do not apply physics
-
-                Switch lever = (Switch) b.getBlockData();
-                lever.setAttachedFace(FaceAttachable.AttachedFace.WALL);
-                lever.setFacing(r);
-
-                b.setBlockData(lever);
-            }
+            (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */,
+            (b, r) -> setLever(b, BlockUtil.getRotationRelative(Building.DEFAULT_ROTATION, BlockFace.EAST, r))
     );
+
+    private void setLever(Block block, BlockFace rotation) {
+        block.setType(Material.LEVER, false); // do not apply physics
+
+        Switch lever = (Switch) block.getBlockData();
+        lever.setAttachedFace(FaceAttachable.AttachedFace.WALL);
+        lever.setFacing(rotation);
+
+        block.setBlockData(lever);
+    }
 
     @Override
     public List<BiConsumer<Block, BlockFace>> getBlocks() {
