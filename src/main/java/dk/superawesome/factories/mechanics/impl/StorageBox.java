@@ -14,8 +14,8 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
     private ItemStack stored;
     private int amount;
 
-    public StorageBox(Location location, BlockFace rotation) {
-        super(location, rotation);
+    public StorageBox(Location location, BlockFace rotation, MechanicStorageContext context) {
+        super(location, rotation, context);
     }
 
     @Override

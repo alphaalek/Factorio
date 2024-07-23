@@ -5,7 +5,9 @@ import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.gui.GuiFactory;
 import dk.superawesome.factories.gui.impl.StorageBoxGui;
 import dk.superawesome.factories.mechanics.MechanicFactory;
+import dk.superawesome.factories.mechanics.MechanicLevel;
 import dk.superawesome.factories.mechanics.MechanicProfile;
+import dk.superawesome.factories.mechanics.MechanicStorageContext;
 import dk.superawesome.factories.mechanics.impl.StorageBox;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -38,6 +40,11 @@ public class StorageBoxProfile implements MechanicProfile<StorageBox, StorageBox
     }
 
     @Override
+    public MechanicLevel.Registry getLevelRegistry() {
+        return MechanicLevel.Registry.Builder.make(1).build();
+    }
+
+    @Override
     public int getID() {
         return 2;
     }
@@ -45,8 +52,8 @@ public class StorageBoxProfile implements MechanicProfile<StorageBox, StorageBox
     private static class StorageBoxMechanicFactory implements MechanicFactory<StorageBox> {
 
         @Override
-        public StorageBox create(Location loc, BlockFace rotation) {
-            return new StorageBox(loc, rotation);
+        public StorageBox create(Location loc, BlockFace rotation, MechanicStorageContext context) {
+            return new StorageBox(loc, rotation, context);
         }
     }
 

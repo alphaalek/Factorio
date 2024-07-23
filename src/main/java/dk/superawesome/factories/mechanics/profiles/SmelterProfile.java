@@ -5,7 +5,9 @@ import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.gui.GuiFactory;
 import dk.superawesome.factories.gui.impl.SmelterGui;
 import dk.superawesome.factories.mechanics.MechanicFactory;
+import dk.superawesome.factories.mechanics.MechanicLevel;
 import dk.superawesome.factories.mechanics.MechanicProfile;
+import dk.superawesome.factories.mechanics.MechanicStorageContext;
 import dk.superawesome.factories.mechanics.impl.Smelter;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -38,6 +40,11 @@ public class SmelterProfile implements MechanicProfile<Smelter, SmelterGui> {
     }
 
     @Override
+    public MechanicLevel.Registry getLevelRegistry() {
+        return MechanicLevel.Registry.Builder.make(1).build();
+    }
+
+    @Override
     public int getID() {
         return 1;
     }
@@ -45,8 +52,8 @@ public class SmelterProfile implements MechanicProfile<Smelter, SmelterGui> {
     private static class SmelterMechanicFactory implements MechanicFactory<Smelter> {
 
         @Override
-        public Smelter create(Location loc, BlockFace rotation) {
-            return new Smelter(loc, rotation);
+        public Smelter create(Location loc, BlockFace rotation, MechanicStorageContext context) {
+            return new Smelter(loc, rotation, context);
         }
     }
 

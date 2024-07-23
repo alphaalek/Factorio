@@ -40,8 +40,8 @@ public class MechanicManager implements Listener {
         }
     }
 
-    public Mechanic<?, ?> load(MechanicProfile<?, ?> profile, Location loc, BlockFace rotation) {
-        Mechanic<?, ?> mechanic = profile.getFactory().create(loc, rotation);
+    public Mechanic<?, ?> load(MechanicProfile<?, ?> profile, MechanicStorageContext context, Location loc, BlockFace rotation) {
+        Mechanic<?, ?> mechanic = profile.getFactory().create(loc, rotation, context);
         if (mechanic instanceof ThinkingMechanic) {
             thinkingMechanics.add((ThinkingMechanic) mechanic);
         }
@@ -113,7 +113,7 @@ public class MechanicManager implements Listener {
     }
 
     public void buildMechanic(Sign sign) {
-        Mechanic<?, ?> mechanic = loadMechanicFromSign(sign);
+        Mechanic<?, ?> mechanic = loadMechanicFromSign(sign, MechanicStorageContext.DEFAULT);
         if (mechanic == null) {
             return;
         }
@@ -134,15 +134,13 @@ public class MechanicManager implements Listener {
     }
 
     public void loadMechanic(Sign sign) {
-        Mechanic<?, ?> mechanic = loadMechanicFromSign(sign);
+        Mechanic<?, ?> mechanic = loadMechanicFromSign(sign, MechanicStorageContext.findAt(sign.getLocation()));
         if (mechanic != null) {
-            // TODO db load
-
             mechanic.blocksLoaded();
         }
     }
 
-    private Mechanic<?, ?> loadMechanicFromSign(Sign sign) {
+    private Mechanic<?, ?> loadMechanicFromSign(Sign sign, MechanicStorageContext context) {
         // check if this sign is related to a mechanic
         if (!sign.getSide(Side.FRONT).getLine(0).startsWith("[")
                 || !sign.getSide(Side.FRONT).getLine(0).endsWith("]")) {
@@ -168,6 +166,6 @@ public class MechanicManager implements Listener {
 
         // load this mechanic
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
-        return load(mechanicProfile.get(), on.getLocation(), rotation);
+        return load(mechanicProfile.get(), context, on.getLocation(), rotation);
     }
 }

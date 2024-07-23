@@ -3,6 +3,7 @@ package dk.superawesome.factories.mechanics.impl;
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.gui.impl.PowerCentralGui;
 import dk.superawesome.factories.mechanics.*;
+import dk.superawesome.factories.mechanics.profiles.PowerCentralProfile;
 import dk.superawesome.factories.mechanics.routes.Routes;
 import dk.superawesome.factories.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
@@ -22,13 +23,12 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
     private double recentProduction;
     private double recentConsumption;
 
-    private double capacity;
     private Block lever;
     private double energy;
     private boolean turnedOn;
 
-    public PowerCentral(Location loc, BlockFace rotation) {
-        super(loc, rotation);
+    public PowerCentral(Location loc, BlockFace rotation, MechanicStorageContext context) {
+        super(loc, rotation, context);
     }
 
     @Override
@@ -118,11 +118,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
     }
 
     public double getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(double capacity) {
-        this.capacity = capacity;
+        return level.get(PowerCentralProfile.CAPACITY);
     }
 
     public void setHasGraph(boolean hasGraph) {

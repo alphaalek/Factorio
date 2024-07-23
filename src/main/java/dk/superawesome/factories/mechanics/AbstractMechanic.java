@@ -19,10 +19,17 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
     protected final TickThrottle tickThrottle = new TickThrottle();
     protected final Location loc;
     protected final BlockFace rotation;
+    protected final MechanicLevel level;
 
-    public AbstractMechanic(Location loc, BlockFace rotation) {
+    public AbstractMechanic(Location loc, BlockFace rotation, MechanicStorageContext context) {
         this.loc = loc;
         this.rotation = rotation;
+        this.level = MechanicLevel.from(this, context.getLevel());
+        load(context);
+    }
+
+    public void load(MechanicStorageContext context) {
+        // to be overridden if needed
     }
 
     @Override

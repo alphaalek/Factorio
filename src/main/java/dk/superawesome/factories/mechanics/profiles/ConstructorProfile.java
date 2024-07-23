@@ -5,7 +5,9 @@ import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.gui.GuiFactory;
 import dk.superawesome.factories.gui.impl.ConstructorGui;
 import dk.superawesome.factories.mechanics.MechanicFactory;
+import dk.superawesome.factories.mechanics.MechanicLevel;
 import dk.superawesome.factories.mechanics.MechanicProfile;
+import dk.superawesome.factories.mechanics.MechanicStorageContext;
 import dk.superawesome.factories.mechanics.impl.Constructor;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -38,6 +40,11 @@ public class ConstructorProfile implements MechanicProfile<Constructor, Construc
     }
 
     @Override
+    public MechanicLevel.Registry getLevelRegistry() {
+        return MechanicLevel.Registry.Builder.make(1).build();
+    }
+
+    @Override
     public int getID() {
         return 0;
     }
@@ -45,8 +52,8 @@ public class ConstructorProfile implements MechanicProfile<Constructor, Construc
     private static class ConstructorMechanicFactory implements MechanicFactory<Constructor> {
 
         @Override
-        public Constructor create(Location loc, BlockFace rotation) {
-            return new Constructor(loc, rotation);
+        public Constructor create(Location loc, BlockFace rotation, MechanicStorageContext context) {
+            return new Constructor(loc, rotation, context);
         }
     }
 

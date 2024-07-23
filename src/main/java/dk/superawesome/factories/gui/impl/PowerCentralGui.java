@@ -51,7 +51,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
     private static class Graph implements Runnable {
 
         private static final int WIDTH = 9;
-        private static final int COLLECT_WIDTH = 18;
+        private static final int COLLECT_WIDTH = 12;
         private static final int GRADE_SHIFT = ~0 & 0x0F;
 
         private final int[] columns = new int[WIDTH];
@@ -92,7 +92,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
             // adding 0.1, so we are bound to lower value when rounding to nearest grade
             double diff = (max - min) / 5 + .1;
 
-
+            // start iterating over the columns and placing grades
             for (int i = 0; i < WIDTH; i++) {
                 double state = states[COLLECT_WIDTH - WIDTH + i];
                 int grade = 2;
@@ -106,24 +106,30 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                 if (state != -1) {
                     setSlots(i, null);
 
-                    // check if we have to smooth out the graph
                     if (i > 0 && columns[i - 1] != grade) {
                         int lowestPrev = columns[i - 1] & GRADE_SHIFT;
                         int highestPrev = getHighestGrade(columns[i - 1]);
 
+                        // check if we have to smooth out the graph
                         if (grade < lowestPrev || grade > highestPrev) {
                             int g = 0;
                             int current = grade;
-                            while (current == grade
-                                    || (grade < lowestPrev
-                                            ? lowestPrev - current
-                                            : current - highestPrev) > 0) {
+                            // ensure correct low-to-high
+                            if (grade > highestPrev) {
+                                current = highestPrev + 1;
+                            }
+
+                            // mask grades
+                            for (;;) {
                                 g = (g << 4) | current;
-                                if (grade > highestPrev) {
-                                    current--;
-                                } else if (grade < lowestPrev) {
-                                    current++;
+
+                                if (grade > highestPrev && current == grade) {
+                                    break;
+                                } else if (grade < lowestPrev && lowestPrev - current <= 1) {
+                                    break;
                                 }
+
+                                current++;
                             }
 
                             columns[i] = g;
@@ -132,6 +138,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                     }
                 }
 
+                // this column wasn't smoothed out, just use the original grade
                 if (!smoothed) {
                     columns[i] = grade;
                 }
@@ -219,7 +226,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
     @Override
     public boolean onClickOpen(InventoryClickEvent event) {
-        return true;
+        return true;    
     }
 
     @Override

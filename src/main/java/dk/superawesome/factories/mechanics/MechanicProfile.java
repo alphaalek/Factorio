@@ -14,4 +14,6 @@ public interface MechanicProfile<M extends Mechanic<M, G>, G extends BaseGui<G>>
     MechanicFactory<M> getFactory();
 
     GuiFactory<M, G> getGuiFactory();
+
+    MechanicLevel.Registry getLevelRegistry();
 }

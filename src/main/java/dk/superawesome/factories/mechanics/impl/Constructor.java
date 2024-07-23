@@ -19,8 +19,8 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     private boolean declinedState;
 
-    public Constructor(Location loc, BlockFace rotation) {
-        super(loc, rotation);
+    public Constructor(Location loc, BlockFace rotation, MechanicStorageContext context) {
+        super(loc, rotation, context);
     }
 
     @Override

@@ -33,8 +33,8 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     private ItemStack storageType;
     private int storageAmount;
 
-    public Smelter(Location loc, BlockFace rotation) {
-        super(loc, rotation);
+    public Smelter(Location loc, BlockFace rotation, MechanicStorageContext context) {
+        super(loc, rotation, context);
     }
 
     @Override
