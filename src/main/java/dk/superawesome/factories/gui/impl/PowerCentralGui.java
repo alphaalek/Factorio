@@ -37,7 +37,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
     private final List<BukkitTask> tasks = new ArrayList<>();
 
     public PowerCentralGui(PowerCentral mechanic, AtomicReference<PowerCentralGui> inUseReference) {
-        super(mechanic, inUseReference, new InitCallbackHolder(), "Power Central (Capacity: " + mechanic.getCapacity() + ")");
+        super(mechanic, inUseReference, new InitCallbackHolder(), "Power Central (Capacity: " + mechanic.getCapacity() + "J)");
         initCallback.call();
 
         //this.tasks.add(

@@ -88,6 +88,12 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
     }
 
     public void setEnergy(double energy) {
+        double cap = getCapacity();
+        if (energy > cap) {
+            energy = cap - this.energy;
+            this.energy = cap;
+        }
+
         if (this.hasGraph && energy > this.energy) {
             this.recentProduction += energy - this.energy;
         } else if (this.hasGraph && energy < this.energy) {

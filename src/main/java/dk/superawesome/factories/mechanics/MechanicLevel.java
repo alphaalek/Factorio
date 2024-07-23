@@ -37,7 +37,7 @@ public class MechanicLevel {
             }
 
             public Registry build() {
-                return data::get;
+                return i -> data.get(i - 1);
             }
         }
     }
