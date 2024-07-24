@@ -30,6 +30,8 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
     public MechanicGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback, String title) {
         super(initCallback, inUseReference, BaseGui.DOUBLE_CHEST, title);
         this.mechanic = mechanic;
+
+        // TODO tick throttles for guis
     }
 
     public MechanicGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback) {

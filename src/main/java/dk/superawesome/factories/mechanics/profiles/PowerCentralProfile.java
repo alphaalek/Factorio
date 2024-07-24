@@ -45,7 +45,7 @@ public class PowerCentralProfile implements MechanicProfile<PowerCentral, PowerC
     @Override
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder.make(4)
-                .mark(CAPACITY, Array.fromData(1000d, 2500d, 3000d))
+                .mark(PowerCentral.CAPACITY, Array.fromData(1000d, 2500d, 3000d))
                 .build();
     }
 

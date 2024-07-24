@@ -17,6 +17,9 @@ import org.bukkit.block.data.type.Switch;
 
 public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui> implements ThinkingMechanic {
 
+    public static final int CAPACITY = 0;
+
+
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
 
     private boolean hasGraph;
@@ -124,7 +127,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
     }
 
     public double getCapacity() {
-        return level.get(PowerCentralProfile.CAPACITY);
+        return level.get(CAPACITY);
     }
 
     public void setHasGraph(boolean hasGraph) {

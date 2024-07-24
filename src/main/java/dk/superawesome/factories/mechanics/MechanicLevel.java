@@ -61,4 +61,36 @@ public class MechanicLevel {
     public <T> T get(int mark) {
         return (T) this.data.get(mark);
     }
+
+    public int getInt(int mark) {
+        return get(mark);
+    }
+
+    public double getDouble(int mark) {
+        return get(mark);
+    }
+
+    public float getFloat(int mark) {
+        return get(mark);
+    }
+
+    public long getLong(int mark) {
+        return get(mark);
+    }
+
+    public byte getByte(int mark) {
+        return get(mark);
+    }
+
+    public short getShort(int mark) {
+        return get(mark);
+    }
+
+    public char getChar(int mark) {
+        return get(mark);
+    }
+
+    public boolean getBoolean(int mark) {
+        return get(mark);
+    }
 }

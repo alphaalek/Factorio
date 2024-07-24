@@ -32,6 +32,8 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         initCallback.call();
     }
 
+    // TODO capacity
+
     @Override
     public void loadItems() {
         super.loadItems();

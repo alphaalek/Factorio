@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -19,18 +20,26 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
     }
 
     @Override
+    public void load(MechanicStorageContext context) throws Exception {
+        ByteArrayInputStream str = context.getData();
+        this.stored = context.readItemStack(str);
+        this.amount = str.read();
+    }
+
+    @Override
     public MechanicProfile<StorageBox, StorageBoxGui> getProfile() {
         return Profiles.STORAGE_BOX;
     }
 
     @Override
     public void pipePut(ItemCollection collection) {
-        if (tickThrottle.isThrottled()) {
+        int capacity = getCapacity();
+        if (tickThrottle.isThrottled() || amount == capacity) {
             return;
         }
 
         if (stored == null || collection.has(stored)) {
-            amount += put(collection, StorageBoxGui::updateAddedItems, new Updater<ItemStack>() {
+            amount += put(collection, Math.min(64, capacity - amount), inUse, StorageBoxGui::updateAddedItems, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return stored;
@@ -45,6 +54,11 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
     }
 
     @Override
+    public int getCapacity() {
+        return level.get(ItemCollection.CAPACITY_MARK);
+    }
+
+    @Override
     public boolean has(ItemStack stack) {
         return has(i -> i.isSimilar(stack) && amount >= stack.getAmount());
     }
@@ -56,7 +70,7 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
 
     @Override
     public List<ItemStack> take(int amount) {
-        List<ItemStack> items = take(amount, stored, amount, g -> g.updateRemovedItems(amount), new Updater<Integer>() {
+        List<ItemStack> items = take(amount, stored, amount, inUse, g -> g.updateRemovedItems(amount), new Updater<Integer>() {
             @Override
             public Integer get() {
                 return StorageBox.this.amount;

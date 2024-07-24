@@ -11,11 +11,15 @@ import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
+import java.io.ByteArrayInputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
 public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements ThinkingMechanic, ItemCollection, Container {
+
+    public static final int INGREDIENT_CAPACITY = 1;
+    public static final int FUEL_CAPACITY = 2;
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
 
@@ -38,6 +42,28 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     }
 
     @Override
+    public void load(MechanicStorageContext context) throws Exception {
+        ByteArrayInputStream str = context.getData();
+        this.ingredient = context.readItemStack(str);
+        this.ingredientAmount = str.read();
+
+        ItemStack fuel = context.readItemStack(str);
+        if (fuel != null) {
+            this.fuel = Fuel.get(fuel.getType());
+        }
+        this.fuelAmount = str.read();
+        ItemStack currentFuel = context.readItemStack(str);
+        int currentFuelAmount = str.read();
+        if (currentFuel != null) {
+            this.currentFuel = Fuel.get(currentFuel.getType());
+            this.currentFuelAmount = 1 - this.currentFuel.getFuelAmount() * currentFuelAmount;
+        }
+
+        this.storageType = context.readItemStack(str);
+        this.storageAmount = str.read();
+    }
+
+    @Override
     public MechanicProfile<Smelter, SmelterGui> getProfile() {
         return Profiles.SMELTER;
     }
@@ -49,7 +75,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         }
 
         if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(i -> canSmelt(i.getType()))) {
-            ingredientAmount += put(collection, SmelterGui::updateAddedIngredients, new Updater<ItemStack>() {
+            ingredientAmount += put(collection, Math.min(64, level.getInt(INGREDIENT_CAPACITY) - ingredientAmount), inUse, SmelterGui::updateAddedIngredients, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return ingredient;
@@ -67,7 +93,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         }
 
         if (fuel != null && collection.has(new ItemStack(fuel.getMaterial())) || fuel == null && collection.has(i -> Fuel.get(i.getType()) != null)) {
-            fuelAmount += put(collection, SmelterGui::updateAddedFuel, new Updater<ItemStack>() {
+            fuelAmount += put(collection, Math.min(64, level.getInt(FUEL_CAPACITY) - fuelAmount), inUse, SmelterGui::updateAddedFuel, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return fuel == null ? null : new ItemStack(fuel.getMaterial());
@@ -79,6 +105,11 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
                 }
             });
         }
+    }
+
+    @Override
+    public int getCapacity() {
+        return level.get(ItemCollection.CAPACITY_MARK);
     }
 
     public boolean canSmelt(Material type) {
@@ -134,7 +165,10 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         // if there are no ingredients ready to be smelted, don't continue
         if (ingredient == null || smeltResult == null
                 // if there are no fuel left, don't continue
-                || (currentFuelAmount == 0 && fuelAmount == 0)) {
+                || (currentFuelAmount == 0 && fuelAmount == 0)
+                // if there is no space left, don't continue
+                || storageAmount + smeltResult.getAmount() > getCapacity()
+                ) {
             return;
         }
 
@@ -200,7 +234,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
     @Override
     public List<ItemStack> take(int amount) {
-        List<ItemStack> items = take(amount, storageType, storageAmount, g -> g.updateRemovedStorage(amount), new Updater<Integer>() {
+        List<ItemStack> items = take(amount, storageType, storageAmount, inUse, g -> g.updateRemovedStorage(amount), new Updater<Integer>() {
             @Override
             public Integer get() {
                 return storageAmount;

@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -21,6 +22,18 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     public Constructor(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
+    }
+
+    @Override
+    public void load(MechanicStorageContext context) throws Exception {
+        ByteArrayInputStream str = context.getData();
+        for (int i = 0; i < 9; i++) {
+            this.craftingGridItems[i] = context.readItemStack(str);
+        }
+
+        this.recipeResult = context.readItemStack(str);
+        this.storageType = context.readItemStack(str);
+        this.storageAmount = str.read();
     }
 
     @Override
@@ -66,6 +79,11 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     }
 
     @Override
+    public int getCapacity() {
+        return level.get(ItemCollection.CAPACITY_MARK);
+    }
+
+    @Override
     public ThinkDelayHandler getDelayHandler() {
         return thinkDelayHandler;
     }
@@ -99,7 +117,9 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
         }
 
         // if there are not any recipe in the crafting grid, don't continue
-        if (recipeResult == null) {
+        if (recipeResult == null
+                // if there is no space left, don't continue
+                || storageAmount + recipeResult.getAmount() > getCapacity()) {
             return;
         }
 
@@ -148,7 +168,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     @Override
     public List<ItemStack> take(int amount) {
-        List<ItemStack> items = take(amount, storageType, storageAmount, g -> g.updateRemovedItems(amount), new Updater<Integer>() {
+        List<ItemStack> items = take(amount, storageType, storageAmount, inUse, g -> g.updateRemovedItems(amount), new Updater<Integer>() {
             @Override
             public Integer get() {
                 return storageAmount;

@@ -4,11 +4,9 @@ import dk.superawesome.factories.building.Building;
 import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.gui.GuiFactory;
 import dk.superawesome.factories.gui.impl.StorageBoxGui;
-import dk.superawesome.factories.mechanics.MechanicFactory;
-import dk.superawesome.factories.mechanics.MechanicLevel;
-import dk.superawesome.factories.mechanics.MechanicProfile;
-import dk.superawesome.factories.mechanics.MechanicStorageContext;
+import dk.superawesome.factories.mechanics.*;
 import dk.superawesome.factories.mechanics.impl.StorageBox;
+import dk.superawesome.factories.util.Array;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
@@ -41,7 +39,10 @@ public class StorageBoxProfile implements MechanicProfile<StorageBox, StorageBox
 
     @Override
     public MechanicLevel.Registry getLevelRegistry() {
-        return MechanicLevel.Registry.Builder.make(1).build();
+        return MechanicLevel.Registry.Builder
+                .make(5)
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(64 * 75, 64 * 125, 64 * 175, 64 * 250, 64 * 500))
+                .build();
     }
 
     @Override
