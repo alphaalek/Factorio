@@ -22,6 +22,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     public Constructor(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
+        loadFromStorage();
     }
 
     @Override
@@ -33,7 +34,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
         this.recipeResult = context.readItemStack(str);
         this.storageType = context.readItemStack(str);
-        this.storageAmount = str.read();
+        this.storageAmount = context.readInt(str);
     }
 
     @Override
@@ -66,7 +67,8 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
                         if (oCraft != craft
                                 && oCraft != null
                                 && oCraft.isSimilar(craft)
-                                && oCraft.getAmount() < craft.getAmount()) {
+                                && oCraft.getAmount() < craft.getAmount()
+                                && oCraft.getAmount() < oCraft.getMaxStackSize()) {
                             craft = oCraft;
                             break;
                         }

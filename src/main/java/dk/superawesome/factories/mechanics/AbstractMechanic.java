@@ -29,7 +29,9 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
         this.rotation = rotation;
         this.context = context;
         this.level = MechanicLevel.from(this, context.getLevel());
+    }
 
+    protected void loadFromStorage() {
         try  {
             load(context);
         } catch (Exception ex) {

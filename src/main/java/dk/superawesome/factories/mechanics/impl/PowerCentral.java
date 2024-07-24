@@ -32,6 +32,12 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
 
     public PowerCentral(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
+        loadFromStorage();
+    }
+
+    @Override
+    public void load(MechanicStorageContext context) {
+
     }
 
     @Override

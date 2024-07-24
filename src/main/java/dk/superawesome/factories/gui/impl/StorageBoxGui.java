@@ -11,9 +11,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.io.BukkitObjectInputStream;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -133,22 +135,90 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     @Override
     public boolean onDrag(InventoryDragEvent event) {
+        if (getMechanic().getTickThrottle().isThrottled()) {
+            return true;
+        }
+
+        // only check for storage slots
         if (event.getInventorySlots().stream().anyMatch(i -> i < 35)) {
-            if (handleInteract(event.getCursor())) {
+            int capacity = getMechanic().getCapacity();
+            int amount = getMechanic().getAmount();
+            if (amount == capacity) {
                 return true;
             }
 
-            for (ItemStack item : event.getNewItems().values()) {
+            // check if the amount of items in the storage box will exceed the capacity
+            int added = event.getNewItems().entrySet().stream()
+                    .mapToInt(entry -> entry.getValue().getAmount() -
+                            Optional.ofNullable(event.getView().getItem(entry.getKey()))
+                                    .map(ItemStack::getAmount)
+                                    .orElse(0)
+                    )
+                    .sum();
+            boolean checkSize = amount + added > capacity;
+
+            boolean cancel = false;
+            // add the dragged items
+            for (Map.Entry<Integer, ItemStack> entry : event.getNewItems().entrySet()) {
+                ItemStack item = entry.getValue();
                 if (handleInteract(item)) {
                     return true;
                 }
+
+                amount += item.getAmount();
+                ItemStack at = event.getView().getItem(entry.getKey());
+                if (at != null) {
+                    // the item at this slot originally, wasn't added in this event
+                    amount -= at.getAmount();
+                }
+                // check if the storage box does not have enough capacity for these items
+                if (checkSize) {
+                    if (amount > capacity) {
+                        int subtract = amount - capacity;
+                        amount -= subtract;
+                        added -= subtract;
+
+                        // ensure cursor set for post-work
+                        ItemStack cursor = event.getCursor();
+                        if (cursor == null) {
+                            cursor = item.clone();
+                        }
+                        cursor.setAmount(cursor.getAmount() + subtract);
+                        event.setCursor(cursor);
+
+                        item.setAmount(item.getAmount() - subtract);
+
+                        cancel = true;
+                    }
+                }
             }
 
-            if (getMechanic().getTickThrottle().isThrottled()) {
+            // update storage amount for storage box
+            getMechanic().setAmount(amount);
+
+            // do manual work if there was too many items tried to be added
+            if (cancel) {
+                getMechanic().getTickThrottle().throttle();
+
+                // re-set items
+                Bukkit.getScheduler().runTask(Factories.get(), () -> {
+                    for (Map.Entry<Integer, ItemStack> entry : event.getNewItems().entrySet()) {
+                        event.getView().setItem(entry.getKey(), entry.getValue());
+                    }
+                });
+
+                // remove the added items from the cursor
+                if (event.getCursor() != null) {
+                    event.getCursor().setAmount(event.getCursor().getAmount() - added);
+
+                    Bukkit.getScheduler().runTask(Factories.get(), () -> {
+                        event.getWhoClicked().getOpenInventory().setCursor(event.getCursor());
+                    });
+                }
+
                 return true;
             }
 
-            updateAmount();
             return false;
         }
 

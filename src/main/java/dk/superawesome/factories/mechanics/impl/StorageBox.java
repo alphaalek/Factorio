@@ -17,13 +17,14 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
 
     public StorageBox(Location location, BlockFace rotation, MechanicStorageContext context) {
         super(location, rotation, context);
+        loadFromStorage();
     }
 
     @Override
     public void load(MechanicStorageContext context) throws Exception {
         ByteArrayInputStream str = context.getData();
         this.stored = context.readItemStack(str);
-        this.amount = str.read();
+        this.amount = context.readInt(str);
     }
 
     @Override

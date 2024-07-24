@@ -39,28 +39,29 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
     public Smelter(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
+        loadFromStorage();
     }
 
     @Override
     public void load(MechanicStorageContext context) throws Exception {
         ByteArrayInputStream str = context.getData();
         this.ingredient = context.readItemStack(str);
-        this.ingredientAmount = str.read();
+        this.ingredientAmount = context.readInt(str);
 
         ItemStack fuel = context.readItemStack(str);
         if (fuel != null) {
             this.fuel = Fuel.get(fuel.getType());
         }
-        this.fuelAmount = str.read();
+        this.fuelAmount = context.readInt(str);
         ItemStack currentFuel = context.readItemStack(str);
-        int currentFuelAmount = str.read();
+        int currentFuelAmount = context.readInt(str);
         if (currentFuel != null) {
             this.currentFuel = Fuel.get(currentFuel.getType());
             this.currentFuelAmount = 1 - this.currentFuel.getFuelAmount() * currentFuelAmount;
         }
 
         this.storageType = context.readItemStack(str);
-        this.storageAmount = str.read();
+        this.storageAmount = context.readInt(str);
     }
 
     @Override

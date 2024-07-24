@@ -4,7 +4,6 @@ package dk.superawesome.factories.mechanics;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import sun.misc.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,12 +32,22 @@ public class MechanicStorageContext {
     }
 
     public ItemStack readItemStack(ByteArrayInputStream stream) throws IOException {
-        String mat = new String(IOUtils.readNBytes(stream, stream.read()));
-        if (!mat.isEmpty()) {
-            return new ItemStack(Material.valueOf(mat));
-        } else {
-            return null;
+        int l = stream.read();
+        if (l > 0) {
+            byte[] buf = new byte[l];
+            int len = stream.read(buf);
+            String mat;
+            if (len == buf.length && (mat = new String(buf)).length() == buf.length) {
+                return new ItemStack(Material.valueOf(mat));
+            }
         }
+
+        return null;
+    }
+
+    public int readInt(ByteArrayInputStream stream) {
+        int l = stream.read();
+        return l == -1 ? 0 : l;
     }
 
     public int getLevel() {
