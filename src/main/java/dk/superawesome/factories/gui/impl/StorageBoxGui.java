@@ -5,6 +5,7 @@ import dk.superawesome.factories.gui.MechanicGui;
 import dk.superawesome.factories.mechanics.impl.StorageBox;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -33,8 +34,6 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         super(mechanic, inUseReference, new InitCallbackHolder());
         initCallback.call();
     }
-
-    // TODO capacity
 
     @Override
     public void loadItems() {
@@ -93,21 +92,37 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     }
 
-    private void updateAmount() {
+    private void updateAmount(HumanEntity adder) {
         getMechanic().getTickThrottle().throttle();
 
         int before = findItems().stream()
                 .mapToInt(ItemStack::getAmount).sum();
         Bukkit.getScheduler().runTask(Factories.get(), () -> {
+            // get the difference in items of the storage box inventory view
             int after = findItems().stream()
                     .mapToInt(ItemStack::getAmount).sum();
+            int diff = after - before;
 
-            // get the difference in the items of the current inventory view of the storage box
-            int diff = before - after;
-            getMechanic().setAmount(getMechanic().getAmount() - diff);
+            Bukkit.broadcastMessage(after + " " + before + " " + diff + " " + getMechanic().getAmount());
+            // check if the storage box has enough space for these items
+            if (after > before && getMechanic().getAmount() + diff > getMechanic().getCapacity()) {
+                // evaluate leftovers
+                getMechanic().setAmount(getMechanic().getCapacity());
+                int left = getMechanic().getAmount() + diff - getMechanic().getCapacity();
+                updateRemovedItems(left);
 
-            if (getMechanic().getAmount() == 0) {
-                getMechanic().setStored(null);
+                // add leftovers to inventory again
+                ItemStack item = getMechanic().getStored().clone();
+                item.setAmount(left);
+                Bukkit.getLogger().info("Left " + left);
+                adder.getInventory().addItem(item);
+            } else {
+                // update storage amount in storage box
+                getMechanic().setAmount(getMechanic().getAmount() + diff);
+
+                if (getMechanic().getAmount() == 0) {
+                    getMechanic().setStored(null);
+                }
             }
         });
     }
@@ -138,6 +153,8 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         if (getMechanic().getTickThrottle().isThrottled()) {
             return true;
         }
+
+        // TODO fix bugs with storage update
 
         // only check for storage slots
         if (event.getInventorySlots().stream().anyMatch(i -> i < 35)) {
@@ -171,22 +188,21 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
                     // the item at this slot originally, wasn't added in this event
                     amount -= at.getAmount();
                 }
+
                 // check if the storage box does not have enough capacity for these items
                 if (checkSize) {
                     if (amount > capacity) {
                         int subtract = amount - capacity;
                         amount -= subtract;
                         added -= subtract;
+                        item.setAmount(item.getAmount() - subtract);
 
                         // ensure cursor set for post-work
                         ItemStack cursor = event.getCursor();
                         if (cursor == null) {
                             cursor = item.clone();
                         }
-                        cursor.setAmount(cursor.getAmount() + subtract);
                         event.setCursor(cursor);
-
-                        item.setAmount(item.getAmount() - subtract);
 
                         cancel = true;
                     }
@@ -268,7 +284,7 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
                     // update the stored item stack
                     if (highest != null) {
-                        int amount = typeAmounts.get(highest);
+                        int amount = Math.min(getMechanic().getCapacity(), typeAmounts.get(highest));
                         getMechanic().setStored(new ItemStack(highest));
                         getMechanic().setAmount(amount);
 
@@ -278,13 +294,16 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
                                         .collect(Collectors.toList()));
                         updateAddedItems(amount);
                     }
-                } else {
+                } else if (getMechanic().getAmount() < getMechanic().getCapacity()) {
                     // take all items from the player's inventory and put into the storage box
                     int left = updateRemovedItems(playerInv, Integer.MAX_VALUE, getMechanic().getStored(),
                             IntStream.range(0, playerInv.getSize())
                                     .boxed()
                                     .collect(Collectors.toList()));
                     int amount = Integer.MAX_VALUE - left;
+                    if (getMechanic().getAmount() + amount > getMechanic().getCapacity()) {
+                        amount -= getMechanic().getAmount() + amount - getMechanic().getCapacity();
+                    }
 
                     getMechanic().setAmount(getMechanic().getAmount() + amount);
                     updateAddedItems(amount);
@@ -338,8 +357,12 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     @Override
     public void onClickPost(InventoryClickEvent event) {
+        if (getMechanic().getTickThrottle().isThrottled()) {
+            event.setCancelled(true);
+        }
+
         if (!event.isCancelled()) {
-            updateAmount();
+            updateAmount(event.getWhoClicked());
         }
     }
 }
