@@ -73,6 +73,8 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
         @Override
         public void run() {
+            // TODO doesn't show up sometimes?
+
             double[] states = new double[COLLECT_WIDTH];
             double min = -1;
             double max = 0;

@@ -147,8 +147,6 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
             return true;
         }
 
-        // TODO doesn't update amount correctly, i don't know where the problem is
-
         // check if all slots dragged over are just in the player's own inventory
         if (event.getRawSlots().stream().allMatch(s -> event.getView().getInventory(s).getType() == InventoryType.PLAYER)) {
             // ... if it was, don't continue
@@ -157,9 +155,8 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
         // only check for storage slots
         if (event.getRawSlots().stream().anyMatch(i -> i < 35)) {
-            int capacity = getMechanic().getCapacity();
             int amount = getMechanic().getAmount();
-            if (amount == capacity) {
+            if (amount == getMechanic().getCapacity()) {
                 return true;
             }
 
@@ -171,7 +168,7 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
                                     .orElse(0)
                     )
                     .sum();
-            boolean checkSize = amount + added > capacity;
+            boolean checkSize = amount + added > getMechanic().getCapacity();
 
             ItemStack cursor = null;
             boolean cancel = false;
@@ -182,13 +179,6 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
                 // do not register added items to the storage box if the slot is in the player's own inventory
                 if (event.getView().getInventory(entry.getKey()).getType() == InventoryType.PLAYER) {
-                    added -= item.getAmount();
-                    if (at != null) {
-                        // the item at this slot originally, wasn't added in this event
-                        // therefore we removed too much by the removing the amount of the item entry, and
-                        // we have to add the amount of the item at this slot originally to track the correct added amount
-                        added += at.getAmount();
-                    }
                     continue;
                 }
 
@@ -210,8 +200,8 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
                 }
 
                 // check if the storage box does not have enough capacity for these items
-                if (checkSize && amount > capacity) {
-                    int subtract = amount - capacity;
+                if (checkSize && amount > getMechanic().getCapacity()) {
+                    int subtract = amount - getMechanic().getCapacity();
                     amount -= subtract;
                     added -= subtract;
                     item.setAmount(item.getAmount() - subtract);
@@ -305,15 +295,13 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
                         updateAddedItems(amount);
                     }
                 } else if (getMechanic().getAmount() < getMechanic().getCapacity()) {
+                    int add = getMechanic().getCapacity() - getMechanic().getAmount();
                     // take all items from the player's inventory and put into the storage box
-                    int left = updateRemovedItems(playerInv, Integer.MAX_VALUE, getMechanic().getStored(),
+                    int left = updateRemovedItems(playerInv, add, getMechanic().getStored(),
                             IntStream.range(0, playerInv.getSize())
                                     .boxed()
                                     .collect(Collectors.toList()));
-                    int amount = Integer.MAX_VALUE - left;
-                    if (getMechanic().getAmount() + amount > getMechanic().getCapacity()) {
-                        amount = getMechanic().getCapacity() - getMechanic().getAmount();
-                    }
+                    int amount = add - left;
 
                     // update amount if we were able to add anything
                     if (amount > 0) {
