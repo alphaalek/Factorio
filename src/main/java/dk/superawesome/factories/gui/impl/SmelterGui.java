@@ -9,7 +9,9 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,8 +79,13 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
     @Override
     public boolean onDrag(InventoryDragEvent event) {
-        boolean modifyIngredients = event.getInventorySlots().stream().anyMatch(INGREDIENT_SLOTS::contains);
-        boolean modifyFuel = event.getInventorySlots().stream().anyMatch(FUEL_SLOTS::contains);
+        if (getMechanic().getTickThrottle().isThrottled()
+                && event.getRawSlots().stream().anyMatch(s -> event.getView().getInventory(s).getType() != InventoryType.PLAYER)) {
+            return true;
+        }
+
+        boolean modifyIngredients = event.getRawSlots().stream().anyMatch(INGREDIENT_SLOTS::contains);
+        boolean modifyFuel = event.getRawSlots().stream().anyMatch(FUEL_SLOTS::contains);
         // disallow dragging items over both the ingredient and fuel slots
         if (modifyFuel && modifyIngredients) {
             return true;
@@ -201,7 +208,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
     @Override
     public boolean onClickIn(InventoryClickEvent event) {
-        if (INGREDIENT_SLOTS.contains(event.getSlot())) {
+        if (INGREDIENT_SLOTS.contains(event.getRawSlot())) {
             if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) {
                 updateIngredientsPost =  true;
                 return false;
@@ -223,7 +230,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             return true;
         }
 
-        if (FUEL_SLOTS.contains(event.getSlot())) {
+        if (FUEL_SLOTS.contains(event.getRawSlot())) {
             if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) {
                 updateFuelPost = true;
                 return false;
@@ -245,7 +252,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             return true;
         }
 
-        if (event.getSlot() == 35) {
+        if (event.getRawSlot() == 35) {
             loadInputOutputItems();
         }
 
@@ -270,9 +277,9 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY && event.getClickedInventory() != null) {
 
                 if (event.getClickedInventory() == getInventory()) {
-                    if (INGREDIENT_SLOTS.contains(event.getSlot())) {
+                    if (INGREDIENT_SLOTS.contains(event.getRawSlot())) {
                         updateIngredientsPost = true;
-                    } else if (FUEL_SLOTS.contains(event.getSlot())) {
+                    } else if (FUEL_SLOTS.contains(event.getRawSlot())) {
                         updateFuelPost = true;
                     }
                 } else if (!getMechanic().getTickThrottle().isThrottled()) {
@@ -326,7 +333,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             if ((event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD || event.getAction() == InventoryAction.HOTBAR_SWAP)) {
                 ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
 
-                if (INGREDIENT_SLOTS.contains(event.getSlot())) {
+                if (INGREDIENT_SLOTS.contains(event.getRawSlot())) {
                     if (hotbarItem == null) {
                         updateIngredientsPost = true;
                         return false;
@@ -350,7 +357,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                     }
                 }
 
-                if (FUEL_SLOTS.contains(event.getSlot())) {
+                if (FUEL_SLOTS.contains(event.getRawSlot())) {
                     if (hotbarItem == null) {
                         updateFuelPost = true;
                         return false;

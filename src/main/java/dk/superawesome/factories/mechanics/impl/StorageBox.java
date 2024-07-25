@@ -7,6 +7,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -25,6 +26,15 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
         ByteArrayInputStream str = context.getData();
         this.stored = context.readItemStack(str);
         this.amount = context.readInt(str);
+    }
+
+    @Override
+    public void save(MechanicStorageContext context) throws Exception {
+        ByteArrayOutputStream str = new ByteArrayOutputStream();
+        context.writeItemStack(str, this.stored);
+        str.write(this.amount);
+
+        context.upload(str);
     }
 
     @Override

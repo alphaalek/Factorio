@@ -6,10 +6,7 @@ import dk.superawesome.factories.mechanics.impl.StorageBox;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -150,8 +147,16 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
             return true;
         }
 
+        // TODO doesn't update amount correctly, i don't know where the problem is
+
+        // check if all slots dragged over are just in the player's own inventory
+        if (event.getRawSlots().stream().allMatch(s -> event.getView().getInventory(s).getType() == InventoryType.PLAYER)) {
+            // ... if it was, don't continue
+            return false;
+        }
+
         // only check for storage slots
-        if (event.getInventorySlots().stream().anyMatch(i -> i < 35)) {
+        if (event.getRawSlots().stream().anyMatch(i -> i < 35)) {
             int capacity = getMechanic().getCapacity();
             int amount = getMechanic().getAmount();
             if (amount == capacity) {
@@ -173,6 +178,21 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
             // add the dragged items
             for (Map.Entry<Integer, ItemStack> entry : event.getNewItems().entrySet()) {
                 ItemStack item = entry.getValue();
+                ItemStack at = event.getView().getItem(entry.getKey());
+
+                // do not register added items to the storage box if the slot is in the player's own inventory
+                if (event.getView().getInventory(entry.getKey()).getType() == InventoryType.PLAYER) {
+                    added -= item.getAmount();
+                    if (at != null) {
+                        // the item at this slot originally, wasn't added in this event
+                        // therefore we removed too much by the removing the amount of the item entry, and
+                        // we have to add the amount of the item at this slot originally to track the correct added amount
+                        added += at.getAmount();
+                    }
+                    continue;
+                }
+
+                // check if this item can be added to the storage box
                 if (handleInteract(item)) {
                     return true;
                 }
@@ -184,7 +204,6 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
                 // register added item
                 amount += item.getAmount();
-                ItemStack at = event.getView().getItem(entry.getKey());
                 if (at != null) {
                     // the item at this slot originally, wasn't added in this event
                     amount -= at.getAmount();
@@ -238,19 +257,15 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     @Override
     public boolean onClickIn(InventoryClickEvent event) {
-        if (event.getSlot() < 35) {
-            if (handleInteract(event.getCursor())) {
-                return true;
-            }
-
-            return getMechanic().getTickThrottle().isThrottled();
+        if (event.getRawSlot() < 35) {
+            return handleInteract(event.getCursor());
         }
 
-        if (event.getSlot() == 35) {
+        if (event.getRawSlot() == 35) {
             loadInputOutputItems();
         }
 
-        if (event.getSlot() == 49) {
+        if (event.getRawSlot() == 49 && !getMechanic().getTickThrottle().isThrottled()) {
             Inventory playerInv = event.getWhoClicked().getInventory();
 
             if (event.getClick() == ClickType.LEFT) {
@@ -346,8 +361,6 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
                     && handleInteract(event.getWhoClicked().getInventory().getItem(event.getHotbarButton()))) {
                 return true;
             }
-
-            return getMechanic().getTickThrottle().isThrottled();
         }
 
         return false;

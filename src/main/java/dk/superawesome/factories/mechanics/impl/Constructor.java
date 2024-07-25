@@ -7,6 +7,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -26,7 +27,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws Exception {
+    public void load(MechanicStorageContext context) {
         ByteArrayInputStream str = context.getData();
         for (int i = 0; i < 9; i++) {
             this.craftingGridItems[i] = context.readItemStack(str);
@@ -35,6 +36,20 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
         this.recipeResult = context.readItemStack(str);
         this.storageType = context.readItemStack(str);
         this.storageAmount = context.readInt(str);
+    }
+
+    @Override
+    public void save(MechanicStorageContext context) {
+        ByteArrayOutputStream str = new ByteArrayOutputStream();
+        for (int i = 0; i < 9; i++) {
+            context.writeItemStack(str, this.craftingGridItems[i]);
+        }
+
+        context.writeItemStack(str, this.recipeResult);
+        context.writeItemStack(str, this.storageType);
+        str.write(this.storageAmount);
+
+        context.upload(str);
     }
 
     @Override

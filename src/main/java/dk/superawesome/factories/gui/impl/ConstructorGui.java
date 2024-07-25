@@ -79,9 +79,12 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     @Override
     public boolean onClickIn(InventoryClickEvent event) {
-        if (!CRAFTING_SLOTS.contains(event.getSlot())) {
+        if (getMechanic().getTickThrottle().isThrottled()) {
+            return true;
+        }
 
-            if (event.getSlot() == 35) {
+        if (!CRAFTING_SLOTS.contains(event.getRawSlot())) {
+            if (event.getRawSlot() == 35) {
                 loadInputOutputItems();
             }
 
@@ -112,7 +115,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                 return true;
             }
 
-            if (!CRAFTING_SLOTS.contains(event.getSlot())
+            if (!CRAFTING_SLOTS.contains(event.getRawSlot())
                     && event.getClickedInventory() == getInventory()) {
                 return true;
             }
@@ -131,7 +134,11 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     @Override
     public boolean onDrag(InventoryDragEvent event) {
-        if (event.getInventorySlots().stream().anyMatch(i -> !CRAFTING_SLOTS.contains(i))) {
+        if (getMechanic().getTickThrottle().isThrottled()) {
+            return true;
+        }
+
+        if (event.getRawSlots().stream().anyMatch(i -> !CRAFTING_SLOTS.contains(i))) {
             return true;
         }
 

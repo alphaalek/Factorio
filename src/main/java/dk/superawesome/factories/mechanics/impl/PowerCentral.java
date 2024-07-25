@@ -15,6 +15,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Lightable;
 import org.bukkit.block.data.type.Switch;
 
+import java.io.*;
+
 public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui> implements ThinkingMechanic {
 
     public static final int CAPACITY = 0;
@@ -36,8 +38,17 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
     }
 
     @Override
-    public void load(MechanicStorageContext context) {
+    public void load(MechanicStorageContext context) throws IOException {
+        ByteArrayInputStream str = context.getData();
+        this.energy = new DataInputStream(str).readDouble();
+    }
 
+    @Override
+    public void save(MechanicStorageContext context) throws IOException {
+        ByteArrayOutputStream str = new ByteArrayOutputStream();
+        new DataOutputStream(str).writeDouble(this.energy);
+
+        context.upload(str);
     }
 
     @Override

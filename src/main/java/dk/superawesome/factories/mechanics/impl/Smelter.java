@@ -12,8 +12,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements ThinkingMechanic, ItemCollection, Container {
@@ -62,6 +66,35 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
         this.storageType = context.readItemStack(str);
         this.storageAmount = context.readInt(str);
+    }
+
+    @Override
+    public void save(MechanicStorageContext context) throws IOException {
+        ByteArrayOutputStream str = new ByteArrayOutputStream();
+        context.writeItemStack(str, this.ingredient);
+        str.write(this.ingredientAmount);
+
+        if (this.fuel != null) {
+            context.writeItemStack(str, new ItemStack(this.fuel.getMaterial()));
+        } else {
+            context.writeItemStack(str, null);
+        }
+        str.write(this.fuelAmount);
+        if (this.currentFuel != null) {
+            context.writeItemStack(str, new ItemStack(this.currentFuel.getMaterial()));
+        } else {
+            context.writeItemStack(str, null);
+        }
+        if (this.fuel != null) {
+            str.write((int) ((1 - this.currentFuelAmount) / this.fuel.getFuelAmount()));
+        } else {
+            str.write(0);
+        }
+
+        context.writeItemStack(str, this.storageType);
+        str.write(this.storageAmount);
+
+        context.upload(str);
     }
 
     @Override

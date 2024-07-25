@@ -32,19 +32,13 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
     }
 
     protected void loadFromStorage() {
-        try  {
-            load(context);
-        } catch (Exception ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "Failed to load mechanic data " + getProfile().getName()  + ", " + getLocation(), ex);
+        if (context.hasContext()) {
+            try  {
+                load(context);
+            } catch (Exception ex) {
+                Bukkit.getLogger().log(Level.SEVERE, "Failed to load mechanic data " + getProfile().getName()  + ", " + getLocation(), ex);
+            }
         }
-    }
-
-    public void load(MechanicStorageContext context) throws Exception {
-        // to be overridden if needed
-    }
-
-    public void save(MechanicStorageContext context) throws Exception {
-        // to be overridden if needed
     }
 
     @Override
@@ -54,6 +48,14 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
         } catch (Exception ex) {
             Bukkit.getLogger().log(Level.SEVERE, "Failed to save mechanic data " + getProfile().getName()  + ", " + getLocation(), ex);
         }
+    }
+
+    public void load(MechanicStorageContext context) throws Exception {
+        // to be overridden if needed
+    }
+
+    public void save(MechanicStorageContext context) throws Exception {
+        // to be overridden if needed
     }
 
     @Override

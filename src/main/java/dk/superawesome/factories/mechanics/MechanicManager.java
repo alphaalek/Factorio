@@ -52,11 +52,14 @@ public class MechanicManager implements Listener {
     }
 
     public void unload(Mechanic<?, ?> mechanic) {
+        // unregister this mechanic from the lists
         mechanics.remove(BlockUtil.getVec(mechanic.getLocation()));
-
         if (mechanic instanceof ThinkingMechanic) {
             thinkingMechanics.removeIf(m -> mechanic == m);
         }
+
+        // finally unload this mechanic
+        mechanic.unload();
     }
 
     public List<Mechanic<?, ?>> getNearbyMechanics(Location loc) {
@@ -157,6 +160,7 @@ public class MechanicManager implements Listener {
         }
         // fix lowercase/uppercase and my headache
         sign.getSide(Side.FRONT).setLine(0, "[" + mechanicProfile.get().getName() + "]");
+        sign.update();
 
         // get the block which the sign is hanging on, because this block is the root of the mechanic
         Block on = BlockUtil.getPointingBlock(sign.getBlock(), true);
