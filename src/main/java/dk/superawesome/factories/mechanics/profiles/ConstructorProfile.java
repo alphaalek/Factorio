@@ -6,6 +6,7 @@ import dk.superawesome.factories.gui.GuiFactory;
 import dk.superawesome.factories.gui.impl.ConstructorGui;
 import dk.superawesome.factories.mechanics.*;
 import dk.superawesome.factories.mechanics.impl.Constructor;
+import dk.superawesome.factories.mechanics.items.ItemCollection;
 import dk.superawesome.factories.util.Array;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;

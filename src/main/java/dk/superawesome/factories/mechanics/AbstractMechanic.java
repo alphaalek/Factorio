@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
@@ -18,12 +19,19 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
     protected final BlockFace rotation;
     protected final MechanicLevel level;
     protected final MechanicStorageContext context;
+    protected final Management management;
 
     public AbstractMechanic(Location loc, BlockFace rotation, MechanicStorageContext context) {
         this.loc = loc;
         this.rotation = rotation;
         this.context = context;
-        this.level = MechanicLevel.from(this, context.getLevel());
+
+        try {
+            this.level = MechanicLevel.from(this, this.context.getLevel());
+            this.management = this.context.getManagement();
+        } catch (SQLException ex) {
+            throw new RuntimeException("Failed to acquire data of mechanic at location " + loc, ex);
+        }
     }
 
     protected void loadFromStorage() {
@@ -39,7 +47,10 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
     @Override
     public void unload() {
         try  {
-            save(context);
+            this.context.getController().setLevel(this.loc, this.level.getLevel());
+
+            this.context.uploadManagement(this.management);
+            save(this.context);
         } catch (Exception ex) {
             Bukkit.getLogger().log(Level.SEVERE, "Failed to save mechanic data " + getProfile().getName()  + ", " + getLocation(), ex);
         }

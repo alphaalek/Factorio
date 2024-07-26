@@ -2,6 +2,8 @@ package dk.superawesome.factories.mechanics.impl;
 
 import dk.superawesome.factories.gui.impl.ConstructorGui;
 import dk.superawesome.factories.mechanics.*;
+import dk.superawesome.factories.mechanics.items.Container;
+import dk.superawesome.factories.mechanics.items.ItemCollection;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;

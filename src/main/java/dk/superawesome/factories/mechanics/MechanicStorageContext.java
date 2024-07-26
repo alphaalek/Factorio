@@ -2,6 +2,7 @@ package dk.superawesome.factories.mechanics;
 
 
 import dk.superawesome.factories.mechanics.db.MechanicController;
+import dk.superawesome.factories.util.db.Query;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -40,22 +41,42 @@ public class MechanicStorageContext {
         this.location = location;
     }
 
-    public ByteArrayInputStream getData() throws SQLException {
-        String base64 = controller.getData(location);
+    public MechanicController getController() {
+        return this.controller;
+    }
 
-        byte[] bytes = Base64.getDecoder().decode(base64);
+    public ByteArrayInputStream getData(Query.CheckedSupplier<String> data) throws SQLException {
+        byte[] bytes = Base64.getDecoder().decode(data.<SQLException>sneaky());
         return new ByteArrayInputStream(bytes);
     }
 
-    public void upload(ByteArrayOutputStream stream) throws SQLException {
+    public ByteArrayInputStream getData() throws SQLException {
+        return getData(() -> this.controller.getData(this.location));
+    }
+
+    public Management getManagement() throws SQLException {
+        ByteArrayInputStream stream = getData(() -> this.controller.getManagement(this.location));
+        return this.controller.getManagementSerializer().deserialize(stream);
+    }
+
+    public void upload(ByteArrayOutputStream stream, Query.CheckedConsumer<String> data) throws SQLException {
         byte[] bytes = stream.toByteArray();
         String base64 = Base64.getEncoder().encodeToString(bytes);
 
-        controller.setData(location, base64);
+        data.<SQLException>sneaky(base64);
+    }
+
+    public void upload(ByteArrayOutputStream stream) throws SQLException {
+        upload(stream, base64 -> this.controller.setData(this.location, base64));
+    }
+
+    public void uploadManagement(Management management) throws SQLException {
+        ByteArrayOutputStream stream = this.controller.getManagementSerializer().serialize(management);
+        upload(stream, base64 -> this.controller.setManagement(this.location, base64));
     }
 
     public boolean hasContext() throws SQLException {
-        return controller.hasData(location);
+        return this.controller.hasData(this.location);
     }
 
     public void writeItemStack(ByteArrayOutputStream stream, ItemStack item) {
@@ -89,7 +110,7 @@ public class MechanicStorageContext {
         return l == -1 ? 0 : l;
     }
 
-    public int getLevel() {
-        return 1;
+    public int getLevel() throws SQLException {
+        return this.controller.getLevel(this.location);
     }
 }

@@ -1,6 +1,7 @@
 package dk.superawesome.factories;
 
 import dk.superawesome.factories.listeners.*;
+import dk.superawesome.factories.mechanics.Management;
 import dk.superawesome.factories.mechanics.MechanicManager;
 import dk.superawesome.factories.mechanics.MechanicStorageContext;
 import dk.superawesome.factories.mechanics.db.DatabaseConnection;
@@ -35,7 +36,8 @@ public final class Factories extends JavaPlugin implements Listener {
             throw new RuntimeException("Could not find database configuration section");
         }
         DatabaseConnection connection = new DatabaseConnection(sec);
-        MechanicController controller = new MechanicController(connection);
+        Management.Serializer managementSerializer = new Management.Serializer();
+        MechanicController controller = new MechanicController(connection, managementSerializer);
         this.contextProvider = new MechanicStorageContext.Provider(controller);
 
         for (World world : Bukkit.getServer().getWorlds()) {

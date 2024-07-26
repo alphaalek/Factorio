@@ -1,7 +1,7 @@
 package dk.superawesome.factories.mechanics.routes;
 
 import dk.superawesome.factories.Factories;
-import dk.superawesome.factories.mechanics.ItemCollection;
+import dk.superawesome.factories.mechanics.items.ItemCollection;
 import dk.superawesome.factories.mechanics.impl.PowerCentral;
 import dk.superawesome.factories.mechanics.routes.events.PipeSuckEvent;
 import dk.superawesome.factories.util.statics.BlockUtil;

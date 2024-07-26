@@ -1,4 +1,4 @@
-package dk.superawesome.factories.mechanics;
+package dk.superawesome.factories.mechanics.items;
 
 import org.bukkit.Material;
 import org.bukkit.Tag;

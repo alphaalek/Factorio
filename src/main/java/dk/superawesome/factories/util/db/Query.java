@@ -23,25 +23,6 @@ public class Query {
         return this;
     }
 
-    @FunctionalInterface
-    public interface CheckedFunction<T, R> {
-
-        R apply(T val) throws Exception;
-
-        default R sneaky(T val) {
-            try {
-                return apply(val);
-            } catch (Exception ex) {
-                return sneakyThrow(ex);
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        static <T, E extends Exception> T sneakyThrow(Exception e) throws E {
-            throw (E) e;
-        }
-    }
-
     private <T> T create(DatabaseConnection connection, CheckedFunction<PreparedStatement, T> apply) throws SQLException {
         if (connection.hasConnection()) {
             try (PreparedStatement statement = connection.getConnection().prepareStatement(this.query)) {
@@ -67,5 +48,52 @@ public class Query {
     public int executeUpdate(DatabaseConnection connection) throws SQLException {
         return Optional.ofNullable(create(connection, PreparedStatement::executeUpdate))
                 .orElse(0);
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T, E extends Exception> T sneakyThrow(Exception e) throws E {
+        throw (E) e;
+    }
+
+    @FunctionalInterface
+    public interface CheckedSupplier<T> {
+
+        T get() throws Exception;
+
+        default <E extends Exception> T sneaky() throws E {
+            try {
+                return get();
+            } catch (Exception ex) {
+                return sneakyThrow(ex);
+            }
+        }
+    }
+
+    @FunctionalInterface
+    public interface CheckedConsumer<T> {
+
+        void accept(T val) throws Exception;
+
+        default <E extends Exception> void sneaky(T val) throws E {
+            try {
+                accept(val);
+            } catch (Exception ex) {
+                sneakyThrow(ex);
+            }
+        }
+    }
+
+    @FunctionalInterface
+    public interface CheckedFunction<T, R> {
+
+        R apply(T val) throws Exception;
+
+        default <E extends Exception> R sneaky(T val) throws E {
+            try {
+                return apply(val);
+            } catch (Exception ex) {
+                return sneakyThrow(ex);
+            }
+        }
     }
 }

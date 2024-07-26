@@ -2,6 +2,8 @@ package dk.superawesome.factories.mechanics;
 
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.building.Buildings;
+import dk.superawesome.factories.mechanics.items.Container;
+import dk.superawesome.factories.mechanics.items.ItemCollection;
 import dk.superawesome.factories.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factories.mechanics.routes.events.PipeSuckEvent;
 import dk.superawesome.factories.util.db.Query;
@@ -19,6 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -130,7 +133,7 @@ public class MechanicManager implements Listener {
             if (mechanic == null) {
                 return;
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             Bukkit.getLogger().log(Level.SEVERE, "Failed to create mechanic at location " + sign.getLocation(), ex);
             return;
         }
@@ -156,12 +159,12 @@ public class MechanicManager implements Listener {
             if (mechanic != null) {
                 mechanic.blocksLoaded();
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             Bukkit.getLogger().log(Level.SEVERE, "Failed to load mechanic at location " + sign.getLocation(), ex);
         }
     }
 
-    private Mechanic<?, ?> loadMechanicFromSign(Sign sign, Query.CheckedFunction<String, MechanicStorageContext> context) {
+    private Mechanic<?, ?> loadMechanicFromSign(Sign sign, Query.CheckedFunction<String, MechanicStorageContext> context) throws SQLException {
         // check if this sign is related to a mechanic
         if (!sign.getSide(Side.FRONT).getLine(0).startsWith("[")
                 || !sign.getSide(Side.FRONT).getLine(0).endsWith("]")) {
@@ -189,6 +192,6 @@ public class MechanicManager implements Listener {
 
         // load this mechanic
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
-        return load(profile, context.sneaky(profile.getName()), on.getLocation(), rotation);
+        return load(profile, context.<SQLException>sneaky(profile.getName()), on.getLocation(), rotation);
     }
 }

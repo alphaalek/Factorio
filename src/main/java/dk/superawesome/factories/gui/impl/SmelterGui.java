@@ -2,7 +2,7 @@ package dk.superawesome.factories.gui.impl;
 
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.gui.MechanicGui;
-import dk.superawesome.factories.mechanics.Fuel;
+import dk.superawesome.factories.mechanics.items.Fuel;
 import dk.superawesome.factories.mechanics.impl.Smelter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -11,7 +11,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {

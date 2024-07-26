@@ -1,6 +1,7 @@
-package dk.superawesome.factories.mechanics;
+package dk.superawesome.factories.mechanics.items;
 
 import dk.superawesome.factories.gui.BaseGui;
+import dk.superawesome.factories.mechanics.AbstractMechanic;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;

@@ -2,6 +2,9 @@ package dk.superawesome.factories.mechanics.impl;
 
 import dk.superawesome.factories.gui.impl.SmelterGui;
 import dk.superawesome.factories.mechanics.*;
+import dk.superawesome.factories.mechanics.items.Container;
+import dk.superawesome.factories.mechanics.items.Fuel;
+import dk.superawesome.factories.mechanics.items.ItemCollection;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
