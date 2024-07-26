@@ -20,7 +20,6 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
 
     public static final int CAPACITY = 0;
 
-
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
 
     private boolean hasGraph;
@@ -39,13 +38,13 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
     @Override
     public void load(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayInputStream str = context.getData();
-        this.energy = new DataInputStream(str).readDouble();
+        this.energy = context.getSerializer().readDouble(str);
     }
 
     @Override
     public void save(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
-        new DataOutputStream(str).writeDouble(this.energy);
+        context.getSerializer().writeDouble(str, this.energy);
 
         context.upload(str);
     }

@@ -26,15 +26,15 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
     @Override
     public void load(MechanicStorageContext context) throws Exception {
         ByteArrayInputStream str = context.getData();
-        this.stored = context.readItemStack(str);
-        this.amount = context.readInt(str);
+        this.stored = context.getSerializer().readItemStack(str);
+        this.amount = context.getSerializer().readInt(str);
     }
 
     @Override
     public void save(MechanicStorageContext context) throws Exception {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
-        context.writeItemStack(str, this.stored);
-        str.write(this.amount);
+        context.getSerializer().writeItemStack(str, this.stored);
+        context.getSerializer().writeInt(str, this.amount);
 
         context.upload(str);
     }

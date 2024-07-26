@@ -50,50 +50,50 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     @Override
     public void load(MechanicStorageContext context) throws Exception {
         ByteArrayInputStream str = context.getData();
-        this.ingredient = context.readItemStack(str);
-        this.ingredientAmount = context.readInt(str);
+        this.ingredient = context.getSerializer().readItemStack(str);
+        this.ingredientAmount = context.getSerializer().readInt(str);
 
-        ItemStack fuel = context.readItemStack(str);
+        ItemStack fuel = context.getSerializer().readItemStack(str);
         if (fuel != null) {
             this.fuel = Fuel.get(fuel.getType());
         }
-        this.fuelAmount = context.readInt(str);
-        ItemStack currentFuel = context.readItemStack(str);
-        int currentFuelAmount = context.readInt(str);
+        this.fuelAmount = context.getSerializer().readInt(str);
+        ItemStack currentFuel = context.getSerializer().readItemStack(str);
+        int currentFuelAmount = context.getSerializer().readInt(str);
         if (currentFuel != null) {
             this.currentFuel = Fuel.get(currentFuel.getType());
             this.currentFuelAmount = 1 - this.currentFuel.getFuelAmount() * currentFuelAmount;
         }
 
-        this.storageType = context.readItemStack(str);
-        this.storageAmount = context.readInt(str);
+        this.storageType = context.getSerializer().readItemStack(str);
+        this.storageAmount = context.getSerializer().readInt(str);
     }
 
     @Override
     public void save(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
-        context.writeItemStack(str, this.ingredient);
-        str.write(this.ingredientAmount);
+        context.getSerializer().writeItemStack(str, this.ingredient);
+        context.getSerializer().writeInt(str, this.ingredientAmount);
 
         if (this.fuel != null) {
-            context.writeItemStack(str, new ItemStack(this.fuel.getMaterial()));
+            context.getSerializer().writeItemStack(str, new ItemStack(this.fuel.getMaterial()));
         } else {
-            context.writeItemStack(str, null);
+            context.getSerializer().writeItemStack(str, null);
         }
-        str.write(this.fuelAmount);
+        context.getSerializer().writeInt(str, this.fuelAmount);
         if (this.currentFuel != null) {
-            context.writeItemStack(str, new ItemStack(this.currentFuel.getMaterial()));
+            context.getSerializer().writeItemStack(str, new ItemStack(this.currentFuel.getMaterial()));
         } else {
-            context.writeItemStack(str, null);
+            context.getSerializer().writeItemStack(str, null);
         }
         if (this.fuel != null) {
-            str.write((int) ((1 - this.currentFuelAmount) / this.fuel.getFuelAmount()));
+            context.getSerializer().writeInt(str, (int) ((1 - this.currentFuelAmount) / this.fuel.getFuelAmount()));
         } else {
-            str.write(0);
+            context.getSerializer().writeInt(str, 0);
         }
 
-        context.writeItemStack(str, this.storageType);
-        str.write(this.storageAmount);
+        context.getSerializer().writeItemStack(str, this.storageType);
+        context.getSerializer().writeInt(str, this.storageAmount);
 
         context.upload(str);
     }

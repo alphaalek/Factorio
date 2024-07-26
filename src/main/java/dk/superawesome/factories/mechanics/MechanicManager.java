@@ -125,11 +125,11 @@ public class MechanicManager implements Listener {
         }
     }
 
-    public void buildMechanic(Sign sign) {
+    public void buildMechanic(Sign sign, UUID owner) {
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
         Mechanic<?, ?> mechanic;
         try {
-            mechanic = loadMechanicFromSign(sign, type -> contextProvider.create(sign.getLocation(), rotation, type));
+            mechanic = loadMechanicFromSign(sign, type -> contextProvider.create(sign.getLocation(), rotation, type, owner));
             if (mechanic == null) {
                 return;
             }

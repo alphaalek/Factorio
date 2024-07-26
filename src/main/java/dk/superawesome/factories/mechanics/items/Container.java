@@ -1,7 +1,6 @@
 package dk.superawesome.factories.mechanics.items;
 
 import dk.superawesome.factories.gui.BaseGui;
-import dk.superawesome.factories.mechanics.AbstractMechanic;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ public interface Container {
 
     int getCapacity();
 
-    default <G extends BaseGui<G>> List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicReference<G> inUse, Consumer<G> doGui, AbstractMechanic.Updater<Integer> updater) {
+    default <G extends BaseGui<G>> List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicReference<G> inUse, Consumer<G> doGui, Updater<Integer> updater) {
         List<ItemStack> items = new ArrayList<>();
         int taken = 0;
         while (taken < amount && taken < storedAmount) {
@@ -37,7 +36,7 @@ public interface Container {
         return items;
     }
 
-    default <G extends BaseGui<G>> int put(ItemCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, AbstractMechanic.Updater<ItemStack> updater) {
+    default <G extends BaseGui<G>> int put(ItemCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, Updater<ItemStack> updater) {
         List<ItemStack> items = from.take(64);
         int add = 0;
         for (ItemStack item : items) {
@@ -58,5 +57,12 @@ public interface Container {
         }
 
         return add;
+    }
+
+    interface Updater<T> {
+
+        T get();
+
+        void set(T val);
     }
 }

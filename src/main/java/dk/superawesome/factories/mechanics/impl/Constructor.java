@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Predicate;
@@ -37,27 +38,27 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws SQLException {
+    public void load(MechanicStorageContext context) throws Exception {
         ByteArrayInputStream str = context.getData();
         for (int i = 0; i < 9; i++) {
-            this.craftingGridItems[i] = context.readItemStack(str);
+            this.craftingGridItems[i] = context.getSerializer().readItemStack(str);
         }
 
-        this.recipeResult = context.readItemStack(str);
-        this.storageType = context.readItemStack(str);
-        this.storageAmount = context.readInt(str);
+        this.recipeResult = context.getSerializer().readItemStack(str);
+        this.storageType = context.getSerializer().readItemStack(str);
+        this.storageAmount = context.getSerializer().readInt(str);
     }
 
     @Override
-    public void save(MechanicStorageContext context) throws SQLException {
+    public void save(MechanicStorageContext context) throws SQLException, IOException {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
         for (int i = 0; i < 9; i++) {
-            context.writeItemStack(str, this.craftingGridItems[i]);
+            context.getSerializer().writeItemStack(str, this.craftingGridItems[i]);
         }
 
-        context.writeItemStack(str, this.recipeResult);
-        context.writeItemStack(str, this.storageType);
-        str.write(this.storageAmount);
+        context.getSerializer().writeItemStack(str, this.recipeResult);
+        context.getSerializer().writeItemStack(str, this.storageType);
+        context.getSerializer().writeInt(str, this.storageAmount);
 
         context.upload(str);
     }

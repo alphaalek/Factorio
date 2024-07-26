@@ -20,6 +20,8 @@ public interface Mechanic<M extends Mechanic<M, G>, G extends BaseGui<G>> {
 
     int getLevel();
 
+    Management getManagement();
+
     MechanicProfile<M, G> getProfile();
 
     void openInventory(Player player);

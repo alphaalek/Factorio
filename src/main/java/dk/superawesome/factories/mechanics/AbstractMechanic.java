@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -26,10 +27,14 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
         this.rotation = rotation;
         this.context = context;
 
+        int level = 1;
         try {
+            if (this.context.hasContext())  {
+                level = this.context.getLevel();
+            }
             this.level = MechanicLevel.from(this, this.context.getLevel());
             this.management = this.context.getManagement();
-        } catch (SQLException ex) {
+        } catch (SQLException | IOException ex) {
             throw new RuntimeException("Failed to acquire data of mechanic at location " + loc, ex);
         }
     }
@@ -89,11 +94,9 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
         return rotation;
     }
 
-    protected interface Updater<T> {
-
-        T get();
-
-        void set(T val);
+    @Override
+    public Management getManagement() {
+        return management;
     }
 
     @Override

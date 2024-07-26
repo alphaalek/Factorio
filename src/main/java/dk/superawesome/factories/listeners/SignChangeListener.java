@@ -18,7 +18,7 @@ public class SignChangeListener implements Listener {
         if (manager.getMechanicPartially(event.getBlock().getLocation()) != null) {
             event.setCancelled(true);
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
-            Bukkit.getScheduler().runTask(Factories.get(), () -> manager.buildMechanic((Sign) event.getBlock().getState()));
+            Bukkit.getScheduler().runTask(Factories.get(), () -> manager.buildMechanic((Sign) event.getBlock().getState(), event.getPlayer().getUniqueId()));
         }
     }
 }
