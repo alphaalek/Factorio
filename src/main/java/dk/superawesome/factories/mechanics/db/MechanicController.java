@@ -3,12 +3,14 @@ package dk.superawesome.factories.mechanics.db;
 import dk.superawesome.factories.mechanics.MechanicStorageContext;
 import dk.superawesome.factories.util.db.Query;
 import dk.superawesome.factories.util.db.Types;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.logging.Level;
 
 public class MechanicController {
 
@@ -16,6 +18,22 @@ public class MechanicController {
 
     public MechanicController(DatabaseConnection connection) {
         this.connection = connection;
+
+        Query query = new Query(
+                "CREATE TABLE IF NOT EXISTS mechanics (" +
+                "id INT PRIMARY KEY AUTO_INCREMENT, " +
+                "type VARCHAR(16), " +
+                "location VARCHAR(64), " +
+                "rotation ENUM(NORTH, EAST, SOUTH, WEST), " +
+                "management TEXT, " +
+                "data TEXT)"
+        );
+
+        try {
+            query.execute(this.connection);
+        } catch (SQLException ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Failed to create table!", ex);
+        }
     }
 
     public MechanicStorageContext findAt(Location loc) {
