@@ -3,10 +3,8 @@ package dk.superawesome.factories.mechanics.impl;
 import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.gui.impl.PowerCentralGui;
 import dk.superawesome.factories.mechanics.*;
-import dk.superawesome.factories.mechanics.profiles.PowerCentralProfile;
 import dk.superawesome.factories.mechanics.routes.Routes;
 import dk.superawesome.factories.util.statics.BlockUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,6 +14,7 @@ import org.bukkit.block.data.Lightable;
 import org.bukkit.block.data.type.Switch;
 
 import java.io.*;
+import java.sql.SQLException;
 
 public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui> implements ThinkingMechanic {
 
@@ -38,13 +37,13 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws IOException {
+    public void load(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayInputStream str = context.getData();
         this.energy = new DataInputStream(str).readDouble();
     }
 
     @Override
-    public void save(MechanicStorageContext context) throws IOException {
+    public void save(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
         new DataOutputStream(str).writeDouble(this.energy);
 

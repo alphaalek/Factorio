@@ -154,7 +154,7 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         }
 
         // only check for storage slots
-        if (event.getRawSlots().stream().anyMatch(i -> i < 35)) {
+        if (event.getRawSlots().stream().anyMatch(i -> i < STORED_SIZE)) {
             int amount = getMechanic().getAmount();
             if (amount == getMechanic().getCapacity()) {
                 return true;

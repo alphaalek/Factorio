@@ -1,7 +1,6 @@
 package dk.superawesome.factories.mechanics.impl;
 
 import dk.superawesome.factories.gui.impl.SmelterGui;
-import dk.superawesome.factories.mechanics.ItemCollection;
 import dk.superawesome.factories.mechanics.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -13,11 +12,10 @@ import org.bukkit.inventory.Recipe;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements ThinkingMechanic, ItemCollection, Container {
@@ -69,7 +67,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     }
 
     @Override
-    public void save(MechanicStorageContext context) throws IOException {
+    public void save(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
         context.writeItemStack(str, this.ingredient);
         str.write(this.ingredientAmount);

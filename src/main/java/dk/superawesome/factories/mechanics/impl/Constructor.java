@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -24,10 +25,17 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     public Constructor(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
         loadFromStorage();
+
+        // id
+        // location
+        // rotation
+        // type
+        // management
+        // data
     }
 
     @Override
-    public void load(MechanicStorageContext context) {
+    public void load(MechanicStorageContext context) throws SQLException {
         ByteArrayInputStream str = context.getData();
         for (int i = 0; i < 9; i++) {
             this.craftingGridItems[i] = context.readItemStack(str);
@@ -39,7 +47,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     }
 
     @Override
-    public void save(MechanicStorageContext context) {
+    public void save(MechanicStorageContext context) throws SQLException {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
         for (int i = 0; i < 9; i++) {
             context.writeItemStack(str, this.craftingGridItems[i]);

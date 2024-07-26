@@ -6,13 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseGui<G>> implements Mechanic<M, G> {
@@ -32,12 +27,12 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
     }
 
     protected void loadFromStorage() {
-        if (context.hasContext()) {
-            try  {
+        try  {
+            if (context.hasContext()) {
                 load(context);
-            } catch (Exception ex) {
-                Bukkit.getLogger().log(Level.SEVERE, "Failed to load mechanic data " + getProfile().getName()  + ", " + getLocation(), ex);
             }
+        } catch (Exception ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Failed to load mechanic data " + getProfile().getName()  + ", " + getLocation(), ex);
         }
     }
 

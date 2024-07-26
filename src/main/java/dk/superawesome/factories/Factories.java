@@ -2,9 +2,13 @@ package dk.superawesome.factories;
 
 import dk.superawesome.factories.listeners.*;
 import dk.superawesome.factories.mechanics.MechanicManager;
+import dk.superawesome.factories.mechanics.MechanicStorageContext;
+import dk.superawesome.factories.mechanics.db.DatabaseConnection;
+import dk.superawesome.factories.mechanics.db.MechanicController;
 import dk.superawesome.factories.util.Tick;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -19,12 +23,23 @@ public final class Factories extends JavaPlugin implements Listener {
     private static Factories instance;
 
     private final Map<World, MechanicManager> mechanicManagers = new HashMap<>();
+    private MechanicStorageContext.Provider contextProvider;
 
     @Override
     public void onEnable() {
         instance = this;
+
+        saveDefaultConfig();
+        ConfigurationSection sec = getConfig().getConfigurationSection("database");
+        if (sec == null) {
+            throw new RuntimeException("Could not find database configuration section");
+        }
+        DatabaseConnection connection = new DatabaseConnection(sec);
+        MechanicController controller = new MechanicController(connection);
+        this.contextProvider = new MechanicStorageContext.Provider(controller);
+
         for (World world : Bukkit.getServer().getWorlds()) {
-            MechanicManager mm = new MechanicManager(world);
+            MechanicManager mm = new MechanicManager(world, contextProvider);
             mechanicManagers.put(world, mm);
         }
 
@@ -51,6 +66,6 @@ public final class Factories extends JavaPlugin implements Listener {
     }
 
     public MechanicManager getMechanicManager(World world) {
-        return mechanicManagers.computeIfAbsent(world, d -> new MechanicManager(world));
+        return mechanicManagers.computeIfAbsent(world, d -> new MechanicManager(world, contextProvider));
     }
 }

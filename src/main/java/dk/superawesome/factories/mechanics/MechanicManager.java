@@ -4,8 +4,12 @@ import dk.superawesome.factories.Factories;
 import dk.superawesome.factories.building.Buildings;
 import dk.superawesome.factories.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factories.mechanics.routes.events.PipeSuckEvent;
+import dk.superawesome.factories.util.db.Query;
 import dk.superawesome.factories.util.statics.BlockUtil;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
@@ -16,13 +20,16 @@ import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.logging.Level;
 
 public class MechanicManager implements Listener {
 
     private final World world;
+    private final MechanicStorageContext.Provider contextProvider;
 
-    public MechanicManager(World world) {
+    public MechanicManager(World world, MechanicStorageContext.Provider contextProvider) {
         this.world = world;
+        this.contextProvider = contextProvider;
 
         Bukkit.getPluginManager().registerEvents(this, Factories.get());
 
@@ -116,8 +123,15 @@ public class MechanicManager implements Listener {
     }
 
     public void buildMechanic(Sign sign) {
-        Mechanic<?, ?> mechanic = loadMechanicFromSign(sign, MechanicStorageContext.DEFAULT);
-        if (mechanic == null) {
+        BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
+        Mechanic<?, ?> mechanic;
+        try {
+            mechanic = loadMechanicFromSign(sign, type -> contextProvider.create(sign.getLocation(), rotation, type));
+            if (mechanic == null) {
+                return;
+            }
+        } catch (Exception ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Failed to create mechanic at location " + sign.getLocation(), ex);
             return;
         }
 
@@ -137,13 +151,17 @@ public class MechanicManager implements Listener {
     }
 
     public void loadMechanic(Sign sign) {
-        Mechanic<?, ?> mechanic = loadMechanicFromSign(sign, MechanicStorageContext.findAt(sign.getLocation()));
-        if (mechanic != null) {
-            mechanic.blocksLoaded();
+        try {
+            Mechanic<?, ?> mechanic = loadMechanicFromSign(sign, __ -> contextProvider.findAt(sign.getLocation()));
+            if (mechanic != null) {
+                mechanic.blocksLoaded();
+            }
+        } catch (Exception ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Failed to load mechanic at location " + sign.getLocation(), ex);
         }
     }
 
-    private Mechanic<?, ?> loadMechanicFromSign(Sign sign, MechanicStorageContext context) {
+    private Mechanic<?, ?> loadMechanicFromSign(Sign sign, Query.CheckedFunction<String, MechanicStorageContext> context) {
         // check if this sign is related to a mechanic
         if (!sign.getSide(Side.FRONT).getLine(0).startsWith("[")
                 || !sign.getSide(Side.FRONT).getLine(0).endsWith("]")) {
@@ -158,8 +176,9 @@ public class MechanicManager implements Listener {
         if (!mechanicProfile.isPresent()) {
             return null;
         }
+        MechanicProfile<?, ?> profile = mechanicProfile.get();
         // fix lowercase/uppercase and my headache
-        sign.getSide(Side.FRONT).setLine(0, "[" + mechanicProfile.get().getName() + "]");
+        sign.getSide(Side.FRONT).setLine(0, "[" + profile.getName() + "]");
         sign.update();
 
         // get the block which the sign is hanging on, because this block is the root of the mechanic
@@ -170,6 +189,6 @@ public class MechanicManager implements Listener {
 
         // load this mechanic
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
-        return load(mechanicProfile.get(), context, on.getLocation(), rotation);
+        return load(profile, context.sneaky(profile.getName()), on.getLocation(), rotation);
     }
 }
