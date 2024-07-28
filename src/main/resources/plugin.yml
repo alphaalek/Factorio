@@ -1,5 +1,5 @@
-name: Factories
+name: Factorio
 version: 1.0
 author: Alek05
 api-version: 1.13
-main: dk.superawesome.factories.Factories
+main: dk.superawesome.factorio.Factorio
