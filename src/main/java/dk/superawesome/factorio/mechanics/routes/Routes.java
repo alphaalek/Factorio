@@ -20,15 +20,15 @@ public class Routes {
     private static final RouteFactory<AbstractRoute.Pipe> itemsRouteFactory = new RouteFactory.PipeRouteFactory();
     private static final RouteFactory<AbstractRoute.Signal> signalRouteFactory = new RouteFactory.SignalRouteFactory();
 
-    public static void suckItems(Block start, PowerCentral source) {
+    public static boolean suckItems(Block start, PowerCentral source) {
         if (start.getType() != Material.STICKY_PISTON) {
-            return;
+            return false;
         }
 
         // we will suck items out of the mechanic that the sticky piston is pointing towards
         Block from = BlockUtil.getPointingBlock(start, false);
         if (from == null) {
-            return;
+            return false;
         }
 
         PipeSuckEvent event = new PipeSuckEvent(from);
@@ -36,13 +36,14 @@ public class Routes {
         if (event.getItems() == null
                 || event.getItems().isEmpty()
                 || source.getEnergy() < event.getItems().getEnergyCost()) {
-            return;
+            return false;
         }
 
         source.setEnergy(source.getEnergy() - event.getItems().getEnergyCost());
 
         // start the pipe route
         startItemsRoute(start, event.getItems());
+        return true;
     }
 
     private static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory) {

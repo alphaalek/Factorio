@@ -201,8 +201,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
                 // if there are no fuel left, don't continue
                 || (currentFuelAmount == 0 && fuelAmount == 0)
                 // if there is no space left, don't continue
-                || storageAmount + smeltResult.getAmount() > getCapacity()
-                ) {
+                || storageAmount + smeltResult.getAmount() > getCapacity()) {
             return;
         }
 

@@ -91,14 +91,14 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             this.world = world;
         }
 
-        public void handle(int runId, PowerCentral source) {
+        public boolean handle(int runId, PowerCentral source) {
             if (runId == lastRunId) {
-                return;
+                return false;
             }
             this.lastRunId = runId;
 
             Block block = BlockUtil.getBlock(world, vec);
-            Routes.suckItems(block, source);
+            return Routes.suckItems(block, source);
         }
 
         @Override
@@ -246,14 +246,22 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 return;
             }
 
+            // handle signal outputs
+            int mechanics = 0;
             source.setEnergy(source.getEnergy() - signalCost);
-
             for (SignalOutputEntry entry : outputs) {
-                entry.handle(runId, source);
+                if (entry.handle(runId, source)) {
+                    mechanics++;
+                }
 
                 if (source.getEnergy() == 0) {
                     break;
                 }
+            }
+
+            // power related mechanic stress
+            if (mechanics < outputs.size()) {
+                source.setEnergy(source.getEnergy() + signalCost * (((double)mechanics) / outputs.size()));
             }
         }
     }
