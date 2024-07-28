@@ -4,17 +4,21 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.items.ItemCollection;
 import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.PipeSuckEvent;
+import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+
 public class Routes {
 
-    private static final RouteFactory<AbstractRoute.Pipe, AbstractRoute.ItemsOutputEntry> itemsRouteFactory = new RouteFactory.PipeRouteFactory();
-    private static final RouteFactory<AbstractRoute.Signal, AbstractRoute.SignalOutputEntry> signalRouteFactory = new RouteFactory.SignalRouteFactory();
+    private static final RouteFactory<AbstractRoute.Pipe> itemsRouteFactory = new RouteFactory.PipeRouteFactory();
+    private static final RouteFactory<AbstractRoute.Signal> signalRouteFactory = new RouteFactory.SignalRouteFactory();
 
     public static void suckItems(Block start, PowerCentral source) {
         if (start.getType() != Material.STICKY_PISTON) {
@@ -41,7 +45,7 @@ public class Routes {
         startItemsRoute(start, event.getItems());
     }
 
-    private static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R, P> factory) {
+    private static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory) {
         R route = AbstractRoute.getCachedRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
             route = createNewRoute(start, factory);
@@ -64,7 +68,15 @@ public class Routes {
                 .start(source);
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R, P> factory) {
+    public static void unloadRoutes(Chunk chunk) {
+        for (AbstractRoute<?, ?> route : new ArrayList<>(AbstractRoute.getCachedRoutes(chunk.getWorld()))) {
+            route.unload(chunk);
+        }
+
+        // TODO: load again
+    }
+
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R> factory) {
         R route = factory.create();
 
         expandRoute(route, start);

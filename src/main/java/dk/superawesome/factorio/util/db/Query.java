@@ -108,4 +108,18 @@ public class Query {
             }
         }
     }
+
+    @FunctionalInterface
+    public interface CheckedBiFunction<T, V, R> {
+
+        R apply(T val1, V val2) throws Exception;
+
+        default <E extends Exception> R sneaky(T val1, V val2) throws E {
+            try {
+                return apply(val1, val2);
+            } catch (Exception ex) {
+                return sneakyThrow(ex);
+            }
+        }
+    }
 }

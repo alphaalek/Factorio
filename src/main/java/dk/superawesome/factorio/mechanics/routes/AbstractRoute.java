@@ -5,6 +5,7 @@ import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -47,6 +48,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         route.cached = false;
     }
 
+    public static Collection<AbstractRoute<?, ?>> getCachedRoutes(World world) {
+        return cachedRoutes.containsKey(world) ? cachedRoutes.get(world).values() : Collections.emptyList();
+    }
+
     public static class ItemsOutputEntry implements OutputEntry {
 
         private int lastRunId = -1;
@@ -67,6 +72,11 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             Block block = BlockUtil.getBlock(world, vec);
             PipePutEvent event = new PipePutEvent(BlockUtil.getPointingBlock(block, false), collection);
             Bukkit.getPluginManager().callEvent(event);
+        }
+
+        @Override
+        public BlockVector getVec() {
+            return vec;
         }
     }
 
@@ -89,6 +99,11 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
             Block block = BlockUtil.getBlock(world, vec);
             Routes.suckItems(block, source);
+        }
+
+        @Override
+        public BlockVector getVec() {
+            return vec;
         }
     }
 
@@ -114,19 +129,29 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
     }
 
     public void addOutput(World world, BlockVector vec) {
-        outputs.add(getOutputEntry(world, vec));
+        outputs.add(createOutputEntry(world, vec));
     }
 
-    public abstract RouteFactory<R, P> getFactory();
+    public void unload(Chunk chunk) {
+        locations.removeIf(vec -> BlockUtil.getBlock(chunk.getWorld(), vec).getChunk().equals(chunk));
+        outputs.removeIf(output -> BlockUtil.getBlock(chunk.getWorld(), output.getVec()).getChunk().equals(chunk));
+
+        if (locations.isEmpty()) {
+            removeRouteFromCache(chunk.getWorld(), this);
+        }
+    }
+
+    public abstract RouteFactory<R> getFactory();
 
     public abstract void search(Block from, Material fromMat, BlockVector relVec, Block rel);
 
-    protected abstract P getOutputEntry(World world, BlockVector vec);
+    protected abstract P createOutputEntry(World world, BlockVector vec);
+
 
     public static class Pipe extends AbstractRoute<Pipe, ItemsOutputEntry> {
 
         @Override
-        public RouteFactory<Pipe, ItemsOutputEntry> getFactory() {
+        public RouteFactory<Pipe> getFactory() {
             return new RouteFactory.PipeRouteFactory();
         }
 
@@ -153,7 +178,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
 
         @Override
-        protected ItemsOutputEntry getOutputEntry(World world, BlockVector vec) {
+        protected ItemsOutputEntry createOutputEntry(World world, BlockVector vec) {
             return new ItemsOutputEntry(world, vec);
         }
 
@@ -175,7 +200,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         private static final double SIGNAL_COST = 1d / 32d;
 
         @Override
-        public RouteFactory<Signal, SignalOutputEntry> getFactory() {
+        public RouteFactory<Signal> getFactory() {
             return new RouteFactory.SignalRouteFactory();
         }
 
@@ -209,7 +234,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
 
         @Override
-        protected SignalOutputEntry getOutputEntry(World world, BlockVector vec) {
+        protected SignalOutputEntry createOutputEntry(World world, BlockVector vec) {
             return new SignalOutputEntry(world, vec);
         }
 

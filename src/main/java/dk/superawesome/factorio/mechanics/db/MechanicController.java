@@ -37,7 +37,7 @@ public class MechanicController {
                 "location VARCHAR(64) NOT NULL, " +
                 "rotation ENUM('NORTH', 'EAST', 'SOUTH', 'WEST') NOT NULL, " +
                 "level INT DEFAULT 1, " +
-                "management TEXT NOT NULL, " +
+                "management TEXT, " +
                 "data TEXT)"
         );
 
@@ -62,17 +62,30 @@ public class MechanicController {
     }
 
     public MechanicStorageContext create(Location loc, BlockFace rot, String type, UUID owner) throws SQLException, IOException {
-        Management management = new Management(owner);
-        String managementData = MechanicStorageContext.encode(managementSerializer.serialize(management));
+        Management management;
+        Query query;
+        if (owner != null) {
+            management = new Management(owner);
 
-        Query query = new Query(
-                "INSERT INTO mechanics (type, location, rotation, management) " +
-                "VALUES (?, ?, ?, ?)"
-                )
-                .add(type)
-                .add(Types.LOCATION.convert(loc))
-                .add(rot.name())
-                .add(managementData);
+            query = new Query(
+                    "INSERT INTO mechanics (type, location, rotation, management) " +
+                    "VALUES (?, ?, ?, ?)"
+                    )
+                    .add(type)
+                    .add(Types.LOCATION.convert(loc))
+                    .add(rot.name())
+                    .add(MechanicStorageContext.encode(managementSerializer.serialize(management)));
+        } else {
+            management = Management.ALL_ACCESS;
+
+            query = new Query(
+                    "INSERT INTO mechanics (type, location, rotation) " +
+                    "VALUES (?, ?, ?)"
+                    )
+                    .add(type)
+                    .add(Types.LOCATION.convert(loc))
+                    .add(rot.name());
+        }
         query.execute(this.connection);
 
         return new MechanicStorageContext(this, loc, management);
@@ -87,7 +100,7 @@ public class MechanicController {
                 .add(Types.LOCATION.convert(loc));
 
         return Boolean.TRUE.equals(
-                query.<Boolean>executeQuery(this.connection, ResultSet::next));
+                query.<Boolean>executeQuery(this.connection, __ -> true));
     }
 
     public <T> T get(Location loc, String column, Query.CheckedFunction<ResultSet, T> function) throws SQLException {

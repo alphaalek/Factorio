@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.mechanics.db.MechanicController;
 import dk.superawesome.factorio.util.db.Query;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 public class MechanicStorageContext {
 
@@ -42,7 +44,13 @@ public class MechanicStorageContext {
     }
 
     public static void upload(ByteArrayOutputStream stream, Query.CheckedConsumer<String> data) throws SQLException {
-        data.<SQLException>sneaky(encode(stream));
+        if (hasData(stream.toByteArray())) {
+            data.<SQLException>sneaky(encode(stream));
+        }
+    }
+
+    public static boolean hasData(byte[] bytes) {
+        return IntStream.range(0, bytes.length).map(i -> bytes[i]).anyMatch(b -> b > 0);
     }
 
     public static ByteArrayInputStream getData(Query.CheckedSupplier<String> data) throws SQLException {
@@ -73,7 +81,7 @@ public class MechanicStorageContext {
 
     public Management getManagement() throws SQLException, IOException {
         ByteArrayInputStream stream = getData(() -> this.controller.getManagement(this.location));
-        if (stream.available() == 0) {
+        if (stream.available() > 0) {
             // return fallback management if it failed to poll from db
             return fallbackManagement;
         }

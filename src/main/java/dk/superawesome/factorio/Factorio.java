@@ -9,6 +9,7 @@ import dk.superawesome.factorio.mechanics.db.DatabaseConnection;
 import dk.superawesome.factorio.mechanics.db.MechanicController;
 import dk.superawesome.factorio.util.Tick;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Event;
@@ -58,11 +59,20 @@ public final class Factorio extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        // save all mechanics
+        for (World world : Bukkit.getWorlds()) {
+            for (Chunk chunk : world.getLoadedChunks()) {
+                Factorio.get().getMechanicManager(world).unloadMechanics(chunk);
+            }
+        }
     }
 
     public static Factorio get() {
         return instance;
+    }
+
+    public MechanicStorageContext.Provider getContextProvider() {
+        return contextProvider;
     }
 
     public <E extends Event> void registerEvent(Class<? extends E> clazz, EventPriority priority, Consumer<E> listener) {

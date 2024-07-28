@@ -1,17 +1,16 @@
 package dk.superawesome.factorio.mechanics;
 
+import com.google.common.collect.Sets;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.items.Container;
 import dk.superawesome.factorio.mechanics.items.ItemCollection;
+import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.routes.events.PipeSuckEvent;
 import dk.superawesome.factorio.util.db.Query;
 import dk.superawesome.factorio.util.statics.BlockUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
@@ -73,6 +72,18 @@ public class MechanicManager implements Listener {
         mechanic.unload();
     }
 
+    public void unloadMechanics(Chunk chunk) {
+        // unload all mechanics in this chunk
+        for (Mechanic<?, ?> mechanic : Sets.newHashSet(mechanics.values())) {
+            if (mechanic.getLocation().getChunk().equals(chunk)) {
+                unload(mechanic);
+            }
+        }
+
+        // unload all route blocks in this chunk
+        Routes.unloadRoutes(chunk);
+    }
+
     public List<Mechanic<?, ?>> getNearbyMechanics(Location loc) {
         List<Mechanic<?, ?>> mechanics = new ArrayList<>();
 
@@ -130,7 +141,7 @@ public class MechanicManager implements Listener {
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
         Mechanic<?, ?> mechanic;
         try {
-            mechanic = loadMechanicFromSign(sign, type -> contextProvider.create(sign.getLocation(), rotation, type, owner));
+            mechanic = loadMechanicFromSign(sign, (type, on) -> contextProvider.create(on.getLocation(), rotation, type, owner));
             if (mechanic == null) {
                 return;
             }
@@ -156,7 +167,7 @@ public class MechanicManager implements Listener {
 
     public void loadMechanic(Sign sign) {
         try {
-            Mechanic<?, ?> mechanic = loadMechanicFromSign(sign, __ -> contextProvider.findAt(sign.getLocation()));
+            Mechanic<?, ?> mechanic = loadMechanicFromSign(sign, (__, on) -> contextProvider.findAt(on.getLocation()));
             if (mechanic != null) {
                 mechanic.blocksLoaded();
             }
@@ -165,7 +176,7 @@ public class MechanicManager implements Listener {
         }
     }
 
-    private Mechanic<?, ?> loadMechanicFromSign(Sign sign, Query.CheckedFunction<String, MechanicStorageContext> context) throws IOException, SQLException {
+    private Mechanic<?, ?> loadMechanicFromSign(Sign sign, Query.CheckedBiFunction<String, Block, MechanicStorageContext> context) throws IOException, SQLException {
         // check if this sign is related to a mechanic
         if (!sign.getSide(Side.FRONT).getLine(0).startsWith("[")
                 || !sign.getSide(Side.FRONT).getLine(0).endsWith("]")) {
@@ -193,6 +204,6 @@ public class MechanicManager implements Listener {
 
         // load this mechanic
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
-        return load(profile, context.<SQLException>sneaky(profile.getName()), on.getLocation(), rotation);
+        return load(profile, context.<SQLException>sneaky(profile.getName(), on), on.getLocation(), rotation);
     }
 }

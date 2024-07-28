@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.util.db.Query;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,7 +14,8 @@ public class MechanicSerializer {
     public UUID readUUID(ByteArrayInputStream stream) throws IOException {
         long l1 = readLong(stream);
         long l2 = readLong(stream);
-        if (l1 > 0 && l2 > 0) {
+
+        if (l1 > 0 || l2 > 0) {
             return new UUID(l1, l2);
         } else {
             return null;

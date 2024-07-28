@@ -24,6 +24,7 @@ public class InteractListener implements Listener {
 
                 // check if the player has access to open this mechanic
                 if (!mechanic.getManagement().hasAccess(event.getPlayer().getUniqueId(), Management.OPEN)) {
+                    event.getPlayer().sendMessage("§cDu har ikke adgang til at åbne denne maskine!");
                     event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 0.5f);
                     return;
                 }

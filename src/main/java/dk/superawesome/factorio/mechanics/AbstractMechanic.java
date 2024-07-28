@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.util.TickThrottle;
+import dk.superawesome.factorio.util.db.Types;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -10,6 +11,8 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
@@ -18,21 +21,21 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
     protected final AtomicReference<G> inUse = new AtomicReference<>();
     protected final TickThrottle tickThrottle = new TickThrottle();
     protected final Location loc;
-    protected final BlockFace rotation;
+    protected final BlockFace rot;
     protected final MechanicLevel level;
     protected final MechanicStorageContext context;
     protected final Management management;
 
     public AbstractMechanic(Location loc, BlockFace rotation, MechanicStorageContext context) {
         this.loc = loc;
-        this.rotation = rotation;
+        this.rot = rotation;
         this.context = context;
 
         try {
             this.level = MechanicLevel.from(this, this.context.getLevel());
             this.management = this.context.getManagement();
         } catch (SQLException | IOException ex) {
-            throw new RuntimeException("Failed to acquire data of mechanic at location " + loc, ex);
+            throw new RuntimeException("Failed to load mechanic " + getProfile().getName()  + " at " + Types.LOCATION.convert(loc), ex);
         }
     }
 
@@ -42,13 +45,19 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
                 load(context);
             }
         } catch (Exception ex) {
-            Factorio.get().getLogger().log(Level.SEVERE, "Failed to load mechanic " + getProfile().getName()  + ", " + getLocation(), ex);
+            Factorio.get().getLogger().log(Level.SEVERE, "Failed to load mechanic data " + getProfile().getName()  + ", " + getLocation(), ex);
         }
     }
 
     @Override
     public void unload() {
-        try  {
+        try {
+            // ensure record exists
+            if (!this.context.hasContext()) {
+                Factorio.get().getContextProvider().create(this.loc, this.rot, getProfile().getName(), this.management.getOwner());
+            }
+
+            // save data for this mechanic
             this.context.getController().setLevel(this.loc, this.level.getLevel());
             if (this.management != Management.ALL_ACCESS) {
                 this.context.uploadManagement(this.management);
@@ -85,12 +94,12 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
 
     @Override
     public Location getLocation() {
-        return loc;
+        return loc.clone();
     }
 
     @Override
     public BlockFace getRotation() {
-        return rotation;
+        return rot;
     }
 
     @Override

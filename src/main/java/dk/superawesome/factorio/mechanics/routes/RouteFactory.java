@@ -1,10 +1,10 @@
 package dk.superawesome.factorio.mechanics.routes;
 
-public interface RouteFactory<R extends AbstractRoute<R, P>, P extends OutputEntry> {
+public interface RouteFactory<R extends AbstractRoute<R, ? extends OutputEntry>> {
 
     R create();
 
-    class PipeRouteFactory implements RouteFactory<AbstractRoute.Pipe, AbstractRoute.ItemsOutputEntry> {
+    class PipeRouteFactory implements RouteFactory<AbstractRoute.Pipe> {
 
         @Override
         public AbstractRoute.Pipe create() {
@@ -12,7 +12,7 @@ public interface RouteFactory<R extends AbstractRoute<R, P>, P extends OutputEnt
         }
     }
 
-    class SignalRouteFactory implements RouteFactory<AbstractRoute.Signal, AbstractRoute.SignalOutputEntry> {
+    class SignalRouteFactory implements RouteFactory<AbstractRoute.Signal> {
 
         @Override
         public AbstractRoute.Signal create() {
