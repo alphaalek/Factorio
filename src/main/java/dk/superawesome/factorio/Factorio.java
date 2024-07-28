@@ -10,7 +10,10 @@ import dk.superawesome.factorio.mechanics.db.MechanicController;
 import dk.superawesome.factorio.util.Tick;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Tag;
 import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -55,6 +58,18 @@ public final class Factorio extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
 
         Tick.start();
+
+        // load all mechanics
+        for (World world : Bukkit.getWorlds()) {
+            for (Chunk chunk : world.getLoadedChunks()) {
+                for (BlockState state : chunk.getTileEntities()) {
+                    if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())) {
+                        // load this mechanic
+                        Bukkit.getScheduler().runTask(Factorio.get(), () -> Factorio.get().getMechanicManager(world).loadMechanic((Sign) state));
+                    }
+                }
+            }
+        }
     }
 
     @Override

@@ -15,7 +15,6 @@ public class ChunkLoadListener implements Listener {
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
-        // TODO loader nogen gange ikke
         World world = event.getWorld();
         for (BlockState state : event.getChunk().getTileEntities()) {
             if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())) {

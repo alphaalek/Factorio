@@ -85,12 +85,9 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         context.getSerializer().writeInt(str, this.fuelAmount);
         if (this.currentFuel != null) {
             context.getSerializer().writeItemStack(str, new ItemStack(this.currentFuel.getMaterial()));
+            context.getSerializer().writeInt(str, (int) ((1 - this.currentFuelAmount) / this.currentFuel.getFuelAmount()));
         } else {
             context.getSerializer().writeItemStack(str, null);
-        }
-        if (this.fuel != null) {
-            context.getSerializer().writeInt(str, (int) ((1 - this.currentFuelAmount) / this.fuel.getFuelAmount()));
-        } else {
             context.getSerializer().writeInt(str, 0);
         }
 

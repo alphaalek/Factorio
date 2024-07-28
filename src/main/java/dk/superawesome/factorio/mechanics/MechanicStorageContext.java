@@ -81,7 +81,7 @@ public class MechanicStorageContext {
 
     public Management getManagement() throws SQLException, IOException {
         ByteArrayInputStream stream = getData(() -> this.controller.getManagement(this.location));
-        if (stream.available() > 0) {
+        if (stream.available() == 0) {
             // return fallback management if it failed to poll from db
             return fallbackManagement;
         }
