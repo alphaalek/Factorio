@@ -52,6 +52,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         ByteArrayInputStream str = context.getData();
         this.ingredient = context.getSerializer().readItemStack(str);
         this.ingredientAmount = context.getSerializer().readInt(str);
+        this.smeltResult = context.getSerializer().readItemStack(str);
 
         ItemStack fuel = context.getSerializer().readItemStack(str);
         if (fuel != null) {
@@ -74,6 +75,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         ByteArrayOutputStream str = new ByteArrayOutputStream();
         context.getSerializer().writeItemStack(str, this.ingredient);
         context.getSerializer().writeInt(str, this.ingredientAmount);
+        context.getSerializer().writeItemStack(str, this.smeltResult);
 
         if (this.fuel != null) {
             context.getSerializer().writeItemStack(str, new ItemStack(this.fuel.getMaterial()));
