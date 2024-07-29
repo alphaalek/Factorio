@@ -32,6 +32,10 @@ public class MechanicStorageContext {
         public MechanicStorageContext create(Location loc, BlockFace rot, String type, UUID owner) throws SQLException, IOException {
             return controller.create(loc, rot, type, owner);
         }
+
+        public void deleteAt(Location loc) throws SQLException {
+            controller.deleteAt(loc);
+        }
     }
 
     public static String encode(ByteArrayOutputStream stream) {

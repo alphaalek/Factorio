@@ -1,6 +1,8 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.gui.Elements;
+import dk.superawesome.factorio.gui.GuiElement;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.impl.StorageBox;
 import org.bukkit.Bukkit;
@@ -18,12 +20,8 @@ import java.util.stream.IntStream;
 public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     private static final int STORED_SIZE = 35;
-    private static final List<Integer> GRAY = Arrays.asList(45, 46, 47, 51, 53);
+    private static final List<Integer> GRAY = Arrays.asList(45, 46, 47, 48, 50);
     private static final List<Integer> BLACK = IntStream.range(36, 45).boxed().collect(Collectors.toList());
-
-    static {
-        BLACK.addAll(Arrays.asList(48, 50));
-    }
 
     public StorageBoxGui(StorageBox mechanic, AtomicReference<StorageBoxGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder());
@@ -49,6 +47,11 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         if (getMechanic().getStored() != null) {
             loadStorageTypes(getMechanic().getStored(), getMechanic().getAmount(), IntStream.range(0, STORED_SIZE).boxed().collect(Collectors.toList()));
         }
+    }
+
+    @Override
+    protected List<GuiElement> getGuiElements() {
+        return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
     }
 
     public List<ItemStack> findItems(boolean asc) {
@@ -146,101 +149,91 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         }
 
         // check if all slots dragged over are just in the player's own inventory
-        if (event.getRawSlots().stream().allMatch(s -> event.getView().getInventory(s).getType() == InventoryType.PLAYER)) {
+        if (event.getRawSlots().stream().allMatch(s -> event.getView().getInventory(s).getType() == InventoryType.PLAYER)
+                // check if none of the slots are in the storage box view
+                || event.getRawSlots().stream().noneMatch(i -> i < STORED_SIZE)) {
             // ... if it was, don't continue
             return false;
         }
 
-        // only check for storage slots
-        if (event.getRawSlots().stream().anyMatch(i -> i < STORED_SIZE)) {
-            int amount = getMechanic().getAmount();
-            if (amount == getMechanic().getCapacity()) {
-                return true;
-            }
-
-            // check if the amount of items in the storage box will exceed the capacity
-            int added = event.getNewItems().entrySet().stream()
-                    .mapToInt(entry -> entry.getValue().getAmount() -
-                            Optional.ofNullable(event.getView().getItem(entry.getKey()))
-                                    .map(ItemStack::getAmount)
-                                    .orElse(0)
-                    )
-                    .sum();
-            boolean checkSize = amount + added > getMechanic().getCapacity();
-
-            ItemStack cursor = null;
-            boolean cancel = false;
-            // add the dragged items
-            for (Map.Entry<Integer, ItemStack> entry : event.getNewItems().entrySet()) {
-                ItemStack item = entry.getValue();
-                ItemStack at = event.getView().getItem(entry.getKey());
-
-                // do not register added items to the storage box if the slot is in the player's own inventory
-                if (event.getView().getInventory(entry.getKey()).getType() == InventoryType.PLAYER) {
-                    continue;
-                }
-
-                // check if this item can be added to the storage box
-                if (handleInteract(item)) {
-                    return true;
-                }
-
-                // ensure cursor set for post-work
-                if (cursor == null) {
-                    cursor = item.clone();
-                }
-
-                // register added item
-                amount += item.getAmount();
-                if (at != null) {
-                    // the item at this slot originally, wasn't added in this event
-                    amount -= at.getAmount();
-                }
-
-                // check if the storage box does not have enough capacity for these items
-                if (checkSize && amount > getMechanic().getCapacity()) {
-                    int subtract = amount - getMechanic().getCapacity();
-                    amount -= subtract;
-                    added -= subtract;
-                    item.setAmount(item.getAmount() - subtract);
-
-                    cancel = true;
-                }
-            }
-
-            // update storage amount for storage box
-            getMechanic().setAmount(amount);
-
-            // do manual work if there was too many items tried to be added
-            if (cancel) {
-                getMechanic().getTickThrottle().throttle();
-
-                // re-set items
-                Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-                    for (Map.Entry<Integer, ItemStack> entry : event.getNewItems().entrySet()) {
-                        event.getView().setItem(entry.getKey(), entry.getValue());
-                    }
-                });
-
-                // remove the added items from the cursor
-                int a = added;
-                ItemStack c = cursor;
-                Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-                    c.setAmount(
-                            Optional.ofNullable(event.getWhoClicked().getOpenInventory().getCursor())
-                                    .map(ItemStack::getAmount)
-                                    .orElse(0) - a);
-
-                    event.getWhoClicked().getOpenInventory().setCursor(c);
-                });
-
-                return true;
-            }
-
-            return false;
+        int amount = getMechanic().getAmount();
+        if (amount == getMechanic().getCapacity()) {
+            return true;
         }
 
-        return true;
+        // check if the amount of items in the storage box will exceed the capacity
+        int added = event.getNewItems().entrySet().stream()
+                .mapToInt(entry -> entry.getValue().getAmount() -
+                        Optional.ofNullable(event.getView().getItem(entry.getKey()))
+                                .map(ItemStack::getAmount)
+                                .orElse(0)
+                )
+                .sum();
+        boolean checkSize = amount + added > getMechanic().getCapacity();
+
+        ItemStack cursor = event.getWhoClicked().getOpenInventory().getCursor();
+        if (cursor == null) {
+            // why did this event call? No item on the player's cursor (weird?)
+            return true;
+        }
+        boolean cancel = false;
+        // add the dragged items
+        for (Map.Entry<Integer, ItemStack> entry : event.getNewItems().entrySet()) {
+            ItemStack item = entry.getValue();
+            ItemStack at = event.getView().getItem(entry.getKey());
+
+            // do not register added items to the storage box if the slot is in the player's own inventory
+            if (event.getView().getInventory(entry.getKey()).getType() == InventoryType.PLAYER) {
+                continue;
+            }
+
+            // check if this item can be added to the storage box
+            if (handleInteract(item)) {
+                return true;
+            }
+
+            // register added item
+            amount += item.getAmount();
+            if (at != null) {
+                // the item at this slot originally, wasn't added in this event
+                amount -= at.getAmount();
+            }
+
+            // check if the storage box does not have enough capacity for these items
+            if (checkSize && amount > getMechanic().getCapacity()) {
+                int subtract = amount - getMechanic().getCapacity();
+                amount -= subtract;
+                added -= subtract;
+                item.setAmount(item.getAmount() - subtract);
+
+                cancel = true;
+            }
+        }
+
+        // update storage amount for storage box
+        getMechanic().setAmount(amount);
+
+        // do manual work if there was too many items tried to be added
+        if (cancel) {
+            getMechanic().getTickThrottle().throttle();
+
+            // re-set items
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+                for (Map.Entry<Integer, ItemStack> entry : event.getNewItems().entrySet()) {
+                    event.getView().setItem(entry.getKey(), entry.getValue());
+                }
+            });
+
+            // remove the added items from the cursor
+            int a = added;
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+                cursor.setAmount(cursor.getAmount() - a);
+            });
+
+            return true;
+        }
+
+        return false;
     }
 
     @Override

@@ -2,7 +2,7 @@ package dk.superawesome.factorio.gui;
 
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.util.Callback;
-import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,12 +38,19 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
 
     @Override
     public void loadItems() {
-        getInventory().setItem(52, new ItemStack(Material.WRITABLE_BOOK));
+        int i = 0;
+        for (GuiElement element : getGuiElements()) {
+            int slot = 51 + i++;
+            registerEvent(slot, event -> element.handle(event, (Player) event.getWhoClicked(), this));
+            getInventory().setItem(slot, element.getItem());
+        }
 
         loadInputOutputItems();
     }
 
     public abstract void loadInputOutputItems();
+
+    protected abstract List<GuiElement> getGuiElements();
 
     public M getMechanic() {
         return mechanic;

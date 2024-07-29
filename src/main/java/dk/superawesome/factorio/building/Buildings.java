@@ -84,4 +84,10 @@ public class Buildings {
                     .accept(world.getBlockAt(relLoc), mechanic.getRotation());
         }
     }
+
+    public static void remove(World world, Mechanic<?, ?> mechanic) {
+        for (Location relLoc : getLocations(mechanic)) {
+            world.getBlockAt(relLoc).setType(Material.AIR);
+        }
+    }
 }

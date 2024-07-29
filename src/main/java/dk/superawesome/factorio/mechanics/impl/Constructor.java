@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -218,6 +219,11 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     @Override
     public boolean isEmpty() {
         return storageType == null;
+    }
+
+    @Override
+    public boolean isContainerEmpty() {
+        return recipeResult == null;
     }
 
     @Override

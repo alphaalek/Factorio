@@ -1,6 +1,8 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.gui.Elements;
+import dk.superawesome.factorio.gui.GuiElement;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.items.Fuel;
 import dk.superawesome.factorio.mechanics.impl.Smelter;
@@ -23,13 +25,12 @@ import java.util.stream.IntStream;
 
 public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
-    private static final List<Integer> GRAY = Arrays.asList(0, 1, 2, 6, 7, 8, 42, 43, 44, 51, 53);
-    private static final List<Integer> BLACK = Arrays.asList(5, 14, 23, 32, 41, 50);
+    private static final List<Integer> BLACK = Arrays.asList(0, 1, 2, 5, 14, 23, 32, 41, 42, 43, 44, 50);
     private static final List<Integer> RED = Arrays.asList(11, 20, 29, 38, 47);
     private static final List<Integer> DECLINE = Arrays.asList(14, 23, 32);
     private static final List<Integer> INGREDIENT_SLOTS = Arrays.asList(9, 10, 18, 19, 27, 28, 36, 37, 45, 46);
     private static final List<Integer> FUEL_SLOTS = Arrays.asList(12, 13, 21, 22, 30, 31, 39, 40, 48, 49);
-    private static final List<Integer> STORAGE_SLOTS = Arrays.asList(15, 16, 17, 24, 25, 26, 33, 34);
+    private static final List<Integer> STORAGE_SLOTS = Arrays.asList(6, 7, 8, 15, 16, 17, 24, 25, 26, 33, 34);
 
     public SmelterGui(Smelter mechanic, AtomicReference<SmelterGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder());
@@ -40,9 +41,6 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     public void loadItems() {
         super.loadItems();
 
-        for (int i : GRAY) {
-            getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
-        }
         for (int i : BLACK) {
             getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
         }
@@ -68,6 +66,11 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         if (getMechanic().getStorageType() != null) {
             loadStorageTypes(getMechanic().getStorageType(), getMechanic().getStorageAmount(), STORAGE_SLOTS);
         }
+    }
+
+    @Override
+    protected List<GuiElement> getGuiElements() {
+        return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
     }
 
     @Override

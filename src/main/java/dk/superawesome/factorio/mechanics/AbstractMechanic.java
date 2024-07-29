@@ -4,15 +4,12 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.util.TickThrottle;
 import dk.superawesome.factorio.util.db.Types;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
@@ -32,8 +29,8 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
         this.context = context;
 
         try {
-            this.level = MechanicLevel.from(this, this.context.getLevel());
-            this.management = this.context.getManagement();
+            this.level = MechanicLevel.from(this, context.getLevel());
+            this.management = context.getManagement();
         } catch (SQLException | IOException ex) {
             throw new RuntimeException("Failed to load mechanic " + getProfile().getName()  + " at " + Types.LOCATION.convert(loc), ex);
         }
@@ -41,8 +38,8 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
 
     protected void loadFromStorage() {
         try  {
-            if (context.hasContext()) {
-                load(context);
+            if (this.context.hasContext()) {
+                load(this.context);
             }
         } catch (Exception ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to load mechanic data " + getProfile().getName()  + ", " + getLocation(), ex);

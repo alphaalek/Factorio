@@ -13,9 +13,15 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, Listener {
@@ -45,6 +51,8 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
                 if (holder instanceof BaseGui) {
                     boolean cancelled = (gui = ((BaseGui<?>)holder)).onClickIn(e);
                     e.setCancelled(cancelled);
+
+                    ((BaseGui<?>)holder).callEvents(e);
                 }
             }
 
@@ -77,6 +85,7 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
     protected boolean loaded = false;
     protected final Callback initCallback;
     protected final Inventory inventory;
+    private final Map<Integer, List<Consumer<InventoryClickEvent>>> eventHandlers = new HashMap<>();
 
     private final AtomicReference<G> inUseReference;
 
@@ -87,6 +96,18 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
         this.loaded = true;
         this.inUseReference = inUseReference;
         this.inUseReference.set((G) this);
+    }
+
+    protected void registerEvent(int slot, Consumer<InventoryClickEvent> handler) {
+        eventHandlers.computeIfAbsent(slot, d -> new ArrayList<>()).add(handler);
+    }
+
+    protected void callEvents(InventoryClickEvent event) {
+        if (eventHandlers.containsKey(event.getRawSlot())) {
+            for (Consumer<InventoryClickEvent> handler : eventHandlers.get(event.getRawSlot())) {
+                handler.accept(event);
+            }
+        }
     }
 
     private void clearInUse() {

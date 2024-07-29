@@ -56,6 +56,15 @@ public class MechanicController {
         return this.mechanicSerializer;
     }
 
+    public void deleteAt(Location location) throws SQLException {
+        Query query = new Query(
+                "DELETE FROM mechanics " +
+                "WHERE location = ?"
+                ).add(Types.LOCATION.convert(location));
+
+        query.execute(this.connection);
+    }
+
     public MechanicStorageContext findAt(Location loc) throws SQLException, IOException {
         Management management = managementSerializer.deserialize(MechanicStorageContext.decode(getManagement(loc)));
         return new MechanicStorageContext(this, loc, management != null ? management : Management.ALL_ACCESS);

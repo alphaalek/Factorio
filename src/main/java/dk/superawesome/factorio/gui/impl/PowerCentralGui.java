@@ -1,6 +1,8 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.gui.GuiElement;
+import dk.superawesome.factorio.gui.Elements;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
@@ -13,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
@@ -205,6 +208,11 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
     @Override
     public void loadInputOutputItems() {
 
+    }
+
+    @Override
+    protected List<GuiElement> getGuiElements() {
+        return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
     }
 
     @Override

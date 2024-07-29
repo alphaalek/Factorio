@@ -292,6 +292,11 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     }
 
     @Override
+    public boolean isContainerEmpty() {
+        return fuel == null && ingredient == null;
+    }
+
+    @Override
     public double getEnergyCost() {
         return 1d / 2d;
     }

@@ -11,6 +11,8 @@ import java.util.function.Consumer;
 
 public interface Container {
 
+    boolean isContainerEmpty();
+
     void pipePut(ItemCollection collection);
 
     int getCapacity();
@@ -37,7 +39,7 @@ public interface Container {
     }
 
     default <G extends BaseGui<G>> int put(ItemCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, Updater<ItemStack> updater) {
-        List<ItemStack> items = from.take(64);
+        List<ItemStack> items = from.take(take);
         int add = 0;
         for (ItemStack item : items) {
             add += item.getAmount();

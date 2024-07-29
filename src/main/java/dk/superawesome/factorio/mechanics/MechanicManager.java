@@ -160,8 +160,8 @@ public class MechanicManager implements Listener {
         Buildings.build(sign.getWorld(), mechanic);
         mechanic.blocksLoaded();
 
-        // world stuff
-        sign.getWorld().playSound(sign.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 0.8f);
+        // player stuff
+        sign.getWorld().playSound(sign.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.375f, 0.8f);
         sign.getWorld().playSound(sign.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 0.9f, 1f);
     }
 

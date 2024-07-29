@@ -260,8 +260,9 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             }
 
             // power related mechanic stress
-            if (mechanics < outputs.size()) {
-                source.setEnergy(source.getEnergy() + signalCost * (((double)mechanics) / outputs.size()));
+            if (mechanics < outputs.size() && outputs.size() > 1) {
+                double ratio = ((double)mechanics) / (outputs.size() - 1);
+                source.setEnergy(source.getEnergy() + signalCost * ratio);
             }
         }
     }

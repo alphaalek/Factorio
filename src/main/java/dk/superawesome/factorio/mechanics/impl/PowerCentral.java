@@ -108,8 +108,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
     public void setEnergy(double energy) {
         double cap = getCapacity();
         if (energy > cap) {
-            energy = cap - this.energy;
-            this.energy = cap;
+            this.energy = energy = cap;
         }
 
         if (this.hasGraph && energy > this.energy) {
@@ -147,6 +146,8 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
 
     public void setHasGraph(boolean hasGraph) {
         this.hasGraph = hasGraph;
+        this.recentConsumption = 0;
+        this.recentProduction = 0;
     }
 
     public boolean hasGraph() {

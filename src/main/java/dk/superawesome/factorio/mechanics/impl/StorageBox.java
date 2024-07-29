@@ -108,6 +108,11 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
     }
 
     @Override
+    public boolean isContainerEmpty() {
+        return stored == null;
+    }
+
+    @Override
     public double getEnergyCost() {
         return 1d / 4d;
     }
