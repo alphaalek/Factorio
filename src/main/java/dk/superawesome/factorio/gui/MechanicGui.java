@@ -15,16 +15,6 @@ import java.util.stream.IntStream;
 
 public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>> extends BaseGui<G> {
 
-    public static class InitCallbackHolder implements Supplier<Callback> {
-
-        private final Callback initCallback = new Callback();
-
-        @Override
-        public Callback get() {
-            return initCallback;
-        }
-    }
-
     private final M mechanic;
 
     public MechanicGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback, String title) {

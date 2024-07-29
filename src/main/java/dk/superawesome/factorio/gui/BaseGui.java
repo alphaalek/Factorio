@@ -3,13 +3,12 @@ package dk.superawesome.factorio.gui;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.util.Callback;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -22,13 +21,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, Listener {
 
+    public static class InitCallbackHolder implements Supplier<Callback> {
+
+        private final Callback initCallback = new Callback();
+
+        @Override
+        public Callback get() {
+            return initCallback;
+        }
+    }
+
     static {
         Factorio.get().registerEvent(InventoryCloseEvent.class, EventPriority.LOWEST, e -> {
-            closeGui(e.getInventory().getHolder(), e.getPlayer());
+            closeGui(e.getInventory().getHolder(), (Player) e.getPlayer());
         });
 
         Factorio.get().registerEvent(PlayerQuitEvent.class, EventPriority.LOWEST, e -> {
@@ -70,14 +80,22 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
         });
     }
 
-    private static void closeGui(InventoryHolder holder, HumanEntity player) {
+    private static void closeGui(InventoryHolder holder, Player player) {
         if (holder instanceof BaseGui) {
             BaseGui<?> gui = (BaseGui<?>) holder;
             gui.onClose();
 
+            // clear usage if no other player has this gui open
             if (holder.getInventory().getViewers().stream().noneMatch(p -> p != player)) {
                 gui.clearInUse();
             }
+
+            // play close sound if the player didn't instantly open a new inventory
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+                if (player.getOpenInventory().getTopInventory().getType() == InventoryType.PLAYER) {
+                    player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, 0.5f, 0.5f);
+                }
+            });
         }
     }
 
@@ -94,8 +112,11 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
         this.initCallback = initCallback.get();
         this.initCallback.add(this::loadItems);
         this.loaded = true;
+
         this.inUseReference = inUseReference;
-        this.inUseReference.set((G) this);
+        if (inUseReference != null) {
+            this.inUseReference.set((G) this);
+        }
     }
 
     protected void registerEvent(int slot, Consumer<InventoryClickEvent> handler) {
@@ -107,11 +128,15 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
             for (Consumer<InventoryClickEvent> handler : eventHandlers.get(event.getRawSlot())) {
                 handler.accept(event);
             }
+
+            ((Player)event.getWhoClicked()).playSound(event.getWhoClicked().getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 0.5f);
         }
     }
 
     private void clearInUse() {
-        inUseReference.set(null);
+        if (inUseReference != null) {
+            inUseReference.set(null);
+        }
     }
 
     protected boolean movedFromOtherInventory(InventoryClickEvent event) {

@@ -1,7 +1,5 @@
 package dk.superawesome.factorio.mechanics;
 
-import org.bukkit.Bukkit;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,14 +9,15 @@ import java.util.UUID;
 
 public class Management {
 
-    public static Management ALL_ACCESS = new Management(null, null);
+    public static Management ALL_ACCESS = new Management(null, new ArrayList<>());
 
     public static int OPEN = 1;
     public static int LEVEL_UP = 2;
     public static int DELETE = 4;
+    public static int MODIFY_MEMBERS = 8;
 
     public static int MEMBER_ACCESS = OPEN | LEVEL_UP;
-    public static int OWNER_ACCESS = MEMBER_ACCESS | DELETE;
+    public static int OWNER_ACCESS = MEMBER_ACCESS | DELETE | MODIFY_MEMBERS;
 
 
     public static class Serializer implements dk.superawesome.factorio.util.Serializer<Management> {

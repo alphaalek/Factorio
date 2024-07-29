@@ -160,6 +160,7 @@ public class MechanicController {
     }
 
     public void setManagement(Location loc, String data) throws SQLException {
+        Bukkit.getLogger().info("Set management " + data);
         set(loc, "management", data);
     }
 }

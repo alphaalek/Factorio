@@ -15,7 +15,7 @@ public class MechanicSerializer {
         long l1 = readLong(stream);
         long l2 = readLong(stream);
 
-        if (l1 > 0 || l2 > 0) {
+        if (l1 != 0 || l2 != 0) {
             return new UUID(l1, l2);
         } else {
             return null;
