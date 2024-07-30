@@ -126,6 +126,11 @@ public class Elements {
                 @Override
                 public boolean onClickIn(InventoryClickEvent event) {
                     ItemStack item = event.getCurrentItem();
+                    if (item != null && item.getType() != Material.GRAY_STAINED_GLASS_PANE) {
+                        ((Player)event.getWhoClicked()).playSound(event.getWhoClicked().getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 0.5f);
+                    }
+
+                    // scroll pages
                     if (item != null && item.getType() == Material.ARROW) {
                         if (event.getSlot() % 9 == 1) {
                             currentPage--;
@@ -136,6 +141,7 @@ public class Elements {
                         loadView();
                     }
 
+                    // check access to modify members
                     Player player = (Player) event.getWhoClicked();
                     if (item != null && (item.getType() == Material.NAME_TAG || item.getType() == Material.PLAYER_HEAD)) {
                         if (!mechanic.getManagement().hasAccess(player.getUniqueId(), Management.MODIFY_MEMBERS)) {
@@ -145,6 +151,7 @@ public class Elements {
                         }
                     }
 
+                    // add member
                     if (item != null && item.getType() == Material.NAME_TAG) {
                         // actions performed when closing the sign gui
                         List<SignGUIAction> post = Arrays.asList(
@@ -193,9 +200,9 @@ public class Elements {
                                 })
                                 .build();
                         gui.open(player);
-                        player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1.25f, 1.5f);
                     }
 
+                    // remove member
                     if (item != null && item.getType() == Material.PLAYER_HEAD && item.hasItemMeta()) {
                         String name = item.getItemMeta().getDisplayName();
                         UUID uuid = Bukkit.getOfflinePlayer(name).getUniqueId();

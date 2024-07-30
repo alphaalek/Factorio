@@ -138,17 +138,17 @@ public class MechanicManager implements Listener {
         }
     }
 
-    public void buildMechanic(Sign sign, UUID owner) {
+    public boolean buildMechanic(Sign sign, UUID owner) {
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
         Mechanic<?, ?> mechanic;
         try {
             mechanic = loadMechanicFromSign(sign, (type, on) -> contextProvider.create(on.getLocation(), rotation, type, owner));
             if (mechanic == null) {
-                return;
+                return false;
             }
         } catch (SQLException | IOException ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to create mechanic at location " + sign.getLocation(), ex);
-            return;
+            return false;
         }
 
         MechanicBuildEvent event = new MechanicBuildEvent(mechanic);
@@ -156,16 +156,16 @@ public class MechanicManager implements Listener {
         // check if the build of this mechanic is allowed
         if (event.isCancelled() || !Buildings.hasSpaceFor(sign.getWorld(), sign.getBlock(), mechanic)) {
             unload(mechanic);
-            return;
+            return false;
         }
 
         // place the blocks for this mechanic
         Buildings.build(sign.getWorld(), mechanic);
         mechanic.blocksLoaded();
 
-        // player stuff
-        sign.getWorld().playSound(sign.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.375f, 0.8f);
-        sign.getWorld().playSound(sign.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 0.9f, 1f);
+        // play sound
+        sign.getWorld().playSound(sign.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.675f, 1f);
+        return true;
     }
 
     public void loadMechanic(Sign sign) {

@@ -77,8 +77,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
         @Override
         public void run() {
             double[] states = new double[COLLECT_WIDTH];
-            double min = -1;
-            double max = 0;
+            double min = -1, max = 0;
             for (int i = 1; i < COLLECT_WIDTH + 1; i++) {
                 double state = i < this.states.length ? this.states[i] : this.currentState.getAsDouble();
                 if (state > max) {
@@ -89,7 +88,6 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                 }
                 states[i - 1] = state;
             }
-            this.states = states;
 
             // evaluating the grade difference by the average between min and max values
             // adding 0.1, so we are bound to lower value when rounding to nearest grade
@@ -106,7 +104,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
                 // remove graph items for this column at last tick
                 setSlots(i, columns[i], null);
-                if (states[COLLECT_WIDTH - WIDTH - 1 + i] == -1) {
+                if (this.states[COLLECT_WIDTH - WIDTH - 1 + i] == -1) {
                     setSlots(i, 3, null);
                 }
 
@@ -158,11 +156,13 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                     setSlots(i, max > min ? 1 : 3, item);
                 }
             }
+
+            // update new states after ticking
+            this.states = states;
         }
 
         private int getLowestGrade(int val) {
-            int d = val;
-            int prev = 1, j = 0;
+            int d = val, prev = 1, j = 0;
             while (d > 1) {
                 prev = d & GRADE_MASK;
                 d >>= (4 * ++j);

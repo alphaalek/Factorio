@@ -30,7 +30,7 @@ public class InteractListener implements Listener {
                 }
 
                 // open the mechanic inventory
-                event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_CHEST_OPEN, 0.5f, 0.5f);
+                event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_CHEST_OPEN, 0.375f, 0.5f);
                 mechanic.openInventory(event.getPlayer());
             }
         }
