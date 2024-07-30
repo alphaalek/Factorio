@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics;
 
 import com.google.common.collect.Sets;
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.items.Container;
 import dk.superawesome.factorio.mechanics.items.ItemCollection;
@@ -150,8 +151,10 @@ public class MechanicManager implements Listener {
             return;
         }
 
-        // check if we can build this mechanic in the world
-        if (!Buildings.hasSpaceFor(sign.getWorld(), sign.getBlock(), mechanic)) {
+        MechanicBuildEvent event = new MechanicBuildEvent(mechanic);
+        Bukkit.getPluginManager().callEvent(event);
+        // check if the build of this mechanic is allowed
+        if (event.isCancelled() || !Buildings.hasSpaceFor(sign.getWorld(), sign.getBlock(), mechanic)) {
             unload(mechanic);
             return;
         }

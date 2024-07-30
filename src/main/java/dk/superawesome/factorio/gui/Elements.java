@@ -3,12 +3,14 @@ package dk.superawesome.factorio.gui;
 import de.rapha149.signgui.SignGUI;
 import de.rapha149.signgui.SignGUIAction;
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.Management;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.items.Container;
 import dk.superawesome.factorio.mechanics.items.ItemCollection;
 import dk.superawesome.factorio.util.db.Types;
+import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -34,15 +36,15 @@ public class Elements {
 
         @Override
         public ItemStack getItem() {
-            return new ItemStack(Material.WRITABLE_BOOK);
+            return new ItemBuilder(Material.WRITABLE_BOOK).setName("§eOpgradér Maskine").build();
         }
     };
 
     public static GuiElement MEMBERS = new GuiElement() {
 
         private static final String TITLE = "Konfigurér Medlemmer";
-        private static final int SIZE = 45;
-        private static final int PAGE_SIZE = 9;
+        private static final int SIZE = 36;
+        private static final int PAGE_SIZE = 27;
 
         @Override
         public void handle(InventoryClickEvent event, Player player, MechanicGui<?, ?> gui) {
@@ -80,7 +82,7 @@ public class Elements {
                     IntStream.range(0, PAGE_SIZE).forEach(i -> getInventory().setItem(i, null));
 
                     // evaluate pages
-                    int skip = Math.max(0, (currentPage - 1) * PAGE_SIZE);
+                    int skip = Math.max(0, (currentPage - 1) * PAGE_SIZE - 1);
                     int i = 0;
                     int displayed = 0;
                     List<OfflinePlayer> members = getMembers();
@@ -92,7 +94,7 @@ public class Elements {
                         }
 
                         // show until page ends
-                        if (++displayed > PAGE_SIZE) {
+                        if (++displayed > PAGE_SIZE - 1) {
                             break;
                         }
 
@@ -107,7 +109,7 @@ public class Elements {
                         }
                     }
 
-                    getInventory().setItem(displayed, new ItemStack(Material.NAME_TAG));
+                    getInventory().setItem(displayed, new ItemBuilder(Material.NAME_TAG).setName("§eTilføj Medlem").build());
 
                     // set arrows for previous/next page buttons
                     getInventory().setItem(PAGE_SIZE, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
@@ -135,13 +137,15 @@ public class Elements {
                     }
 
                     Player player = (Player) event.getWhoClicked();
-                    if (item != null && item.getType() == Material.NAME_TAG) {
-                        if (mechanic.getManagement().hasAccess(player.getUniqueId(), Management.MODIFY_MEMBERS)) {
+                    if (item != null && (item.getType() == Material.NAME_TAG || item.getType() == Material.PLAYER_HEAD)) {
+                        if (!mechanic.getManagement().hasAccess(player.getUniqueId(), Management.MODIFY_MEMBERS)) {
                             player.sendMessage("§cDu har ikke adgang til at ændre på medlemmerne af maskinen!");
                             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
                             return true;
                         }
+                    }
 
+                    if (item != null && item.getType() == Material.NAME_TAG) {
                         // actions performed when closing the sign gui
                         List<SignGUIAction> post = Arrays.asList(
                                 SignGUIAction.openInventory(Factorio.get(), getInventory()), SignGUIAction.runSync(Factorio.get(), this::loadView));
@@ -151,42 +155,55 @@ public class Elements {
                                 .setLines("", "", "---------------", "Vælg spillernavn")
                                 .setHandler((p, result) -> {
                                     String name = (result.getLine(0).trim() + result.getLine(1).trim());
-                                    List<OfflinePlayer> members = getMembers();
-                                    // check if this player is already a member
-                                    if (
-                                        // check owner
-                                        (Optional.ofNullable(mechanic.getManagement().getOwner())
-                                            .map(Bukkit::getOfflinePlayer)
-                                            .map(OfflinePlayer::getName)
-                                            .orElse("").equalsIgnoreCase(name)
-                                        ||
-                                        // check members
-                                        members.stream()
-                                            .map(OfflinePlayer::getName)
-                                            .filter(Objects::nonNull)
-                                            .anyMatch(name::equalsIgnoreCase))) {
-                                        player.sendMessage("§cSpilleren " + name + " er allerede medlem af maskinen!");
-                                        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
-                                        return post;
-                                    }
+                                    if (!name.isEmpty()) {
+                                        List<OfflinePlayer> members = getMembers();
+                                        // check if this player is already a member
+                                        if (
+                                            // check owner
+                                            (Optional.ofNullable(mechanic.getManagement().getOwner())
+                                                    .map(Bukkit::getOfflinePlayer)
+                                                    .map(OfflinePlayer::getName)
+                                                    .orElse("").equalsIgnoreCase(name)
+                                                    ||
+                                            // check members
+                                            members.stream()
+                                                    .map(OfflinePlayer::getName)
+                                                    .filter(Objects::nonNull)
+                                                    .anyMatch(name::equalsIgnoreCase))) {
+                                            player.sendMessage("§cSpilleren " + name + " er allerede medlem af maskinen!");
+                                            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
+                                            return post;
+                                        }
 
-                                    OfflinePlayer target = Bukkit.getOfflinePlayer(name);
-                                    // check if the target player is valid
-                                    if (!target.hasPlayedBefore()) {
-                                        player.sendMessage("§cKunne ikke finde spilleren " + name + "!");
-                                        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
-                                        return post;
-                                    }
+                                        OfflinePlayer target = Bukkit.getOfflinePlayer(name);
+                                        // check if the target player is valid
+                                        if (!target.hasPlayedBefore()) {
+                                            player.sendMessage("§cKunne ikke finde spilleren " + name + "!");
+                                            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
+                                            return post;
+                                        }
 
-                                    // finally, add this player as a member of the mechanic
-                                    mechanic.getManagement().getMembers().add(target.getUniqueId());
-                                    player.sendMessage("§eDu tilføjede spilleren " + name + " som medlem af maskinen.");
-                                    player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35f, 0.5f);
+                                        // finally, add this player as a member of the mechanic
+                                        mechanic.getManagement().getMembers().add(target.getUniqueId());
+                                        player.sendMessage("§eDu tilføjede spilleren " + name + " som medlem af maskinen.");
+                                        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35f, 0.5f);
+                                    }
 
                                     return post;
                                 })
                                 .build();
                         gui.open(player);
+                        player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1.25f, 1.5f);
+                    }
+
+                    if (item != null && item.getType() == Material.PLAYER_HEAD && item.hasItemMeta()) {
+                        String name = item.getItemMeta().getDisplayName();
+                        UUID uuid = Bukkit.getOfflinePlayer(name).getUniqueId();
+                        mechanic.getManagement().getMembers().remove(uuid);
+                        loadView();
+
+                        player.sendMessage("§eDu fjernede spilleren " + name + " som medlem fra maskinen!");
+                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, 1f);
                     }
 
                     return true;
@@ -196,7 +213,7 @@ public class Elements {
 
         @Override
         public ItemStack getItem() {
-            return new ItemStack(Material.NAME_TAG);
+            return new ItemBuilder(Material.NAME_TAG).setName("§eKonfigurér Medlemmer").build();
         }
     };
 
@@ -222,6 +239,15 @@ public class Elements {
                 return;
             }
 
+            // call mechanic remove event to event handlers
+            MechanicRemoveEvent removeEvent = new MechanicRemoveEvent(mechanic);
+            Bukkit.getPluginManager().callEvent(removeEvent);
+            if (removeEvent.isCancelled()) {
+                // this event was cancelled. (why though?)
+                player.sendMessage("§cFjernelse af denne maskine blev afbrudt.");
+                return;
+            }
+
             // unload and delete this mechanic
             Factorio.get().getMechanicManager(player.getWorld()).unload(mechanic);
             try {
@@ -240,7 +266,7 @@ public class Elements {
 
         @Override
         public ItemStack getItem() {
-            return new ItemStack(Material.RED_WOOL);
+            return new ItemBuilder(Material.RED_WOOL).setName("§cSlet Maskine").build();
         }
     };
 }

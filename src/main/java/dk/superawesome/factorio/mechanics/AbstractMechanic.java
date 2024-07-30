@@ -107,11 +107,19 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
     @Override
     public void openInventory(Player player) {
         G inUse = this.inUse.get();
+        // check for inventory already in use
         if (inUse != null) {
+            // check if the player is already looking in this inventory
+            if (inUse.getInventory().getViewers().contains(player)) {
+                return;
+            }
+
+            // open the inventory
             player.openInventory(inUse.getInventory());
             return;
         }
 
+        // create a new inventory
         G gui = getProfile().getGuiFactory().create((M) this, this.inUse);
         player.openInventory(gui.getInventory());
     }

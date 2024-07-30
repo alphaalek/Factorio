@@ -17,8 +17,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class PowerCentralProfile implements MechanicProfile<PowerCentral, PowerCentralGui> {
 
-    public static final int CAPACITY = 0;
-
     private final MechanicFactory<PowerCentral> factory = new PowerCentralMechanicFactory();
     private final GuiFactory<PowerCentral, PowerCentralGui> guiFactory = new PowerCentralGuiFactory();
 

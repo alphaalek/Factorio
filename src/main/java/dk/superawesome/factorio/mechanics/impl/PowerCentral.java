@@ -55,6 +55,9 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
         if (lever.getType() != Material.LEVER) {
             // invalid power central
             Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
+        } else {
+            // update block state
+            update();
         }
     }
 

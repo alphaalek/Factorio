@@ -171,11 +171,7 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
                 .sum();
         boolean checkSize = amount + added > getMechanic().getCapacity();
 
-        ItemStack cursor = event.getWhoClicked().getOpenInventory().getCursor();
-        if (cursor == null) {
-            // why did this event call? No item on the player's cursor (weird?)
-            return true;
-        }
+        ItemStack cursor = event.getOldCursor();
         boolean cancel = false;
         // add the dragged items
         for (Map.Entry<Integer, ItemStack> entry : event.getNewItems().entrySet()) {
@@ -228,6 +224,7 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
             int a = added;
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                 cursor.setAmount(cursor.getAmount() - a);
+                event.getWhoClicked().getOpenInventory().setCursor(cursor);
             });
 
             return true;
@@ -238,11 +235,11 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     @Override
     public boolean onClickIn(InventoryClickEvent event) {
-        if (event.getRawSlot() < 35) {
+        if (event.getRawSlot() < STORED_SIZE) {
             return handleInteract(event.getCursor());
         }
 
-        if (event.getRawSlot() == 35) {
+        if (event.getRawSlot() == STORED_SIZE) {
             loadInputOutputItems();
         }
 

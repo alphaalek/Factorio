@@ -55,7 +55,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
         private static final int WIDTH = 9;
         private static final int COLLECT_WIDTH = 12;
-        private static final int GRADE_SHIFT = ~0 & 0x0F;
+        private static final int GRADE_MASK = ~0 & 0x0F;
 
         private final int[] columns = new int[WIDTH];
         private double[] states = new double[COLLECT_WIDTH];
@@ -76,8 +76,6 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
         @Override
         public void run() {
-            // TODO doesn't show up sometimes?
-
             double[] states = new double[COLLECT_WIDTH];
             double min = -1;
             double max = 0;
@@ -100,66 +98,73 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
             // start iterating over the columns and placing grades
             for (int i = 0; i < WIDTH; i++) {
                 double state = states[COLLECT_WIDTH - WIDTH + i];
-                int grade = 2;
+                int grade = -1;
                 if (state != -1 && max > min) {
                     double d = (state - min) / diff;
                     grade = (int) Math.round(d);
                 }
 
+                // remove graph items for this column at last tick
+                setSlots(i, columns[i], null);
+                if (states[COLLECT_WIDTH - WIDTH - 1 + i] == -1) {
+                    setSlots(i, 3, null);
+                }
+
                 ItemStack item = this.item.apply(state);
                 boolean smoothed = false;
-                if (state != -1) {
-                    setSlots(i, null);
+                // smooth out graph
+                if (grade != -1 && i > 0 && columns[i - 1] != grade) {
+                    int lowestPrev = getLowestGrade(columns[i - 1]);
+                    int highestPrev = (columns[i - 1] & GRADE_MASK);
+                    // make 0-index based
+                    lowestPrev--; highestPrev--;
 
-                    if (i > 0 && columns[i - 1] != grade) {
-                        int lowestPrev = columns[i - 1] & GRADE_SHIFT;
-                        int highestPrev = getHighestGrade(columns[i - 1]);
-
-                        // check if we have to smooth out the graph
-                        if (grade < lowestPrev || grade > highestPrev) {
-                            int g = 0;
-                            int current = grade;
-                            // ensure correct low-to-high
-                            if (grade > highestPrev) {
-                                current = highestPrev + 1;
-                            }
-
-                            // mask grades
-                            for (;;) {
-                                g = (g << 4) | current;
-
-                                if (grade > highestPrev && current == grade) {
-                                    break;
-                                } else if (grade < lowestPrev && lowestPrev - current <= 1) {
-                                    break;
-                                }
-
-                                current++;
-                            }
-
-                            columns[i] = g;
-                            smoothed = true;
+                    // check if we have to smooth out the graph
+                    if (grade < lowestPrev || grade > highestPrev) {
+                        int g = 0;
+                        int current = grade;
+                        // ensure correct low-to-high
+                        if (grade > highestPrev) {
+                            current = highestPrev + 1;
                         }
+
+                        // mask grades
+                        for (;;) {
+                            g = (g << 4) | (current + 1);
+
+                            if (grade > highestPrev && current == grade) {
+                                break;
+                            } else if (grade < lowestPrev && lowestPrev - current <= 1) {
+                                break;
+                            }
+
+                            current++;
+                        }
+
+                        columns[i] = g;
+                        smoothed = true;
                     }
                 }
 
-                // this column wasn't smoothed out, just use the original grade
-                if (!smoothed) {
-                    columns[i] = grade;
-                }
+                if (grade != -1) {
+                    // this column wasn't smoothed out, just use the original grade
+                    if (!smoothed) {
+                        columns[i] = grade + 1;
+                    }
 
-                // finally set the graph slots for this column
-                if (state != -1) {
-                    setSlots(i, item);
+                    // finally set the graph slots for this column
+                    setSlots(i, columns[i], item);
+                } else {
+                    setSlots(i, max > min ? 1 : 3, item);
                 }
             }
         }
 
-        private int getHighestGrade(int val) {
+        private int getLowestGrade(int val) {
             int d = val;
-            int prev = 0, j = 0;
-            while (d > 0) {
-                prev = d & GRADE_SHIFT;
+            int prev = 1, j = 0;
+            while (d > 1) {
+                prev = d & GRADE_MASK;
                 d >>= (4 * ++j);
             }
 
@@ -170,15 +175,15 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
             return WIDTH * (4 - Math.min(4, grade)) + i;
         }
 
-        private void setSlots(int i, ItemStack item) {
-            int g = columns[i];
-            int j = 0;
+        private void setSlots(int i, int column, ItemStack item) {
+            int g = column;
             for (;;) {
-                int grade = g & GRADE_SHIFT;
-                if (grade == 0 && j > 0) {
+                int grade = g & GRADE_MASK;
+                if (grade == 0) {
                     break;
                 }
-                g >>= (4 * ++j);
+                grade--; // make 0-index based
+                g >>= 4;
 
                 // check if this slot is used by the graph if it's being removed
                 int slot = getSlot(i, grade);
