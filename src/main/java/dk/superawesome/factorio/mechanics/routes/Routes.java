@@ -31,8 +31,6 @@ public class Routes {
             return false;
         }
 
-        Bukkit.getLogger().info("Sucking items " + from);
-
         PipeSuckEvent event = new PipeSuckEvent(from);
         Bukkit.getPluginManager().callEvent(event);
         if (event.getItems() == null

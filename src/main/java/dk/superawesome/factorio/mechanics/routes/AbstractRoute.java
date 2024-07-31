@@ -71,7 +71,6 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             this.lastRunId = runId;
 
             Block block = BlockUtil.getBlock(world, vec);
-            Bukkit.getLogger().info("Put into " + block);
             PipePutEvent event = new PipePutEvent(BlockUtil.getPointingBlock(block, false), collection);
             Bukkit.getPluginManager().callEvent(event);
         }
@@ -247,8 +246,6 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             if (source.getEnergy() < signalCost) {
                 return;
             }
-
-            Bukkit.getLogger().info("Starting signal route, outputs: " + outputs.size() + ", from: " + Types.LOCATION.convert(source.getLocation()));
 
             // handle signal outputs
             int mechanics = 0;
