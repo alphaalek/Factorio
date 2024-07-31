@@ -1,9 +1,6 @@
 package dk.superawesome.factorio.building;
 
-import dk.superawesome.factorio.building.impl.Constructor;
-import dk.superawesome.factorio.building.impl.PowerCentral;
-import dk.superawesome.factorio.building.impl.Smelter;
-import dk.superawesome.factorio.building.impl.StorageBox;
+import dk.superawesome.factorio.building.impl.*;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
@@ -18,6 +15,7 @@ import java.util.List;
 
 public class Buildings {
 
+    public static Building ASSEMBLER;
     public static Building CONSTRUCTOR;
     public static Building SMELTER;
     public static Building STORAGE_BOX;
@@ -26,10 +24,11 @@ public class Buildings {
     static {
         buildings = new Array<>();
 
-        CONSTRUCTOR   = loadBuilding(new Constructor());
-        SMELTER       = loadBuilding(new Smelter());
-        STORAGE_BOX   = loadBuilding(new StorageBox());
-        POWER_CENTRAL = loadBuilding(new PowerCentral());
+        ASSEMBLER     = loadBuilding(new AssemblerBuilding());
+        CONSTRUCTOR   = loadBuilding(new ConstructorBuilding());
+        SMELTER       = loadBuilding(new SmelterBuilding());
+        STORAGE_BOX   = loadBuilding(new StorageBoxBuilding());
+        POWER_CENTRAL = loadBuilding(new PowerCentralBuilding());
     }
 
     private static final Array<Building> buildings;

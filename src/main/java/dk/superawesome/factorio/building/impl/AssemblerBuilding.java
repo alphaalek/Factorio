@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class Smelter implements Building {
+public class AssemblerBuilding implements Building {
 
     private final List<BlockVector> relatives = Arrays.asList(
             new BlockVector(),
@@ -20,11 +20,8 @@ public class Smelter implements Building {
     );
 
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
-            (b, r) -> b.setType(Material.COBBLESTONE),
-            (b, r) -> {
-                b.setType(Material.BLAST_FURNACE);
-                rotate(b, r);
-            },
+            (b, r) -> b.setType(Material.CRYING_OBSIDIAN),
+            (b, r) -> b.setType(Material.ENCHANTING_TABLE),
             (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */
     );
 
@@ -40,6 +37,6 @@ public class Smelter implements Building {
 
     @Override
     public int getID() {
-        return Profiles.SMELTER.getID();
+        return Profiles.ASSEMBLER.getID();
     }
 }

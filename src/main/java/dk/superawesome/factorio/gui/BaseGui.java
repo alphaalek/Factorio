@@ -129,7 +129,7 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
                 handler.accept(event);
             }
 
-            ((Player)event.getWhoClicked()).playSound(event.getWhoClicked().getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 0.5f);
+            ((Player)event.getWhoClicked()).playSound(event.getWhoClicked().getLocation(), Sound.UI_BUTTON_CLICK, 0.3f, 0.5f);
         }
     }
 

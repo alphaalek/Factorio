@@ -113,10 +113,6 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
             } else {
                 // update storage amount in storage box
                 getMechanic().setAmount(getMechanic().getAmount() + diff);
-
-                if (getMechanic().getAmount() == 0) {
-                    getMechanic().setStored(null);
-                }
             }
         });
     }

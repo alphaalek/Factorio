@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.routes;
 import dk.superawesome.factorio.mechanics.items.ItemCollection;
 import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
+import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -70,6 +71,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             this.lastRunId = runId;
 
             Block block = BlockUtil.getBlock(world, vec);
+            Bukkit.getLogger().info("Put into " + block);
             PipePutEvent event = new PipePutEvent(BlockUtil.getPointingBlock(block, false), collection);
             Bukkit.getPluginManager().callEvent(event);
         }
@@ -245,6 +247,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             if (source.getEnergy() < signalCost) {
                 return;
             }
+
+            Bukkit.getLogger().info("Starting signal route, outputs: " + outputs.size() + ", from: " + Types.LOCATION.convert(source.getLocation()));
 
             // handle signal outputs
             int mechanics = 0;

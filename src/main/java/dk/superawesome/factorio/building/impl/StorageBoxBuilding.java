@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class StorageBox implements Building {
+public class StorageBoxBuilding implements Building {
 
     private final List<BlockVector> relatives = Arrays.asList(
             new BlockVector(),

@@ -4,6 +4,7 @@ import dk.superawesome.factorio.gui.impl.StorageBoxGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.items.Container;
 import dk.superawesome.factorio.mechanics.items.ItemCollection;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -46,12 +47,15 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
 
     @Override
     public void pipePut(ItemCollection collection) {
+        Bukkit.getLogger().info("Pipe put, amount: " + amount + ", capacity: " + getCapacity() + ", throttled: " + tickThrottle.isThrottled());
         int capacity = getCapacity();
         if (tickThrottle.isThrottled() || amount == capacity) {
             return;
         }
 
+        Bukkit.getLogger().info("Stored " + stored);
         if (stored == null || collection.has(stored)) {
+            Bukkit.getLogger().info("Taking from collection " + collection);
             amount += put(collection, Math.min(64, capacity - amount), inUse, StorageBoxGui::updateAddedItems, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
@@ -131,5 +135,9 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
 
     public void setAmount(int amount) {
         this.amount = amount;
+
+        if (this.amount == 0) {
+            stored = null;
+        }
     }
 }

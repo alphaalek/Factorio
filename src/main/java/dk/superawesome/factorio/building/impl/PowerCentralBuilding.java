@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class PowerCentral implements Building {
+public class PowerCentralBuilding implements Building {
 
     private final List<BlockVector> relatives = Arrays.asList(
             new BlockVector(),
