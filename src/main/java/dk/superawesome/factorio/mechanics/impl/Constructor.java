@@ -29,13 +29,6 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     public Constructor(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
         loadFromStorage();
-
-        // id
-        // location
-        // rotation
-        // type
-        // management
-        // data
     }
 
     @Override

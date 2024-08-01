@@ -56,13 +56,13 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
         ItemStack fuel = context.getSerializer().readItemStack(str);
         if (fuel != null) {
-            this.fuel = Fuel.get(fuel.getType());
+            this.fuel = Fuel.getFuel(fuel.getType());
         }
         this.fuelAmount = context.getSerializer().readInt(str);
         ItemStack currentFuel = context.getSerializer().readItemStack(str);
         int currentFuelAmount = context.getSerializer().readInt(str);
         if (currentFuel != null) {
-            this.currentFuel = Fuel.get(currentFuel.getType());
+            this.currentFuel = Fuel.getFuel(currentFuel.getType());
             this.currentFuelAmount = 1 - this.currentFuel.getFuelAmount() * currentFuelAmount;
         }
 
@@ -126,7 +126,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
             }
         }
 
-        if (fuel != null && collection.has(new ItemStack(fuel.getMaterial())) || fuel == null && collection.has(i -> Fuel.get(i.getType()) != null)) {
+        if (fuel != null && collection.has(new ItemStack(fuel.getMaterial())) || fuel == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
             fuelAmount += put(collection, Math.min(64, level.getInt(FUEL_CAPACITY) - fuelAmount), inUse, SmelterGui::updateAddedFuel, new Updater<ItemStack>() {
                 @Override
                 public ItemStack get() {
@@ -135,7 +135,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
                 @Override
                 public void set(ItemStack stack) {
-                    fuel = Fuel.get(stack.getType());
+                    fuel = Fuel.getFuel(stack.getType());
                 }
             });
         }

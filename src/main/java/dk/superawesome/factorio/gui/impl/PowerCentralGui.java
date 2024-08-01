@@ -8,7 +8,9 @@ import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -43,8 +45,8 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
         super(mechanic, inUseReference, new InitCallbackHolder(), "Power Central (Capacity: " + mechanic.getCapacity() + "J)");
         initCallback.call();
 
-        //this.tasks.add(
-        //        Bukkit.getScheduler().runTaskTimer(Factories.get(), getProductionGraph(getInventory(), getMechanic()), 0L, 10L));
+        this.tasks.add(
+                Bukkit.getScheduler().runTaskTimer(Factorio.get(), getProductionGraph(getInventory(), getMechanic()), 0L, 10L));
         this.tasks.add(
                 Bukkit.getScheduler().runTaskTimer(Factorio.get(), getConsumptionGraph(getInventory(), getMechanic()), 0L, 10L));
 
@@ -216,12 +218,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
     }
 
     @Override
-    protected List<GuiElement> getGuiElements() {
-        return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
-    }
-
-    @Override
-    public void onClose() {
+    public void onClose(Player player) {
         for (BukkitTask task : this.tasks) {
             task.cancel();
         }

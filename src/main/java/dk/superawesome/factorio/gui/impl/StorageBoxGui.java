@@ -8,6 +8,7 @@ import dk.superawesome.factorio.mechanics.impl.StorageBox;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -20,8 +21,6 @@ import java.util.stream.IntStream;
 public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     private static final int STORED_SIZE = 35;
-    private static final List<Integer> GRAY = Arrays.asList(45, 46, 47, 48, 50);
-    private static final List<Integer> BLACK = IntStream.range(36, 45).boxed().collect(Collectors.toList());
 
     public StorageBoxGui(StorageBox mechanic, AtomicReference<StorageBoxGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder());
@@ -30,16 +29,17 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     @Override
     public void loadItems() {
-        super.loadItems();
-
-        for (int i : GRAY) {
+        for (int i : Arrays.asList(45, 46, 47, 48, 50)) {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
-        for (int i : BLACK) {
-            getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
-        }
+        IntStream.range(36, 45).forEach(i -> getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE)));
         getInventory().setItem(35, new ItemStack(Material.FEATHER));
         getInventory().setItem(49, new ItemStack(Material.MINECART));
+
+        registerEvent(STORED_SIZE, __ -> loadInputOutputItems());
+        registerEvent(49, this::handlePutOrTakeAll);
+
+        super.loadItems();
     }
 
     @Override
@@ -47,11 +47,6 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         if (getMechanic().getStored() != null) {
             loadStorageTypes(getMechanic().getStored(), getMechanic().getAmount(), IntStream.range(0, STORED_SIZE).boxed().collect(Collectors.toList()));
         }
-    }
-
-    @Override
-    protected List<GuiElement> getGuiElements() {
-        return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
     }
 
     public List<ItemStack> findItems(boolean asc) {
@@ -86,7 +81,7 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
     }
 
     @Override
-    public void onClose() {
+    public void onClose(Player player) {
 
     }
 
@@ -229,91 +224,87 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         return false;
     }
 
+    private void handlePutOrTakeAll(InventoryClickEvent event) {
+        Inventory playerInv = event.getWhoClicked().getInventory();
+
+        if (event.getClick() == ClickType.LEFT) {
+            if (getMechanic().getStored() == null) {
+                // the storage box does not have any stored item
+                // find the item type in the player inventory which occurs the most
+                Map<Material, Integer> typeAmounts = new HashMap<>();
+                for (int i = 0; i < playerInv.getSize(); i++) {
+                    ItemStack item = playerInv.getItem(i);
+                    if (item != null) {
+                        typeAmounts.put(item.getType(), typeAmounts.getOrDefault(item.getType(), 0) + item.getAmount());
+                    }
+                }
+
+                if (typeAmounts.isEmpty()) {
+                    // empty inventory
+                    return;
+                }
+
+                Material highest = null;
+                for (Map.Entry<Material, Integer> entry : typeAmounts.entrySet()) {
+                    if (highest == null || entry.getValue() > typeAmounts.get(highest)) {
+                        highest = entry.getKey();
+                    }
+                }
+
+                // update the stored item stack
+                if (highest != null) {
+                    int amount = Math.min(getMechanic().getCapacity(), typeAmounts.get(highest));
+                    getMechanic().setStored(new ItemStack(highest));
+                    getMechanic().setAmount(amount);
+
+                    updateRemovedItems(playerInv, amount, getMechanic().getStored(),
+                            IntStream.range(0, playerInv.getSize())
+                                    .boxed()
+                                    .collect(Collectors.toList()));
+                    updateAddedItems(amount);
+                }
+            } else if (getMechanic().getAmount() < getMechanic().getCapacity()) {
+                int add = getMechanic().getCapacity() - getMechanic().getAmount();
+                // take all items from the player's inventory and put into the storage box
+                int left = updateRemovedItems(playerInv, add, getMechanic().getStored(),
+                        IntStream.range(0, playerInv.getSize())
+                                .boxed()
+                                .collect(Collectors.toList()));
+                int amount = add - left;
+
+                // update amount if we were able to add anything
+                if (amount > 0) {
+                    getMechanic().setAmount(getMechanic().getAmount() + amount);
+                    updateAddedItems(amount);
+                }
+            }
+        } else if (event.getClick() == ClickType.RIGHT) {
+            if (getMechanic().getStored() == null) {
+                // no items stored, nothing can be collected
+                return;
+            }
+
+            // put all items we can in the player's inventory from the storage box
+            int left = updateAddedItems(playerInv, getMechanic().getAmount(), getMechanic().getStored(),
+                    IntStream.range(0, playerInv.getSize())
+                            .boxed()
+                            .collect(Collectors.toList()));
+            int amount = getMechanic().getAmount() - left;
+
+            if (amount == 0) {
+                // no items could be added to the player's inventory
+                return;
+            }
+
+            getMechanic().setAmount(getMechanic().getAmount() - amount);
+            updateRemovedItems(amount);
+        }
+    }
+
     @Override
     public boolean onClickIn(InventoryClickEvent event) {
         if (event.getRawSlot() < STORED_SIZE) {
             return handleInteract(event.getCursor());
-        }
-
-        if (event.getRawSlot() == STORED_SIZE) {
-            loadInputOutputItems();
-        }
-
-        if (event.getRawSlot() == 49 && !getMechanic().getTickThrottle().isThrottled()) {
-            Inventory playerInv = event.getWhoClicked().getInventory();
-
-            if (event.getClick() == ClickType.LEFT) {
-                if (getMechanic().getStored() == null) {
-                    // the storage box does not have any stored item
-                    // find the item type in the player inventory which occurs the most
-                    Map<Material, Integer> typeAmounts = new HashMap<>();
-                    for (int i = 0; i < playerInv.getSize(); i++) {
-                        ItemStack item = playerInv.getItem(i);
-                        if (item != null) {
-                            typeAmounts.put(item.getType(), typeAmounts.getOrDefault(item.getType(), 0) + item.getAmount());
-                        }
-                    }
-
-                    if (typeAmounts.isEmpty()) {
-                        // empty inventory
-                        return true;
-                    }
-
-                    Material highest = null;
-                    for (Map.Entry<Material, Integer> entry : typeAmounts.entrySet()) {
-                        if (highest == null || entry.getValue() > typeAmounts.get(highest)) {
-                            highest = entry.getKey();
-                        }
-                    }
-
-                    // update the stored item stack
-                    if (highest != null) {
-                        int amount = Math.min(getMechanic().getCapacity(), typeAmounts.get(highest));
-                        getMechanic().setStored(new ItemStack(highest));
-                        getMechanic().setAmount(amount);
-
-                        updateRemovedItems(playerInv, amount, getMechanic().getStored(),
-                                IntStream.range(0, playerInv.getSize())
-                                        .boxed()
-                                        .collect(Collectors.toList()));
-                        updateAddedItems(amount);
-                    }
-                } else if (getMechanic().getAmount() < getMechanic().getCapacity()) {
-                    int add = getMechanic().getCapacity() - getMechanic().getAmount();
-                    // take all items from the player's inventory and put into the storage box
-                    int left = updateRemovedItems(playerInv, add, getMechanic().getStored(),
-                            IntStream.range(0, playerInv.getSize())
-                                    .boxed()
-                                    .collect(Collectors.toList()));
-                    int amount = add - left;
-
-                    // update amount if we were able to add anything
-                    if (amount > 0) {
-                        getMechanic().setAmount(getMechanic().getAmount() + amount);
-                        updateAddedItems(amount);
-                    }
-                }
-            } else if (event.getClick() == ClickType.RIGHT) {
-                if (getMechanic().getStored() == null) {
-                    // no items stored, nothing can be collected
-                    return true;
-                }
-
-                // put all items we can in the player's inventory from the storage box
-                int left = updateAddedItems(playerInv, getMechanic().getAmount(), getMechanic().getStored(),
-                        IntStream.range(0, playerInv.getSize())
-                                .boxed()
-                                .collect(Collectors.toList()));
-                int amount = getMechanic().getAmount() - left;
-
-                if (amount == 0) {
-                    // no items could be added to the player's inventory
-                    return true;
-                }
-
-                getMechanic().setAmount(getMechanic().getAmount() - amount);
-                updateRemovedItems(amount);
-            }
         }
 
         return true;
@@ -327,8 +318,7 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
                     && handleInteract(event.getCurrentItem())) {
                 return true;
             }
-
-            if ((event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD || event.getAction() == InventoryAction.HOTBAR_SWAP)
+            else if ((event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD || event.getAction() == InventoryAction.HOTBAR_SWAP)
                     && (event.getCurrentItem() == null || findItems().size() > 1)
                     && handleInteract(event.getWhoClicked().getInventory().getItem(event.getHotbarButton()))) {
                 return true;

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,7 +41,9 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
 
     public abstract void loadInputOutputItems();
 
-    protected abstract List<GuiElement> getGuiElements();
+    protected List<GuiElement> getGuiElements() {
+        return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
+    }
 
     public M getMechanic() {
         return mechanic;

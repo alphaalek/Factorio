@@ -1,17 +1,13 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.gui.Elements;
-import dk.superawesome.factorio.gui.GuiElement;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.items.Fuel;
 import dk.superawesome.factorio.mechanics.impl.Smelter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -21,13 +17,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
-    private static final List<Integer> BLACK = Arrays.asList(0, 1, 2, 5, 14, 23, 32, 41, 42, 43, 44, 50);
-    private static final List<Integer> RED = Arrays.asList(11, 20, 29, 38, 47);
-    private static final List<Integer> DECLINE = Arrays.asList(14, 23, 32);
     private static final List<Integer> INGREDIENT_SLOTS = Arrays.asList(9, 10, 18, 19, 27, 28, 36, 37, 45, 46);
     private static final List<Integer> FUEL_SLOTS = Arrays.asList(12, 13, 21, 22, 30, 31, 39, 40, 48, 49);
     private static final List<Integer> STORAGE_SLOTS = Arrays.asList(6, 7, 8, 15, 16, 17, 24, 25, 26, 33, 34);
@@ -39,9 +32,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
     @Override
     public void loadItems() {
-        super.loadItems();
-
-        for (int i : BLACK) {
+        for (int i : Arrays.asList(0, 1, 2, 5, 14, 23, 32, 41, 42, 43, 44, 50)) {
             getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
         }
         for (int i = 3; i < 5; i++) {
@@ -53,6 +44,8 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         if (getMechanic().isDeclined()) {
             updateDeclinedState(true);
         }
+
+        super.loadItems();
     }
 
     @Override
@@ -68,69 +61,16 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         }
     }
 
-    @Override
-    protected List<GuiElement> getGuiElements() {
-        return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
-    }
-
-    @Override
-    public void onClose() {
-
-    }
-
-    @Override
-    public boolean onDrag(InventoryDragEvent event) {
-        if (getMechanic().getTickThrottle().isThrottled()
-                && event.getRawSlots().stream().anyMatch(s -> event.getView().getInventory(s).getType() != InventoryType.PLAYER)) {
-            return true;
-        }
-
-        boolean modifyIngredients = event.getRawSlots().stream().anyMatch(INGREDIENT_SLOTS::contains);
-        boolean modifyFuel = event.getRawSlots().stream().anyMatch(FUEL_SLOTS::contains);
-        // disallow dragging items over both the ingredient and fuel slots
-        if (modifyFuel && modifyIngredients) {
-            return true;
-        }
-
-        for (ItemStack item : event.getNewItems().values()) {
-            // disallow if ingredient is not allowed
-            if (modifyIngredients
-                    && getMechanic().getIngredient() != null && !getMechanic().getIngredient().isSimilar(item) || getMechanic().getIngredient() == null && !getMechanic().canSmelt(item.getType())) {
-                return true;
+    public void updateDeclinedState(boolean declined) {
+        if (declined) {
+            for (int i : Arrays.asList(14, 23, 32)) {
+                getInventory().setItem(i, new ItemStack(Material.BARRIER));
             }
-
-            // disallow if fuel is not allowed
-            if (modifyFuel
-                    && (getMechanic().getFuel() != null && getMechanic().getFuel().getMaterial() != item.getType() || getMechanic().getFuel() == null && !Fuel.isFuel(item.getType()))) {
-                return true;
+        } else {
+            for (int i : Arrays.asList(14, 23, 32)) {
+                getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
             }
         }
-
-        // this was not dragged over either the ingredient or fuel slots, don't continue
-        if (!modifyFuel && !modifyIngredients) {
-            return true;
-        }
-
-        ItemStack item = event.getNewItems().entrySet().iterator().next().getValue();
-        if (modifyIngredients) {
-            // update ingredient if not set
-            if (getMechanic().getIngredient() == null) {
-                updateType(item, i -> getMechanic().setIngredient(i));
-            }
-
-            updateIngredients();
-        }
-
-        if (modifyFuel) {
-            // update fuel if not set
-            if (getMechanic().getFuel() == null) {
-                getMechanic().setFuel(Fuel.get(item.getType()));
-            }
-
-            updateFuel();
-        }
-
-        return false;
     }
 
     private void updateType(ItemStack item, Consumer<ItemStack> set) {
@@ -139,24 +79,10 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         set.accept(stored);
     }
 
-    public void updateDeclinedState(boolean declined) {
-        if (declined) {
-            for (int i : DECLINE) {
-                getInventory().setItem(i, new ItemStack(Material.BARRIER));
-            }
-        } else {
-            for (int i : DECLINE) {
-                getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
-            }
-        }
-    }
-
     public void updateFuelState() {
         int blaze = Math.round(getMechanic().getCurrentFuelAmount() * 5f);
         AtomicInteger times = new AtomicInteger();
-        IntStream.range(0, RED.size())
-                .boxed()
-                .map(RED::get)
+        Stream.of(11, 20, 29, 38, 47)
                 .sorted(Collections.reverseOrder())
                 .forEach(i -> {
                     if (times.incrementAndGet() > blaze) {
@@ -208,6 +134,66 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     }
 
     @Override
+    public void onClose(Player player) {
+
+    }
+
+    @Override
+    public boolean onDrag(InventoryDragEvent event) {
+        if (getMechanic().getTickThrottle().isThrottled()
+                && event.getRawSlots().stream().anyMatch(s -> event.getView().getInventory(s).getType() != InventoryType.PLAYER)) {
+            return true;
+        }
+
+        boolean modifyIngredients = event.getRawSlots().stream().anyMatch(INGREDIENT_SLOTS::contains);
+        boolean modifyFuel = event.getRawSlots().stream().anyMatch(FUEL_SLOTS::contains);
+        // disallow dragging items over both the ingredient and fuel slots
+        if (modifyFuel && modifyIngredients) {
+            return true;
+        }
+
+        for (ItemStack item : event.getNewItems().values()) {
+            // disallow if ingredient is not allowed
+            if (modifyIngredients
+                    && getMechanic().getIngredient() != null && !getMechanic().getIngredient().isSimilar(item) || getMechanic().getIngredient() == null && !getMechanic().canSmelt(item.getType())) {
+                return true;
+            }
+
+            // disallow if fuel is not allowed
+            if (modifyFuel
+                    && (getMechanic().getFuel() != null && getMechanic().getFuel().getMaterial() != item.getType() || getMechanic().getFuel() == null && !Fuel.isFuel(item.getType()))) {
+                return true;
+            }
+        }
+
+        // this was not dragged over either the ingredient or fuel slots, don't continue
+        if (!modifyFuel && !modifyIngredients) {
+            return true;
+        }
+
+        ItemStack item = event.getNewItems().entrySet().iterator().next().getValue();
+        if (modifyIngredients) {
+            // update ingredient if not set
+            if (getMechanic().getIngredient() == null) {
+                updateType(item, i -> getMechanic().setIngredient(i));
+            }
+
+            updateIngredients();
+        }
+
+        if (modifyFuel) {
+            // update fuel if not set
+            if (getMechanic().getFuel() == null) {
+                getMechanic().setFuel(Fuel.getFuel(item.getType()));
+            }
+
+            updateFuel();
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean onClickIn(InventoryClickEvent event) {
         if (INGREDIENT_SLOTS.contains(event.getRawSlot())) {
             if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) {
@@ -243,7 +229,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
                     // update fuel if not set
                     if (getMechanic().getFuel() == null) {
-                        getMechanic().setFuel(Fuel.get(event.getCursor().getType()));
+                        getMechanic().setFuel(Fuel.getFuel(event.getCursor().getType()));
                     }
 
                     return false;
@@ -310,7 +296,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
                             // update fuel if not set
                             if (getMechanic().getFuel() == null) {
-                                getMechanic().setFuel(Fuel.get(copy.getType()));
+                                getMechanic().setFuel(Fuel.getFuel(copy.getType()));
                             }
                         }
 
@@ -370,7 +356,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
                         // update fuel if not set or not equal
                         if (getMechanic().getFuel() == null || getMechanic().getFuel().getMaterial() != hotbarItem.getType()) {
-                            getMechanic().setFuel(Fuel.get(hotbarItem.getType()));
+                            getMechanic().setFuel(Fuel.getFuel(hotbarItem.getType()));
                         }
 
                         return false;

@@ -40,7 +40,7 @@ public class Fuel {
         return Arrays.stream(FuelType.values()).filter(fuel -> fuel.tester.test(mat)).findFirst();
     }
 
-    public static Fuel get(Material mat) {
+    public static Fuel getFuel(Material mat) {
         return getType(mat).map(fuelType -> new Fuel(mat, fuelType)).orElse(null);
 
     }

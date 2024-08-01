@@ -17,6 +17,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -55,8 +56,8 @@ public class Elements {
             return new BaseGuiAdapter<G>(new BaseGui.InitCallbackHolder(), null, SIZE, TITLE, true) {
 
                 {
-                    // load the items when the gui is loaded
-                    loadItems();
+                    // call init callback when loaded
+                    initCallback.call();
                 }
 
                 private int currentPage = 1;
@@ -68,6 +69,15 @@ public class Elements {
                     }
 
                     loadView();
+                }
+
+                @Override
+                public void onClose(Player player) {
+                    Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+                        if (player.isOnline() && !player.getOpenInventory().getType().isCreatable()) {
+                            mechanic.openInventory(player);
+                        }
+                    });
                 }
 
                 private List<OfflinePlayer> getMembers() {

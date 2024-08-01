@@ -8,8 +8,10 @@ import dk.superawesome.factorio.mechanics.impl.Constructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.*;
 
@@ -22,9 +24,6 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     private static final int GRID_WIDTH = 3;
     private static final int GRID_HEIGHT = 3;
-    private static final List<Integer> GRAY = Arrays.asList(0, 1, 2, 3, 5, 6, 7, 8, 9, 18, 27, 36, 45, 46, 48, 49, 50);
-    private static final List<Integer> BLACK = Arrays.asList(4, 13, 22, 31, 40, 41, 42, 43, 44);
-    private static final List<Integer> DECLINE = Arrays.asList(13, 22, 31);
     private static final List<Integer> CRAFTING_SLOTS = Arrays.asList(10, 11, 12, 19, 20, 21, 28, 29, 30);
     private static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34);
 
@@ -37,12 +36,10 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     @Override
     public void loadItems() {
-        super.loadItems();
-
-        for (int i : GRAY) {
+        for (int i : Arrays.asList(0, 1, 2, 3, 5, 6, 7, 8, 9, 18, 27, 36, 45, 46, 48, 49, 50)) {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
-        for (int i : BLACK) {
+        for (int i : Arrays.asList(4, 13, 22, 31, 40, 41, 42, 43, 44)) {
             getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
         }
         for (int i = 37; i <= 39; i++) {
@@ -65,6 +62,10 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         if (getMechanic().isDeclined()) {
             updateDeclinedState(true);
         }
+
+        registerEvent(35, __ -> loadInputOutputItems());
+
+        super.loadItems();
     }
 
     @Override
@@ -74,27 +75,27 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         }
     }
 
-    @Override
-    protected List<GuiElement> getGuiElements() {
-        return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
+    public void updateDeclinedState(boolean declined) {
+        if (declined) {
+            for (int i : Arrays.asList(13, 22, 31)) {
+                getInventory().setItem(i, new ItemStack(Material.BARRIER));
+            }
+        } else {
+            for (int i : Arrays.asList(13, 22, 31)) {
+                getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
+            }
+        }
     }
 
     @Override
-    public void onClose() {
+    public void onClose(Player player) {
 
     }
 
     @Override
     public boolean onClickIn(InventoryClickEvent event) {
-        if (getMechanic().getTickThrottle().isThrottled()) {
-            return true;
-        }
-
-        if (!CRAFTING_SLOTS.contains(event.getRawSlot())) {
-            if (event.getRawSlot() == 35) {
-                loadInputOutputItems();
-            }
-
+        if (getMechanic().getTickThrottle().isThrottled()
+                || !CRAFTING_SLOTS.contains(event.getRawSlot())) {
             return true;
         }
 
@@ -109,7 +110,6 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     @Override
     public boolean onClickOpen(InventoryClickEvent event) {
         if (movedFromOtherInventory(event)) {
-
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY
                     && event.getClickedInventory() != null
                     && event.getClickedInventory() != getInventory()
@@ -152,18 +152,6 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         getMechanic().getTickThrottle().throttle();
         Bukkit.getScheduler().runTask(Factorio.get(), this::updateCrafting);
         return false;
-    }
-
-    public void updateDeclinedState(boolean declined) {
-        if (declined) {
-            for (int i : DECLINE) {
-                getInventory().setItem(i, new ItemStack(Material.BARRIER));
-            }
-        } else {
-            for (int i : DECLINE) {
-                getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
-            }
-        }
     }
 
     private int getUpperCorner() {

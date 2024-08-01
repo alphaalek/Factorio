@@ -83,7 +83,7 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
     private static void closeGui(InventoryHolder holder, Player player) {
         if (holder instanceof BaseGui) {
             BaseGui<?> gui = (BaseGui<?>) holder;
-            gui.onClose();
+            gui.onClose(player);
 
             // clear usage if no other player has this gui open
             if (holder.getInventory().getViewers().stream().noneMatch(p -> p != player)) {
@@ -159,7 +159,7 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
 
     public abstract void loadItems();
 
-    public abstract void onClose();
+    public abstract void onClose(Player player);
 
     public abstract boolean onDrag(InventoryDragEvent event);
 
