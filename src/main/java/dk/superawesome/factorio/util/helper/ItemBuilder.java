@@ -11,7 +11,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -93,11 +96,14 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder setLore(String[] lores) {
-        for(int i = 0; i <lores.length; i++) {
-            lores[i] = ChatColor.translateAlternateColorCodes('&', lores[i]);
-        }
-        itemMeta.setLore(Arrays.asList(lores).stream().flatMap((s) -> Stream.of( s.split( "\\r?\\n" ) )).collect(Collectors.toList()));
+    public ItemBuilder addLore(String line) {
+        return changeLore(l -> l.add(line));
+    }
+
+    public ItemBuilder changeLore(Consumer<List<String>> doLore) {
+        List<String> lore = itemMeta.hasLore() ? itemMeta.getLore() : new ArrayList<>();
+        doLore.accept(lore);
+        itemMeta.setLore(lore);
         updateMeta();
         return this;
     }

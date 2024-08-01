@@ -1,9 +1,8 @@
 package dk.superawesome.factorio.mechanics.routes;
 
-import dk.superawesome.factorio.mechanics.items.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
-import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -53,18 +52,18 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         return cachedRoutes.containsKey(world) ? cachedRoutes.get(world).values() : Collections.emptyList();
     }
 
-    public static class ItemsOutputEntry implements OutputEntry {
+    public static class TransferOutputEntry implements OutputEntry {
 
         private int lastRunId = -1;
         protected final World world;
         protected final BlockVector vec;
 
-        private ItemsOutputEntry(World world, BlockVector vec) {
+        private TransferOutputEntry(World world, BlockVector vec) {
             this.vec = vec;
             this.world = world;
         }
 
-        public void handle(int runId, ItemCollection collection) {
+        public void handle(int runId, TransferCollection collection) {
             if (lastRunId == runId) {
                 return;
             }
@@ -149,7 +148,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
     protected abstract P createOutputEntry(World world, BlockVector vec);
 
 
-    public static class Pipe extends AbstractRoute<Pipe, ItemsOutputEntry> {
+    public static class Pipe extends AbstractRoute<Pipe, TransferOutputEntry> {
 
         @Override
         public RouteFactory<Pipe> getFactory() {
@@ -179,17 +178,17 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
 
         @Override
-        protected ItemsOutputEntry createOutputEntry(World world, BlockVector vec) {
-            return new ItemsOutputEntry(world, vec);
+        protected TransferOutputEntry createOutputEntry(World world, BlockVector vec) {
+            return new TransferOutputEntry(world, vec);
         }
 
-        public void start(ItemCollection collection) {
+        public void start(TransferCollection collection) {
             int runId = currentId++;
 
-            for (ItemsOutputEntry entry : outputs) {
+            for (TransferOutputEntry entry : outputs) {
                 entry.handle(runId, collection);
 
-                if (collection.isEmpty()) {
+                if (collection.isTransferEmpty()) {
                     break;
                 }
             }

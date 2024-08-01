@@ -6,7 +6,7 @@ import dk.superawesome.factorio.gui.GuiFactory;
 import dk.superawesome.factorio.gui.impl.StorageBoxGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.StorageBox;
-import dk.superawesome.factorio.mechanics.items.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;

@@ -2,9 +2,9 @@ package dk.superawesome.factorio.mechanics.impl;
 
 import dk.superawesome.factorio.gui.impl.StorageBoxGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.items.Container;
-import dk.superawesome.factorio.mechanics.items.ItemCollection;
-import org.bukkit.Bukkit;
+import dk.superawesome.factorio.mechanics.transfer.Container;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -14,7 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> implements ItemCollection, Container {
+public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> implements ItemCollection, ItemContainer {
 
     private ItemStack stored;
     private int amount;
@@ -104,7 +104,7 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
     }
 
     @Override
-    public boolean isEmpty() {
+    public boolean isTransferEmpty() {
         return stored == null;
     }
 
@@ -114,7 +114,7 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
     }
 
     @Override
-    public double getEnergyCost() {
+    public double getTransferEnergyCost() {
         return 1d / 4d;
     }
 

@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.items;
+package dk.superawesome.factorio.mechanics.transfer;
 
 import dk.superawesome.factorio.gui.BaseGui;
 import org.bukkit.inventory.ItemStack;
@@ -9,11 +9,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public interface Container {
+public interface Container<C extends TransferCollection> {
+
+    boolean accepts(TransferCollection collection);
 
     boolean isContainerEmpty();
 
-    void pipePut(ItemCollection collection);
+    void pipePut(C collection);
 
     int getCapacity();
 

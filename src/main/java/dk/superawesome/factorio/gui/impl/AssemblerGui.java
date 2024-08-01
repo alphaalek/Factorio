@@ -6,20 +6,23 @@ import dk.superawesome.factorio.gui.BaseGuiAdapter;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.impl.Assembler;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
+import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
+
+    private static final List<Integer> STORAGE_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
 
     public AssemblerGui(Assembler mechanic, AtomicReference<AssemblerGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder());
@@ -47,7 +50,15 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
 
         registerEvent(34, e -> openChooseAssemblerGui((Player) e.getWhoClicked()));
 
+        if (getMechanic().getType() != null) {
+            loadStorageTypes(new ItemStack(getMechanic().getType().getMat()), getMechanic().getIngredientAmount(), STORAGE_SLOTS);
+        }
+
         super.loadItems();
+    }
+
+    public void updateAddedIngredients(int amount) {
+        updateAddedItems(getInventory(), amount, new ItemStack(getMechanic().getType().getMat()), STORAGE_SLOTS);
     }
 
     private void openChooseAssemblerGui(Player player) {
@@ -87,6 +98,9 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
                                 .makeGlowing()
                                 .build();
                     }
+                    item = new ItemBuilder(item)
+                            .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + type.getProduces() + " §8(§f$" + (StringUtil.formatDecimals(type.getProduces() / type.getRequires(), 2)) + " §epr. item§8)")
+                            .build();
 
                     getInventory().setItem(i++, item);
                 }
@@ -98,17 +112,27 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
                     Optional<Assembler.Types> typeOptional = Assembler.Types.getType(event.getCurrentItem().getType());
                     Player player = (Player) event.getWhoClicked();
                     if (typeOptional.isPresent()) {
-                        Assembler.Types type = typeOptional.get();
-                        if (getMechanic().getType() != null && getMechanic().getType().equals(type)) {
-                            player.sendMessage("§cDenne assembler bruger allerede sammensætningen " + type + ".");
+                        // do not allow to change the assembler type if the assembler still have items
+                        if (getMechanic().getIngredientAmount() > 0) {
+                            player.sendMessage("§Ryd maskinens inventar før du ændrer sammensætning.");
                             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1);
                             return true;
                         }
 
-                        getMechanic().setType(type);
-                        loadAssemblerTypes();
+                        // get the chosen assembler type and set the assembler to use it
+                        Assembler.Types type = typeOptional.get();
+                        if (getMechanic().getType() != null && getMechanic().getType().equals(type)) {
+                            player.sendMessage("§cMaskinen bruger allerede denne sammensætning.");
+                            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1);
+                            return true;
+                        }
+
                         player.sendMessage("§eDu har valgt sammensætningen " + type + ".");
                         player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.5f, 1);
+
+                        // set the assembler type
+                        getMechanic().setType(type);
+                        loadAssemblerTypes();
                     }
                 }
 

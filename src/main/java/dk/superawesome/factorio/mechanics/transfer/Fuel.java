@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.items;
+package dk.superawesome.factorio.mechanics.transfer;
 
 import org.bukkit.Material;
 import org.bukkit.Tag;

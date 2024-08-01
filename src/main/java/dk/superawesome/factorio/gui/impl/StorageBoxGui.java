@@ -5,6 +5,7 @@ import dk.superawesome.factorio.gui.Elements;
 import dk.superawesome.factorio.gui.GuiElement;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.impl.StorageBox;
+import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -33,10 +34,10 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
         IntStream.range(36, 45).forEach(i -> getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE)));
-        getInventory().setItem(35, new ItemStack(Material.FEATHER));
+        getInventory().setItem(35, new ItemBuilder(Material.FEATHER).setName("§eOpdatér Inventar").build());
         getInventory().setItem(49, new ItemStack(Material.MINECART));
 
-        registerEvent(STORED_SIZE, __ -> loadInputOutputItems());
+        registerEvent(35, __ -> loadInputOutputItems());
         registerEvent(49, this::handlePutOrTakeAll);
 
         super.loadItems();

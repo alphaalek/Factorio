@@ -5,6 +5,7 @@ import dk.superawesome.factorio.gui.Elements;
 import dk.superawesome.factorio.gui.GuiElement;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.impl.Constructor;
+import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -45,7 +46,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         for (int i = 37; i <= 39; i++) {
             getInventory().setItem(i, new ItemStack(Material.CRAFTING_TABLE));
         }
-        getInventory().setItem(35, new ItemStack(Material.FEATHER, 1));
+        getInventory().setItem(35, new ItemBuilder(Material.FEATHER).setName("§eOpdatér Inventar").build());
 
         getInventory().setItem(47, this.craft = getMechanic().getRecipeResult());
         for (int i = 0; i < CRAFTING_SLOTS.size(); i++) {

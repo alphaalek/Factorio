@@ -1,6 +1,6 @@
 package dk.superawesome.factorio.mechanics.routes.events;
 
-import dk.superawesome.factorio.mechanics.items.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import org.bukkit.block.Block;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;

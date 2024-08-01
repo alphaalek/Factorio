@@ -4,11 +4,12 @@ import com.google.common.collect.Sets;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.building.Buildings;
-import dk.superawesome.factorio.mechanics.items.Container;
-import dk.superawesome.factorio.mechanics.items.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.Container;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.routes.events.PipeSuckEvent;
+import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.db.Query;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.*;
@@ -132,10 +133,15 @@ public class MechanicManager implements Listener {
     public void onPipePut(PipePutEvent event) {
         if (event.getBlock().getWorld().equals(this.world)) {
             Mechanic<?, ?> mechanic = getMechanicAt(event.getBlock().getLocation());
-            if (mechanic instanceof Container) {
-                ((Container)mechanic).pipePut(event.getItems());
+            if (mechanic instanceof Container && ((Container<?>)mechanic).accepts(event.getTransfer())) {
+                doTransfer((Container<?>) mechanic, event.getTransfer());
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <C extends TransferCollection> void doTransfer(Container<? extends TransferCollection> container, TransferCollection collection) {
+        ((Container<C>)container).pipePut((C) collection);
     }
 
     public boolean buildMechanic(Sign sign, UUID owner) {

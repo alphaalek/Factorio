@@ -2,8 +2,9 @@ package dk.superawesome.factorio.mechanics.impl;
 
 import dk.superawesome.factorio.gui.impl.ConstructorGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.items.Container;
-import dk.superawesome.factorio.mechanics.items.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.Container;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -12,11 +13,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> implements ThinkingMechanic, ItemCollection, Container {
+public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> implements ThinkingMechanic, ItemCollection, ItemContainer {
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
     private final ItemStack[] craftingGridItems = new ItemStack[9];
@@ -210,7 +210,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     }
 
     @Override
-    public boolean isEmpty() {
+    public boolean isTransferEmpty() {
         return storageType == null;
     }
 
@@ -220,7 +220,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     }
 
     @Override
-    public double getEnergyCost() {
+    public double getTransferEnergyCost() {
         return 2d / 3d;
     }
 

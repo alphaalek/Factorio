@@ -1,10 +1,9 @@
 package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.mechanics.items.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.PipeSuckEvent;
-import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -34,12 +33,12 @@ public class Routes {
         PipeSuckEvent event = new PipeSuckEvent(from);
         Bukkit.getPluginManager().callEvent(event);
         if (event.getItems() == null
-                || event.getItems().isEmpty()
-                || source.getEnergy() < event.getItems().getEnergyCost()) {
+                || event.getItems().isTransferEmpty()
+                || source.getEnergy() < event.getItems().getTransferEnergyCost()) {
             return false;
         }
 
-        source.setEnergy(source.getEnergy() - event.getItems().getEnergyCost());
+        source.setEnergy(source.getEnergy() - event.getItems().getTransferEnergyCost());
 
         // start the pipe route
         startItemsRoute(start, event.getItems());

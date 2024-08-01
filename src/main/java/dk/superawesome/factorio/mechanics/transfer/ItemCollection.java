@@ -1,11 +1,11 @@
-package dk.superawesome.factorio.mechanics.items;
+package dk.superawesome.factorio.mechanics.transfer;
 
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-public interface ItemCollection {
+public interface ItemCollection extends TransferCollection {
 
     int CAPACITY_MARK = 0;
 
@@ -14,8 +14,4 @@ public interface ItemCollection {
     boolean has(Predicate<ItemStack> stack);
 
     List<ItemStack> take(int amount);
-
-    boolean isEmpty();
-
-    double getEnergyCost();
 }

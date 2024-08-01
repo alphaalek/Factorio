@@ -2,9 +2,9 @@ package dk.superawesome.factorio.mechanics.impl;
 
 import dk.superawesome.factorio.gui.impl.SmelterGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.items.Container;
-import dk.superawesome.factorio.mechanics.items.Fuel;
-import dk.superawesome.factorio.mechanics.items.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.Fuel;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements ThinkingMechanic, ItemCollection, Container {
+public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements ThinkingMechanic, ItemCollection, ItemContainer {
 
     public static final int INGREDIENT_CAPACITY = 1;
     public static final int FUEL_CAPACITY = 2;
@@ -287,7 +287,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     }
 
     @Override
-    public boolean isEmpty() {
+    public boolean isTransferEmpty() {
         return storageType == null;
     }
 
@@ -297,7 +297,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
     }
 
     @Override
-    public double getEnergyCost() {
+    public double getTransferEnergyCost() {
         return 1d / 2d;
     }
 

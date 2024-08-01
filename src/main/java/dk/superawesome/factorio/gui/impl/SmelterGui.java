@@ -2,8 +2,9 @@ package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.MechanicGui;
-import dk.superawesome.factorio.mechanics.items.Fuel;
+import dk.superawesome.factorio.mechanics.transfer.Fuel;
 import dk.superawesome.factorio.mechanics.impl.Smelter;
+import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -38,7 +39,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         for (int i = 3; i < 5; i++) {
             getInventory().setItem(i, new ItemStack(Material.FURNACE));
         }
-        getInventory().setItem(35, new ItemStack(Material.FEATHER));
+        getInventory().setItem(35, new ItemBuilder(Material.FEATHER).setName("§eOpdatér Inventar").build());
 
         updateFuelState();
         if (getMechanic().isDeclined()) {

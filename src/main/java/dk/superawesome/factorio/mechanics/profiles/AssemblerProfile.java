@@ -9,6 +9,8 @@ import dk.superawesome.factorio.mechanics.MechanicLevel;
 import dk.superawesome.factorio.mechanics.MechanicProfile;
 import dk.superawesome.factorio.mechanics.MechanicStorageContext;
 import dk.superawesome.factorio.mechanics.impl.Assembler;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
+import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
@@ -41,7 +43,10 @@ public class AssemblerProfile implements MechanicProfile<Assembler, AssemblerGui
 
     @Override
     public MechanicLevel.Registry getLevelRegistry() {
-        return MechanicLevel.Registry.Builder.make(1).build();
+        return MechanicLevel.Registry.Builder
+                .make(1)
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(64 * 8))
+                .build();
     }
 
     @Override

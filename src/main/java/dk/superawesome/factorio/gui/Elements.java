@@ -7,8 +7,8 @@ import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.Management;
 import dk.superawesome.factorio.mechanics.Mechanic;
-import dk.superawesome.factorio.mechanics.items.Container;
-import dk.superawesome.factorio.mechanics.items.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.Container;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
@@ -17,7 +17,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -249,7 +248,7 @@ public class Elements {
             }
 
             // check if this mechanic has any items in its inventory
-            if (mechanic instanceof ItemCollection && !((ItemCollection)mechanic).isEmpty()
+            if (mechanic instanceof ItemCollection && !((ItemCollection)mechanic).isTransferEmpty()
                     || mechanic instanceof Container && !((Container)mechanic).isContainerEmpty()) {
                 player.sendMessage("§cRyd maskinens inventar før du sletter den!");
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
