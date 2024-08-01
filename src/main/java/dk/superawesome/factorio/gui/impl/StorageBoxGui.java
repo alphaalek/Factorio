@@ -1,5 +1,9 @@
 package dk.superawesome.factorio.gui.impl;
 
+import de.rapha149.signgui.SignGUI;
+import de.rapha149.signgui.SignGUIAction;
+import de.rapha149.signgui.SignGUIFinishHandler;
+import de.rapha149.signgui.SignGUIResult;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.Elements;
 import dk.superawesome.factorio.gui.GuiElement;
@@ -8,6 +12,7 @@ import dk.superawesome.factorio.mechanics.impl.StorageBox;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.*;
@@ -16,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -35,7 +41,12 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         }
         IntStream.range(36, 45).forEach(i -> getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE)));
         getInventory().setItem(35, new ItemBuilder(Material.FEATHER).setName("§eOpdatér Inventar").build());
-        getInventory().setItem(49, new ItemStack(Material.MINECART));
+        getInventory().setItem(49, new ItemBuilder(Material.MINECART)
+                .setName("§eIndsæt/Tage imellem inventar")
+                .addLore("")
+                .addLore("§eHøjreklik for at tage alt ud. §8(§e§oShift for at angiv antal§8)")
+                .addLore("§eVenstreklik for at putte alt ind. §8(§e§oShift for at angiv antal§8)")
+                .build());
 
         registerEvent(35, __ -> loadInputOutputItems());
         registerEvent(49, this::handlePutOrTakeAll);
@@ -225,80 +236,153 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         return false;
     }
 
+    private Material findHighestItemCount(Inventory inventory, Map<Material, Integer> typeAmounts) {
+        for (int i = 0; i < inventory.getSize(); i++) {
+            ItemStack item = inventory.getItem(i);
+            if (item != null) {
+                typeAmounts.put(item.getType(), typeAmounts.getOrDefault(item.getType(), 0) + item.getAmount());
+            }
+        }
+
+        if (typeAmounts.isEmpty()) {
+            // empty inventory
+            return null;
+        }
+
+        Material highest = null;
+        // loop through all entries and find the highest value
+        for (Map.Entry<Material, Integer> entry : typeAmounts.entrySet()) {
+            if (highest == null || entry.getValue() > typeAmounts.get(highest)) {
+                highest = entry.getKey();
+            }
+        }
+
+        return highest;
+    }
+
+    private void openSignGuiAndCall(Player p, int total, Consumer<Integer> function) {
+        SignGUI gui = SignGUI.builder()
+                .setLines("", "/ " + total, "---------------", "Vælg antal")
+                // calls when the gui is closed
+                .setHandler((player, result) -> {
+                    // get the amount chosen and apply this to the take function
+                    try {
+                        int amount = Integer.parseInt(result.getLine(0));
+                        function.accept(amount);
+                    } catch (NumberFormatException ex) {
+                        player.sendMessage("§cUgyldigt antal valgt!");
+                        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+                    }
+
+                    // return to the storage box gui and reload view
+                    return Arrays.asList(
+                            SignGUIAction.openInventory(Factorio.get(), getInventory()), SignGUIAction.runSync(Factorio.get(), this::loadInputOutputItems));
+                })
+                .build();
+        gui.open(p);
+    }
+
     private void handlePutOrTakeAll(InventoryClickEvent event) {
         Inventory playerInv = event.getWhoClicked().getInventory();
 
-        if (event.getClick() == ClickType.LEFT) {
-            if (getMechanic().getStored() == null) {
-                // the storage box does not have any stored item
-                // find the item type in the player inventory which occurs the most
-                Map<Material, Integer> typeAmounts = new HashMap<>();
-                for (int i = 0; i < playerInv.getSize(); i++) {
-                    ItemStack item = playerInv.getItem(i);
-                    if (item != null) {
-                        typeAmounts.put(item.getType(), typeAmounts.getOrDefault(item.getType(), 0) + item.getAmount());
-                    }
-                }
-
-                if (typeAmounts.isEmpty()) {
-                    // empty inventory
-                    return;
-                }
-
-                Material highest = null;
-                for (Map.Entry<Material, Integer> entry : typeAmounts.entrySet()) {
-                    if (highest == null || entry.getValue() > typeAmounts.get(highest)) {
-                        highest = entry.getKey();
-                    }
-                }
-
-                // update the stored item stack
-                if (highest != null) {
-                    int amount = Math.min(getMechanic().getCapacity(), typeAmounts.get(highest));
-                    getMechanic().setStored(new ItemStack(highest));
-                    getMechanic().setAmount(amount);
-
-                    updateRemovedItems(playerInv, amount, getMechanic().getStored(),
-                            IntStream.range(0, playerInv.getSize())
-                                    .boxed()
-                                    .collect(Collectors.toList()));
-                    updateAddedItems(amount);
-                }
-            } else if (getMechanic().getAmount() < getMechanic().getCapacity()) {
-                int add = getMechanic().getCapacity() - getMechanic().getAmount();
+        if (event.getClick().isLeftClick()) {
+            // create a put function
+            Consumer<Integer> put = a -> {
+                int space = Math.min(getMechanic().getCapacity() - getMechanic().getAmount(), a);
                 // take all items from the player's inventory and put into the storage box
-                int left = updateRemovedItems(playerInv, add, getMechanic().getStored(),
+                int left = updateRemovedItems(playerInv, space, getMechanic().getStored(),
                         IntStream.range(0, playerInv.getSize())
                                 .boxed()
                                 .collect(Collectors.toList()));
-                int amount = add - left;
+                int amount = space - left;
 
                 // update amount if we were able to add anything
                 if (amount > 0) {
                     getMechanic().setAmount(getMechanic().getAmount() + amount);
                     updateAddedItems(amount);
                 }
+            };
+
+            Material stored = null;
+            if (getMechanic().getStored() == null) {
+                // the storage box does not have any stored item
+                // find the item type in the player inventory which occurs the most
+                Map<Material, Integer> typeAmounts = new HashMap<>();
+                Material highest = findHighestItemCount(playerInv, typeAmounts);
+
+                // update the stored item stack
+                if (highest != null) {
+                    if (!event.getClick().isShiftClick()) {
+                        // update the stored amount and put into the storage box at (1)
+                        getMechanic().setStored(new ItemStack(highest));
+                    } else {
+                        stored = highest;
+                        Consumer<Integer> putCopy = put;
+                        put = i -> {
+                            if (getMechanic().getStored() == null) {
+                                // the stored type has not changed while the player was editing the sign
+                                // just assume the highest item count is the same as when the sign was opened
+                                getMechanic().setStored(new ItemStack(highest));
+                            }
+                            putCopy.accept(i);
+                        };
+                    }
+                }
+            } else if (getMechanic().getAmount() >= getMechanic().getCapacity()) {
+                return;
             }
-        } else if (event.getClick() == ClickType.RIGHT) {
+
+            Bukkit.broadcastMessage(event.getClick() + " " + getMechanic().getStored());
+            if (stored == null && getMechanic().getStored() != null) {
+                stored = getMechanic().getStored().getType();
+            }
+
+            if (stored != null) {
+                // (1)
+                if (!event.getClick().isShiftClick()) {
+                    put.accept(getMechanic().getCapacity() - getMechanic().getAmount());
+                } else {
+                    Material storedCopy = stored;
+                    // evaluate total amount of the storage box stored item present in the player's inventory
+                    int amount = Arrays.stream(playerInv.getContents())
+                            .filter(Objects::nonNull)
+                            .filter(i -> i.getType().equals(storedCopy))
+                            .mapToInt(ItemStack::getAmount)
+                            .sum();
+                    if (amount > 0) {
+                        openSignGuiAndCall((Player) event.getWhoClicked(), amount, put);
+                    }
+                }
+            }
+        } else if (event.getClick().isRightClick()) {
             if (getMechanic().getStored() == null) {
                 // no items stored, nothing can be collected
                 return;
             }
 
-            // put all items we can in the player's inventory from the storage box
-            int left = updateAddedItems(playerInv, getMechanic().getAmount(), getMechanic().getStored(),
-                    IntStream.range(0, playerInv.getSize())
-                            .boxed()
-                            .collect(Collectors.toList()));
-            int amount = getMechanic().getAmount() - left;
+            // create a take function
+            Consumer<Integer> take = a -> {
+                int boxAmount = Math.min(a, getMechanic().getAmount());
+                // put all items we can in the player's inventory from the storage box
+                int left = updateAddedItems(playerInv, boxAmount, getMechanic().getStored(),
+                        IntStream.range(0, playerInv.getSize())
+                                .boxed()
+                                .collect(Collectors.toList()));
+                int amount = boxAmount - left;
+                if (amount == 0) {
+                    // no items could be added to the player's inventory
+                    return;
+                }
 
-            if (amount == 0) {
-                // no items could be added to the player's inventory
-                return;
+                updateRemovedItems(amount);
+                getMechanic().setAmount(getMechanic().getAmount() - amount);
+            };
+
+            if (!event.getClick().isShiftClick()) {
+                take.accept(getMechanic().getAmount());
+            } else {
+                openSignGuiAndCall((Player) event.getWhoClicked(), getMechanic().getAmount(), take);
             }
-
-            getMechanic().setAmount(getMechanic().getAmount() - amount);
-            updateRemovedItems(amount);
         }
     }
 

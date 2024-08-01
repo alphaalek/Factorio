@@ -113,7 +113,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                     setSlots(i, 3, null);
                 }
 
-                ItemStack item = this.item.apply(state);
+                ItemStack item = this.item.apply(Math.max(0, state));
                 boolean smoothed = false;
                 // smooth out graph
                 if (grade != -1 && i > 0 && columns[i - 1] != grade) {

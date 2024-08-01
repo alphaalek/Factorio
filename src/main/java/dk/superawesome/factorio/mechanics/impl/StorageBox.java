@@ -5,6 +5,7 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -105,11 +106,13 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
 
     @Override
     public boolean isTransferEmpty() {
+        Bukkit.broadcastMessage("Stored " + stored);
         return stored == null;
     }
 
     @Override
     public boolean isContainerEmpty() {
+        Bukkit.broadcastMessage("Stored " + stored);
         return stored == null;
     }
 

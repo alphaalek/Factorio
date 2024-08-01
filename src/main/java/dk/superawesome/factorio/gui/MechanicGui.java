@@ -2,6 +2,7 @@ package dk.superawesome.factorio.gui;
 
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.util.Callback;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;

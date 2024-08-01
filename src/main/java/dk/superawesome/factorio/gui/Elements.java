@@ -187,7 +187,7 @@ public class Elements {
                                                     .filter(Objects::nonNull)
                                                     .anyMatch(name::equalsIgnoreCase))) {
                                             player.sendMessage("§cSpilleren " + name + " er allerede medlem af maskinen!");
-                                            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
+                                            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                                             return post;
                                         }
 
@@ -195,7 +195,7 @@ public class Elements {
                                         // check if the target player is valid
                                         if (!target.hasPlayedBefore()) {
                                             player.sendMessage("§cKunne ikke finde spilleren " + name + "!");
-                                            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
+                                            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                                             return post;
                                         }
 
@@ -243,15 +243,15 @@ public class Elements {
             // check if the player has access to remove this mechanic
             if (!mechanic.getManagement().hasAccess(player.getUniqueId(), Management.DELETE)) {
                 player.sendMessage("§cDu har ikke adgang til at fjerne denne maskine!");
-                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                 return;
             }
 
             // check if this mechanic has any items in its inventory
             if (mechanic instanceof ItemCollection && !((ItemCollection)mechanic).isTransferEmpty()
-                    || mechanic instanceof Container && !((Container)mechanic).isContainerEmpty()) {
+                    || mechanic instanceof Container && !((Container<?>)mechanic).isContainerEmpty()) {
                 player.sendMessage("§cRyd maskinens inventar før du sletter den!");
-                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                 return;
             }
 

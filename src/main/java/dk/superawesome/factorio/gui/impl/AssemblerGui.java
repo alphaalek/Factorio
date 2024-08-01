@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
 
     private static final List<Integer> STORAGE_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
+    private static final List<Integer> MONEY_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40);
 
     public AssemblerGui(Assembler mechanic, AtomicReference<AssemblerGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder());
@@ -47,18 +48,25 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
         if (getMechanic().getType() != null) {
             getInventory().setItem(16, new ItemStack(getMechanic().getType().getMat()));
         }
-
         registerEvent(34, e -> openChooseAssemblerGui((Player) e.getWhoClicked()));
-
-        if (getMechanic().getType() != null) {
-            loadStorageTypes(new ItemStack(getMechanic().getType().getMat()), getMechanic().getIngredientAmount(), STORAGE_SLOTS);
-        }
 
         super.loadItems();
     }
 
     public void updateAddedIngredients(int amount) {
         updateAddedItems(getInventory(), amount, new ItemStack(getMechanic().getType().getMat()), STORAGE_SLOTS);
+    }
+
+    public void updateRemovedIngredients(int amount) {
+        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getType().getMat()), STORAGE_SLOTS);
+    }
+
+    public void updateAddedMoney(double amount) {
+        updateAddedItems(getInventory(), (int) amount, new ItemStack(Material.EMERALD), MONEY_SLOTS);
+    }
+
+    public void updateRemovedMoney(double amount) {
+        updateRemovedItems(getInventory(), (int) amount, new ItemStack(Material.EMERALD), MONEY_SLOTS);
     }
 
     private void openChooseAssemblerGui(Player player) {
@@ -144,7 +152,13 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
 
     @Override
     public void loadInputOutputItems() {
-
+        if (getMechanic().getType() != null) {
+            loadStorageTypes(new ItemStack(getMechanic().getType().getMat()), getMechanic().getIngredientAmount(), STORAGE_SLOTS);
+        }
+        int moneyAmount = (int) Math.round(getMechanic().getMoneyAmount());
+        if (moneyAmount > 0) {
+            loadStorageTypes(new ItemStack(Material.EMERALD), moneyAmount, MONEY_SLOTS);
+        }
     }
 
     @Override

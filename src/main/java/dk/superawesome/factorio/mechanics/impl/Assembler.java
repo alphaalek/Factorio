@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Optional;
@@ -22,7 +23,7 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
     private Types type;
     private int ingredientAmount;
-    private int moneyAmount;
+    private double moneyAmount;
 
     public Assembler(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -30,21 +31,25 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws SQLException {
+    public void load(MechanicStorageContext context) throws SQLException, IOException {
         ByteArrayInputStream data = context.getData();
         ItemStack item = context.getSerializer().readItemStack(data);
         if (item != null) {
             this.type = Types.getType(item.getType()).orElse(null);
         }
+        this.ingredientAmount = context.getSerializer().readInt(data);
+        this.moneyAmount = context.getSerializer().readDouble(data);
     }
 
-    public void save(MechanicStorageContext context) throws SQLException {
+    public void save(MechanicStorageContext context) throws SQLException, IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         context.getSerializer().writeItemStack(stream,
                 Optional.ofNullable(this.type)
                         .map(Types::getMat)
                         .map(ItemStack::new)
                         .orElse(null));
+        context.getSerializer().writeInt(stream, this.ingredientAmount);
+        context.getSerializer().writeDouble(stream, this.moneyAmount);
 
         context.uploadData(stream);
     }
@@ -61,7 +66,27 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
 
     @Override
     public void think() {
+        // check if no assembler type is chosen, if not, don't continue
+        if (type == null
+                // check if the assembler does not have enough ingredients to assemble, if not, don't continue
+                || ingredientAmount < type.getRequires()) {
+            return;
+        }
 
+        // check for enough space
+        if (moneyAmount + type.getProduces() > getCapacity()) {
+            return;
+        }
+
+        // do the assembling
+        ingredientAmount -= type.getRequires();
+        moneyAmount += type.getProduces();
+
+        AssemblerGui inUse = this.inUse.get();
+        if (inUse != null) {
+            inUse.updateRemovedIngredients(type.getRequires());
+            inUse.updateAddedMoney(type.getProduces());
+        }
     }
 
     @Override
@@ -108,11 +133,11 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
         this.ingredientAmount = amount;
     }
 
-    public int getMoneyAmount() {
+    public double getMoneyAmount() {
         return this.moneyAmount;
     }
 
-    public void setMoneyAmount(int amount) {
+    public void setMoneyAmount(double amount) {
         this.moneyAmount = amount;
     }
 
