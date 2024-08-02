@@ -1,14 +1,15 @@
 package dk.superawesome.factorio.api.events;
 
 import dk.superawesome.factorio.mechanics.Mechanic;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
 public class MechanicBuildEvent extends MechanicEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public MechanicBuildEvent(Mechanic<?, ?> mechanic) {
-        super(mechanic);
+    public MechanicBuildEvent(Player player, Mechanic<?, ?> mechanic) {
+        super(player, mechanic);
     }
 
     @Override

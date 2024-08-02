@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.gui.impl;
 
+import dk.superawesome.factorio.api.events.MoneyCollectEvent;
 import dk.superawesome.factorio.gui.Elements;
 import dk.superawesome.factorio.gui.GuiElement;
 import dk.superawesome.factorio.gui.MechanicGui;
@@ -78,6 +79,14 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
 
         Consumer<Double> take = a -> {
             double moneyAmount = Math.min(getMechanic().getMoneyAmount(), a);
+
+            MoneyCollectEvent collectEvent = new MoneyCollectEvent(player, moneyAmount, getMechanic());
+            Bukkit.getPluginManager().callEvent(collectEvent);
+            if (collectEvent.isCancelled()) {
+                player.sendMessage("§cKunne ikke tage fra maskinens inventar. Kontakt en udvikler.");
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+                return;
+            }
 
             int displayAmount = (int) Math.round(moneyAmount);
             displayed -= displayAmount;

@@ -17,6 +17,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.BlockVector;
@@ -144,25 +145,28 @@ public class MechanicManager implements Listener {
         ((Container<C>)container).pipePut((C) collection);
     }
 
-    public boolean buildMechanic(Sign sign, UUID owner) {
+    public MechanicBuildResponse buildMechanic(Sign sign, Player owner) {
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
         Mechanic<?, ?> mechanic;
         try {
-            mechanic = loadMechanicFromSign(sign, (type, on) -> contextProvider.create(on.getLocation(), rotation, type, owner));
+            mechanic = loadMechanicFromSign(sign, (type, on) -> contextProvider.create(on.getLocation(), rotation, type, owner.getUniqueId()));
             if (mechanic == null) {
-                return false;
+                return MechanicBuildResponse.NO_SUCH;
             }
         } catch (SQLException | IOException ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to create mechanic at location " + sign.getLocation(), ex);
-            return false;
+            return MechanicBuildResponse.ERROR;
         }
 
-        MechanicBuildEvent event = new MechanicBuildEvent(mechanic);
+        MechanicBuildEvent event = new MechanicBuildEvent(owner, mechanic);
         Bukkit.getPluginManager().callEvent(event);
-        // check if the build of this mechanic is allowed
-        if (event.isCancelled() || !Buildings.hasSpaceFor(sign.getWorld(), sign.getBlock(), mechanic)) {
+        if (event.isCancelled()) {
             unload(mechanic);
-            return false;
+            return MechanicBuildResponse.ABORT;
+        // check if the build of this mechanic is allowed
+        } else if (!Buildings.hasSpaceFor(sign.getWorld(), sign.getBlock(), mechanic)) {
+            unload(mechanic);
+            return MechanicBuildResponse.NOT_ENOUGH_SPACE;
         }
 
         // place the blocks for this mechanic
@@ -171,7 +175,7 @@ public class MechanicManager implements Listener {
 
         // play sound
         sign.getWorld().playSound(sign.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.675f, 1f);
-        return true;
+        return MechanicBuildResponse.SUCCESS;
     }
 
     public void loadMechanic(Sign sign) {

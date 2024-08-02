@@ -242,7 +242,7 @@ public class Elements {
             Mechanic<?, ?> mechanic = gui.getMechanic();
             // check if the player has access to remove this mechanic
             if (!mechanic.getManagement().hasAccess(player.getUniqueId(), Management.DELETE)) {
-                player.sendMessage("§cDu har ikke adgang til at fjerne denne maskine!");
+                player.sendMessage("§cDu har ikke adgang til at fjerne maskinen!");
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                 return;
             }
@@ -256,11 +256,11 @@ public class Elements {
             }
 
             // call mechanic remove event to event handlers
-            MechanicRemoveEvent removeEvent = new MechanicRemoveEvent(mechanic);
+            MechanicRemoveEvent removeEvent = new MechanicRemoveEvent(player, mechanic);
             Bukkit.getPluginManager().callEvent(removeEvent);
             if (removeEvent.isCancelled()) {
                 // this event was cancelled. (why though?)
-                player.sendMessage("§cFjernelse af denne maskine blev afbrudt.");
+                player.sendMessage("§cFjernelse af maskinen blev afbrudt. Kontakt en udvikler.");
                 return;
             }
 
@@ -269,7 +269,7 @@ public class Elements {
             try {
                 Factorio.get().getContextProvider().deleteAt(mechanic.getLocation());
             } catch (SQLException ex) {
-                player.sendMessage("§cDer opstod en fejl! Kontakt en staff.");
+                player.sendMessage("§cDer opstod en fejl! Kontakt en udvikler.");
                 Factorio.get().getLogger().log(Level.SEVERE, "Failed to delete mechanic at location " + mechanic.getLocation(), ex);
                 return;
             }

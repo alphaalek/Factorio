@@ -59,6 +59,8 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
     protected void openSignGuiAndCall(Player p, String total, Consumer<Double> function) {
         SignGUI gui = SignGUI.builder()
                 .setLines("", "/ " + total, "---------------", "Vælg antal")
+                // ensure synchronous call
+                .callHandlerSynchronously(Factorio.get())
                 // calls when the gui is closed
                 .setHandler((player, result) -> {
                     // get the amount chosen and apply this to the take function

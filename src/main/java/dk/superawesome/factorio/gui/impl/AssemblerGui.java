@@ -45,7 +45,12 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
         }
         getInventory().setItem(34, new ItemBuilder(Material.PAPER).setName("§eVælg sammensætning").build());
         if (getMechanic().getType() != null) {
-            getInventory().setItem(16, new ItemStack(getMechanic().getType().getMat()));
+            Assembler.Types type = getMechanic().getType();
+            getInventory().setItem(16,
+                    new ItemBuilder(type.getMat())
+                            .makeGlowing()
+                            .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + type.getProduces() + " §8(§f$" + (StringUtil.formatDecimals(type.getProduces() / type.getRequires(), 2)) + " §epr. item§8)")
+                            .build());
         }
         registerEvent(34, e -> openChooseAssemblerGui((Player) e.getWhoClicked()));
 
@@ -121,7 +126,7 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
                     if (typeOptional.isPresent()) {
                         // do not allow to change the assembler type if the assembler still have items
                         if (getMechanic().getIngredientAmount() > 0) {
-                            player.sendMessage("§Ryd maskinens inventar før du ændrer sammensætning.");
+                            player.sendMessage("§cRyd maskinens inventar før du ændrer sammensætning.");
                             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1);
                             return true;
                         }
