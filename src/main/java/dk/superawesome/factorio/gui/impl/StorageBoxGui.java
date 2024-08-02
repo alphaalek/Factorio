@@ -1,21 +1,17 @@
 package dk.superawesome.factorio.gui.impl;
 
-import de.rapha149.signgui.SignGUI;
-import de.rapha149.signgui.SignGUIAction;
-import de.rapha149.signgui.SignGUIFinishHandler;
-import de.rapha149.signgui.SignGUIResult;
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.gui.Elements;
-import dk.superawesome.factorio.gui.GuiElement;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.impl.StorageBox;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.*;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 

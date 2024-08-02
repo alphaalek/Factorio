@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.mechanics.routes;
 
+import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
@@ -91,14 +92,14 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             this.world = world;
         }
 
-        public boolean handle(int runId, PowerCentral source) {
+        public boolean handle(int runId, SignalSource source) {
             if (runId == lastRunId) {
                 return false;
             }
             this.lastRunId = runId;
 
             Block block = BlockUtil.getBlock(world, vec);
-            return Routes.suckItems(block, source);
+            return source.handleOutput(block);
         }
 
         @Override
@@ -126,6 +127,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
     public Collection<BlockVector> getLocations() {
         return locations;
+    }
+
+    public Queue<P> getOutputs() {
+        return outputs;
     }
 
     public void addOutput(World world, BlockVector vec) {
@@ -197,7 +202,6 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
     public static class Signal extends AbstractRoute<Signal, SignalOutputEntry> {
 
-        private static final double SIGNAL_COST = 1d / 32d;
 
         @Override
         public RouteFactory<Signal> getFactory() {
@@ -238,31 +242,24 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return new SignalOutputEntry(world, vec);
         }
 
-        public void start(PowerCentral source) {
+        public void start(SignalSource source) {
             int runId = currentId++;
 
-            double signalCost = locations.size() * SIGNAL_COST;
-            if (source.getEnergy() < signalCost) {
+            if (!source.preSignal(this)) {
                 return;
             }
 
             // handle signal outputs
             int mechanics = 0;
-            source.setEnergy(source.getEnergy() - signalCost);
             for (SignalOutputEntry entry : outputs) {
                 if (entry.handle(runId, source)) {
                     mechanics++;
-                }
-
-                if (source.getEnergy() == 0) {
-                    break;
                 }
             }
 
             // power related mechanic stress
             if (mechanics < outputs.size() && outputs.size() > 1) {
-                double ratio = ((double)mechanics) / (outputs.size() - 1);
-                source.setEnergy(source.getEnergy() + signalCost * ratio);
+                source.postSignal(this, mechanics);
             }
         }
     }

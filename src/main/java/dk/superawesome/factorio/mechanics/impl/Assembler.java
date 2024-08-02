@@ -79,10 +79,10 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
         ingredientAmount -= type.getRequires();
         moneyAmount += type.getProduces();
 
-        AssemblerGui inUse = this.inUse.get();
-        if (inUse != null) {
-            inUse.updateRemovedIngredients(type.getRequires());
-            inUse.updateAddedMoney(type.getProduces());
+        AssemblerGui gui = this.inUse.get();
+        if (gui != null) {
+            gui.updateRemovedIngredients(type.getRequires());
+            gui.updateAddedMoney(type.getProduces());
         }
     }
 
@@ -153,9 +153,9 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
         double take = Math.min(amount, moneyAmount);
         moneyAmount -= take;
 
-        AssemblerGui inUse = this.inUse.get();
-        if (inUse != null) {
-            inUse.updateRemovedMoney(take);
+        AssemblerGui gui = this.inUse.get();
+        if (gui != null) {
+            gui.updateRemovedMoney(take);
         }
 
         return take;

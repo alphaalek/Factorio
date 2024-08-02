@@ -10,25 +10,27 @@ import java.util.function.Predicate;
 public class Fuel {
 
     public enum FuelType {
-        COAL(Material.COAL, 1f / 8f),
-        CHARCOAL(Material.CHARCOAL, 1f / 8f),
-        BLAZE_ROD(Material.BLAZE_ROD, 1f / 16f),
-        COAL_BLOCK(Material.COAL_BLOCK, 1f / 72),
-        LAVA_BUCKET(Material.LAVA_BUCKET, 1f / 100f),
-        WOOD(Tag.PLANKS::isTagged, 1f / 2f),
-        LOG(Tag.LOGS::isTagged, 1f / 5f),
+        COAL(Material.COAL, 1f / 8f, 6.5d),
+        CHARCOAL(Material.CHARCOAL, 1f / 8f, 6.5d),
+        BLAZE_ROD(Material.BLAZE_ROD, 1f / 16f, 16d),
+        COAL_BLOCK(Material.COAL_BLOCK, 1f / 72, 6.5d),
+        LAVA_BUCKET(Material.LAVA_BUCKET, 1f / 100f, 12d),
+        WOOD(Tag.PLANKS::isTagged, 1f / 2f, 3d),
+        LOG(Tag.LOGS::isTagged, 1f / 5f, 4.5d),
         ;
 
         private final Predicate<Material> tester;
+        private final double energyAmount;
         private final float fuelAmount;
 
-        FuelType(Material mat, float fuelAmount) {
-            this(m -> m == mat, fuelAmount);
+        FuelType(Material mat, float fuelAmount, double energyAmount) {
+            this(m -> m == mat, fuelAmount, energyAmount);
         }
 
-        FuelType(Predicate<Material> tester, float fuelAmount) {
+        FuelType(Predicate<Material> tester, float fuelAmount, double energyAmount) {
             this.tester = tester;
             this.fuelAmount = fuelAmount;
+            this.energyAmount = energyAmount;
         }
     }
 
@@ -59,5 +61,9 @@ public class Fuel {
 
     public float getFuelAmount() {
         return type.fuelAmount;
+    }
+
+    public double getEnergyAmount() {
+        return type.energyAmount;
     }
 }

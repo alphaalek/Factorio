@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements ThinkingMechanic, ItemCollection, ItemContainer {
+public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements FuelMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
     public static final int INGREDIENT_CAPACITY = 1;
     public static final int FUEL_CAPACITY = 2;
@@ -54,17 +54,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         this.ingredientAmount = context.getSerializer().readInt(str);
         this.smeltResult = context.getSerializer().readItemStack(str);
 
-        ItemStack fuel = context.getSerializer().readItemStack(str);
-        if (fuel != null) {
-            this.fuel = Fuel.getFuel(fuel.getType());
-        }
-        this.fuelAmount = context.getSerializer().readInt(str);
-        ItemStack currentFuel = context.getSerializer().readItemStack(str);
-        int currentFuelAmount = context.getSerializer().readInt(str);
-        if (currentFuel != null) {
-            this.currentFuel = Fuel.getFuel(currentFuel.getType());
-            this.currentFuelAmount = 1 - this.currentFuel.getFuelAmount() * currentFuelAmount;
-        }
+        loadFuel(context, str);
 
         this.storageType = context.getSerializer().readItemStack(str);
         this.storageAmount = context.getSerializer().readInt(str);
@@ -77,19 +67,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         context.getSerializer().writeInt(str, this.ingredientAmount);
         context.getSerializer().writeItemStack(str, this.smeltResult);
 
-        if (this.fuel != null) {
-            context.getSerializer().writeItemStack(str, new ItemStack(this.fuel.getMaterial()));
-        } else {
-            context.getSerializer().writeItemStack(str, null);
-        }
-        context.getSerializer().writeInt(str, this.fuelAmount);
-        if (this.currentFuel != null) {
-            context.getSerializer().writeItemStack(str, new ItemStack(this.currentFuel.getMaterial()));
-            context.getSerializer().writeInt(str, (int) ((1 - this.currentFuelAmount) / this.currentFuel.getFuelAmount()));
-        } else {
-            context.getSerializer().writeItemStack(str, null);
-            context.getSerializer().writeInt(str, 0);
-        }
+        saveFuel(context, str);
 
         context.getSerializer().writeItemStack(str, this.storageType);
         context.getSerializer().writeInt(str, this.storageAmount);
@@ -198,36 +176,14 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
         // if there are no ingredients ready to be smelted, don't continue
         if (ingredient == null || smeltResult == null
-                // if there are no fuel left, don't continue
-                || (currentFuelAmount == 0 && fuelAmount == 0)
                 // if there is no space left, don't continue
                 || storageAmount + smeltResult.getAmount() > getCapacity()) {
             return;
         }
 
-        // use fuel
-        if (currentFuelAmount == 0 && fuelAmount > 0) {
-            SmelterGui gui = inUse.get();
-            if (gui != null) {
-                gui.updateRemovedFuel(1);
-            }
-
-            // remove the fuel internally after we updated to gui
-            fuelAmount--;
-            currentFuelAmount = 1;
-            currentFuel = fuel;
-            if (fuelAmount <= 0) {
-                fuel = null;
-            }
-        }
-        if (currentFuelAmount > 0) {
-            currentFuelAmount -= currentFuel.getFuelAmount();
-            // due to working with floats, there can be calculation errors due to java binary encoding
-            // this means that we can possibly end up with a number slightly above zero
-            if (currentFuelAmount <= .001) {
-                currentFuel = null;
-                currentFuelAmount = 0; // ensure zero value (related problem mentioned above)
-            }
+        FuelState state = useFuel();
+        if (state == FuelState.ABORT) {
+            return;
         }
 
         // update storage type if not set
@@ -333,6 +289,16 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
         this.fuelAmount = amount;
     }
 
+    @Override
+    public Fuel getCurrentFuel() {
+        return currentFuel;
+    }
+
+    @Override
+    public void setCurrentFuel(Fuel fuel) {
+        this.currentFuel = fuel;
+    }
+
     public ItemStack getSmeltResult() {
         return smeltResult;
     }
@@ -359,6 +325,19 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Th
 
     public float getCurrentFuelAmount() {
         return currentFuelAmount;
+    }
+
+    @Override
+    public void setCurrentFuelAmount(float amount) {
+        this.currentFuelAmount = amount;
+    }
+
+    @Override
+    public void removeFuel(int amount) {
+        SmelterGui gui = inUse.get();
+        if (gui != null) {
+            gui.updateRemovedFuel(amount);
+        }
     }
 
     public boolean isDeclined() {

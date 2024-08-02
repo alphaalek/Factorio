@@ -53,9 +53,9 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge, EmeraldForgeGui
         double amount = collection.take(take);
         moneyAmount += amount;
 
-        EmeraldForgeGui inUse = this.inUse.get();
-        if (inUse != null) {
-            inUse.updateAddedMoney(amount);
+        EmeraldForgeGui gui = this.inUse.get();
+        if (gui != null) {
+            gui.updateAddedMoney(amount);
         }
     }
 

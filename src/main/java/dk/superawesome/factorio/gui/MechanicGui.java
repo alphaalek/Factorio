@@ -3,10 +3,12 @@ package dk.superawesome.factorio.gui;
 import de.rapha149.signgui.SignGUI;
 import de.rapha149.signgui.SignGUIAction;
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.mechanics.FuelMechanic;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.util.Callback;
 import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -15,11 +17,13 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>> extends BaseGuiAdapter<G> {
 
@@ -85,6 +89,21 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
                 })
                 .build();
         gui.open(p);
+    }
+
+    public void updateFuelState(List<Integer> slots) {
+        if (getMechanic() instanceof FuelMechanic fuelMechanic) {
+            int blaze = Math.round(fuelMechanic.getCurrentFuelAmount() * slots.size());
+            int times = 0;
+            for (int slot : slots) {
+                if (++times > blaze) {
+                    getInventory().setItem(slot, new ItemStack(Material.RED_STAINED_GLASS_PANE));
+                    return;
+                }
+
+                getInventory().setItem(slot, new ItemStack(Material.BLAZE_POWDER));
+            }
+        }
     }
 
     protected int updateAddedItems(Inventory inventory, int amount, ItemStack stored, List<Integer> slots) {

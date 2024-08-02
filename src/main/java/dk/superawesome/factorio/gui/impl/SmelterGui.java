@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
@@ -81,18 +82,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     }
 
     public void updateFuelState() {
-        int blaze = Math.round(getMechanic().getCurrentFuelAmount() * 5f);
-        AtomicInteger times = new AtomicInteger();
-        Stream.of(11, 20, 29, 38, 47)
-                .sorted(Collections.reverseOrder())
-                .forEach(i -> {
-                    if (times.incrementAndGet() > blaze) {
-                        getInventory().setItem(i, new ItemStack(Material.RED_STAINED_GLASS_PANE));
-                        return;
-                    }
-
-                    getInventory().setItem(i, new ItemStack(Material.BLAZE_POWDER));
-                });
+        updateFuelState(Stream.of(11, 20, 29, 38, 47).sorted(Collections.reverseOrder()).collect(Collectors.toList()));
     }
 
     private void updateAmount(List<Integer> slots, Consumer<Integer> applyDiff) {

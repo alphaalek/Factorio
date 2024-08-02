@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.impl;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.impl.PowerCentralGui;
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Location;
@@ -16,9 +17,11 @@ import org.bukkit.block.data.type.Switch;
 import java.io.*;
 import java.sql.SQLException;
 
-public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui> implements ThinkingMechanic {
+public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui> implements ThinkingMechanic, SignalSource, dk.superawesome.factorio.mechanics.Lightable {
 
     public static final int CAPACITY = 0;
+
+    private static final double SIGNAL_COST = 1d / 32d;
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
 
@@ -57,7 +60,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
             Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
         } else {
             // update block state
-            update();
+            updateLight();
         }
     }
 
@@ -74,17 +77,18 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
 
             if (!turnedOn && energy < prev) {
                 turnedOn = true;
-                update();
+                updateLight();
             }
         }
 
         if ((energy == 0 || energy == prev) && turnedOn) {
             turnedOn = false;
-            update();
+            updateLight();
         }
     }
 
-    private void update() {
+    @Override
+    public void updateLight() {
         if (loc.getWorld() != null) {
             Block block = loc.getWorld().getBlockAt(BlockUtil.getRel(loc, getProfile().getBuilding().getRelatives().get(1)));
             BlockData data = block.getBlockData();
@@ -155,5 +159,28 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
 
     public boolean hasGraph() {
         return hasGraph;
+    }
+
+    @Override
+    public boolean preSignal(AbstractRoute.Signal signal) {
+        double signalCost = signal.getLocations().size() * SIGNAL_COST;
+        if (this.energy < signalCost) {
+            return false;
+        }
+
+        this.energy -= signalCost;
+        return true;
+    }
+
+    @Override
+    public void postSignal(AbstractRoute.Signal signal, int outputs) {
+        double signalCost = signal.getLocations().size() * SIGNAL_COST;
+        double ratio = ((double)outputs) / (signal.getOutputs().size() - 1);
+        this.energy += signalCost * ratio;
+    }
+
+    @Override
+    public boolean handleOutput(Block block) {
+        return Routes.suckItems(block, this);
     }
 }

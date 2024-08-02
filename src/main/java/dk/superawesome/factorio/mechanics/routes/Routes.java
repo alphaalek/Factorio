@@ -1,6 +1,9 @@
 package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.mechanics.Mechanic;
+import dk.superawesome.factorio.mechanics.SignalSource;
+import dk.superawesome.factorio.mechanics.impl.Generator;
 import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.PipeSuckEvent;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
@@ -45,6 +48,25 @@ public class Routes {
         return true;
     }
 
+    public static boolean transferEnergyToPowerCentral(Block start, Generator source) {
+        Mechanic<?, ?> mechanic = Factorio.get().getMechanicManager(start.getWorld()).getMechanicPartially(start.getLocation());
+        if (!(mechanic instanceof PowerCentral powerCentral)) {
+            return false;
+        }
+
+        // check if the power central has capacity for more energy
+        if (powerCentral.getCapacity() == powerCentral.getEnergy()) {
+            return false;
+        }
+
+        // transfer energy
+        double take = powerCentral.getCapacity() - powerCentral.getEnergy();
+        double amount = source.takeEnergy(take);
+        powerCentral.setEnergy(powerCentral.getEnergy() + amount);
+
+        return true;
+    }
+
     private static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory) {
         R route = AbstractRoute.getCachedRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
@@ -63,7 +85,7 @@ public class Routes {
                 .start(collection);
     }
 
-    public static void startSignalRoute(Block start, PowerCentral source) {
+    public static void startSignalRoute(Block start, SignalSource source) {
         setupRoute(start, signalRouteFactory)
                 .start(source);
     }
