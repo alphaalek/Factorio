@@ -7,10 +7,17 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.util.BlockVector;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
 public interface Building extends Identifiable {
+
+    List<BlockVector> DEFAULT_RELATIVES = Arrays.asList(
+            new BlockVector(),
+            new BlockVector(0, 1, 0),
+            new BlockVector(-1, 0, 0)
+    );
 
     BlockFace DEFAULT_ROTATION = BlockFace.WEST;
 

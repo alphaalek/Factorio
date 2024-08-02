@@ -13,12 +13,6 @@ import java.util.function.BiConsumer;
 
 public class AssemblerBuilding implements Building {
 
-    private final List<BlockVector> relatives = Arrays.asList(
-            new BlockVector(),
-            new BlockVector(0, 1, 0),
-            new BlockVector(-1, 0, 0)
-    );
-
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
             (b, r) -> b.setType(Material.CRYING_OBSIDIAN),
             (b, r) -> b.setType(Material.ENCHANTING_TABLE),
@@ -32,7 +26,7 @@ public class AssemblerBuilding implements Building {
 
     @Override
     public List<BlockVector> getRelatives() {
-        return relatives;
+        return DEFAULT_RELATIVES;
     }
 
     @Override

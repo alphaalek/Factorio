@@ -123,8 +123,8 @@ public class MechanicManager implements Listener {
     public void onPipeSuck(PipeSuckEvent event) {
         if (event.getBlock().getWorld().equals(this.world)) {
             Mechanic<?, ?> mechanic = getMechanicAt(event.getBlock().getLocation());
-            if (mechanic instanceof ItemCollection) {
-                event.setItems((ItemCollection) mechanic);
+            if (mechanic instanceof TransferCollection) {
+                event.setTransfer((TransferCollection) mechanic);
             }
         }
     }

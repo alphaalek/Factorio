@@ -89,11 +89,6 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     }
 
     @Override
-    public void onClose(Player player) {
-
-    }
-
-    @Override
     public boolean onClickIn(InventoryClickEvent event) {
         if (getMechanic().getTickThrottle().isThrottled()
                 || !CRAFTING_SLOTS.contains(event.getRawSlot())) {
@@ -133,11 +128,6 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         }
 
         return false;
-    }
-
-    @Override
-    public void onClickPost(InventoryClickEvent event) {
-
     }
 
     @Override

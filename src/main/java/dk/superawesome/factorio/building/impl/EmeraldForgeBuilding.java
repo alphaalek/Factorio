@@ -11,14 +11,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class StorageBoxBuilding implements Building {
+public class EmeraldForgeBuilding implements Building {
 
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
-            (b, r) -> b.setType(Material.OAK_LOG),
-            (b, r) -> {
-                b.setType(Material.CHEST);
-                rotate(b, r);
-            },
+            (b, r) -> b.setType(Material.EMERALD_BLOCK),
+            (b, r) -> b.setType(Material.BEACON),
             (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */
     );
 
@@ -34,6 +31,6 @@ public class StorageBoxBuilding implements Building {
 
     @Override
     public int getID() {
-        return Profiles.STORAGE_BOX.getID();
+        return Profiles.EMERALD_FORGE.getID();
     }
 }

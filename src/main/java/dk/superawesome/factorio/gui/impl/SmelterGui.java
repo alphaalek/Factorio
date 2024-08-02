@@ -135,11 +135,6 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     }
 
     @Override
-    public void onClose(Player player) {
-
-    }
-
-    @Override
     public boolean onDrag(InventoryDragEvent event) {
         if (getMechanic().getTickThrottle().isThrottled()
                 && event.getRawSlots().stream().anyMatch(s -> event.getView().getInventory(s).getType() != InventoryType.PLAYER)) {

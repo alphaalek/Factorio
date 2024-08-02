@@ -228,24 +228,4 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
         getMechanic().setHasGraph(false);
     }
-
-    @Override
-    public boolean onDrag(InventoryDragEvent event) {
-        return true;
-    }
-
-    @Override
-    public boolean onClickIn(InventoryClickEvent event) {
-        return true;
-    }
-
-    @Override
-    public boolean onClickOpen(InventoryClickEvent event) {
-        return true;    
-    }
-
-    @Override
-    public void onClickPost(InventoryClickEvent event) {
-
-    }
 }

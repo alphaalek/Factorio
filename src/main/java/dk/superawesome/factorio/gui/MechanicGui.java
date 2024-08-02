@@ -1,8 +1,13 @@
 package dk.superawesome.factorio.gui;
 
+import de.rapha149.signgui.SignGUI;
+import de.rapha149.signgui.SignGUIAction;
+import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.util.Callback;
+import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -11,16 +16,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>> extends BaseGui<G> {
+public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>> extends BaseGuiAdapter<G> {
 
     private final M mechanic;
 
     public MechanicGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback, String title) {
-        super(initCallback, inUseReference, BaseGui.DOUBLE_CHEST, title);
+        super(initCallback, inUseReference, BaseGui.DOUBLE_CHEST, title, true);
         this.mechanic = mechanic;
     }
 
@@ -48,6 +54,35 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
 
     public M getMechanic() {
         return mechanic;
+    }
+
+    protected void openSignGuiAndCall(Player p, String total, Consumer<Double> function) {
+        SignGUI gui = SignGUI.builder()
+                .setLines("", "/ " + total, "---------------", "Vælg antal")
+                // calls when the gui is closed
+                .setHandler((player, result) -> {
+                    // get the amount chosen and apply this to the take function
+                    double amount = 0;
+                    try {
+                        amount = Double.parseDouble(result.getLine(0));
+                    } catch (NumberFormatException ex) {
+                        // ignore
+                    }
+
+                    // ony apply the function if the player wrote a valid amount
+                    if (amount <= 0) {
+                        player.sendMessage("§cUgyldigt antal valgt!");
+                        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+                    } else {
+                        function.accept(amount);
+                    }
+
+                    // return to the storage box gui and reload view
+                    return Arrays.asList(
+                            SignGUIAction.openInventory(Factorio.get(), getInventory()), SignGUIAction.runSync(Factorio.get(), this::loadInputOutputItems));
+                })
+                .build();
+        gui.open(p);
     }
 
     protected int updateAddedItems(Inventory inventory, int amount, ItemStack stored, List<Integer> slots) {

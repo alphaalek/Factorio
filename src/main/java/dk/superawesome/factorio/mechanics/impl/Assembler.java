@@ -2,10 +2,10 @@ package dk.superawesome.factorio.mechanics.impl;
 
 import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -66,15 +66,12 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
 
     @Override
     public void think() {
-        // check if no assembler type is chosen, if not, don't continue
+        // check if an assembler type is chosen, if not, don't continue
         if (type == null
-                // check if the assembler does not have enough ingredients to assemble, if not, don't continue
-                || ingredientAmount < type.getRequires()) {
-            return;
-        }
-
-        // check for enough space
-        if (moneyAmount + type.getProduces() > getCapacity()) {
+                // check if the assembler has enough ingredients to assemble, if not, don't continue
+                || ingredientAmount < type.getRequires()
+                // check if the assembler has enough space for money, if not, don't continue
+                || moneyAmount + type.getProduces() > getCapacity()) {
             return;
         }
 
@@ -149,6 +146,19 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
     @Override
     public double getTransferEnergyCost() {
         return 0;
+    }
+
+    @Override
+    public double take(double amount) {
+        double take = Math.min(amount, moneyAmount);
+        moneyAmount -= take;
+
+        AssemblerGui inUse = this.inUse.get();
+        if (inUse != null) {
+            inUse.updateRemovedMoney(take);
+        }
+
+        return take;
     }
 
     public enum Types {

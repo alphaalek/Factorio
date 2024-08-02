@@ -12,7 +12,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -159,30 +158,5 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
         if (moneyAmount > 0) {
             loadStorageTypes(new ItemStack(Material.EMERALD), moneyAmount, MONEY_SLOTS);
         }
-    }
-
-    @Override
-    public void onClose(Player player) {
-
-    }
-
-    @Override
-    public boolean onDrag(InventoryDragEvent event) {
-        return true;
-    }
-
-    @Override
-    public boolean onClickIn(InventoryClickEvent event) {
-        return true;
-    }
-
-    @Override
-    public boolean onClickOpen(InventoryClickEvent event) {
-        return true;
-    }
-
-    @Override
-    public void onClickPost(InventoryClickEvent event) {
-
     }
 }

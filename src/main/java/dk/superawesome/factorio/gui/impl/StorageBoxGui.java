@@ -36,16 +36,15 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
     @Override
     public void loadItems() {
-        for (int i : Arrays.asList(45, 46, 47, 48, 50)) {
+        for (int i : Arrays.asList(36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 50)) {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
-        IntStream.range(36, 45).forEach(i -> getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE)));
         getInventory().setItem(35, new ItemBuilder(Material.FEATHER).setName("§eOpdatér Inventar").build());
         getInventory().setItem(49, new ItemBuilder(Material.MINECART)
                 .setName("§eIndsæt/Tage imellem inventar")
                 .addLore("")
-                .addLore("§eHøjreklik for at tage alt ud. §8(§e§oShift for at angiv antal§8)")
-                .addLore("§eVenstreklik for at putte alt ind. §8(§e§oShift for at angiv antal§8)")
+                .addLore("§eHøjreklik for at tage ud. §8(§e§oShift for alt§8)")
+                .addLore("§eVenstreklik for at putte ind. §8(§e§oShift for alt§8)")
                 .build());
 
         registerEvent(35, __ -> loadInputOutputItems());
@@ -260,35 +259,13 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
         return highest;
     }
 
-    private void openSignGuiAndCall(Player p, int total, Consumer<Integer> function) {
-        SignGUI gui = SignGUI.builder()
-                .setLines("", "/ " + total, "---------------", "Vælg antal")
-                // calls when the gui is closed
-                .setHandler((player, result) -> {
-                    // get the amount chosen and apply this to the take function
-                    try {
-                        int amount = Integer.parseInt(result.getLine(0));
-                        function.accept(amount);
-                    } catch (NumberFormatException ex) {
-                        player.sendMessage("§cUgyldigt antal valgt!");
-                        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
-                    }
-
-                    // return to the storage box gui and reload view
-                    return Arrays.asList(
-                            SignGUIAction.openInventory(Factorio.get(), getInventory()), SignGUIAction.runSync(Factorio.get(), this::loadInputOutputItems));
-                })
-                .build();
-        gui.open(p);
-    }
-
     private void handlePutOrTakeAll(InventoryClickEvent event) {
         Inventory playerInv = event.getWhoClicked().getInventory();
 
         if (event.getClick().isLeftClick()) {
             // create a put function
-            Consumer<Integer> put = a -> {
-                int space = Math.min(getMechanic().getCapacity() - getMechanic().getAmount(), a);
+            Consumer<Double> put = a -> {
+                int space = Math.min(getMechanic().getCapacity() - getMechanic().getAmount(), (int) a.doubleValue());
                 // take all items from the player's inventory and put into the storage box
                 int left = updateRemovedItems(playerInv, space, getMechanic().getStored(),
                         IntStream.range(0, playerInv.getSize())
@@ -312,12 +289,12 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
 
                 // update the stored item stack
                 if (highest != null) {
-                    if (!event.getClick().isShiftClick()) {
+                    if (event.getClick().isShiftClick()) {
                         // update the stored amount and put into the storage box at (1)
                         getMechanic().setStored(new ItemStack(highest));
                     } else {
                         stored = highest;
-                        Consumer<Integer> putCopy = put;
+                        Consumer<Double> putCopy = put;
                         put = i -> {
                             if (getMechanic().getStored() == null) {
                                 // the stored type has not changed while the player was editing the sign
@@ -332,15 +309,14 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
                 return;
             }
 
-            Bukkit.broadcastMessage(event.getClick() + " " + getMechanic().getStored());
             if (stored == null && getMechanic().getStored() != null) {
                 stored = getMechanic().getStored().getType();
             }
 
             if (stored != null) {
                 // (1)
-                if (!event.getClick().isShiftClick()) {
-                    put.accept(getMechanic().getCapacity() - getMechanic().getAmount());
+                if (event.getClick().isShiftClick()) {
+                    put.accept((double) getMechanic().getCapacity() - getMechanic().getAmount());
                 } else {
                     Material storedCopy = stored;
                     // evaluate total amount of the storage box stored item present in the player's inventory
@@ -350,7 +326,7 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
                             .mapToInt(ItemStack::getAmount)
                             .sum();
                     if (amount > 0) {
-                        openSignGuiAndCall((Player) event.getWhoClicked(), amount, put);
+                        openSignGuiAndCall((Player) event.getWhoClicked(), amount + "", put);
                     }
                 }
             }
@@ -361,8 +337,8 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
             }
 
             // create a take function
-            Consumer<Integer> take = a -> {
-                int boxAmount = Math.min(a, getMechanic().getAmount());
+            Consumer<Double> take = a -> {
+                int boxAmount = (int) Math.min(a, getMechanic().getAmount());
                 // put all items we can in the player's inventory from the storage box
                 int left = updateAddedItems(playerInv, boxAmount, getMechanic().getStored(),
                         IntStream.range(0, playerInv.getSize())
@@ -378,10 +354,10 @@ public class StorageBoxGui extends MechanicGui<StorageBoxGui, StorageBox> {
                 getMechanic().setAmount(getMechanic().getAmount() - amount);
             };
 
-            if (!event.getClick().isShiftClick()) {
-                take.accept(getMechanic().getAmount());
+            if (event.getClick().isShiftClick()) {
+                take.accept((double) getMechanic().getAmount());
             } else {
-                openSignGuiAndCall((Player) event.getWhoClicked(), getMechanic().getAmount(), take);
+                openSignGuiAndCall((Player) event.getWhoClicked(), getMechanic().getAmount() + "", take);
             }
         }
     }

@@ -1,9 +1,9 @@
 package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.PipeSuckEvent;
+import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class Routes {
 
-    private static final RouteFactory<AbstractRoute.Pipe> itemsRouteFactory = new RouteFactory.PipeRouteFactory();
+    private static final RouteFactory<AbstractRoute.Pipe> transferRouteFactory = new RouteFactory.PipeRouteFactory();
     private static final RouteFactory<AbstractRoute.Signal> signalRouteFactory = new RouteFactory.SignalRouteFactory();
 
     public static boolean suckItems(Block start, PowerCentral source) {
@@ -32,16 +32,16 @@ public class Routes {
 
         PipeSuckEvent event = new PipeSuckEvent(from);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.getItems() == null
-                || event.getItems().isTransferEmpty()
-                || source.getEnergy() < event.getItems().getTransferEnergyCost()) {
+        if (event.getTransfer() == null
+                || event.getTransfer().isTransferEmpty()
+                || source.getEnergy() < event.getTransfer().getTransferEnergyCost()) {
             return false;
         }
 
-        source.setEnergy(source.getEnergy() - event.getItems().getTransferEnergyCost());
+        source.setEnergy(source.getEnergy() - event.getTransfer().getTransferEnergyCost());
 
         // start the pipe route
-        startItemsRoute(start, event.getItems());
+        startTransferRoute(start, event.getTransfer());
         return true;
     }
 
@@ -58,8 +58,8 @@ public class Routes {
         return route;
     }
 
-    public static void startItemsRoute(Block start, ItemCollection collection) {
-        setupRoute(start, itemsRouteFactory)
+    public static void startTransferRoute(Block start, TransferCollection collection) {
+        setupRoute(start, transferRouteFactory)
                 .start(collection);
     }
 
