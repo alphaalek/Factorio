@@ -93,7 +93,7 @@ public class MechanicManager implements Listener {
         BlockVector ori = BlockUtil.getVec(loc);
         // iterate over the nearby blocks and check if there is any root mechanic block
         for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
+            for (int y = -1; y <= 2; y++) {
                 for (int z = -1; z <= 1; z++) {
                     BlockVector rel = (BlockVector) new BlockVector(ori).add(new Vector(x, y, z));
                     if (this.mechanics.containsKey(rel)) {

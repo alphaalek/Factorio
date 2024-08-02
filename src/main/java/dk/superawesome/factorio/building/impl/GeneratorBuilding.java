@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class PowerCentralBuilding implements Building {
+public class GeneratorBuilding implements Building {
 
     private final List<BlockVector> relatives = Arrays.asList(
             new BlockVector(),
@@ -25,9 +25,9 @@ public class PowerCentralBuilding implements Building {
     );
 
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
-            (b, r) -> b.setType(Material.SMOOTH_STONE),
-            (b, r) -> b.setType(Material.REDSTONE_LAMP),
-            (b, r) -> b.setType(Material.REDSTONE_TORCH),
+            (b, r) -> b.setType(Material.BRICK),
+            (b, r) -> b.setType(Material.SMOKER),
+            (b, r) -> b.setType(Material.CAMPFIRE),
             (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */,
             (b, r) -> setLever(b, BlockUtil.getRotationRelative(DEFAULT_ROTATION, DEFAULT_ROTATION.getOppositeFace(), r))
     );

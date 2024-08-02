@@ -11,6 +11,7 @@ public class Profiles {
     public static MechanicProfile<Assembler, AssemblerGui> ASSEMBLER;
     public static MechanicProfile<Constructor, ConstructorGui> CONSTRUCTOR;
     public static MechanicProfile<EmeraldForge, EmeraldForgeGui> EMERALD_FORGE;
+    public static MechanicProfile<Generator, GeneratorGui> GENERATOR;
     public static MechanicProfile<Smelter, SmelterGui> SMELTER;
     public static MechanicProfile<StorageBox, StorageBoxGui> STORAGE_BOX;
     public static MechanicProfile<PowerCentral, PowerCentralGui> POWER_CENTRAL;
@@ -21,6 +22,7 @@ public class Profiles {
         ASSEMBLER     = loadProfile(new AssemblerProfile());
         CONSTRUCTOR   = loadProfile(new ConstructorProfile());
         EMERALD_FORGE = loadProfile(new EmeraldForgeProfile());
+        GENERATOR     = loadProfile(new GeneratorProfile());
         SMELTER       = loadProfile(new SmelterProfile());
         STORAGE_BOX   = loadProfile(new StorageBoxProfile());
         POWER_CENTRAL = loadProfile(new PowerCentralProfile());

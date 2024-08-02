@@ -18,6 +18,7 @@ public class Buildings {
     public static Building ASSEMBLER;
     public static Building CONSTRUCTOR;
     public static Building EMERALD_FORGE;
+    public static Building GENERATOR;
     public static Building SMELTER;
     public static Building STORAGE_BOX;
     public static Building POWER_CENTRAL;
@@ -28,6 +29,7 @@ public class Buildings {
         ASSEMBLER     = loadBuilding(new AssemblerBuilding());
         CONSTRUCTOR   = loadBuilding(new ConstructorBuilding());
         EMERALD_FORGE = loadBuilding(new EmeraldForgeBuilding());
+        GENERATOR     = loadBuilding(new GeneratorBuilding());
         SMELTER       = loadBuilding(new SmelterBuilding());
         STORAGE_BOX   = loadBuilding(new StorageBoxBuilding());
         POWER_CENTRAL = loadBuilding(new PowerCentralBuilding());
