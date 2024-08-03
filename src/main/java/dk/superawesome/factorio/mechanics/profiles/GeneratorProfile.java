@@ -51,7 +51,7 @@ public class GeneratorProfile implements MechanicProfile<Generator, GeneratorGui
 
     @Override
     public int getID() {
-        return 5;
+        return 6;
     }
 
     private static class GeneratorMechanicFactory implements MechanicFactory<Generator> {
