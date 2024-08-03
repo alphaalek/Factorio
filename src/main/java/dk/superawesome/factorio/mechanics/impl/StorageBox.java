@@ -13,7 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> implements ItemCollection, ItemContainer {
+public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> implements ItemCollection, ItemContainer, SingleStorage {
 
     private ItemStack stored;
     private int amount;

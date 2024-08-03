@@ -37,11 +37,8 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     @Override
     public void loadItems() {
-        for (int i : Arrays.asList(0, 1, 2, 3, 5, 6, 7, 8, 9, 18, 27, 36, 45, 46, 48, 49, 50)) {
+        for (int i : Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 18, 22, 27, 31, 36, 40, 41, 42, 43, 44, 45, 46, 48, 49, 50)) {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
-        }
-        for (int i : Arrays.asList(4, 13, 22, 31, 40, 41, 42, 43, 44)) {
-            getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
         }
         for (int i = 37; i <= 39; i++) {
             getInventory().setItem(i, new ItemStack(Material.CRAFTING_TABLE));

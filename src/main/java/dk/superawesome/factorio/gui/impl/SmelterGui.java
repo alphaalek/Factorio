@@ -35,7 +35,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     @Override
     public void loadItems() {
         for (int i : Arrays.asList(0, 1, 2, 5, 14, 23, 32, 41, 42, 43, 44, 50)) {
-            getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
+            getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
         for (int i = 3; i < 5; i++) {
             getInventory().setItem(i, new ItemStack(Material.FURNACE));

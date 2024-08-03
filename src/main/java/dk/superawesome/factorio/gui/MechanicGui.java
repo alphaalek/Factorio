@@ -67,7 +67,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
                 .callHandlerSynchronously(Factorio.get())
                 // calls when the gui is closed
                 .setHandler((player, result) -> {
-                    // get the amount chosen and apply this to the take function
+                    // get the amount chosen and apply this to the function
                     double amount = 0;
                     try {
                         amount = Double.parseDouble(result.getLine(0));
@@ -83,7 +83,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
                         function.accept(amount);
                     }
 
-                    // return to the storage box gui and reload view
+                    // return to the gui and reload view
                     return Arrays.asList(
                             SignGUIAction.openInventory(Factorio.get(), getInventory()), SignGUIAction.runSync(Factorio.get(), this::loadInputOutputItems));
                 })
@@ -98,7 +98,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
             for (int slot : slots) {
                 if (++times > blaze) {
                     getInventory().setItem(slot, new ItemStack(Material.RED_STAINED_GLASS_PANE));
-                    return;
+                    continue;
                 }
 
                 getInventory().setItem(slot, new ItemStack(Material.BLAZE_POWDER));

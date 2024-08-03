@@ -7,7 +7,6 @@ import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.Fuel;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -15,8 +14,15 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Campfire;
 import org.bukkit.block.data.type.Switch;
+import org.bukkit.inventory.ItemStack;
 
-public class Generator extends AbstractMechanic<Generator, GeneratorGui> implements FuelMechanic, ItemContainer, ThinkingMechanic, SignalSource, Lightable {
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Optional;
+
+public class Generator extends AbstractMechanic<Generator, GeneratorGui> implements FuelMechanic, ItemContainer, ThinkingMechanic, SignalSource, Lightable, SingleStorage {
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
     private Block lever;
@@ -32,6 +38,24 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
 
     public Generator(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
+    }
+
+    @Override
+    public void load(MechanicStorageContext context) throws IOException, SQLException {
+        ByteArrayInputStream str = context.getData();
+
+        loadFuel(context, str);
+        this.provideEnergy = context.getSerializer().readDouble(str);
+    }
+
+    @Override
+    public void save(MechanicStorageContext context) throws IOException, SQLException {
+        ByteArrayOutputStream str = new ByteArrayOutputStream();
+
+        saveFuel(context, str);
+        context.getSerializer().writeDouble(str, this.provideEnergy);
+
+        context.uploadData(str);
     }
 
     @Override
@@ -106,18 +130,8 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
     }
 
     @Override
-    public boolean isContainerEmpty() {
-        return fuelAmount == 0;
-    }
-
-    @Override
     public void pipePut(ItemCollection collection) {
 
-    }
-
-    @Override
-    public int getCapacity() {
-        return level.getInt(ItemCollection.CAPACITY_MARK);
     }
 
     public double takeEnergy(double energy) {
@@ -137,6 +151,36 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
         }
 
         return transferred;
+    }
+
+    @Override
+    public boolean isContainerEmpty() {
+        return fuelAmount == 0;
+    }
+
+    @Override
+    public int getCapacity() {
+        return level.getInt(ItemCollection.CAPACITY_MARK);
+    }
+
+    @Override
+    public ItemStack getStored() {
+        return Optional.ofNullable(getFuel()).map(Fuel::getMaterial).map(ItemStack::new).orElse(null);
+    }
+
+    @Override
+    public void setStored(ItemStack stored) {
+        setFuel(Fuel.getFuel(stored.getType()));
+    }
+
+    @Override
+    public int getAmount() {
+        return getFuelAmount();
+    }
+
+    @Override
+    public void setAmount(int amount) {
+        setFuelAmount(amount);
     }
 
     @Override
