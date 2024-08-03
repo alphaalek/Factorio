@@ -6,6 +6,7 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -92,7 +93,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
 
             FuelState state = useFuel();
             if (state != FuelState.ABORT) {
-                provideEnergy = prevCurrentFuel != null ? prevCurrentFuel.getEnergyAmount() : prevFuel.getEnergyAmount();
+                provideEnergy = prevCurrentFuel != null ? prevCurrentFuel.getEnergyAmount() : prevFuel.getEnergyAmount(); // both can't be null, but has to check current fuel first
 
                 GeneratorGui gui = inUse.get();
                 if (gui != null) {
@@ -107,7 +108,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
             Routes.startSignalRoute(lever, this);
 
             if (provideEnergy == prevProvideEnergy && turnedOn) {
-                // the generator was not able to transfer any energy, although it has energy to provide
+                // the generator was not able to transfer any energy, although it has energy to provide, so turn off
                 turnedOn = false;
                 updateLight();
             }
@@ -139,12 +140,12 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
             return;
         }
 
-        putFuel(collection, this, inUse, GeneratorGui::updateRemovedFuel);
+        putFuel(collection, this, inUse, GeneratorGui::updateAddedItems);
     }
 
     public double takeEnergy(double energy) {
         double take = Math.min(provideEnergy, energy);
-        provideEnergy -= provideEnergy;
+        provideEnergy -= take;
         return take;
     }
 
@@ -244,7 +245,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
     public void removeFuel(int amount) {
         GeneratorGui gui = inUse.get();
         if (gui != null) {
-            gui.updateRemovedFuel(amount);
+            gui.updateRemovedItems(amount);
         }
     }
 
