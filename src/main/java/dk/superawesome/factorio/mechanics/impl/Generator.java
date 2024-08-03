@@ -6,7 +6,6 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -33,7 +32,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
     private Fuel currentFuel;
     private float currentFuelAmount;
 
-    private double provideEnergy;
+    private double availableEnergy;
     private boolean turnedOn;
 
     public Generator(Location loc, BlockFace rotation, MechanicStorageContext context) {
@@ -46,7 +45,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
         ByteArrayInputStream str = context.getData();
 
         loadFuel(context, str);
-        this.provideEnergy = context.getSerializer().readDouble(str);
+        this.availableEnergy = context.getSerializer().readDouble(str);
     }
 
     @Override
@@ -54,7 +53,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
         ByteArrayOutputStream str = new ByteArrayOutputStream();
 
         saveFuel(context, str);
-        context.getSerializer().writeDouble(str, this.provideEnergy);
+        context.getSerializer().writeDouble(str, this.availableEnergy);
 
         context.uploadData(str);
     }
@@ -86,14 +85,14 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
     @Override
     public void think() {
         // check if the generator does not have any energy ready for a power central
-        if (provideEnergy == 0) {
+        if (availableEnergy == 0) {
             // ... use fuel and generate energy if not
             Fuel prevFuel = fuel;
             Fuel prevCurrentFuel = currentFuel;
 
             FuelState state = useFuel();
             if (state != FuelState.ABORT) {
-                provideEnergy = prevCurrentFuel != null ? prevCurrentFuel.getEnergyAmount() : prevFuel.getEnergyAmount(); // both can't be null, but has to check current fuel first
+                availableEnergy = prevCurrentFuel != null ? prevCurrentFuel.getEnergyAmount() : prevFuel.getEnergyAmount(); // both can't be null, but has to check current fuel first
 
                 GeneratorGui gui = inUse.get();
                 if (gui != null) {
@@ -103,11 +102,11 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
         }
 
         // try to transfer energy if the generator has any energy ready
-        if (provideEnergy > 0) {
-            double prevProvideEnergy = provideEnergy;
+        if (availableEnergy > 0) {
+            double prevProvideEnergy = availableEnergy;
             Routes.startSignalRoute(lever, this);
 
-            if (provideEnergy == prevProvideEnergy && turnedOn) {
+            if (availableEnergy == prevProvideEnergy && turnedOn) {
                 // the generator was not able to transfer any energy, although it has energy to provide, so turn off
                 turnedOn = false;
                 updateLight();
@@ -144,8 +143,8 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
     }
 
     public double takeEnergy(double energy) {
-        double take = Math.min(provideEnergy, energy);
-        provideEnergy -= take;
+        double take = Math.min(availableEnergy, energy);
+        availableEnergy -= take;
         return take;
     }
 
