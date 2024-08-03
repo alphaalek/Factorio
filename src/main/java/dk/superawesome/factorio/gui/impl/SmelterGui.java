@@ -2,12 +2,11 @@ package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.MechanicGui;
-import dk.superawesome.factorio.mechanics.transfer.Fuel;
+import dk.superawesome.factorio.mechanics.Fuel;
 import dk.superawesome.factorio.mechanics.impl.Smelter;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.ItemStack;
 
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;

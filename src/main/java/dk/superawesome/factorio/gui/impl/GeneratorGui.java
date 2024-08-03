@@ -3,7 +3,7 @@ package dk.superawesome.factorio.gui.impl;
 import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.mechanics.SingleStorage;
 import dk.superawesome.factorio.mechanics.impl.Generator;
-import dk.superawesome.factorio.mechanics.transfer.Fuel;
+import dk.superawesome.factorio.mechanics.Fuel;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

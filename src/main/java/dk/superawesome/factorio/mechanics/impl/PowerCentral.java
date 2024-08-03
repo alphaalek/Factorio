@@ -6,6 +6,7 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.statics.BlockUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -169,15 +170,15 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
             return false;
         }
 
-        this.energy -= signalCost;
+        setEnergy(getEnergy() - signalCost);
         return true;
     }
 
     @Override
     public void postSignal(AbstractRoute.Signal signal, int outputs) {
         double signalCost = signal.getLocations().size() * SIGNAL_COST;
-        double ratio = ((double)outputs) / (signal.getOutputs(FROM_POWER_CENTRAL).size() - 1);
-        this.energy += signalCost * ratio;
+        double ratio = signal.getOutputs(FROM_POWER_CENTRAL).isEmpty() ? 1 : ((double)outputs) / signal.getOutputs(FROM_POWER_CENTRAL).size();
+        setEnergy(getEnergy() + signalCost * ratio);
     }
 
     @Override

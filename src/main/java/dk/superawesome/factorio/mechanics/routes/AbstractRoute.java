@@ -238,17 +238,13 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 // check if this repeater continues the signal route or triggers an output
                 Repeater repeater = (Repeater) rel.getBlockData();
                 Block facing = rel.getRelative(repeater.getFacing().getOppositeFace());
-                switch (facing.getType()) {
-                    // redstone or repeater - signal expand
-                    case REDSTONE_WIRE:
-                    case REPEATER:
-                        expand = true;
-                        break;
-                    // facing sticky piston - signal output (for power-central to mechanics)
-                    case STICKY_PISTON:
-                        add(relVec);
-                        addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.FROM_POWER_CENTRAL);
-                        return;
+                expand = true;
+
+                // facing sticky piston - signal output (for power-central to mechanics)
+                if (facing.getType() == Material.STICKY_PISTON) {
+                    add(relVec);
+                    addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.FROM_POWER_CENTRAL);
+                    return;
                 }
             // comparator - signal output (for generator to power-central)
             } else if (mat == Material.COMPARATOR) {
@@ -289,7 +285,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             }
 
             // power related mechanic stress
-            if (mechanics < outputs.size() && outputs.size() > 1) {
+            if (outputs.get(source.getContext()).isEmpty() || mechanics < outputs.get(source.getContext()).size()) {
                 source.postSignal(this, mechanics);
             }
         }

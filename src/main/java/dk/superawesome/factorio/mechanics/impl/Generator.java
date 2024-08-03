@@ -4,10 +4,8 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.impl.GeneratorGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
-import dk.superawesome.factorio.mechanics.transfer.Fuel;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -113,6 +111,10 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
                 turnedOn = false;
                 updateLight();
             }
+        } else if (turnedOn) {
+            // turn off after all energy has been transferred to a power central
+            turnedOn = false;
+            updateLight();
         }
     }
 

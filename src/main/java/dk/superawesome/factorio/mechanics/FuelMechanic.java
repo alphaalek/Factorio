@@ -2,10 +2,8 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.mechanics.transfer.Container;
-import dk.superawesome.factorio.mechanics.transfer.Fuel;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;

@@ -129,8 +129,13 @@ public class Routes {
         BlockVector fromVec = BlockUtil.getVec(from);
         Material fromMat = from.getType();
 
+        // search origin vector
+        if (!route.has(fromVec)) {
+            route.search(from, fromMat, fromVec, from);
+        }
         // iterate over all blocks around this block
         for (BlockVector relVec : getRelativeVecs(fromVec)) {
+            // search relative vector
             if (!route.has(relVec)) {
                 Block rel = BlockUtil.getBlock(from.getWorld(), relVec);
                 route.search(from, fromMat, relVec, rel);
