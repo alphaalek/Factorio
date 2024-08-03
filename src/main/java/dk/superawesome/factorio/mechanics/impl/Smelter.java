@@ -24,7 +24,6 @@ import java.util.function.Predicate;
 public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements FuelMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
     public static final int INGREDIENT_CAPACITY = 1;
-    public static final int FUEL_CAPACITY = 2;
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
 
@@ -87,7 +86,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
         }
 
         if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(i -> canSmelt(i.getType()))) {
-            ingredientAmount += put(collection, Math.min(64, level.getInt(INGREDIENT_CAPACITY) - ingredientAmount), inUse, SmelterGui::updateAddedIngredients, new Updater<ItemStack>() {
+            ingredientAmount += put(collection, Math.min(64, level.getInt(INGREDIENT_CAPACITY) - ingredientAmount), inUse, SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
                 @Override
                 public ItemStack get() {
                     return ingredient;
@@ -104,24 +103,17 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
             }
         }
 
-        if (fuel != null && collection.has(new ItemStack(fuel.getMaterial())) || fuel == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
-            fuelAmount += put(collection, Math.min(64, level.getInt(FUEL_CAPACITY) - fuelAmount), inUse, SmelterGui::updateAddedFuel, new Updater<ItemStack>() {
-                @Override
-                public ItemStack get() {
-                    return fuel == null ? null : new ItemStack(fuel.getMaterial());
-                }
-
-                @Override
-                public void set(ItemStack stack) {
-                    fuel = Fuel.getFuel(stack.getType());
-                }
-            });
-        }
+        putFuel(collection, this, inUse, SmelterGui::updateAddedFuel);
     }
 
     @Override
     public int getCapacity() {
         return level.get(ItemCollection.CAPACITY_MARK);
+    }
+
+    @Override
+    public int getFuelCapacity() {
+        return level.getInt(FUEL_CAPACITY);
     }
 
     public boolean canSmelt(Material type) {
@@ -223,7 +215,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
 
     @Override
     public List<ItemStack> take(int amount) {
-        List<ItemStack> items = take(amount, storageType, storageAmount, inUse, g -> g.updateRemovedStorage(amount), new Updater<Integer>() {
+        List<ItemStack> items = take(amount, storageType, storageAmount, inUse, g -> g.updateRemovedStorage(amount), new HeapToStackAccess<Integer>() {
             @Override
             public Integer get() {
                 return storageAmount;

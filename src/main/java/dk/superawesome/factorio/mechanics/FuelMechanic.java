@@ -1,13 +1,22 @@
 package dk.superawesome.factorio.mechanics;
 
+import dk.superawesome.factorio.gui.BaseGui;
+import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.Fuel;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
 public interface FuelMechanic {
+
+    int FUEL_CAPACITY = 2;
 
     Fuel getFuel();
 
@@ -27,7 +36,29 @@ public interface FuelMechanic {
 
     void removeFuel(int amount);
 
+    int getFuelCapacity();
+
+    default <G extends BaseGui<G>> void putFuel(ItemCollection collection, Container<? extends TransferCollection> container, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui) {
+        if (getFuel() != null && collection.has(new ItemStack(getFuel().getMaterial())) || getFuel() == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
+            int amount = container.put(collection, Math.min(64, getFuelCapacity() - getFuelAmount()), inUse, doGui, new Container.HeapToStackAccess<>() {
+                @Override
+                public ItemStack get() {
+                    return getFuel() == null ? null : new ItemStack(getFuel().getMaterial());
+                }
+
+                @Override
+                public void set(ItemStack stack) {
+                    setFuel(Fuel.getFuel(stack.getType()));
+                }
+            });
+
+            setFuelAmount(getFuelAmount() + amount);
+        }
+    }
+
     default FuelState useFuel() {
+        Bukkit.broadcastMessage("Use fuel " + getCurrentFuel() + " " + getCurrentFuelAmount() + " " + getFuel() + " " + getFuelAmount());
+
         // if there are no fuel left, don't continue
         if (getCurrentFuelAmount() == 0 && getFuelAmount() == 0) {
             return FuelState.ABORT;
@@ -35,12 +66,13 @@ public interface FuelMechanic {
 
         // use fuel
         if (getCurrentFuelAmount() == 0 && getFuelAmount() > 0) {
+            // update view
             removeFuel(1);
 
             // remove the fuel
             setFuelAmount(getFuelAmount() - 1);
             setCurrentFuelAmount(1);
-            setCurrentFuel(getCurrentFuel());
+            setCurrentFuel(getFuel());
             if (getFuelAmount() == 0) {
                 setFuel(null);
             }

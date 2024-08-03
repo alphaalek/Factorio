@@ -25,7 +25,7 @@ public class GeneratorBuilding implements Building {
     );
 
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
-            (b, r) -> b.setType(Material.BRICK),
+            (b, r) -> b.setType(Material.BRICKS),
             (b, r) -> b.setType(Material.SMOKER),
             (b, r) -> b.setType(Material.CAMPFIRE),
             (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */,

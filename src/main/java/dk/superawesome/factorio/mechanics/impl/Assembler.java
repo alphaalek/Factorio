@@ -5,7 +5,6 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -95,7 +94,7 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
     public void pipePut(ItemCollection collection) {
         ItemStack item = Optional.ofNullable(type).map(Types::getMat).map(ItemStack::new).orElse(null);
         if (item == null || collection.has(item)) {
-            ingredientAmount += put(collection, Math.min(64, getCapacity() - ingredientAmount), inUse, AssemblerGui::updateAddedIngredients, new Updater<ItemStack>() {
+            ingredientAmount += put(collection, Math.min(64, getCapacity() - ingredientAmount), inUse, AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return item;

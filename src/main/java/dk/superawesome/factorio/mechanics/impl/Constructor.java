@@ -189,7 +189,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     @Override
     public List<ItemStack> take(int amount) {
-        List<ItemStack> items = take(amount, storageType, storageAmount, inUse, g -> g.updateRemovedItems(amount), new Updater<Integer>() {
+        List<ItemStack> items = take(amount, storageType, storageAmount, inUse, g -> g.updateRemovedItems(amount), new HeapToStackAccess<Integer>() {
             @Override
             public Integer get() {
                 return storageAmount;

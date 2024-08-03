@@ -44,11 +44,6 @@ public class GeneratorGui extends SingleStorageGui<GeneratorGui, Generator> {
         return Fuel.isFuel(item.getType());
     }
 
-    @Override
-    public void loadInputOutputItems() {
-
-    }
-
     public void updateFuelState() {
         updateFuelState(Stream.of(0, 9, 18, 27, 36, 45).sorted(Collections.reverseOrder()).collect(Collectors.toList()));
     }

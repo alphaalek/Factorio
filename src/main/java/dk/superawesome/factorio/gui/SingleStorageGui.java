@@ -89,27 +89,21 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         });
     }
 
-    private boolean checkFailedInteraction(ItemStack item) {
-        // check if a player tries to add an item to the storage box which is not the one currently being stored
-        if (getStorage().getStored() != null
-                && item != null
-                && item.getType() != Material.AIR
-                && !item.isSimilar(getStorage().getStored())) {
-            return true;
-        }
+    private boolean registerInteractionAndCheckFailed(ItemStack item) {
+        if (item != null && item.getType() != Material.AIR) {
+            // check if a player tries to add an item to the storage box which is not the one currently being stored
+            if (getStorage().getStored() != null && !item.isSimilar(getStorage().getStored())
+                    // check if this item is allowed to be stored
+                    || !isItemAllowed(item)) {
+                return true;
+            }
 
-        // check if this item is allowed to be stored
-        if (!isItemAllowed(item)) {
-            return true;
-        }
-
-        // update stored stack
-        if (getStorage().getStored() == null
-                && item != null
-                && item.getType() != Material.AIR) {
-            ItemStack stored = item.clone();
-            stored.setAmount(1);
-            getStorage().setStored(stored);
+            // update stored stack
+            if (getStorage().getStored() == null) {
+                ItemStack stored = item.clone();
+                stored.setAmount(1);
+                getStorage().setStored(stored);
+            }
         }
 
         return false;
@@ -157,7 +151,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
             }
 
             // check if this item can be added to the storage box
-            if (checkFailedInteraction(item)) {
+            if (registerInteractionAndCheckFailed(item)) {
                 return true;
             }
 
@@ -336,7 +330,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
     @Override
     public boolean onClickIn(InventoryClickEvent event) {
         if (slots.contains(event.getRawSlot()))  {
-            return checkFailedInteraction(event.getCursor());
+            return registerInteractionAndCheckFailed(event.getCursor());
         }
 
         return true;
@@ -347,12 +341,12 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         if (movedFromOtherInventory(event)) {
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY
                     && event.getClickedInventory() != getInventory()
-                    && checkFailedInteraction(event.getCurrentItem())) {
+                    && registerInteractionAndCheckFailed(event.getCurrentItem())) {
                 return true;
             }
             else if ((event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD || event.getAction() == InventoryAction.HOTBAR_SWAP)
                     && (event.getCurrentItem() == null || findItems().size() > 1)
-                    && checkFailedInteraction(event.getWhoClicked().getInventory().getItem(event.getHotbarButton()))) {
+                    && registerInteractionAndCheckFailed(event.getWhoClicked().getInventory().getItem(event.getHotbarButton()))) {
                 return true;
             }
         }

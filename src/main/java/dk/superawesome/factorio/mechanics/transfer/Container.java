@@ -19,7 +19,7 @@ public interface Container<C extends TransferCollection> {
 
     int getCapacity();
 
-    default <G extends BaseGui<G>> List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicReference<G> inUse, Consumer<G> doGui, Updater<Integer> updater) {
+    default <G extends BaseGui<G>> List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicReference<G> inUse, Consumer<G> doGui, HeapToStackAccess<Integer> updater) {
         List<ItemStack> items = new ArrayList<>();
         int taken = 0;
         while (taken < amount && taken < storedAmount) {
@@ -40,16 +40,16 @@ public interface Container<C extends TransferCollection> {
         return items;
     }
 
-    default <G extends BaseGui<G>> int put(ItemCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, Updater<ItemStack> updater) {
+    default <G extends BaseGui<G>> int put(ItemCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, HeapToStackAccess<ItemStack> access) {
         List<ItemStack> items = from.take(take);
         int add = 0;
         for (ItemStack item : items) {
             add += item.getAmount();
 
-            if (updater.get() == null) {
+            if (access.get() == null) {
                 ItemStack type = item.clone();
                 type.setAmount(1);
-                updater.set(type);
+                access.set(type);
             }
         }
 
@@ -63,7 +63,7 @@ public interface Container<C extends TransferCollection> {
         return add;
     }
 
-    interface Updater<T> {
+    interface HeapToStackAccess<T> {
 
         T get();
 

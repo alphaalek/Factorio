@@ -38,6 +38,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
 
     public Generator(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
+        loadFromStorage();
     }
 
     @Override
@@ -131,7 +132,11 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
 
     @Override
     public void pipePut(ItemCollection collection) {
+        if (tickThrottle.isThrottled()) {
+            return;
+        }
 
+        putFuel(collection, this, inUse, GeneratorGui::updateRemovedFuel);
     }
 
     public double takeEnergy(double energy) {
@@ -201,6 +206,10 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
     @Override
     public void setFuelAmount(int amount) {
         this.fuelAmount = amount;
+
+        if (this.fuelAmount == 0) {
+            fuel = null;
+        }
     }
 
     @Override
@@ -229,5 +238,10 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
         if (gui != null) {
             gui.updateRemovedFuel(amount);
         }
+    }
+
+    @Override
+    public int getFuelCapacity() {
+        return getCapacity();
     }
 }
