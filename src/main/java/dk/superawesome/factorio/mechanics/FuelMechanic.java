@@ -57,8 +57,6 @@ public interface FuelMechanic {
     }
 
     default FuelState useFuel() {
-        Bukkit.broadcastMessage("Use fuel " + getCurrentFuel() + " " + getCurrentFuelAmount() + " " + getFuel() + " " + getFuelAmount());
-
         // if there are no fuel left, don't continue
         if (getCurrentFuelAmount() == 0 && getFuelAmount() == 0) {
             return FuelState.ABORT;

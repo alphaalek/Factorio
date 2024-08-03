@@ -4,12 +4,14 @@ import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
+import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Comparator;
 import org.bukkit.block.data.type.Repeater;
 import org.bukkit.util.BlockVector;
 
@@ -30,11 +32,12 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             cachedRoutes.put(start.getWorld(), new HashMap<>());
         }
 
+        if (!route.getLocations().isEmpty()) {
+            cachedRoutes.get(start.getWorld()).put(BlockUtil.getVec(start), route);
+        }
         for (BlockVector loc : route.getLocations()) {
             cachedRoutes.get(start.getWorld()).put(loc, route);
         }
-
-        route.cached = true;
     }
 
     public static void removeRouteFromCache(World world, AbstractRoute<?, ?> route) {
@@ -42,11 +45,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return;
         }
 
+        cachedRoutes.get(world).remove(route.getStart());
         for (BlockVector loc : route.getLocations()) {
             cachedRoutes.get(world).remove(loc);
         }
-
-        route.cached = false;
     }
 
     public static Collection<AbstractRoute<?, ?>> getCachedRoutes(World world) {
@@ -109,12 +111,17 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
     }
 
     protected int currentId;
-    protected boolean cached;
-    protected final Queue<P> outputs = new LinkedList<>();
+    protected final Array<Queue<P>> outputs = new Array<>();
     protected final Set<BlockVector> locations = new HashSet<>();
 
-    public boolean isCached() {
-        return cached;
+    private final BlockVector start;
+
+    public AbstractRoute(BlockVector start) {
+        this.start = start;
+    }
+
+    public BlockVector getStart() {
+        return start;
     }
 
     public boolean has(BlockVector vec) {
@@ -129,17 +136,25 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         return locations;
     }
 
-    public Queue<P> getOutputs() {
-        return outputs;
+    public Queue<P> getOutputs(int context) {
+        return outputs.get(context, LinkedList::new);
+    }
+
+    public void addOutput(World world, BlockVector vec, int context) {
+        outputs.get(context, LinkedList::new).add(createOutputEntry(world, vec));
     }
 
     public void addOutput(World world, BlockVector vec) {
-        outputs.add(createOutputEntry(world, vec));
+        addOutput(world, vec, 0);
     }
 
     public void unload(Chunk chunk) {
         locations.removeIf(vec -> BlockUtil.getBlock(chunk.getWorld(), vec).getChunk().equals(chunk));
-        outputs.removeIf(output -> BlockUtil.getBlock(chunk.getWorld(), output.getVec()).getChunk().equals(chunk));
+        for (Queue<P> outputs : this.outputs) {
+            if (outputs != null) {
+                outputs.removeIf(output -> BlockUtil.getBlock(chunk.getWorld(), output.getVec()).getChunk().equals(chunk));
+            }
+        }
 
         if (locations.isEmpty()) {
             removeRouteFromCache(chunk.getWorld(), this);
@@ -152,8 +167,11 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
     protected abstract P createOutputEntry(World world, BlockVector vec);
 
-
     public static class Pipe extends AbstractRoute<Pipe, TransferOutputEntry> {
+
+        public Pipe(BlockVector start) {
+            super(start);
+        }
 
         @Override
         public RouteFactory<Pipe> getFactory() {
@@ -190,7 +208,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         public void start(TransferCollection collection) {
             int runId = currentId++;
 
-            for (TransferOutputEntry entry : outputs) {
+            for (TransferOutputEntry entry : outputs.get(0, LinkedList::new)) {
                 entry.handle(runId, collection);
 
                 if (collection.isTransferEmpty()) {
@@ -202,6 +220,9 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
     public static class Signal extends AbstractRoute<Signal, SignalOutputEntry> {
 
+        public Signal(BlockVector start) {
+            super(start);
+        }
 
         @Override
         public RouteFactory<Signal> getFactory() {
@@ -223,12 +244,22 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     case REPEATER:
                         expand = true;
                         break;
-                    // facing sticky piston - signal output
+                    // facing sticky piston - signal output (for power-central to mechanics)
                     case STICKY_PISTON:
                         add(relVec);
-                        addOutput(from.getWorld(), BlockUtil.getVec(facing));
+                        addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.FROM_POWER_CENTRAL);
                         return;
                 }
+            // comparator - signal output (for generator to power-central)
+            } else if (mat == Material.COMPARATOR) {
+                Comparator comparator = (Comparator) rel.getBlockData();
+                Block facing = rel.getRelative(comparator.getFacing().getOppositeFace());
+                // check if the comparator is facing outwards
+                if (!facing.equals(from)) {
+                    add(relVec);
+                    addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
+                }
+                return;
             }
 
             if (mat == Material.REDSTONE_WIRE || expand) {
@@ -251,7 +282,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
             // handle signal outputs
             int mechanics = 0;
-            for (SignalOutputEntry entry : outputs) {
+            for (SignalOutputEntry entry : outputs.get(source.getContext(), LinkedList::new)) {
                 if (entry.handle(runId, source)) {
                     mechanics++;
                 }

@@ -71,9 +71,6 @@ public class Routes {
         R route = AbstractRoute.getCachedRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
             route = createNewRoute(start, factory);
-        }
-
-        if (!route.isCached()) {
             AbstractRoute.addRouteToCache(start, route);
         }
 
@@ -99,8 +96,7 @@ public class Routes {
     }
 
     public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R> factory) {
-        R route = factory.create();
-
+        R route = factory.create(BlockUtil.getVec(start));
         expandRoute(route, start);
 
         return route;
@@ -147,20 +143,22 @@ public class Routes {
 
         // check blocks in next tick, because we are calling this in a block/break event
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+            AbstractRoute<?, ?> route = AbstractRoute.getCachedRoute(block.getWorld(), BlockUtil.getVec(block));
+            if (route != null && block.getType() == Material.AIR) {
+                // the route was broken, remove it from cache
+                AbstractRoute.removeRouteFromCache(block.getWorld(), route);
+                route = null;
+            }
+
             // iterate over all blocks around this block
             for (BlockVector relVec : getRelativeVecs(fromVec)) {
+                AbstractRoute<?, ?> relRoute = AbstractRoute.getCachedRoute(block.getWorld(), relVec);
 
-                AbstractRoute<?, ?> route = AbstractRoute.getCachedRoute(block.getWorld(), relVec);
-                if (route != null) {
-                    if (block.getType() == Material.AIR) {
-                        // the route was broken
-                        AbstractRoute.removeRouteFromCache(block.getWorld(), route);
-                        setupRoute(BlockUtil.getRel(block.getLocation(), relVec).getBlock(), route.getFactory());
-                    } else {
-                        // the route was expanded
-                        expandRoute(route, block);
-                        break;
-                    }
+                // setup again and connect routes
+                if (relRoute != null && (route == null || !route.getLocations().contains(relVec))) {
+                    AbstractRoute.removeRouteFromCache(block.getWorld(), relRoute);
+                    setupRoute(BlockUtil.getBlock(block.getWorld(), relVec), relRoute.getFactory());
+                    route = relRoute;
                 }
             }
         });

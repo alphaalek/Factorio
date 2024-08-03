@@ -11,13 +11,14 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Lightable;
 import org.bukkit.block.data.type.Switch;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 
-public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui> implements ThinkingMechanic, SignalSource, dk.superawesome.factorio.mechanics.Lightable {
+public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui> implements ThinkingMechanic, SignalSource, Lightable {
 
     public static final int CAPACITY = 0;
 
@@ -92,8 +93,8 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
         if (loc.getWorld() != null) {
             Block block = loc.getWorld().getBlockAt(BlockUtil.getRel(loc, getProfile().getBuilding().getRelatives().get(1)));
             BlockData data = block.getBlockData();
-            if (data instanceof Lightable) {
-                ((Lightable)data).setLit(turnedOn);
+            if (data instanceof org.bukkit.block.data.Lightable) {
+                ((org.bukkit.block.data.Lightable)data).setLit(turnedOn);
                 block.setBlockData(data);
             }
 
@@ -175,8 +176,13 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
     @Override
     public void postSignal(AbstractRoute.Signal signal, int outputs) {
         double signalCost = signal.getLocations().size() * SIGNAL_COST;
-        double ratio = ((double)outputs) / (signal.getOutputs().size() - 1);
+        double ratio = ((double)outputs) / (signal.getOutputs(FROM_POWER_CENTRAL).size() - 1);
         this.energy += signalCost * ratio;
+    }
+
+    @Override
+    public int getContext() {
+        return SignalSource.FROM_POWER_CENTRAL;
     }
 
     @Override
