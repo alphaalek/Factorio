@@ -11,6 +11,7 @@ import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Hopper;
 import org.bukkit.inventory.ItemStack;
@@ -78,6 +79,10 @@ public interface FuelMechanic {
         // if there are no fuel left, don't continue
         if (getCurrentFuelAmount() == 0 && getFuelAmount() == 0) {
             return FuelState.ABORT;
+        }
+
+        if (getLocation().getWorld() != null) {
+            getLocation().getWorld().playSound(getLocation(), Sound.ENTITY_GENERIC_BURN, 0.5f, 1f);
         }
 
         // use fuel

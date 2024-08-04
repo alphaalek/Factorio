@@ -177,8 +177,11 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Thin
     @Override
     public void postSignal(AbstractRoute.Signal signal, int outputs) {
         double signalCost = signal.getLocations().size() * SIGNAL_COST;
-        double ratio = signal.getOutputs(FROM_POWER_CENTRAL).isEmpty() ? 1 : ((double)outputs) / signal.getOutputs(FROM_POWER_CENTRAL).size();
-        setEnergy(getEnergy() + signalCost * ratio);
+        double ratio = (outputs == 0 || signal.getOutputs(FROM_POWER_CENTRAL).isEmpty()) ? 1 : ((double)outputs) / signal.getOutputs(FROM_POWER_CENTRAL).size();
+
+        double back = signalCost * ratio;
+        energy += back;
+        recentConsumption -= back;
     }
 
     @Override
