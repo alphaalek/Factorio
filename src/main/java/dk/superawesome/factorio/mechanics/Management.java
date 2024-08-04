@@ -1,5 +1,7 @@
 package dk.superawesome.factorio.mechanics;
 
+import org.bukkit.entity.Player;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -82,18 +84,20 @@ public class Management {
         return this.members;
     }
 
-    public boolean hasAccess(UUID uuid, int access) {
+    public boolean hasAccess(Player player, int access) {
         // check for all access
         if (this == ALL_ACCESS) {
             return true;
         }
 
+        UUID uuid = player.getUniqueId();
         if (this.owner.equals(uuid)) {
             return (OWNER_ACCESS & access) > 0;
         } else if (this.members.contains(uuid)) {
             return (MEMBER_ACCESS & access) > 0;
         } else {
-            return false;
+            // give operators access to all mechanics
+            return player.isOp();
         }
     }
 }

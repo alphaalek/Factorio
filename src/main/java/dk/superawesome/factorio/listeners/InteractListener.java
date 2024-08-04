@@ -4,7 +4,9 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.Management;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.MechanicManager;
+import dk.superawesome.factorio.util.Tick;
 import dk.superawesome.factorio.util.TickValue;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -32,7 +34,7 @@ public class InteractListener implements Listener {
                 event.setCancelled(true);
 
                 // check if the player has access to open this mechanic
-                if (!mechanic.getManagement().hasAccess(event.getPlayer().getUniqueId(), Management.OPEN)) {
+                if (!mechanic.getManagement().hasAccess(event.getPlayer(), Management.OPEN)) {
                     // ensure no double messages for blocks that calls interact event twice (e.g. interacting with Power Central)
                     if (interactedPlayers.get().contains(event.getPlayer().getUniqueId())) {
                         return;

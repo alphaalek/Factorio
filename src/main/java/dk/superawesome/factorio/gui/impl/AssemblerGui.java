@@ -2,8 +2,8 @@ package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
-import dk.superawesome.factorio.gui.BaseGuiAdapter;
 import dk.superawesome.factorio.gui.MechanicGui;
+import dk.superawesome.factorio.gui.PaginatedGui;
 import dk.superawesome.factorio.mechanics.impl.Assembler;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import dk.superawesome.factorio.util.statics.StringUtil;
@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -74,7 +75,7 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
     }
 
     private void openChooseAssemblerGui(Player player) {
-        player.openInventory(new BaseGuiAdapter<AssemblerGui>(new BaseGui.InitCallbackHolder(), null, 36, "Vælg Sammensætning", true) {
+        player.openInventory(new PaginatedGui<AssemblerGui, Assembler.Types>(new BaseGui.InitCallbackHolder(), null, 36, "Vælg Sammensætning", true, 3 * 9) {
 
             {
                 // call init callback when loaded
@@ -96,26 +97,26 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
                     getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
                 }
 
-                loadAssemblerTypes();
-
                 super.loadItems();
             }
 
-            private void loadAssemblerTypes() {
-                int i = 0;
-                for (Assembler.Types type : Assembler.Types.values()) {
-                    ItemStack item = new ItemStack(type.getMat());
-                    if (getMechanic().getType() != null && getMechanic().getType().equals(type)) {
-                        item = new ItemBuilder(item)
-                                .makeGlowing()
-                                .build();
-                    }
-                    item = new ItemBuilder(item)
-                            .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + type.getProduces() + " §8(§f$" + (StringUtil.formatDecimals(type.getProduces() / type.getRequires(), 2)) + " §epr. item§8)")
-                            .build();
+            @Override
+            public List<Assembler.Types> getValues() {
+                return Arrays.asList(Assembler.Types.values());
+            }
 
-                    getInventory().setItem(i++, item);
+            @Override
+            public ItemStack getItemFrom(Assembler.Types type) {
+                ItemStack item = new ItemStack(type.getMat());
+                if (getMechanic().getType() != null && getMechanic().getType().equals(type)) {
+                    item = new ItemBuilder(item)
+                            .makeGlowing()
+                            .build();
                 }
+                return new ItemBuilder(item)
+                        .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + type.getProduces() + " §8(§f$" + (StringUtil.formatDecimals(type.getProduces() / type.getRequires(), 2)) + " §epr. item§8)")
+                        .addFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS)
+                        .build();
             }
 
             @Override
@@ -144,9 +145,11 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
 
                         // set the assembler type
                         getMechanic().setType(type);
-                        loadAssemblerTypes();
+                        loadView();
                     }
                 }
+
+                super.onClickIn(event);
 
                 return true;
             }

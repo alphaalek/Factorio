@@ -21,6 +21,7 @@ public class TickValue<T> implements Supplier<T> {
     public T get() {
         int tick = Tick.get();
         if (tick != lastTick) {
+            lastTick = tick;
             val = def != null ? def.get() : null;
         }
         return val;

@@ -84,7 +84,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
 
     @Override
     public void think() {
-        // check if the generator does not have any energy ready for a power central
+        // check if the generator does not have any energy available for a power central
         if (availableEnergy == 0) {
             // ... use fuel and generate energy if not
             Fuel prevFuel = fuel;
@@ -101,7 +101,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
             }
         }
 
-        // try to transfer energy if the generator has any energy ready
+        // try to transfer energy if the generator has any energy available
         if (availableEnergy > 0) {
             double prevProvideEnergy = availableEnergy;
             Routes.startSignalRoute(lever, this);

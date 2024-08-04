@@ -32,6 +32,8 @@ public class Elements {
         @Override
         public void handle(InventoryClickEvent event, Player player, MechanicGui<?, ?> gui) {
             event.setCancelled(true);
+            player.sendMessage("§cDet er ikke muligt at opgradere maskinen.");
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
         }
 
         @Override
@@ -44,7 +46,6 @@ public class Elements {
 
         private static final String TITLE = "Konfigurér Medlemmer";
         private static final int SIZE = 36;
-        private static final int PAGE_SIZE = 27;
 
         @Override
         public void handle(InventoryClickEvent event, Player player, MechanicGui<?, ?> gui) {
@@ -52,22 +53,32 @@ public class Elements {
         }
 
         private <G extends BaseGui<G>> BaseGui<G> createGui(Mechanic<?, ?> mechanic) {
-            return new BaseGuiAdapter<G>(new BaseGui.InitCallbackHolder(), null, SIZE, TITLE, true) {
+            return new PaginatedGui<G, OfflinePlayer>(new BaseGui.InitCallbackHolder(), null, SIZE, TITLE, true, 3 * 9 - 1) {
 
                 {
                     // call init callback when loaded
                     initCallback.call();
                 }
 
-                private int currentPage = 1;
+                @Override
+                public List<OfflinePlayer> getValues() {
+                    return mechanic.getManagement().getMembers().stream()
+                            .map(Bukkit::getOfflinePlayer)
+                            .sorted(Collections.reverseOrder(Comparator.comparing(p -> Optional.ofNullable(p.getName()).orElse(""))))
+                            .collect(Collectors.toList());
+                }
 
                 @Override
-                public void loadItems() {
-                    for (int i = 0; i < SIZE - PAGE_SIZE; i++) {
-                        getInventory().setItem(SIZE - i - 1, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+                public ItemStack getItemFrom(OfflinePlayer player) {
+                    ItemStack stack = new ItemStack(Material.PLAYER_HEAD);
+                    SkullMeta meta = (SkullMeta) stack.getItemMeta();
+                    if (meta != null) {
+                        meta.setOwningPlayer(player);
+                        meta.setDisplayName(player.getName());
+                        stack.setItemMeta(meta);
                     }
 
-                    loadView();
+                    return stack;
                 }
 
                 @Override
@@ -79,57 +90,14 @@ public class Elements {
                     });
                 }
 
-                private List<OfflinePlayer> getMembers() {
-                    return mechanic.getManagement().getMembers().stream()
-                            .map(Bukkit::getOfflinePlayer)
-                            .sorted(Collections.reverseOrder(Comparator.comparing(p -> Optional.ofNullable(p.getName()).orElse(""))))
-                            .collect(Collectors.toList());
-                }
+                protected void loadView() {
+                    super.loadView();
 
-                private void loadView() {
-                    // clear inventory view for new items
-                    IntStream.range(0, PAGE_SIZE).forEach(i -> getInventory().setItem(i, null));
-
-                    // evaluate pages
-                    int skip = Math.max(0, (currentPage - 1) * PAGE_SIZE - 1);
-                    int i = 0;
-                    int displayed = 0;
-                    List<OfflinePlayer> members = getMembers();
-                    while (i < members.size()) {
-                        OfflinePlayer player = members.get(i);
-                        // skip first pages
-                        if (i++ < skip || player == null) {
-                            continue;
-                        }
-
-                        // show until page ends
-                        if (++displayed > PAGE_SIZE - 1) {
-                            break;
-                        }
-
-                        // display the player head
-                        ItemStack stack = new ItemStack(Material.PLAYER_HEAD);
-                        SkullMeta meta = (SkullMeta) stack.getItemMeta();
-                        if (meta != null) {
-                            meta.setOwningPlayer(player);
-                            meta.setDisplayName(player.getName());
-                            stack.setItemMeta(meta);
-                            getInventory().setItem(displayed - 1, stack);
-                        }
+                    int i = -1;
+                    while (getInventory().getItem(++i) != null) {
+                        // empty body
                     }
-
-                    getInventory().setItem(displayed, new ItemBuilder(Material.NAME_TAG).setName("§eTilføj Medlem").build());
-
-                    // set arrows for previous/next page buttons
-                    getInventory().setItem(PAGE_SIZE, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
-                    getInventory().setItem(PAGE_SIZE + 8, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
-
-                    if (members.size() > i) {
-                        getInventory().setItem(PAGE_SIZE, new ItemStack(Material.ARROW));
-                    }
-                    if (currentPage > 1) {
-                        getInventory().setItem(PAGE_SIZE + 8, new ItemStack(Material.ARROW));
-                    }
+                    getInventory().setItem(i, new ItemBuilder(Material.NAME_TAG).setName("§eTilføj Medlem").build());
                 }
 
                 @Override
@@ -139,21 +107,10 @@ public class Elements {
                         ((Player)event.getWhoClicked()).playSound(event.getWhoClicked().getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 0.5f);
                     }
 
-                    // scroll pages
-                    if (item != null && item.getType() == Material.ARROW) {
-                        if (event.getSlot() % 9 == 1) {
-                            currentPage--;
-                        } else if (event.getSlot() % 9 == 8) {
-                            currentPage++;
-                        }
-
-                        loadView();
-                    }
-
                     // check access to modify members
                     Player player = (Player) event.getWhoClicked();
                     if (item != null && (item.getType() == Material.NAME_TAG || item.getType() == Material.PLAYER_HEAD)) {
-                        if (!mechanic.getManagement().hasAccess(player.getUniqueId(), Management.MODIFY_MEMBERS)) {
+                        if (!mechanic.getManagement().hasAccess(player, Management.MODIFY_MEMBERS)) {
                             player.sendMessage("§cDu har ikke adgang til at ændre på medlemmerne af maskinen!");
                             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
                             return true;
@@ -172,7 +129,7 @@ public class Elements {
                                 .setHandler((p, result) -> {
                                     String name = (result.getLine(0).trim() + result.getLine(1).trim());
                                     if (!name.isEmpty()) {
-                                        List<OfflinePlayer> members = getMembers();
+                                        List<OfflinePlayer> members = getValues();
                                         // check if this player is already a member
                                         if (
                                             // check owner
@@ -222,6 +179,8 @@ public class Elements {
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1f, 1f);
                     }
 
+                    super.onClickIn(event);
+
                     return true;
                 }
             };
@@ -241,7 +200,7 @@ public class Elements {
 
             Mechanic<?, ?> mechanic = gui.getMechanic();
             // check if the player has access to remove this mechanic
-            if (!mechanic.getManagement().hasAccess(player.getUniqueId(), Management.DELETE)) {
+            if (!mechanic.getManagement().hasAccess(player, Management.DELETE)) {
                 player.sendMessage("§cDu har ikke adgang til at fjerne maskinen!");
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                 return;

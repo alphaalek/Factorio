@@ -47,8 +47,10 @@ public class MechanicStorageContext {
         return new ByteArrayInputStream(Base64.getDecoder().decode(data));
     }
 
-    public static void upload(ByteArrayOutputStream stream, Query.CheckedConsumer<String> data) throws SQLException {
-        if (hasData(stream.toByteArray())) {
+    public static void upload(ByteArrayOutputStream stream, Query.CheckedConsumer<String> data, String currentData) throws SQLException {
+        // check if either new or current data is valid
+        // if none of them are, don't allow this upload because it doesn't matter anyway
+        if (hasData(stream.toByteArray()) || hasData(decode(currentData).readAllBytes())) {
             data.<SQLException>sneaky(encode(stream));
         }
     }
@@ -94,12 +96,12 @@ public class MechanicStorageContext {
     }
 
     public void uploadData(ByteArrayOutputStream stream) throws SQLException {
-        upload(stream, base64 -> this.controller.setData(this.location, base64));
+        upload(stream, base64 -> this.controller.setData(this.location, base64), this.controller.getData(this.location));
     }
 
     public void uploadManagement(Management management) throws SQLException, IOException {
         ByteArrayOutputStream stream = this.controller.getManagementSerializer().serialize(management);
-        upload(stream, base64 -> this.controller.setManagement(this.location, base64));
+        upload(stream, base64 -> this.controller.setManagement(this.location, base64), this.controller.getManagement(this.location));
     }
 
     public boolean hasContext() throws SQLException {

@@ -30,6 +30,7 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge, EmeraldForgeGui
         this.moneyAmount = context.getSerializer().readDouble(data);
     }
 
+    @Override
     public void save(MechanicStorageContext context) throws SQLException, IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         context.getSerializer().writeDouble(stream, this.moneyAmount);
