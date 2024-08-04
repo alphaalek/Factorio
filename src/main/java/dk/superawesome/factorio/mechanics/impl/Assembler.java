@@ -146,7 +146,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
 
     @Override
     public double getTransferEnergyCost() {
-        return 0;
+        return 2d / 3d;
     }
 
     @Override

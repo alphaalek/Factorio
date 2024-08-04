@@ -33,6 +33,7 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
     public boolean handleInput(Material item) {
         Block above = getLocation().getBlock().getRelative(BlockFace.UP);
         collected = new ItemStack(item);
+        Bukkit.broadcastMessage("Collector " + item);
         Routes.startTransferRoute(above, this);
 
         // if the collected field is null, it means that the item was collected by some container
@@ -73,6 +74,6 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
 
     @Override
     public double getTransferEnergyCost() {
-        return 0;
+        return 1d / 8d;
     }
 }

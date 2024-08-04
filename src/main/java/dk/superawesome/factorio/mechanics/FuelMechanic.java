@@ -86,9 +86,9 @@ public interface FuelMechanic {
             removeFuel(1);
 
             // remove the fuel
+            setCurrentFuel(getFuel());
             setFuelAmount(getFuelAmount() - 1);
             setCurrentFuelAmount(1);
-            setCurrentFuel(getFuel());
             if (getFuelAmount() == 0) {
                 setFuel(null);
             }
@@ -117,6 +117,7 @@ public interface FuelMechanic {
             // search for collectors to take the fuel waste
             Location loc = BlockUtil.getRel(def, vec);
             Block block = loc.getBlock();
+            Bukkit.broadcastMessage("Block " + block);
             if (block.getType() == Material.HOPPER) {
                 MechanicManager manager =  Factorio.get().getMechanicManager(def.getWorld());
 
@@ -124,6 +125,7 @@ public interface FuelMechanic {
                 // check if the hopper is facing towards the mechanic
                 if (manager.getMechanicPartially(block.getRelative(hopper.getFacing()).getLocation()) == this) {
                     Mechanic<?> mechanic = manager.getMechanicPartially(loc);
+                    Bukkit.broadcastMessage("Mechanic " + mechanic);
                     if (mechanic instanceof Collector collector) {
                         if (collector.handleInput(waste)) {
                             // the collector took the waste, just break
