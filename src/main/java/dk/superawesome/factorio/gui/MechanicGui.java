@@ -6,8 +6,6 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.FuelMechanic;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.util.Callback;
-import dk.superawesome.factorio.util.statics.StringUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -17,13 +15,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> extends BaseGuiAdapter<G> {
 

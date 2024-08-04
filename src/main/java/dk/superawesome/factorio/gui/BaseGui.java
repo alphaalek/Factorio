@@ -140,7 +140,8 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
     }
 
     protected boolean movedFromOtherInventory(InventoryClickEvent event) {
-        if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR
+        if (event.getClickedInventory() != null &&
+                event.getAction() == InventoryAction.COLLECT_TO_CURSOR
                 || event.getAction() == InventoryAction.HOTBAR_SWAP
                 || event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD
                 || event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {

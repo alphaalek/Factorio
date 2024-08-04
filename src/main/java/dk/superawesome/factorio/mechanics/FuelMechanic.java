@@ -82,7 +82,7 @@ public interface FuelMechanic {
         }
 
         if (getLocation().getWorld() != null) {
-            getLocation().getWorld().playSound(getLocation(), Sound.ENTITY_GENERIC_BURN, 0.5f, 1f);
+            getLocation().getWorld().playSound(getLocation(), Sound.BLOCK_BLASTFURNACE_FIRE_CRACKLE, 0.5f, 1f);
         }
 
         // use fuel

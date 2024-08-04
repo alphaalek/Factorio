@@ -11,10 +11,16 @@ import org.bukkit.Tag;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.*;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BinaryOperator;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -26,10 +32,27 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     private static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34);
 
     private static final List<Recipe> commonRecipes = new ArrayList<>();
+    private static final List<Tag<Material>> materialTags = new ArrayList<>();
 
     static {
         for (Assembler.Types type : Assembler.Types.values()) {
             addRecipesFor(new ItemStack(type.getMat()));
+        }
+
+        try {
+            Class<?> clazz = Class.forName(Tag.class.getName());
+            for (Field field : clazz.getDeclaredFields()) {
+                Object val = field.get(null);
+                if (val instanceof Tag<?> tag) {
+                    if (Arrays.stream(((ParameterizedType) tag.getClass().getGenericSuperclass()).getActualTypeArguments())
+                            .map(Type::getTypeName)
+                            .anyMatch(t -> Material.class.getName().equals(t))) {
+                        materialTags.add((Tag<Material>) tag);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Failed to acquire material tags", ex);
         }
     }
 
@@ -112,41 +135,69 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     @Override
     public boolean onClickIn(InventoryClickEvent event) {
-        if (getMechanic().getTickThrottle().isThrottled()
-                || !CRAFTING_SLOTS.contains(event.getRawSlot())) {
+        if (getMechanic().getTickThrottle().isThrottled()) {
             return true;
         }
 
-        if (event.getCurrentItem() != null || event.getCursor() != null) {
-            getMechanic().getTickThrottle().throttle();
-            Bukkit.getScheduler().runTask(Factorio.get(), this::updateCrafting);
+        if (CRAFTING_SLOTS.contains(event.getRawSlot())) {
+            if (event.getCurrentItem() != null || event.getCursor() != null) {
+                getMechanic().getTickThrottle().throttle();
+                Bukkit.getScheduler().runTask(Factorio.get(), this::updateCrafting);
+            }
+
+            return false;
+        }
+        if (STORAGE_SLOTS.contains(event.getRawSlot())) {
+            return (event.getCursor() != null && event.getCursor().getType() != Material.AIR)
+                    || event.getAction() == InventoryAction.PLACE_ALL
+                    || event.getAction() == InventoryAction.PLACE_SOME
+                    || event.getAction() == InventoryAction.PLACE_ONE;
         }
 
-        return false;
+        return true;
     }
 
     @Override
     public boolean onClickOpen(InventoryClickEvent event) {
         if (movedFromOtherInventory(event)) {
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY
-                    && event.getClickedInventory() != null
-                    && event.getClickedInventory() != getInventory()
                     && event.getCurrentItem() != null) {
-                ItemStack stack = event.getClickedInventory().getItem(event.getSlot());
-                if (stack != null) {
-                    addItemsToSlots(stack, CRAFTING_SLOTS);
+                if (STORAGE_SLOTS.contains(event.getRawSlot()) && event.getClickedInventory() == getInventory()) {
+                    // allow collecting items from storage slots
+                    return false;
+                } else if (event.getClickedInventory() != getInventory() && !getMechanic().getTickThrottle().isThrottled()) {
+                    // ... otherwise put items into crafting slots
+                    ItemStack stack = event.getClickedInventory().getItem(event.getSlot());
+                    if (stack != null) {
+                        addItemsToSlots(stack, CRAFTING_SLOTS);
+                    }
+                    updateCrafting();
+
+                    return true;
                 }
-
-                return true;
             }
 
-            if (!CRAFTING_SLOTS.contains(event.getRawSlot())
-                    && event.getClickedInventory() == getInventory()) {
-                return true;
+            if (CRAFTING_SLOTS.contains(event.getRawSlot()) && event.getClickedInventory() == getInventory()) {
+                getMechanic().getTickThrottle().throttle();
+                Bukkit.getScheduler().runTask(Factorio.get(), this::updateCrafting);
+
+                return false;
             }
 
-            getMechanic().getTickThrottle().throttle();
-            Bukkit.getScheduler().runTask(Factorio.get(), this::updateCrafting);
+            if (STORAGE_SLOTS.contains(event.getRawSlot())
+                    && (event.getAction() == InventoryAction.HOTBAR_SWAP || event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD)) {
+                ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
+                ItemStack at  = event.getView().getItem(event.getRawSlot());
+                if (at != null && hotbarItem != null) {
+                    if (hotbarItem.isSimilar(at)) {
+                        int add = Math.min(at.getAmount(), hotbarItem.getMaxStackSize() - hotbarItem.getAmount());
+                        hotbarItem.setAmount(hotbarItem.getAmount() + add);
+                        at.setAmount(at.getAmount() - add);
+                    }
+
+                    return true;
+                }
+            }
         }
 
         return false;
@@ -158,13 +209,14 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             return true;
         }
 
-        if (event.getRawSlots().stream().anyMatch(i -> !CRAFTING_SLOTS.contains(i))) {
-            return true;
+        if (CRAFTING_SLOTS.containsAll(event.getRawSlots())) {
+            getMechanic().getTickThrottle().throttle();
+            Bukkit.getScheduler().runTask(Factorio.get(), this::updateCrafting);
+            return false;
         }
 
-        getMechanic().getTickThrottle().throttle();
-        Bukkit.getScheduler().runTask(Factorio.get(), this::updateCrafting);
-        return false;
+        // cancel dragging in constructor gui if it's not in the crafting slots
+        return event.getRawSlots().stream().anyMatch(i -> event.getView().getInventory(i).getType() == InventoryType.CHEST);
     }
 
     private int getUpperCorner() {
@@ -243,17 +295,19 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             Material mat = ingredient.getType();
             Material offerMat = offer.getType();
 
-            // check for similar item variants
-            if (Tag.BASE_STONE_NETHER.isTagged(mat)
-                    && Tag.BASE_STONE_NETHER.isTagged(offerMat)) {
-                return true;
-            } else if (Tag.BASE_STONE_OVERWORLD.isTagged(mat)
-                    && Tag.BASE_STONE_OVERWORLD.isTagged(offerMat)) {
-                return true;
-            } else if (Tag.PLANKS.isTagged(mat)
-                    && Tag.PLANKS.isTagged(offerMat)) {
-                return true;
+            // get all materials from the tags where the ingredient is tagged
+            List<Material> materials = new ArrayList<>();
+            for (Tag<Material> tag : materialTags) {
+                if (tag.isTagged(mat)) {
+                    materials.addAll(tag.getValues());
+                }
             }
+
+            // ... get the material occurring the most of the values from these tags
+            Material mostOccur = materials.stream()
+                    .reduce(BinaryOperator.maxBy(Comparator.comparingInt(o -> Collections.frequency(materials, o))))
+                    .orElse(null);
+            return mostOccur == offerMat;
         }
 
         return false;
@@ -278,7 +332,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     private void searchRecipeIn(Iterator<Recipe> recipeIterator) {
         while (recipeIterator.hasNext()) {
-            Recipe recipe = recipeIterator.next(); // TODO cache common recipes
+            Recipe recipe = recipeIterator.next();
 
             // only check for crafting recipes
             if (recipe instanceof CraftingRecipe) {
@@ -372,7 +426,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     private void searchRecipe() {
         // iterate over all recipes and find the recipe matching the one in the crafting grid (if any)
         searchRecipeIn(commonRecipes.iterator());
-        if (this.craft != null) {
+        if (this.craft == null) {
             searchRecipeIn(Bukkit.recipeIterator());
         }
     }
