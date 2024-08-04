@@ -10,6 +10,7 @@ public class PipePutEvent extends BlockEvent {
     private static final HandlerList handlers = new HandlerList();
 
     private final TransferCollection collection;
+    private boolean transferred;
 
     public PipePutEvent(Block theBlock, TransferCollection collection) {
         super(theBlock);
@@ -18,6 +19,14 @@ public class PipePutEvent extends BlockEvent {
 
     public TransferCollection getTransfer() {
         return collection;
+    }
+
+    public boolean transferred() {
+        return transferred;
+    }
+
+    public void setTransfered(boolean transferred) {
+        this.transferred = transferred;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics.transfer;
 
 import dk.superawesome.factorio.gui.BaseGui;
+import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public interface Container<C extends TransferCollection> {
 
     boolean isContainerEmpty();
 
-    void pipePut(C collection);
+    void pipePut(C collection, PipePutEvent event);
 
     int getCapacity();
 

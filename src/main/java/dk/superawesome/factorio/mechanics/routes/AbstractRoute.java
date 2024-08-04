@@ -66,15 +66,17 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             this.world = world;
         }
 
-        public void handle(int runId, TransferCollection collection) {
+        public boolean handle(int runId, TransferCollection collection) {
             if (lastRunId == runId) {
-                return;
+                return false;
             }
             this.lastRunId = runId;
 
             Block block = BlockUtil.getBlock(world, vec);
             PipePutEvent event = new PipePutEvent(BlockUtil.getPointingBlock(block, false), collection);
             Bukkit.getPluginManager().callEvent(event);
+
+            return event.transferred();
         }
 
         @Override
@@ -205,16 +207,22 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return new TransferOutputEntry(world, vec);
         }
 
-        public void start(TransferCollection collection) {
+        public boolean start(TransferCollection collection) {
             int runId = currentId++;
 
+            boolean transferredAny = false;
             for (TransferOutputEntry entry : outputs.get(0, LinkedList::new)) {
-                entry.handle(runId, collection);
+                boolean transferred = entry.handle(runId, collection);
+                if (!transferredAny && transferred) {
+                    transferredAny = true;
+                }
 
                 if (collection.isTransferEmpty()) {
                     break;
                 }
             }
+
+            return transferredAny;
         }
     }
 
@@ -269,11 +277,11 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return new SignalOutputEntry(world, vec);
         }
 
-        public void start(SignalSource source) {
+        public boolean start(SignalSource source) {
             int runId = currentId++;
 
             if (!source.preSignal(this)) {
-                return;
+                return false;
             }
 
             // handle signal outputs
@@ -288,6 +296,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             if (outputs.get(source.getContext()).isEmpty() || mechanics < outputs.get(source.getContext()).size()) {
                 source.postSignal(this, mechanics);
             }
+
+            return mechanics > 0;
         }
     }
 }

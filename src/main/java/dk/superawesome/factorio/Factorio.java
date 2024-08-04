@@ -74,7 +74,6 @@ public final class Factorio extends JavaPlugin implements Listener {
         // TODO
         //  ensure world signal for signal outputs
         //  gui storage output take
-        //  collector mechanic
     }
 
     @Override

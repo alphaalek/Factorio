@@ -44,8 +44,7 @@ public class Routes {
         source.setEnergy(source.getEnergy() - event.getTransfer().getTransferEnergyCost());
 
         // start the pipe route
-        startTransferRoute(start, event.getTransfer());
-        return true;
+        return startTransferRoute(start, event.getTransfer());
     }
 
     public static boolean transferEnergyToPowerCentral(Block start, Generator source) {
@@ -77,13 +76,13 @@ public class Routes {
         return route;
     }
 
-    public static void startTransferRoute(Block start, TransferCollection collection) {
-        setupRoute(start, transferRouteFactory)
+    public static boolean startTransferRoute(Block start, TransferCollection collection) {
+        return setupRoute(start, transferRouteFactory)
                 .start(collection);
     }
 
-    public static void startSignalRoute(Block start, SignalSource source) {
-        setupRoute(start, signalRouteFactory)
+    public static boolean startSignalRoute(Block start, SignalSource source) {
+        return setupRoute(start, signalRouteFactory)
                 .start(source);
     }
 

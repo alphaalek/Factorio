@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.impl;
 
 import dk.superawesome.factorio.gui.impl.StorageBoxGui;
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Bukkit;
@@ -46,14 +47,14 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements ItemColl
     }
 
     @Override
-    public void pipePut(ItemCollection collection) {
-        int capacity = getCapacity();
-        if (tickThrottle.isThrottled() || amount == capacity) {
+    public void pipePut(ItemCollection collection, PipePutEvent event) {
+        if (tickThrottle.isThrottled()) {
             return;
         }
 
-        if (stored == null || collection.has(stored)) {
-            amount += this.<StorageBoxGui>put(collection, Math.min(64, capacity - amount), getInUse(), StorageBoxGui::updateAddedItems, new HeapToStackAccess<ItemStack>() {
+        if ((stored == null || collection.has(stored)) && amount < getCapacity()) {
+            event.setTransfered(true);
+            amount += this.<StorageBoxGui>put(collection, Math.min(64, getCapacity() - amount), getInUse(), StorageBoxGui::updateAddedItems, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return stored;

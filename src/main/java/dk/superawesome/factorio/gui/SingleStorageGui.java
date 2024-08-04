@@ -291,7 +291,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
                             .mapToInt(ItemStack::getAmount)
                             .sum();
                     if (amount > 0) {
-                        openSignGuiAndCall((Player) event.getWhoClicked(), amount + "", put);
+                        openSignGuiAndCall((Player) event.getWhoClicked(), Math.min(amount, getStorage().getCapacity()) + "", put);
                     }
                 }
             }

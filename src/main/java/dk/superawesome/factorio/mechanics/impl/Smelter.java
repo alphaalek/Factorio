@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.impl;
 
 import dk.superawesome.factorio.gui.impl.SmelterGui;
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Bukkit;
@@ -88,7 +89,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     @Override
-    public void pipePut(ItemCollection collection) {
+    public void pipePut(ItemCollection collection, PipePutEvent event) {
         if (tickThrottle.isThrottled()) {
             return;
         }
@@ -111,7 +112,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
             }
         }
 
-        this.<SmelterGui>putFuel(collection, this, getInUse(), SmelterGui::updateAddedFuel);
+        this.<SmelterGui>putFuel(collection, this, event, getInUse(), SmelterGui::updateAddedFuel);
     }
 
     @Override

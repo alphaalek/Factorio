@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.impl;
 
 import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
@@ -91,9 +92,10 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
     }
 
     @Override
-    public void pipePut(ItemCollection collection) {
+    public void pipePut(ItemCollection collection, PipePutEvent event) {
         ItemStack item = Optional.ofNullable(type).map(Types::getMat).map(ItemStack::new).orElse(null);
-        if (item == null || collection.has(item)) {
+        if ((item == null || collection.has(item)) && ingredientAmount < getCapacity()) {
+            event.setTransfered(true);
             ingredientAmount += this.<AssemblerGui>put(collection, Math.min(64, getCapacity() - ingredientAmount), getInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {

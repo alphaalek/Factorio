@@ -4,6 +4,7 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.impl.GeneratorGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
+import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Location;
@@ -145,12 +146,12 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public void pipePut(ItemCollection collection) {
+    public void pipePut(ItemCollection collection, PipePutEvent event) {
         if (tickThrottle.isThrottled()) {
             return;
         }
 
-        this.<GeneratorGui>putFuel(collection, this, getInUse(), GeneratorGui::updateAddedItems);
+        this.<GeneratorGui>putFuel(collection, this, event, getInUse(), GeneratorGui::updateAddedItems);
     }
 
     public double takeEnergy(double energy) {

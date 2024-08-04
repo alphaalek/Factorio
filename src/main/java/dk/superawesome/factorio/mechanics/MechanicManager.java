@@ -137,14 +137,14 @@ public class MechanicManager implements Listener {
         if (event.getBlock().getWorld().equals(this.world)) {
             Mechanic<?> mechanic = getMechanicAt(event.getBlock().getLocation());
             if (mechanic instanceof Container && ((Container<?>)mechanic).accepts(event.getTransfer())) {
-                doTransfer((Container<?>) mechanic, event.getTransfer());
+                doTransfer((Container<?>) mechanic, event.getTransfer(), event);
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    private <C extends TransferCollection> void doTransfer(Container<? extends TransferCollection> container, TransferCollection collection) {
-        ((Container<C>)container).pipePut((C) collection);
+    private <C extends TransferCollection> void doTransfer(Container<? extends TransferCollection> container, TransferCollection collection, PipePutEvent event) {
+        ((Container<C>)container).pipePut((C) collection, event);
     }
 
     public MechanicBuildResponse buildMechanic(Sign sign, Player owner) {

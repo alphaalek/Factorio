@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.mechanics.impl.Collector;
+import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
@@ -51,21 +52,25 @@ public interface FuelMechanic {
 
     Location getLocation();
 
-    default <G extends BaseGui<G>> void putFuel(ItemCollection collection, Container<? extends TransferCollection> container, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui) {
+    default <G extends BaseGui<G>> void putFuel(ItemCollection collection, Container<? extends TransferCollection> container, PipePutEvent event, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui) {
         if (getFuel() != null && collection.has(new ItemStack(getFuel().getMaterial())) || getFuel() == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
-            int amount = container.put(collection, Math.min(64, getFuelCapacity() - getFuelAmount()), inUse, doGui, new Container.HeapToStackAccess<>() {
-                @Override
-                public ItemStack get() {
-                    return getFuel() == null ? null : new ItemStack(getFuel().getMaterial());
-                }
 
-                @Override
-                public void set(ItemStack stack) {
-                    setFuel(Fuel.getFuel(stack.getType()));
-                }
-            });
+            if (getFuelAmount() < getFuelCapacity()) {
+                event.setTransfered(true);
+                int amount = container.put(collection, Math.min(64, getFuelCapacity() - getFuelAmount()), inUse, doGui, new Container.HeapToStackAccess<>() {
+                    @Override
+                    public ItemStack get() {
+                        return getFuel() == null ? null : new ItemStack(getFuel().getMaterial());
+                    }
 
-            setFuelAmount(getFuelAmount() + amount);
+                    @Override
+                    public void set(ItemStack stack) {
+                        setFuel(Fuel.getFuel(stack.getType()));
+                    }
+                });
+
+                setFuelAmount(getFuelAmount() + amount);
+            }
         }
     }
 

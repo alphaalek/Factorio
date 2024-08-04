@@ -5,6 +5,7 @@ import dk.superawesome.factorio.mechanics.AbstractMechanic;
 import dk.superawesome.factorio.mechanics.MechanicProfile;
 import dk.superawesome.factorio.mechanics.MechanicStorageContext;
 import dk.superawesome.factorio.mechanics.Profiles;
+import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.mechanics.transfer.MoneyContainer;
 import org.bukkit.Location;
@@ -49,10 +50,11 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Mone
     }
 
     @Override
-    public void pipePut(MoneyCollection collection) {
+    public void pipePut(MoneyCollection collection, PipePutEvent event) {
         double take = Math.min(64, getCapacity() - moneyAmount);
         double amount = collection.take(take);
         moneyAmount += amount;
+        event.setTransfered(true);
 
         EmeraldForgeGui gui = this.<EmeraldForgeGui>getInUse().get();
         if (gui != null) {
