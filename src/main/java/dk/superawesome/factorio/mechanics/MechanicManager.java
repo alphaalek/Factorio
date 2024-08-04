@@ -191,11 +191,11 @@ public class MechanicManager implements Listener {
 
     private Mechanic<?, ?> loadMechanicFromSign(Sign sign, Query.CheckedBiFunction<String, Block, MechanicStorageContext> context) throws IOException, SQLException {
         // check if this sign is related to a mechanic
-        if (!sign.getSide(Side.FRONT).getLine(0).startsWith("[")
-                || !sign.getSide(Side.FRONT).getLine(0).endsWith("]")) {
+        if (!sign.getSide(Side.FRONT).getLine(0).trim().startsWith("[")
+                || !sign.getSide(Side.FRONT).getLine(0).trim().endsWith("]")) {
             return null;
         }
-        String type = sign.getSide(Side.FRONT).getLine(0).substring(1, sign.getSide(Side.FRONT).getLine(0).length() - 1);
+        String type = sign.getSide(Side.FRONT).getLine(0).trim().substring(1, sign.getSide(Side.FRONT).getLine(0).trim().length() - 1);
 
         Optional<MechanicProfile<?, ?>> mechanicProfile = Profiles.getProfiles()
                 .stream()

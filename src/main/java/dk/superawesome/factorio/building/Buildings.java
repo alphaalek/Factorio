@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockVector;
 
 import java.util.ArrayList;
@@ -90,7 +91,8 @@ public class Buildings {
 
     public static void remove(World world, Mechanic<?, ?> mechanic) {
         for (Location relLoc : getLocations(mechanic)) {
-            world.getBlockAt(relLoc).setType(Material.AIR);
+            world.getBlockAt(relLoc).setType(Material.AIR, false); // don't apply physics
         }
+        world.dropItemNaturally(mechanic.getLocation(), new ItemStack(Material.OAK_SIGN));
     }
 }

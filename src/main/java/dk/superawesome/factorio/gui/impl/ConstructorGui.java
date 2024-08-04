@@ -1,18 +1,15 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.gui.Elements;
-import dk.superawesome.factorio.gui.GuiElement;
 import dk.superawesome.factorio.gui.MechanicGui;
+import dk.superawesome.factorio.mechanics.impl.Assembler;
 import dk.superawesome.factorio.mechanics.impl.Constructor;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.*;
 
@@ -27,6 +24,32 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     private static final int GRID_HEIGHT = 3;
     private static final List<Integer> CRAFTING_SLOTS = Arrays.asList(10, 11, 12, 19, 20, 21, 28, 29, 30);
     private static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34);
+
+    private static final Set<Recipe> commonRecipes = new HashSet<>();
+
+    static {
+        for (Assembler.Types type : Assembler.Types.values()) {
+            addRecipesFor(new ItemStack(type.getMat()));
+        }
+    }
+
+    private static void addRecipesFor(ItemStack stack) {
+        for (Recipe recipe : Bukkit.getRecipesFor(stack)) {
+            if (recipe instanceof CraftingRecipe) {
+                commonRecipes.add(recipe);
+                if (recipe instanceof ShapelessRecipe shapeless) {
+                    for (ItemStack required : shapeless.getIngredientList()) {
+                        addRecipesFor(required);
+                    }
+                } else if (recipe instanceof ShapedRecipe shaped) {
+                    Arrays.stream(shaped.getShape())
+                            .flatMap(s -> s.codePoints().mapToObj(c -> (char) c))
+                            .map(c -> shaped.getIngredientMap().get(c))
+                            .forEach(ConstructorGui::addRecipesFor);
+                }
+            }
+        }
+    }
 
     private ItemStack craft;
 
@@ -251,11 +274,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         getMechanic().setRecipeResult(this.craft);
     }
 
-    private void searchRecipe() {
-        // TODO tick limit
-
-        // iterate over all bukkit recipes and find the recipe matching the one in the crafting grid (if any)
-        Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
+    private void searchRecipeIn(Iterator<Recipe> recipeIterator) {
         while (recipeIterator.hasNext()) {
             Recipe recipe = recipeIterator.next(); // TODO cache common recipes
 
@@ -266,18 +285,16 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
                 // check for shaped recipe
                 // this means the recipe has a specific shape which needs to be inserted into the grid
-                if (recipe instanceof ShapedRecipe) {
-                    ShapedRecipe shapedRecipe = (ShapedRecipe) recipe;
-
+                if (recipe instanceof ShapedRecipe shaped) {
                     // get the ingredients matrix required for this recipe
-                    List<ItemStack> ingredients = Arrays.stream(shapedRecipe.getShape())
+                    List<ItemStack> ingredients = Arrays.stream(shaped.getShape())
                             .map(r -> new StringBuilder()
                                     .append(r)
                                     .append(new String(new char[3 - r.length()])
                                             .replaceAll("\0", " "))
                             )
                             .flatMap(r -> r.chars().mapToObj(c -> (char) c))
-                            .map(c -> shapedRecipe.getIngredientMap().get(c))
+                            .map(c -> shaped.getIngredientMap().get(c))
                             .collect(Collectors.toList());
 
                     List<ItemStack> offer = getOffer();
@@ -307,13 +324,12 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
                 // check for shapeless recipe
                 // this means that the recipe doesn't care what order and position the ingredients are inserted into the grid
-                if (recipe instanceof ShapelessRecipe) {
-                    ShapelessRecipe shapelessRecipe = (ShapelessRecipe) recipe;
+                if (recipe instanceof ShapelessRecipe shapeless) {
 
-                    List<ItemStack> ingredients = shapelessRecipe.getIngredientList();
+                    List<ItemStack> ingredients = shapeless.getIngredientList();
                     List<ItemStack> offer = getOffer(CRAFTING_SLOTS.get(0)).stream()
                             .filter(Objects::nonNull)
-                            .collect(Collectors.toList());
+                            .toList();
 
                     // loop through all items and check if they match
                     Iterator<ItemStack> offerIterator = offer.iterator();
@@ -349,6 +365,14 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                     break;
                 }
             }
+        }
+    }
+
+    private void searchRecipe() {
+        // iterate over all recipes and find the recipe matching the one in the crafting grid (if any)
+        searchRecipeIn(commonRecipes.iterator());
+        if (this.craft != null) {
+            searchRecipeIn(Bukkit.recipeIterator());
         }
     }
 }

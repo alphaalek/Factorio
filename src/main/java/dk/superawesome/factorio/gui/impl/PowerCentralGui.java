@@ -207,11 +207,9 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
     @Override
     public void loadItems() {
         for (int i = 0; i < 9; i++) {
-            getInventory().setItem(i + 9 * 5, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
+            getInventory().setItem(i + 9 * 5, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
         super.loadItems();
-
-        getMechanic().setEnergy(getMechanic().getEnergy() + 10);
     }
 
     @Override

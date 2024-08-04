@@ -32,11 +32,8 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
 
     @Override
     public void loadItems() {
-        for (int i : Arrays.asList(6, 8, 24, 26, 33, 35)) {
+        for (int i : Arrays.asList(0, 5, 6, 8, 9, 14, 18, 23, 24, 26, 27, 32, 33, 35, 36, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50)) {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
-        }
-        for (int i : Arrays.asList(0, 5, 9, 14, 18, 23, 27, 32, 36, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50)) {
-            getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
         }
         for (int i : Arrays.asList(7, 15, 17, 25)) {
             getInventory().setItem(i, new ItemStack(Material.RED_STAINED_GLASS_PANE));

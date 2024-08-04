@@ -7,11 +7,14 @@ import dk.superawesome.factorio.mechanics.MechanicManager;
 import dk.superawesome.factorio.util.Tick;
 import dk.superawesome.factorio.util.TickValue;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.lang.ref.Reference;
@@ -26,7 +29,7 @@ public class InteractListener implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Block clicked = event.getClickedBlock();
-        if (clicked != null) {
+        if (clicked != null && (!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR)) {
             // check if the player clicked on a mechanic
             MechanicManager manager = Factorio.get().getMechanicManager(clicked.getWorld());
             Mechanic<?, ?> mechanic = manager.getMechanicPartially(clicked.getLocation());
@@ -51,6 +54,15 @@ public class InteractListener implements Listener {
                 event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_CHEST_OPEN, 0.375f, 0.5f);
                 mechanic.openInventory(event.getPlayer());
             }
+        }
+    }
+
+    @EventHandler
+    public void onBreak(BlockBreakEvent event) {
+        MechanicManager manager = Factorio.get().getMechanicManager(event.getBlock().getWorld());
+        Mechanic<?, ?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
+        if (mechanic != null) {
+            event.setCancelled(true);
         }
     }
 }
