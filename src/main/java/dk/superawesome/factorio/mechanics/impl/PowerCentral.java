@@ -19,7 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui> implements ThinkingMechanic, SignalSource, Lightable {
+public class PowerCentral extends AbstractMechanic<PowerCentral> implements ThinkingMechanic, SignalSource, Lightable {
 
     public static final int CAPACITY = 0;
 
@@ -67,7 +67,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral, PowerCentralGui
     }
 
     @Override
-    public MechanicProfile<PowerCentral, PowerCentralGui> getProfile() {
+    public MechanicProfile<PowerCentral> getProfile() {
         return Profiles.POWER_CENTRAL;
     }
 

@@ -17,7 +17,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> implements ThinkingMechanic, ItemContainer, MoneyCollection {
+public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMechanic, ItemContainer, MoneyCollection {
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
     private Types type;
@@ -54,7 +54,7 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
     }
 
     @Override
-    public MechanicProfile<Assembler, AssemblerGui> getProfile() {
+    public MechanicProfile<Assembler> getProfile() {
         return Profiles.ASSEMBLER;
     }
 
@@ -78,7 +78,7 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
         ingredientAmount -= type.getRequires();
         moneyAmount += type.getProduces();
 
-        AssemblerGui gui = this.inUse.get();
+        AssemblerGui gui = this.<AssemblerGui>getInUse().get();
         if (gui != null) {
             gui.updateRemovedIngredients(type.getRequires());
             gui.updateAddedMoney(type.getProduces());
@@ -94,7 +94,7 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
     public void pipePut(ItemCollection collection) {
         ItemStack item = Optional.ofNullable(type).map(Types::getMat).map(ItemStack::new).orElse(null);
         if (item == null || collection.has(item)) {
-            ingredientAmount += put(collection, Math.min(64, getCapacity() - ingredientAmount), inUse, AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
+            ingredientAmount += this.<AssemblerGui>put(collection, Math.min(64, getCapacity() - ingredientAmount), getInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return item;
@@ -139,7 +139,7 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
 
     @Override
     public boolean isTransferEmpty() {
-        return moneyAmount == 0;
+        return Math.ceil(moneyAmount) == 0;
     }
 
     @Override
@@ -152,7 +152,7 @@ public class Assembler extends AbstractMechanic<Assembler, AssemblerGui> impleme
         double take = Math.min(amount, moneyAmount);
         moneyAmount -= take;
 
-        AssemblerGui gui = this.inUse.get();
+        AssemblerGui gui = this.<AssemblerGui>getInUse().get();
         if (gui != null) {
             gui.updateRemovedMoney(take);
         }

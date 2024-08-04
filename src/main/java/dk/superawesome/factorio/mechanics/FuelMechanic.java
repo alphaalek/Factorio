@@ -1,16 +1,23 @@
 package dk.superawesome.factorio.mechanics;
 
+import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
+import dk.superawesome.factorio.util.statics.BlockUtil;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BlockVector;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+import java.util.stream.Collector;
 
 public interface FuelMechanic {
 
@@ -35,6 +42,8 @@ public interface FuelMechanic {
     void removeFuel(int amount);
 
     int getFuelCapacity();
+
+    List<BlockVector> getWasteOutputs();
 
     default <G extends BaseGui<G>> void putFuel(ItemCollection collection, Container<? extends TransferCollection> container, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui) {
         if (getFuel() != null && collection.has(new ItemStack(getFuel().getMaterial())) || getFuel() == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
@@ -86,6 +95,18 @@ public interface FuelMechanic {
         }
 
         return FuelState.SMELTING;
+    }
+
+    default void handleWaste(Location def, Material waste) {
+        for (BlockVector vec : getWasteOutputs()) {
+            Location loc = BlockUtil.getRel(def, vec);
+            if (loc.getBlock().getType() == Material.HOPPER) {
+                Mechanic<?> collector = Factorio.get().getMechanicManager(def.getWorld()).getMechanicPartially(loc);
+                if (collector instanceof Collector) {
+
+                }
+            }
+        }
     }
 
     default void loadFuel(MechanicStorageContext context, ByteArrayInputStream str) throws IOException {

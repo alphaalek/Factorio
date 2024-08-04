@@ -2,7 +2,6 @@ package dk.superawesome.factorio.mechanics.impl;
 
 import dk.superawesome.factorio.gui.impl.SmelterGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.Fuel;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Bukkit;
@@ -12,18 +11,27 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.util.BlockVector;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements FuelMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
+public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
     public static final int INGREDIENT_CAPACITY = 1;
+    private static final List<BlockVector> WASTE_OUTPUT_RELATIVES = Arrays.asList(
+            new BlockVector(0, 2, 0),
+            new BlockVector(1, 1, 1),
+            new BlockVector(-1, 1, 1),
+            new BlockVector(1, 1, -1),
+            new BlockVector(-1, 1, -1)
+    );
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
 
@@ -75,7 +83,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
     }
 
     @Override
-    public MechanicProfile<Smelter, SmelterGui> getProfile() {
+    public MechanicProfile<Smelter> getProfile() {
         return Profiles.SMELTER;
     }
 
@@ -86,7 +94,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
         }
 
         if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(i -> canSmelt(i.getType()))) {
-            ingredientAmount += put(collection, Math.min(64, level.getInt(INGREDIENT_CAPACITY) - ingredientAmount), inUse, SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
+            ingredientAmount += this.<SmelterGui>put(collection, Math.min(64, level.getInt(INGREDIENT_CAPACITY) - ingredientAmount), getInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
                 @Override
                 public ItemStack get() {
                     return ingredient;
@@ -103,7 +111,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
             }
         }
 
-        putFuel(collection, this, inUse, SmelterGui::updateAddedFuel);
+        this.<SmelterGui>putFuel(collection, this, getInUse(), SmelterGui::updateAddedFuel);
     }
 
     @Override
@@ -116,13 +124,17 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
         return level.getInt(FUEL_CAPACITY);
     }
 
+    @Override
+    public List<BlockVector> getWasteOutputs() {
+        return WASTE_OUTPUT_RELATIVES;
+    }
+
     public boolean canSmelt(Material type) {
         Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
         while (recipeIterator.hasNext()) {
             Recipe recipe = recipeIterator.next();
 
-            if (recipe instanceof FurnaceRecipe) {
-                FurnaceRecipe furnaceRecipe = (FurnaceRecipe) recipe;
+            if (recipe instanceof FurnaceRecipe furnaceRecipe) {
                 if (furnaceRecipe.getInput().getType() == type) {
                     cachedSmeltResult = furnaceRecipe.getResult();
                     return true;
@@ -148,7 +160,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
             // set declined state and notify the user that this smelting is not possible yet
             if (!declinedState) {
                 declinedState = true;
-                SmelterGui gui = inUse.get();
+                SmelterGui gui = this.<SmelterGui>getInUse().get();
                 if (gui != null) {
                     gui.updateDeclinedState(true);
                 }
@@ -160,7 +172,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
         // remove declined state if set and smelting is available
         if (declinedState) {
             declinedState = false;
-            SmelterGui gui = inUse.get();
+            SmelterGui gui = this.<SmelterGui>getInUse().get();
             if (gui != null) {
                 gui.updateDeclinedState(false);
             }
@@ -189,7 +201,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
         ingredientAmount -= 1;
         storageAmount += smeltResult.getAmount();
 
-        SmelterGui gui = inUse.get();
+        SmelterGui gui = this.<SmelterGui>getInUse().get();
         if (gui != null) {
             gui.updateRemovedIngredients(1);
             gui.updateAddedStorage(smeltResult.getAmount());
@@ -215,7 +227,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
 
     @Override
     public List<ItemStack> take(int amount) {
-        List<ItemStack> items = take(amount, storageType, storageAmount, inUse, g -> g.updateRemovedStorage(amount), new HeapToStackAccess<Integer>() {
+        List<ItemStack> items = this.<SmelterGui>take(amount, storageType, storageAmount, getInUse(), g -> g.updateRemovedStorage(amount), new HeapToStackAccess<Integer>() {
             @Override
             public Integer get() {
                 return storageAmount;
@@ -326,7 +338,7 @@ public class Smelter extends AbstractMechanic<Smelter, SmelterGui> implements Fu
 
     @Override
     public void removeFuel(int amount) {
-        SmelterGui gui = inUse.get();
+        SmelterGui gui = this.<SmelterGui>getInUse().get();
         if (gui != null) {
             gui.updateRemovedFuel(amount);
         }

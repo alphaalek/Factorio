@@ -8,7 +8,7 @@ public class MechanicBuildEvent extends MechanicEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public MechanicBuildEvent(Player player, Mechanic<?, ?> mechanic) {
+    public MechanicBuildEvent(Player player, Mechanic<?> mechanic) {
         super(player, mechanic);
     }
 

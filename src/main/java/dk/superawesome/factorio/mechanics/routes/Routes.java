@@ -49,7 +49,7 @@ public class Routes {
     }
 
     public static boolean transferEnergyToPowerCentral(Block start, Generator source) {
-        Mechanic<?, ?> mechanic = Factorio.get().getMechanicManager(start.getWorld()).getMechanicPartially(start.getLocation());
+        Mechanic<?> mechanic = Factorio.get().getMechanicManager(start.getWorld()).getMechanicPartially(start.getLocation());
         if (!(mechanic instanceof PowerCentral powerCentral)) {
             return false;
         }

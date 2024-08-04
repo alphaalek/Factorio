@@ -14,14 +14,25 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Campfire;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BlockVector;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
-public class Generator extends AbstractMechanic<Generator, GeneratorGui> implements FuelMechanic, ItemContainer, ThinkingMechanic, SignalSource, Lightable, SingleStorage {
+public class Generator extends AbstractMechanic<Generator> implements FuelMechanic, ItemContainer, ThinkingMechanic, SignalSource, Lightable, SingleStorage {
+
+    private static final List<BlockVector> WASTE_OUTPUT_RELATIVES = Arrays.asList(
+            new BlockVector(0, 2, 0),
+            new BlockVector(1, 1, 1),
+            new BlockVector(-1, 1, 1),
+            new BlockVector(1, 1, -1),
+            new BlockVector(-1, 1, -1)
+    );
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
     private Block lever;
@@ -73,7 +84,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
     }
 
     @Override
-    public MechanicProfile<Generator, GeneratorGui> getProfile() {
+    public MechanicProfile<Generator> getProfile() {
         return Profiles.GENERATOR;
     }
 
@@ -94,7 +105,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
             if (state != FuelState.ABORT) {
                 availableEnergy = prevCurrentFuel != null ? prevCurrentFuel.getEnergyAmount() : prevFuel.getEnergyAmount(); // both can't be null, but has to check current fuel first
 
-                GeneratorGui gui = inUse.get();
+                GeneratorGui gui = this.<GeneratorGui>getInUse().get();
                 if (gui != null) {
                     gui.updateFuelState();
                 }
@@ -139,7 +150,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
             return;
         }
 
-        putFuel(collection, this, inUse, GeneratorGui::updateAddedItems);
+        this.<GeneratorGui>putFuel(collection, this, getInUse(), GeneratorGui::updateAddedItems);
     }
 
     public double takeEnergy(double energy) {
@@ -242,7 +253,7 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
 
     @Override
     public void removeFuel(int amount) {
-        GeneratorGui gui = inUse.get();
+        GeneratorGui gui = this.<GeneratorGui>getInUse().get();
         if (gui != null) {
             gui.updateRemovedItems(amount);
         }
@@ -251,5 +262,10 @@ public class Generator extends AbstractMechanic<Generator, GeneratorGui> impleme
     @Override
     public int getFuelCapacity() {
         return getCapacity();
+    }
+
+    @Override
+    public List<BlockVector> getWasteOutputs() {
+        return WASTE_OUTPUT_RELATIVES;
     }
 }

@@ -8,7 +8,7 @@ public class MechanicRemoveEvent extends MechanicEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public MechanicRemoveEvent(Player player, Mechanic<?, ?> mechanic) {
+    public MechanicRemoveEvent(Player player, Mechanic<?> mechanic) {
         super(player, mechanic);
     }
 

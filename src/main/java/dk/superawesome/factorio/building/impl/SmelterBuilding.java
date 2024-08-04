@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.building.impl;
 
+import dk.superawesome.factorio.building.Buildable;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.mechanics.Profiles;
 import org.bukkit.Material;
@@ -11,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class SmelterBuilding implements Building {
+public class SmelterBuilding implements Building, Buildable {
 
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
             (b, r) -> b.setType(Material.COBBLESTONE),

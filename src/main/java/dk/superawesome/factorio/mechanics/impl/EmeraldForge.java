@@ -15,7 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class EmeraldForge extends AbstractMechanic<EmeraldForge, EmeraldForgeGui> implements MoneyContainer {
+public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements MoneyContainer {
 
     private double moneyAmount;
 
@@ -39,7 +39,7 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge, EmeraldForgeGui
     }
 
     @Override
-    public MechanicProfile<EmeraldForge, EmeraldForgeGui> getProfile() {
+    public MechanicProfile<EmeraldForge> getProfile() {
         return Profiles.EMERALD_FORGE;
     }
 
@@ -54,7 +54,7 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge, EmeraldForgeGui
         double amount = collection.take(take);
         moneyAmount += amount;
 
-        EmeraldForgeGui gui = this.inUse.get();
+        EmeraldForgeGui gui = this.<EmeraldForgeGui>getInUse().get();
         if (gui != null) {
             gui.updateAddedMoney(amount);
         }

@@ -13,7 +13,7 @@ import org.bukkit.block.BlockFace;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SmelterProfile implements MechanicProfile<Smelter, SmelterGui> {
+public class SmelterProfile implements GuiMechanicProfile<Smelter> {
 
     private final MechanicFactory<Smelter> factory = new SmelterMechanicFactory();
     private final GuiFactory<Smelter, SmelterGui> guiFactory = new SmelterGuiFactory();

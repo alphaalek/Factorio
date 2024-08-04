@@ -4,10 +4,7 @@ import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
 import dk.superawesome.factorio.gui.impl.PowerCentralGui;
-import dk.superawesome.factorio.mechanics.MechanicFactory;
-import dk.superawesome.factorio.mechanics.MechanicLevel;
-import dk.superawesome.factorio.mechanics.MechanicProfile;
-import dk.superawesome.factorio.mechanics.MechanicStorageContext;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;
@@ -15,7 +12,7 @@ import org.bukkit.block.BlockFace;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class PowerCentralProfile implements MechanicProfile<PowerCentral, PowerCentralGui> {
+public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
 
     private final MechanicFactory<PowerCentral> factory = new PowerCentralMechanicFactory();
     private final GuiFactory<PowerCentral, PowerCentralGui> guiFactory = new PowerCentralGuiFactory();

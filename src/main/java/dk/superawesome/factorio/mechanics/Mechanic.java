@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
-public interface Mechanic<M extends Mechanic<M, G>, G extends BaseGui<G>> {
+public interface Mechanic<M extends Mechanic<M>> {
 
     void unload();
 
@@ -22,7 +22,7 @@ public interface Mechanic<M extends Mechanic<M, G>, G extends BaseGui<G>> {
 
     Management getManagement();
 
-    MechanicProfile<M, G> getProfile();
+    MechanicProfile<M> getProfile();
 
-    void openInventory(Player player);
+    <G extends BaseGui<G>> void openInventory(Player player);
 }

@@ -14,21 +14,31 @@ public class Fuel {
         CHARCOAL(Material.CHARCOAL, 1f / 8f, 6.5d),
         BLAZE_ROD(Material.BLAZE_ROD, 1f / 16f, 16d),
         COAL_BLOCK(Material.COAL_BLOCK, 1f / 72, 6.5d),
-        LAVA_BUCKET(Material.LAVA_BUCKET, 1f / 100f, 12d),
-        WOOD(Tag.PLANKS::isTagged, 1f / 2f, 3d),
+        LAVA_BUCKET(Material.LAVA_BUCKET, Material.BUCKET, 1f / 100f, 12d),
+        WOOD(Tag.PLANKS::isTagged, Material.STICK, 1f / 2f, 3d),
         LOG(Tag.LOGS::isTagged, 1f / 5f, 4.5d),
         ;
 
         private final Predicate<Material> tester;
+        private final Material waste;
         private final double energyAmount;
         private final float fuelAmount;
 
         FuelType(Material mat, float fuelAmount, double energyAmount) {
-            this(m -> m == mat, fuelAmount, energyAmount);
+            this(m -> m == mat, null, fuelAmount, energyAmount);
+        }
+
+        FuelType(Material mat, Material waste, float fuelAmount, double energyAmount) {
+            this(m -> m == mat, waste, fuelAmount, energyAmount);
         }
 
         FuelType(Predicate<Material> tester, float fuelAmount, double energyAmount) {
+            this(tester, null, fuelAmount, energyAmount);
+        }
+
+        FuelType(Predicate<Material> tester, Material waste, float fuelAmount, double energyAmount) {
             this.tester = tester;
+            this.waste = waste;
             this.fuelAmount = fuelAmount;
             this.energyAmount = energyAmount;
         }
@@ -57,6 +67,10 @@ public class Fuel {
 
     public Material getMaterial() {
         return material;
+    }
+
+    public Material getWaste() {
+        return type.waste;
     }
 
     public float getFuelAmount() {

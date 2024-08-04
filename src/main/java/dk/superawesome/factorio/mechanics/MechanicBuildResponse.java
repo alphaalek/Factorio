@@ -7,6 +7,8 @@ public enum MechanicBuildResponse {
 
     NOT_ENOUGH_SPACE,
 
+    NOT_PLACED_BLOCKS,
+
     ERROR,
 
     SUCCESS

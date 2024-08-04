@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<M, G>> extends MechanicGui<G, M> {
+public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<M>> extends MechanicGui<G, M> {
     
     private final List<Integer> slots;
     

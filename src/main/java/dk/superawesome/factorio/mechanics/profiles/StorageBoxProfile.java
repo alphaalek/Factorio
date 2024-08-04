@@ -13,7 +13,7 @@ import org.bukkit.block.BlockFace;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class StorageBoxProfile implements MechanicProfile<StorageBox, StorageBoxGui> {
+public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
 
     private final MechanicFactory<StorageBox> factory = new StorageBoxMechanicFactory();
     private final GuiFactory<StorageBox, StorageBoxGui> guiFactory = new StorageBoxGuiFactory();

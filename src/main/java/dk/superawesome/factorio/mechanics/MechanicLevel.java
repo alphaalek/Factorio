@@ -2,6 +2,8 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.util.Array;
 
+import java.util.Optional;
+
 public class MechanicLevel {
 
     public interface Registry {
@@ -42,15 +44,15 @@ public class MechanicLevel {
         }
     }
 
-    public static MechanicLevel from(Mechanic<?, ?> mechanic, int level) {
+    public static MechanicLevel from(Mechanic<?> mechanic, int level) {
         return new MechanicLevel(mechanic, level);
     }
 
     private final Array<Object> data;
     private final int level;
 
-    public MechanicLevel(Mechanic<?, ?> mechanic, int level) {
-        this.data = mechanic.getProfile().getLevelRegistry().get(level);
+    public MechanicLevel(Mechanic<?> mechanic, int level) {
+        this.data = Optional.ofNullable(mechanic.getProfile().getLevelRegistry()).map(a -> a.get(level)).orElseGet(Array::new);
         this.level = level;
     }
 

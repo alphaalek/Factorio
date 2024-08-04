@@ -29,7 +29,5 @@ public interface Building extends Identifiable {
         }
     }
 
-    List<BiConsumer<Block, BlockFace>> getBlocks();
-
     List<BlockVector> getRelatives(); // facing west
 }

@@ -52,7 +52,7 @@ public class Elements {
             player.openInventory(createGui(gui.getMechanic()).getInventory());
         }
 
-        private <G extends BaseGui<G>> BaseGui<G> createGui(Mechanic<?, ?> mechanic) {
+        private <G extends BaseGui<G>> BaseGui<G> createGui(Mechanic<?> mechanic) {
             return new PaginatedGui<G, OfflinePlayer>(new BaseGui.InitCallbackHolder(), null, SIZE, TITLE, true, 3 * 9 - 1) {
 
                 {
@@ -198,7 +198,7 @@ public class Elements {
             event.setCancelled(true);
             player.closeInventory();
 
-            Mechanic<?, ?> mechanic = gui.getMechanic();
+            Mechanic<?> mechanic = gui.getMechanic();
             // check if the player has access to remove this mechanic
             if (!mechanic.getManagement().hasAccess(player, Management.DELETE)) {
                 player.sendMessage("§cDu har ikke adgang til at fjerne maskinen!");
@@ -207,8 +207,8 @@ public class Elements {
             }
 
             // check if this mechanic has any items in its inventory
-            if (mechanic instanceof ItemCollection && !((ItemCollection)mechanic).isTransferEmpty()
-                    || mechanic instanceof Container && !((Container<?>)mechanic).isContainerEmpty()) {
+            if (mechanic instanceof ItemCollection && !((ItemCollection) mechanic).isTransferEmpty()
+                    || mechanic instanceof Container && !((Container<?>) mechanic).isContainerEmpty()) {
                 player.sendMessage("§cRyd maskinens inventar før du sletter den!");
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                 return;
@@ -223,20 +223,7 @@ public class Elements {
                 return;
             }
 
-            // unload and delete this mechanic
-            Factorio.get().getMechanicManager(player.getWorld()).unload(mechanic);
-            try {
-                Factorio.get().getContextProvider().deleteAt(mechanic.getLocation());
-            } catch (SQLException ex) {
-                player.sendMessage("§cDer opstod en fejl! Kontakt en udvikler.");
-                Factorio.get().getLogger().log(Level.SEVERE, "Failed to delete mechanic at location " + mechanic.getLocation(), ex);
-                return;
-            }
-            Buildings.remove(player.getWorld(), mechanic);
-
-            // player stuff
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 0.5f, 0.6f);
-            player.sendMessage("§eDu fjernede maskinen " + mechanic.getProfile().getName() + " (Lvl " + mechanic.getLevel() + ") ved " + Types.LOCATION.convert(mechanic.getLocation()) + ".");
+            Factorio.get().getMechanicManager(player.getWorld()).removeMechanic(player, mechanic);
         }
 
         @Override

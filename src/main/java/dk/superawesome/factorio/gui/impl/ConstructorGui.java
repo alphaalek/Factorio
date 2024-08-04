@@ -25,7 +25,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     private static final List<Integer> CRAFTING_SLOTS = Arrays.asList(10, 11, 12, 19, 20, 21, 28, 29, 30);
     private static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34);
 
-    private static final Set<Recipe> commonRecipes = new HashSet<>();
+    private static final List<Recipe> commonRecipes = new ArrayList<>();
 
     static {
         for (Assembler.Types type : Assembler.Types.values()) {
@@ -35,8 +35,8 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     private static void addRecipesFor(ItemStack stack) {
         for (Recipe recipe : Bukkit.getRecipesFor(stack)) {
-            if (recipe instanceof CraftingRecipe) {
-                commonRecipes.add(recipe);
+            if (recipe instanceof CraftingRecipe cr && commonRecipes.stream().map(r -> (CraftingRecipe) r).noneMatch(r -> r.getKey().equals(cr.getKey()))) {
+                commonRecipes.add(cr);
                 if (recipe instanceof ShapelessRecipe shapeless) {
                     for (ItemStack required : shapeless.getIngredientList()) {
                         addRecipesFor(required);
@@ -45,6 +45,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                     Arrays.stream(shaped.getShape())
                             .flatMap(s -> s.codePoints().mapToObj(c -> (char) c))
                             .map(c -> shaped.getIngredientMap().get(c))
+                            .filter(Objects::nonNull)
                             .forEach(ConstructorGui::addRecipesFor);
                 }
             }
@@ -83,6 +84,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         if (getMechanic().isDeclined()) {
             updateDeclinedState(true);
         }
+        updateCrafting();
 
         registerEvent(35, __ -> loadInputOutputItems());
 
@@ -325,11 +327,10 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                 // check for shapeless recipe
                 // this means that the recipe doesn't care what order and position the ingredients are inserted into the grid
                 if (recipe instanceof ShapelessRecipe shapeless) {
-
                     List<ItemStack> ingredients = shapeless.getIngredientList();
                     List<ItemStack> offer = getOffer(CRAFTING_SLOTS.get(0)).stream()
                             .filter(Objects::nonNull)
-                            .toList();
+                            .collect(Collectors.toList()); // can't use Stream#toList because that returns an immutable list
 
                     // loop through all items and check if they match
                     Iterator<ItemStack> offerIterator = offer.iterator();

@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> implements ThinkingMechanic, ItemCollection, ItemContainer {
+public class Constructor extends AbstractMechanic<Constructor> implements ThinkingMechanic, ItemCollection, ItemContainer {
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
     private final ItemStack[] craftingGridItems = new ItemStack[9];
@@ -57,7 +57,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
     }
 
     @Override
-    public MechanicProfile<Constructor, ConstructorGui> getProfile() {
+    public MechanicProfile<Constructor> getProfile() {
         return Profiles.CONSTRUCTOR;
     }
 
@@ -119,7 +119,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
             // set declined state and notify the user that this crafting is not possible yet
             if (!declinedState) {
                 declinedState = true;
-                ConstructorGui gui = inUse.get();
+                ConstructorGui gui = this.<ConstructorGui>getInUse().get();
                 if (gui != null) {
                     gui.updateDeclinedState(true);
                 }
@@ -131,7 +131,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
         // remove declined state if set and crafting is available
         if (declinedState) {
             declinedState = false;
-            ConstructorGui gui = inUse.get();
+            ConstructorGui gui = this.<ConstructorGui>getInUse().get();
             if (gui != null) {
                 gui.updateDeclinedState(false);
             }
@@ -171,7 +171,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
         storageAmount += recipeResult.getAmount();
 
-        ConstructorGui gui = inUse.get();
+        ConstructorGui gui = this.<ConstructorGui>getInUse().get();
         if (gui != null) {
             gui.updateAddedItems(recipeResult.getAmount());
         }
@@ -189,7 +189,7 @@ public class Constructor extends AbstractMechanic<Constructor, ConstructorGui> i
 
     @Override
     public List<ItemStack> take(int amount) {
-        List<ItemStack> items = take(amount, storageType, storageAmount, inUse, g -> g.updateRemovedItems(amount), new HeapToStackAccess<Integer>() {
+        List<ItemStack> items = this.<ConstructorGui>take(amount, storageType, storageAmount, getInUse(), g -> g.updateRemovedItems(amount), new HeapToStackAccess<Integer>() {
             @Override
             public Integer get() {
                 return storageAmount;

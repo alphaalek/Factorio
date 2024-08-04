@@ -13,7 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> implements ItemCollection, ItemContainer, SingleStorage {
+public class StorageBox extends AbstractMechanic<StorageBox> implements ItemCollection, ItemContainer, SingleStorage {
 
     private ItemStack stored;
     private int amount;
@@ -40,7 +40,7 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
     }
 
     @Override
-    public MechanicProfile<StorageBox, StorageBoxGui> getProfile() {
+    public MechanicProfile<StorageBox> getProfile() {
         return Profiles.STORAGE_BOX;
     }
 
@@ -52,7 +52,7 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
         }
 
         if (stored == null || collection.has(stored)) {
-            amount += put(collection, Math.min(64, capacity - amount), inUse, StorageBoxGui::updateAddedItems, new HeapToStackAccess<ItemStack>() {
+            amount += this.<StorageBoxGui>put(collection, Math.min(64, capacity - amount), getInUse(), StorageBoxGui::updateAddedItems, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return stored;
@@ -83,7 +83,7 @@ public class StorageBox extends AbstractMechanic<StorageBox, StorageBoxGui> impl
 
     @Override
     public List<ItemStack> take(int amount) {
-        List<ItemStack> items = take(amount, stored, amount, inUse, g -> g.updateRemovedItems(amount), new HeapToStackAccess<Integer>() {
+        List<ItemStack> items = this.<StorageBoxGui>take(amount, stored, amount, getInUse(), g -> g.updateRemovedItems(amount), new HeapToStackAccess<Integer>() {
             @Override
             public Integer get() {
                 return StorageBox.this.amount;

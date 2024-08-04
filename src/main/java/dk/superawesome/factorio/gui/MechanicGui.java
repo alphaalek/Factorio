@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>> extends BaseGuiAdapter<G> {
+public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> extends BaseGuiAdapter<G> {
 
     private final M mechanic;
 
@@ -96,7 +96,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M, G>
             int blaze = Math.round(fuelMechanic.getCurrentFuelAmount() * slots.size());
             int times = 0;
             for (int slot : slots) {
-                if (++times > blaze) {
+                if (times++ > blaze) {
                     getInventory().setItem(slot, new ItemStack(Material.RED_STAINED_GLASS_PANE));
                     continue;
                 }

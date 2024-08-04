@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import javax.annotation.processing.SupportedOptions;
 import java.io.IOException;
 import java.lang.ref.Reference;
 import java.sql.SQLException;
@@ -17,9 +18,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
-public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseGui<G>> implements Mechanic<M, G> {
+public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechanic<M> {
 
-    protected final AtomicReference<G> inUse = new AtomicReference<>();
+    protected final AtomicReference<? extends BaseGui<?>> inUse = new AtomicReference<>();
     protected final TickThrottle tickThrottle = new TickThrottle();
     protected final Location loc;
     protected final BlockFace rot;
@@ -108,23 +109,31 @@ public abstract class AbstractMechanic<M extends Mechanic<M, G>, G extends BaseG
         return management;
     }
 
+    @SuppressWarnings("unchecked")
+    public <G extends BaseGui<G>> AtomicReference<G> getInUse() {
+        return (AtomicReference<G>) inUse;
+    }
+
     @Override
-    public void openInventory(Player player) {
-        G inUse = this.inUse.get();
-        // check for inventory already in use
-        if (inUse != null) {
-            // check if the player is already looking in this inventory
-            if (inUse.getInventory().getViewers().contains(player)) {
+    @SuppressWarnings("unchecked")
+    public <G extends BaseGui<G>> void openInventory(Player player) {
+        if (getProfile() instanceof GuiMechanicProfile<M>) {
+            BaseGui<?> inUse = this.inUse.get();
+            // check for inventory already in use
+            if (inUse != null) {
+                // check if the player is already looking in this inventory
+                if (inUse.getInventory().getViewers().contains(player)) {
+                    return;
+                }
+
+                // open the inventory
+                player.openInventory(inUse.getInventory());
                 return;
             }
 
-            // open the inventory
-            player.openInventory(inUse.getInventory());
-            return;
+            // create a new inventory
+            BaseGui<?> gui = ((GuiMechanicProfile<M>) getProfile()).<G>getGuiFactory().create((M) this, (AtomicReference<G>) this.inUse);
+            player.openInventory(gui.getInventory());
         }
-
-        // create a new inventory
-        G gui = getProfile().getGuiFactory().create((M) this, this.inUse);
-        player.openInventory(gui.getInventory());
     }
 }

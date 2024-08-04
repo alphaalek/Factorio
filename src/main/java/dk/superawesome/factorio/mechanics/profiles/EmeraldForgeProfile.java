@@ -4,10 +4,7 @@ import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
 import dk.superawesome.factorio.gui.impl.EmeraldForgeGui;
-import dk.superawesome.factorio.mechanics.MechanicFactory;
-import dk.superawesome.factorio.mechanics.MechanicLevel;
-import dk.superawesome.factorio.mechanics.MechanicProfile;
-import dk.superawesome.factorio.mechanics.MechanicStorageContext;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.EmeraldForge;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.util.Array;
@@ -16,7 +13,7 @@ import org.bukkit.block.BlockFace;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class EmeraldForgeProfile implements MechanicProfile<EmeraldForge, EmeraldForgeGui> {
+public class EmeraldForgeProfile implements GuiMechanicProfile<EmeraldForge> {
 
     private final MechanicFactory<EmeraldForge> factory = new EmeraldForgeMechanicFactory();
     private final GuiFactory<EmeraldForge, EmeraldForgeGui> guiFactory = new EmeraldForgeGuiFactory();
