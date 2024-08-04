@@ -37,7 +37,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
             this.level = MechanicLevel.from(this, context.getLevel());
             this.management = context.getManagement();
         } catch (SQLException | IOException ex) {
-            throw new RuntimeException("Failed to load mechanic " + getProfile().getName()  + " at " + Types.LOCATION.convert(loc), ex);
+            throw new RuntimeException("Failed to load mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
         }
     }
 
@@ -47,7 +47,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
                 load(this.context);
             }
         } catch (Exception ex) {
-            Factorio.get().getLogger().log(Level.SEVERE, "Failed to load mechanic data " + getProfile().getName()  + ", " + getLocation(), ex);
+            Factorio.get().getLogger().log(Level.SEVERE, "Failed to load data for mechanic " + this  + ", " + getLocation(), ex);
         }
     }
 
@@ -67,7 +67,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
             save(this.context);
         } catch (Exception ex) {
-            Factorio.get().getLogger().log(Level.SEVERE, "Failed to save mechanic " + getProfile().getName()  + ", " + getLocation(), ex);
+            Factorio.get().getLogger().log(Level.SEVERE, "Failed to save mechanic " + this + ", " + getLocation(), ex);
         }
     }
 
@@ -135,5 +135,10 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
             BaseGui<?> gui = ((GuiMechanicProfile<M>) getProfile()).<G>getGuiFactory().create((M) this, (AtomicReference<G>) this.inUse);
             player.openInventory(gui.getInventory());
         }
+    }
+
+    @Override
+    public String toString() {
+        return getProfile().getName() + (getProfile().getLevelRegistry() != null ? " (Lvl " + getLevel() + ")" : "");
     }
 }

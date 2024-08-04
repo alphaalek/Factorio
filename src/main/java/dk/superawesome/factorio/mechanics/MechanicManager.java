@@ -252,6 +252,6 @@ public class MechanicManager implements Listener {
 
         // player stuff
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 0.5f, 0.6f);
-        player.sendMessage("§eDu fjernede maskinen " + mechanic.getProfile().getName() + " (Lvl " + mechanic.getLevel() + ") ved " + Types.LOCATION.convert(mechanic.getLocation()) + ".");
+        player.sendMessage("§eDu fjernede maskinen " + mechanic.toString() + " ved " + Types.LOCATION.convert(mechanic.getLocation()) + ".");
     }
 }

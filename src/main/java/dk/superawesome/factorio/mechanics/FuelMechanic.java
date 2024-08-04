@@ -2,12 +2,16 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
+import dk.superawesome.factorio.mechanics.impl.Collector;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Hopper;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockVector;
 
@@ -17,7 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
-import java.util.stream.Collector;
+import java.util.function.Predicate;
 
 public interface FuelMechanic {
 
@@ -44,6 +48,8 @@ public interface FuelMechanic {
     int getFuelCapacity();
 
     List<BlockVector> getWasteOutputs();
+
+    Location getLocation();
 
     default <G extends BaseGui<G>> void putFuel(ItemCollection collection, Container<? extends TransferCollection> container, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui) {
         if (getFuel() != null && collection.has(new ItemStack(getFuel().getMaterial())) || getFuel() == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
@@ -87,6 +93,10 @@ public interface FuelMechanic {
             // due to working with floats, there can be calculation errors due to java binary encoding
             // this means that we can possibly end up with a number slightly above zero
             if (getCurrentFuelAmount() <= .001) {
+                // done using current fuel, check for any waste
+                if (getCurrentFuel().getWaste() != null) {
+                    handleWaste(getLocation(), getCurrentFuel().getWaste());
+                }
                 setCurrentFuel(null);
                 setCurrentFuelAmount(0); // ensure zero value (related problem mentioned above)
 
@@ -99,11 +109,22 @@ public interface FuelMechanic {
 
     default void handleWaste(Location def, Material waste) {
         for (BlockVector vec : getWasteOutputs()) {
+            // search for collectors to take the fuel waste
             Location loc = BlockUtil.getRel(def, vec);
-            if (loc.getBlock().getType() == Material.HOPPER) {
-                Mechanic<?> collector = Factorio.get().getMechanicManager(def.getWorld()).getMechanicPartially(loc);
-                if (collector instanceof Collector) {
+            Block block = loc.getBlock();
+            if (block.getType() == Material.HOPPER) {
+                MechanicManager manager =  Factorio.get().getMechanicManager(def.getWorld());
 
+                Hopper hopper = (Hopper) block.getBlockData();
+                // check if the hopper is facing towards the mechanic
+                if (manager.getMechanicPartially(block.getRelative(hopper.getFacing()).getLocation()) == this) {
+                    Mechanic<?> mechanic = manager.getMechanicPartially(loc);
+                    if (mechanic instanceof Collector collector) {
+                        if (collector.handleInput(waste)) {
+                            // the collector took the waste, just break
+                            break;
+                        }
+                    }
                 }
             }
         }

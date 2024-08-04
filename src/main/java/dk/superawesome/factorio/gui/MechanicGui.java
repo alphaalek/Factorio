@@ -35,7 +35,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
     }
 
     public MechanicGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback) {
-        this(mechanic, inUseReference, initCallback, mechanic.getProfile().getName() + " (Lvl " + mechanic.getLevel() + ")");
+        this(mechanic, inUseReference, initCallback, mechanic.toString());
     }
 
     @Override
@@ -96,7 +96,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
             int blaze = Math.round(fuelMechanic.getCurrentFuelAmount() * slots.size());
             int times = 0;
             for (int slot : slots) {
-                if (times++ > blaze) {
+                if (++times > blaze) {
                     getInventory().setItem(slot, new ItemStack(Material.RED_STAINED_GLASS_PANE));
                     continue;
                 }
