@@ -5,7 +5,6 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -15,7 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class StorageBox extends AbstractMechanic<StorageBox> implements ItemCollection, ItemContainer, SingleStorage {
+public class StorageBox extends AbstractMechanic<StorageBox> implements ItemCollection, ItemContainer, Storage {
 
     private ItemStack stored;
     private int amount;

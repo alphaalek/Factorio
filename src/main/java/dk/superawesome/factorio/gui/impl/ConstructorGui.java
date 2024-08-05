@@ -147,11 +147,9 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
             return false;
         }
+
         if (STORAGE_SLOTS.contains(event.getRawSlot())) {
-            return (event.getCursor() != null && event.getCursor().getType() != Material.AIR)
-                    || event.getAction() == InventoryAction.PLACE_ALL
-                    || event.getAction() == InventoryAction.PLACE_SOME
-                    || event.getAction() == InventoryAction.PLACE_ONE;
+            return handleOnlyCollectInteraction(event, getStorage(0));
         }
 
         return true;
@@ -160,9 +158,8 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     @Override
     public boolean onClickOpen(InventoryClickEvent event) {
         if (movedFromOtherInventory(event)) {
-            if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY
-                    && event.getCurrentItem() != null) {
-                if (STORAGE_SLOTS.contains(event.getRawSlot()) && event.getClickedInventory() == getInventory()) {
+            if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY && event.getCurrentItem() != null) {
+                if (STORAGE_SLOTS.contains(event.getRawSlot())) {
                     // allow collecting items from storage slots
                     return false;
                 } else if (event.getClickedInventory() != getInventory() && !getMechanic().getTickThrottle().isThrottled()) {
@@ -178,6 +175,11 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             }
 
             if (CRAFTING_SLOTS.contains(event.getRawSlot()) && event.getClickedInventory() == getInventory()) {
+                if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
+                    // update storage amount because this action can collect items from the storage slots
+                    updateAmount(getStorage(0), event.getWhoClicked(), STORAGE_SLOTS, this::updateAddedItems);
+                }
+
                 getMechanic().getTickThrottle().throttle();
                 Bukkit.getScheduler().runTask(Factorio.get(), this::updateCrafting);
 
@@ -188,15 +190,31 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                     && (event.getAction() == InventoryAction.HOTBAR_SWAP || event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD)) {
                 ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
                 ItemStack at  = event.getView().getItem(event.getRawSlot());
+
                 if (at != null && hotbarItem != null) {
                     if (hotbarItem.isSimilar(at)) {
                         int add = Math.min(at.getAmount(), hotbarItem.getMaxStackSize() - hotbarItem.getAmount());
                         hotbarItem.setAmount(hotbarItem.getAmount() + add);
                         at.setAmount(at.getAmount() - add);
+
+                        getMechanic().setStorageAmount(getMechanic().getStorageAmount() - add);
                     }
 
                     return true;
+                } else if (at != null) {
+                    getMechanic().setStorageAmount(getMechanic().getStorageAmount() - at.getAmount());
                 }
+
+                // don't allow inserting items
+                if (at == null) {
+                    return true;
+                }
+            }
+
+            if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR
+                    && event.getCursor() != null && getMechanic().getStorageType() != null && event.getCursor().isSimilar(getMechanic().getStorageType())) {
+                // update storage amount after this
+                updateAmount(getStorage(0), event.getWhoClicked(), STORAGE_SLOTS, this::updateAddedItems);
             }
         }
 

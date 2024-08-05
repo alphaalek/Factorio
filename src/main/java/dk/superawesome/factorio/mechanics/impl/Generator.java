@@ -7,7 +7,6 @@ import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -26,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class Generator extends AbstractMechanic<Generator> implements FuelMechanic, ItemContainer, ThinkingMechanic, SignalSource, Lightable, SingleStorage {
+public class Generator extends AbstractMechanic<Generator> implements FuelMechanic, ItemContainer, ThinkingMechanic, SignalSource, Lightable, Storage {
 
     private static final List<BlockVector> WASTE_OUTPUT_RELATIVES = Arrays.asList(
             new BlockVector(0, 1, 1),

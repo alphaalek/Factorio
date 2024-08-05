@@ -3,6 +3,7 @@ package dk.superawesome.factorio.gui.impl;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.Fuel;
+import dk.superawesome.factorio.mechanics.Storage;
 import dk.superawesome.factorio.mechanics.impl.Smelter;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
@@ -39,6 +40,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             getInventory().setItem(i, new ItemStack(Material.FURNACE));
         }
         getInventory().setItem(35, new ItemBuilder(Material.FEATHER).setName("§eOpdatér Inventar").build());
+        registerEvent(35, __ -> loadInputOutputItems());
 
         updateFuelState();
         if (getMechanic().isDeclined()) {
@@ -86,11 +88,9 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     private void updateAmount(List<Integer> slots, Consumer<Integer> applyDiff) {
         getMechanic().getTickThrottle().throttle();
 
-        int before = find(slots).stream()
-                .mapToInt(ItemStack::getAmount).sum();
+        int before = find(slots).stream().mapToInt(ItemStack::getAmount).sum();
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-            int after = find(slots).stream()
-                    .mapToInt(ItemStack::getAmount).sum();
+            int after = find(slots).stream().mapToInt(ItemStack::getAmount).sum();
 
             // get the difference in the items of the current inventory view of the storage box
             int diff = before - after;
@@ -124,8 +124,8 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
     @Override
     public boolean onDrag(InventoryDragEvent event) {
-        if (getMechanic().getTickThrottle().isThrottled()
-                && event.getRawSlots().stream().anyMatch(s -> event.getView().getInventory(s).getType() != InventoryType.PLAYER)) {
+        boolean anySlotInInv = event.getRawSlots().stream().anyMatch(s -> !event.getView().getInventory(s).equals(event.getWhoClicked().getOpenInventory().getBottomInventory()));
+        if (getMechanic().getTickThrottle().isThrottled() && anySlotInInv) {
             return true;
         }
 
@@ -139,7 +139,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         for (ItemStack item : event.getNewItems().values()) {
             // disallow if ingredient is not allowed
             if (modifyIngredients
-                    && getMechanic().getIngredient() != null && !getMechanic().getIngredient().isSimilar(item) || getMechanic().getIngredient() == null && !getMechanic().canSmelt(item.getType())) {
+                    && (getMechanic().getIngredient() != null && !getMechanic().getIngredient().isSimilar(item) || getMechanic().getIngredient() == null && !getMechanic().canSmelt(item.getType()))) {
                 return true;
             }
 
@@ -151,7 +151,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         }
 
         // this was not dragged over either the ingredient or fuel slots, don't continue
-        if (!modifyFuel && !modifyIngredients) {
+        if (!modifyFuel && !modifyIngredients && anySlotInInv) {
             return true;
         }
 
@@ -223,8 +223,8 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             return true;
         }
 
-        if (event.getRawSlot() == 35) {
-            loadInputOutputItems();
+        if (STORAGE_SLOTS.contains(event.getRawSlot())) {
+            return handleOnlyCollectInteraction(event, getStorage(Smelter.STORED_STORAGE_CONTEXT));
         }
 
         return true;
@@ -246,12 +246,13 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     public boolean onClickOpen(InventoryClickEvent event) {
         if (movedFromOtherInventory(event)) {
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY && event.getClickedInventory() != null) {
-
                 if (event.getClickedInventory() == getInventory()) {
                     if (INGREDIENT_SLOTS.contains(event.getRawSlot())) {
                         updateIngredientsPost = true;
                     } else if (FUEL_SLOTS.contains(event.getRawSlot())) {
                         updateFuelPost = true;
+                    } else if (STORAGE_SLOTS.contains(event.getRawSlot())) {
+                        return false;
                     }
                 } else if (!getMechanic().getTickThrottle().isThrottled()) {
                     ItemStack item = event.getClickedInventory().getItem(event.getSlot());
@@ -347,6 +348,26 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                     }
                 }
 
+                if (STORAGE_SLOTS.contains(event.getRawSlot())) {
+                    ItemStack at  = event.getView().getItem(event.getRawSlot());
+
+                    if (at != null) {
+                        getMechanic().setStorageAmount(getMechanic().getStorageAmount() - at.getAmount());
+                        if (hotbarItem != null) {
+                            if (hotbarItem.isSimilar(at)) {
+                                int add = Math.min(at.getAmount(), hotbarItem.getMaxStackSize() - hotbarItem.getAmount());
+                                hotbarItem.setAmount(hotbarItem.getAmount() + add);
+                                at.setAmount(at.getAmount() - add);
+                                getMechanic().setStorageAmount(getMechanic().getStorageAmount() + add);
+                            }
+
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
                 return true;
             }
         }
@@ -402,6 +423,8 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                 }
             }
         }
+
+        Bukkit.broadcastMessage("Amount: " + getMechanic().getStorageAmount());
 
         updateIngredientsPost = false;
         updateFuelPost = false;

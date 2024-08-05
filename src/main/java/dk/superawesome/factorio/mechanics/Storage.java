@@ -2,7 +2,7 @@ package dk.superawesome.factorio.mechanics;
 
 import org.bukkit.inventory.ItemStack;
 
-public interface SingleStorage {
+public interface Storage {
 
     ItemStack getStored();
 

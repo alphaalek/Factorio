@@ -25,6 +25,10 @@ import java.util.function.Predicate;
 
 public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
+    public static final int INGREDIENT_STORAGE_CONTEXT = 0;
+    public static final int FUEL_STORAGE_CONTEXT = 1;
+    public static final int STORED_STORAGE_CONTEXT = 2;
+
     public static final int INGREDIENT_CAPACITY = 1;
     private static final List<BlockVector> WASTE_OUTPUT_RELATIVES = Arrays.asList(
             new BlockVector(0, 2, 0),

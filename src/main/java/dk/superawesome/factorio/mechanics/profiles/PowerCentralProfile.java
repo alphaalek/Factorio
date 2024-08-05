@@ -33,6 +33,11 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
     }
 
     @Override
+    public StorageProvider<PowerCentral> getStorageProvider() {
+        return null;
+    }
+
+    @Override
     public GuiFactory<PowerCentral, PowerCentralGui> getGuiFactory() {
         return guiFactory;
     }

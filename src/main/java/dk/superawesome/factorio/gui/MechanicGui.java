@@ -5,13 +5,20 @@ import de.rapha149.signgui.SignGUIAction;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.FuelMechanic;
 import dk.superawesome.factorio.mechanics.Mechanic;
+import dk.superawesome.factorio.mechanics.Storage;
+import dk.superawesome.factorio.mechanics.StorageProvider;
 import dk.superawesome.factorio.util.Callback;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -87,6 +94,15 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         gui.open(p);
     }
 
+    protected int getAffectedAmountForAction(InventoryAction action, ItemStack item) {
+        return switch (action) {
+            case DROP_ALL_CURSOR, DROP_ALL_SLOT, PICKUP_ALL, PICKUP_SOME, MOVE_TO_OTHER_INVENTORY -> item.getAmount();
+            case DROP_ONE_SLOT, DROP_ONE_CURSOR, PICKUP_ONE -> 1;
+            case PICKUP_HALF -> (int) Math.round(item.getAmount() / 2d);
+            default -> 0;
+        };
+    }
+
     public void updateFuelState(List<Integer> slots) {
         if (getMechanic() instanceof FuelMechanic fuelMechanic) {
             int blaze = Math.round(fuelMechanic.getCurrentFuelAmount() * slots.size());
@@ -100,6 +116,71 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
                 getInventory().setItem(slot, new ItemStack(Material.BLAZE_POWDER));
             }
         }
+    }
+
+    protected List<ItemStack> findItems(List<Integer> slots) {
+        List<ItemStack> items = new ArrayList<>();
+        for (int i : slots) {
+            ItemStack item = getInventory().getItem(i);
+            if (item != null) {
+                items.add(item);
+            }
+        }
+
+        return items;
+    }
+
+    protected Storage getStorage(int context) {
+        StorageProvider<M> provider = mechanic.getProfile().getStorageProvider();
+        if (provider != null) {
+            return provider.createStorage(mechanic, context);
+        }
+
+        return null;
+    }
+
+    protected boolean handleOnlyCollectInteraction(InventoryClickEvent event, Storage storage) {
+        if (event.getAction() == InventoryAction.PLACE_ONE
+                || event.getAction() == InventoryAction.PLACE_ALL
+                || event.getAction() == InventoryAction.PLACE_SOME
+                || event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
+            return true;
+        }
+
+        if (event.getCurrentItem() != null) {
+            storage.setAmount(storage.getAmount() - getAffectedAmountForAction(event.getAction(), event.getCurrentItem()));
+        }
+
+        return false;
+    }
+
+    protected void updateAmount(Storage storage, HumanEntity adder, List<Integer> slots, Consumer<Integer> leftover) {
+        getMechanic().getTickThrottle().throttle();
+
+        int before = findItems(slots).stream().mapToInt(ItemStack::getAmount).sum();
+        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+            // get the difference in items of the storage box inventory view
+            int after = findItems(slots).stream().mapToInt(ItemStack::getAmount).sum();
+            int diff = after - before;
+
+            Bukkit.broadcastMessage("Diff " + diff);
+
+            // check if the storage box has enough space for these items
+            if (after > before && storage.getAmount() + diff > storage.getCapacity()) {
+                // evaluate leftovers
+                int left = storage.getAmount() + diff - storage.getCapacity();
+                leftover.accept(left);
+                storage.setAmount(storage.getCapacity());
+
+                // add leftovers to player inventory again
+                ItemStack item = storage.getStored().clone();
+                item.setAmount(left);
+                adder.getInventory().addItem(item);
+            } else {
+                // update storage amount in storage box
+                storage.setAmount(storage.getAmount() + diff);
+            }
+        });
     }
 
     protected int updateAddedItems(Inventory inventory, int amount, ItemStack stored, List<Integer> slots) {

@@ -34,6 +34,11 @@ public class EmeraldForgeProfile implements GuiMechanicProfile<EmeraldForge> {
     }
 
     @Override
+    public StorageProvider<EmeraldForge> getStorageProvider() {
+        return null;
+    }
+
+    @Override
     public GuiFactory<EmeraldForge, EmeraldForgeGui> getGuiFactory() {
         return guiFactory;
     }

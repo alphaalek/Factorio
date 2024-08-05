@@ -8,7 +8,6 @@ import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -21,9 +20,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
-import java.util.function.Predicate;
 
 public interface FuelMechanic {
 
@@ -168,6 +167,35 @@ public interface FuelMechanic {
             context.getSerializer().writeItemStack(str, null);
             context.getSerializer().writeInt(str, 0);
         }
+    }
+
+    default Storage convertFuelStorage() {
+        return new Storage() {
+            @Override
+            public ItemStack getStored() {
+                return Optional.ofNullable(getFuel()).map(Fuel::getMaterial).map(ItemStack::new).orElse(null);
+            }
+
+            @Override
+            public void setStored(ItemStack stored) {
+                setFuel(Fuel.getFuel(stored.getType()));
+            }
+
+            @Override
+            public int getAmount() {
+                return getFuelAmount();
+            }
+
+            @Override
+            public void setAmount(int amount) {
+                setFuelAmount(amount);
+            }
+
+            @Override
+            public int getCapacity() {
+                return getFuelCapacity();
+            }
+        };
     }
 
     enum FuelState {

@@ -252,4 +252,8 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
     public int getStorageAmount() {
         return storageAmount;
     }
+
+    public void setStorageAmount(int amount) {
+        this.storageAmount = amount;
+    }
 }

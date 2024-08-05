@@ -10,6 +10,7 @@ import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -31,6 +32,41 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
     @Override
     public MechanicFactory<Constructor> getFactory() {
         return factory;
+    }
+
+    @Override
+    public StorageProvider<Constructor> getStorageProvider() {
+        return new StorageProvider<Constructor>() {
+            @Override
+            public Storage createStorage(Constructor mechanic, int context) {
+                return new Storage() {
+                    @Override
+                    public ItemStack getStored() {
+                        return mechanic.getStorageType();
+                    }
+
+                    @Override
+                    public void setStored(ItemStack stored) {
+                        mechanic.setStorageType(stored);
+                    }
+
+                    @Override
+                    public int getAmount() {
+                        return mechanic.getStorageAmount();
+                    }
+
+                    @Override
+                    public void setAmount(int amount) {
+                        mechanic.setStorageAmount(amount);
+                    }
+
+                    @Override
+                    public int getCapacity() {
+                        return mechanic.getCapacity();
+                    }
+                };
+            }
+        };
     }
 
     @Override

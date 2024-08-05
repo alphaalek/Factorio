@@ -2,10 +2,7 @@ package dk.superawesome.factorio.mechanics.profiles;
 
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
-import dk.superawesome.factorio.mechanics.MechanicFactory;
-import dk.superawesome.factorio.mechanics.MechanicLevel;
-import dk.superawesome.factorio.mechanics.MechanicProfile;
-import dk.superawesome.factorio.mechanics.MechanicStorageContext;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.Assembler;
 import dk.superawesome.factorio.mechanics.impl.Collector;
 import org.bukkit.Location;
@@ -23,6 +20,11 @@ public class CollectorProfile implements MechanicProfile<Collector> {
     @Override
     public Building getBuilding() {
         return Buildings.COLLECTOR;
+    }
+
+    @Override
+    public StorageProvider<Collector> getStorageProvider() {
+        return null;
     }
 
     @Override

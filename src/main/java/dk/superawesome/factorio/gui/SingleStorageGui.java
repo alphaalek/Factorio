@@ -2,11 +2,10 @@ package dk.superawesome.factorio.gui;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.Mechanic;
-import dk.superawesome.factorio.mechanics.SingleStorage;
+import dk.superawesome.factorio.mechanics.Storage;
 import dk.superawesome.factorio.util.Callback;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -31,7 +30,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         this.slots = slots;
     }
     
-    public abstract SingleStorage getStorage();
+    public abstract Storage getStorage();
 
     protected abstract boolean isItemAllowed(ItemStack item);
 
@@ -42,51 +41,12 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         }
     }
 
-    public List<ItemStack> findItems() {
-        List<ItemStack> items = new ArrayList<>();
-        for (int i : slots) {
-            ItemStack item = getInventory().getItem(i);
-            if (item != null) {
-                items.add(item);
-            }
-        }
-
-        return items;
-    }
-
     public void updateAddedItems(int amount) {
         updateAddedItems(getInventory(), amount, getStorage().getStored(), slots);
     }
 
     public void updateRemovedItems(int amount) {
         updateRemovedItems(getInventory(), amount, getStorage().getStored(), slots.stream().sorted(Collections.reverseOrder()).collect(Collectors.toList()));
-    }
-
-    private void updateAmount(HumanEntity adder) {
-        getMechanic().getTickThrottle().throttle();
-
-        int before = findItems().stream().mapToInt(ItemStack::getAmount).sum();
-        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-            // get the difference in items of the storage box inventory view
-            int after = findItems().stream().mapToInt(ItemStack::getAmount).sum();
-            int diff = after - before;
-
-            // check if the storage box has enough space for these items
-            if (after > before && getStorage().getAmount() + diff > getStorage().getCapacity()) {
-                // evaluate leftovers
-                int left = getStorage().getAmount() + diff - getStorage().getCapacity();
-                updateRemovedItems(left);
-                getStorage().setAmount(getStorage().getCapacity());
-
-                // add leftovers to player inventory again
-                ItemStack item = getStorage().getStored().clone();
-                item.setAmount(left);
-                adder.getInventory().addItem(item);
-            } else {
-                // update storage amount in storage box
-                getStorage().setAmount(getStorage().getAmount() + diff);
-            }
-        });
     }
 
     private boolean registerInteractionAndCheckFailed(ItemStack item) {
@@ -345,7 +305,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
                 return true;
             }
             else if ((event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD || event.getAction() == InventoryAction.HOTBAR_SWAP)
-                    && (event.getCurrentItem() == null || findItems().size() > 1)
+                    && (event.getCurrentItem() == null || findItems(slots).size() > 1)
                     && registerInteractionAndCheckFailed(event.getWhoClicked().getInventory().getItem(event.getHotbarButton()))) {
                 return true;
             }
@@ -361,7 +321,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         }
 
         if (!event.isCancelled()) {
-            updateAmount(event.getWhoClicked());
+            updateAmount(getStorage(), event.getWhoClicked(), slots, this::updateAddedItems);
         }
     }
 }

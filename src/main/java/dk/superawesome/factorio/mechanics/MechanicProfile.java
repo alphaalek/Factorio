@@ -13,5 +13,7 @@ public interface MechanicProfile<M extends Mechanic<M>> extends Identifiable {
 
     MechanicFactory<M> getFactory();
 
+    StorageProvider<M> getStorageProvider();
+
     MechanicLevel.Registry getLevelRegistry();
 }

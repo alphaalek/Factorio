@@ -1,7 +1,7 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.gui.SingleStorageGui;
-import dk.superawesome.factorio.mechanics.SingleStorage;
+import dk.superawesome.factorio.mechanics.Storage;
 import dk.superawesome.factorio.mechanics.impl.StorageBox;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Material;
@@ -41,7 +41,7 @@ public class StorageBoxGui extends SingleStorageGui<StorageBoxGui, StorageBox> {
     }
 
     @Override
-    public SingleStorage getStorage() {
+    public Storage getStorage() {
         return getMechanic();
     }
 

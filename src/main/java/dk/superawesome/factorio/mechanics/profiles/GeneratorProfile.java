@@ -34,6 +34,16 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
     }
 
     @Override
+    public StorageProvider<Generator> getStorageProvider() {
+        return new StorageProvider<Generator>() {
+            @Override
+            public Storage createStorage(Generator mechanic, int context) {
+                return mechanic.convertFuelStorage();
+            }
+        };
+    }
+
+    @Override
     public GuiFactory<Generator, GeneratorGui> getGuiFactory() {
         return guiFactory;
     }
