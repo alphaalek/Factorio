@@ -53,7 +53,7 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(64 * 3, 64 * 125, 64 * 175, 64 * 250, 64 * 500))
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(64 * 35, 64 * 125, 64 * 175, 64 * 250, 64 * 500))
                 .build();
     }
 

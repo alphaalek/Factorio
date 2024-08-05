@@ -11,10 +11,12 @@ public class MoneyCollectEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     private boolean cancelled;
+    private boolean collected;
 
     private final Player player;
     private final double amount;
     private final MoneyContainer container;
+
 
     public MoneyCollectEvent(Player player, double amount, MoneyContainer container) {
         this.player = player;
@@ -42,6 +44,14 @@ public class MoneyCollectEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;
+    }
+
+    public void setCollected() {
+        collected = true;
+    }
+
+    public boolean isCollected() {
+        return collected;
     }
 
     @Override

@@ -305,10 +305,21 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             }
 
             // ... get the material occurring the most of the values from these tags
-            Material mostOccur = materials.stream()
-                    .reduce(BinaryOperator.maxBy(Comparator.comparingInt(o -> Collections.frequency(materials, o))))
-                    .orElse(null);
-            return mostOccur == offerMat;
+            List<Map.Entry<Material, Long>> mostOccur = materials.stream().collect(Collectors.groupingBy(i -> i, Collectors.counting()))
+                    .entrySet().stream()
+                    .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                    .toList();
+            long prev = 0;
+            for (Map.Entry<Material, Long> entry : mostOccur) {
+                if (entry.getValue() >= prev) {
+                    prev = entry.getValue();
+                    if (offerMat == entry.getKey()) {
+                        return true;
+                    }
+                    continue;
+                }
+                return false;
+            }
         }
 
         return false;

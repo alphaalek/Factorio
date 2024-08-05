@@ -82,7 +82,7 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
 
             MoneyCollectEvent collectEvent = new MoneyCollectEvent(player, moneyAmount, getMechanic());
             Bukkit.getPluginManager().callEvent(collectEvent);
-            if (collectEvent.isCancelled()) {
+            if (collectEvent.isCancelled() || !collectEvent.isCollected()) {
                 player.sendMessage("§cKunne ikke tage fra maskinens inventar. Kontakt en udvikler.");
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                 return;
