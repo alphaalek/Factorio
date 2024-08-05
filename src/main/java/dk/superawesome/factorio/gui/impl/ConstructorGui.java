@@ -186,31 +186,14 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                 return false;
             }
 
+            // check hotbar swap interaction for storage slots
             if (STORAGE_SLOTS.contains(event.getRawSlot())
-                    && (event.getAction() == InventoryAction.HOTBAR_SWAP || event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD)) {
-                ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
-                ItemStack at  = event.getView().getItem(event.getRawSlot());
-
-                if (at != null && hotbarItem != null) {
-                    if (hotbarItem.isSimilar(at)) {
-                        int add = Math.min(at.getAmount(), hotbarItem.getMaxStackSize() - hotbarItem.getAmount());
-                        hotbarItem.setAmount(hotbarItem.getAmount() + add);
-                        at.setAmount(at.getAmount() - add);
-
-                        getMechanic().setStorageAmount(getMechanic().getStorageAmount() - add);
-                    }
-
-                    return true;
-                } else if (at != null) {
-                    getMechanic().setStorageAmount(getMechanic().getStorageAmount() - at.getAmount());
-                }
-
-                // don't allow inserting items
-                if (at == null) {
-                    return true;
-                }
+                    && (event.getAction() == InventoryAction.HOTBAR_SWAP || event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD)
+                    && handleOnlyHotbarCollectInteraction(event, getStorage(0))) {
+                return true;
             }
 
+            // ensure correct storage amount when collecting items from the storage slots
             if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR
                     && event.getCursor() != null && getMechanic().getStorageType() != null && event.getCursor().isSimilar(getMechanic().getStorageType())) {
                 // update storage amount after this

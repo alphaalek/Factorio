@@ -118,7 +118,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                 // smooth out graph
                 if (grade != -1 && i > 0 && columns[i - 1] != grade) {
                     int lowestPrev = getLowestGrade(columns[i - 1]);
-                    int highestPrev = (columns[i - 1] & GRADE_MASK);
+                    int highestPrev = columns[i - 1] & GRADE_MASK;
                     lowestPrev--; highestPrev--; // make 0-index based
 
                     // check if we have to smooth out the graph

@@ -154,6 +154,32 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         return false;
     }
 
+    protected boolean handleOnlyHotbarCollectInteraction(InventoryClickEvent event, Storage storage) {
+        ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
+        ItemStack at  = event.getView().getItem(event.getRawSlot());
+
+        if (at != null && hotbarItem != null) {
+            if (hotbarItem.isSimilar(at)) {
+                int add = Math.min(at.getAmount(), hotbarItem.getMaxStackSize() - hotbarItem.getAmount());
+                hotbarItem.setAmount(hotbarItem.getAmount() + add);
+                at.setAmount(at.getAmount() - add);
+
+                storage.setAmount(storage.getAmount() - add);
+            }
+
+            return true;
+        } else if (at != null) {
+            storage.setAmount(storage.getAmount() - at.getAmount());
+        }
+
+        // don't allow inserting items
+        if (at == null) {
+            return true;
+        }
+
+        return false;
+    }
+
     protected void updateAmount(Storage storage, HumanEntity adder, List<Integer> slots, Consumer<Integer> leftover) {
         getMechanic().getTickThrottle().throttle();
 

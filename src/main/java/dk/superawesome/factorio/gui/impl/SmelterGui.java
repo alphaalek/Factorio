@@ -185,7 +185,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                 return false;
             }
 
-            if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR)) {
+            if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
                 if (getMechanic().getIngredient() != null && getMechanic().getIngredient().isSimilar(event.getCursor()) || getMechanic().getIngredient() == null && getMechanic().canSmelt(event.getCursor().getType())) {
                     updateIngredientsPost = true;
 
@@ -290,6 +290,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                 }
             }
 
+            // ensure correct amount when collecting items from the different kind of stored slots
             if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR && event.getCursor() != null) {
                 if (getMechanic().getIngredient() != null
                         && event.getCursor().isSimilar(getMechanic().getIngredient())) {
@@ -299,6 +300,11 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                 if (getMechanic().getFuel() != null
                         && event.getCursor().getType() == getMechanic().getFuel().getMaterial()) {
                     updateFuelPost = true;
+                }
+
+                if (getMechanic().getStorageType() != null
+                        && event.getCursor().isSimilar(getMechanic().getStorageType())) {
+                    updateAmount(STORAGE_SLOTS, diff -> getMechanic().setStorageAmount(getMechanic().getStorageAmount() - diff));
                 }
             }
 
@@ -348,23 +354,9 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                     }
                 }
 
-                if (STORAGE_SLOTS.contains(event.getRawSlot())) {
-                    ItemStack at  = event.getView().getItem(event.getRawSlot());
-
-                    if (at != null) {
-                        getMechanic().setStorageAmount(getMechanic().getStorageAmount() - at.getAmount());
-                        if (hotbarItem != null) {
-                            if (hotbarItem.isSimilar(at)) {
-                                int add = Math.min(at.getAmount(), hotbarItem.getMaxStackSize() - hotbarItem.getAmount());
-                                hotbarItem.setAmount(hotbarItem.getAmount() + add);
-                                at.setAmount(at.getAmount() - add);
-                                getMechanic().setStorageAmount(getMechanic().getStorageAmount() + add);
-                            }
-
-                            return true;
-                        }
-                    }
-
+                // check hotbar swap interaction for storage slots
+                if (STORAGE_SLOTS.contains(event.getRawSlot())
+                        && !handleOnlyHotbarCollectInteraction(event, getStorage(Smelter.STORED_STORAGE_CONTEXT))) {
                     return false;
                 }
 
@@ -375,32 +367,17 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         return false;
     }
 
-    private void updateIngredientsPost() {
-        if (getMechanic().getIngredientAmount() == 0) {
-            getMechanic().setIngredient(null);
-            getMechanic().setSmeltResult(null);
-        }
-
-        if (getMechanic().getSmeltResult() == null && getMechanic().getIngredient() != null) {
-            getMechanic().setSmeltResult(getMechanic().getCachedSmeltResult());
-        }
-    }
-
     private void updateIngredients() {
         updateAmount(INGREDIENT_SLOTS, diff -> {
             getMechanic().setIngredientAmount(getMechanic().getIngredientAmount() - diff);
-            updateIngredientsPost();
+            if (getMechanic().getSmeltResult() == null && getMechanic().getIngredient() != null) {
+                getMechanic().setSmeltResult(getMechanic().getCachedSmeltResult());
+            }
         });
     }
 
     private void updateFuel() {
-        updateAmount(FUEL_SLOTS, diff -> {
-            getMechanic().setFuelAmount(getMechanic().getFuelAmount() - diff);
-
-            if (getMechanic().getFuelAmount() == 0) {
-                getMechanic().setFuel(null);
-            }
-        });
+        updateAmount(FUEL_SLOTS, diff -> getMechanic().setFuelAmount(getMechanic().getFuelAmount() - diff));
     }
 
     private boolean updateIngredientsPost;
@@ -412,19 +389,15 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             if (!event.isCancelled() && !getMechanic().getTickThrottle().isThrottled()) {
                 updateIngredients();
             } else {
-                updateIngredientsPost();
+                if (getMechanic().getSmeltResult() == null && getMechanic().getIngredient() != null) {
+                    getMechanic().setSmeltResult(getMechanic().getCachedSmeltResult());
+                }
             }
         } else if (updateFuelPost) {
             if (!event.isCancelled() && !getMechanic().getTickThrottle().isThrottled()) {
                 updateFuel();
-            } else {
-                if (getMechanic().getFuelAmount() == 0) {
-                    getMechanic().setFuel(null);
-                }
             }
         }
-
-        Bukkit.broadcastMessage("Amount: " + getMechanic().getStorageAmount());
 
         updateIngredientsPost = false;
         updateFuelPost = false;

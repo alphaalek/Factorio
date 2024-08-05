@@ -280,6 +280,10 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     public void setIngredientAmount(int amount) {
         this.ingredientAmount = amount;
+
+        if (this.ingredientAmount == 0) {
+            ingredient = null;
+        }
     }
 
     public Fuel getFuel() {
@@ -296,6 +300,10 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     public void setFuelAmount(int amount) {
         this.fuelAmount = amount;
+
+        if (this.fuelAmount == 0) {
+            fuel = null;
+        }
     }
 
     @Override
