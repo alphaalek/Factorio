@@ -41,8 +41,8 @@ public class StorageBoxGui extends SingleStorageGui<StorageBoxGui, StorageBox> {
     }
 
     @Override
-    public Storage getStorage() {
-        return getMechanic();
+    public int getContext() {
+        return 0;
     }
 
     @Override

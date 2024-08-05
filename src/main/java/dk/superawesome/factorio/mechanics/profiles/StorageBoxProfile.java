@@ -39,32 +39,7 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
         return new StorageProvider<StorageBox>() {
             @Override
             public Storage createStorage(StorageBox mechanic, int context) {
-                return new Storage() {
-                    @Override
-                    public ItemStack getStored() {
-                        return mechanic.getStored();
-                    }
-
-                    @Override
-                    public void setStored(ItemStack stored) {
-                        mechanic.setStored(stored);
-                    }
-
-                    @Override
-                    public int getAmount() {
-                        return mechanic.getAmount();
-                    }
-
-                    @Override
-                    public void setAmount(int amount) {
-                        mechanic.setAmount(amount);
-                    }
-
-                    @Override
-                    public int getCapacity() {
-                        return mechanic.getCapacity();
-                    }
-                };
+                return mechanic;
             }
         };
     }

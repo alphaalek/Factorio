@@ -189,8 +189,6 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
             int after = findItems(slots).stream().mapToInt(ItemStack::getAmount).sum();
             int diff = after - before;
 
-            Bukkit.broadcastMessage("Diff " + diff);
-
             // check if the storage box has enough space for these items
             if (after > before && storage.getAmount() + diff > storage.getCapacity()) {
                 // evaluate leftovers

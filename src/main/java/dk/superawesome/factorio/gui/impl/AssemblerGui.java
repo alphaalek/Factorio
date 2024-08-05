@@ -4,6 +4,8 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.gui.PaginatedGui;
+import dk.superawesome.factorio.gui.SingleStorageGui;
+import dk.superawesome.factorio.mechanics.Storage;
 import dk.superawesome.factorio.mechanics.impl.Assembler;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import dk.superawesome.factorio.util.statics.StringUtil;
@@ -11,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -20,13 +23,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
+public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
     private static final List<Integer> STORAGE_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
     private static final List<Integer> MONEY_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40);
 
     public AssemblerGui(Assembler mechanic, AtomicReference<AssemblerGui> inUseReference) {
-        super(mechanic, inUseReference, new InitCallbackHolder());
+        super(mechanic, inUseReference, new InitCallbackHolder(), STORAGE_SLOTS);
         initCallback.call();
     }
 
@@ -152,6 +155,16 @@ public class AssemblerGui extends MechanicGui<AssemblerGui, Assembler> {
             }
 
         }.getInventory());
+    }
+
+    @Override
+    public int getContext() {
+        return 0;
+    }
+
+    @Override
+    protected boolean isItemAllowed(ItemStack item) {
+        return Assembler.Types.getType(item.getType()).isPresent();
     }
 
     @Override

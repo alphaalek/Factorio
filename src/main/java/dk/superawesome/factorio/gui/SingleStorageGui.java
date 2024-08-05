@@ -24,45 +24,47 @@ import java.util.stream.IntStream;
 public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<M>> extends MechanicGui<G, M> {
     
     private final List<Integer> slots;
+    private final Storage storage;
     
     public SingleStorageGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback, List<Integer> slots) {
         super(mechanic, inUseReference, initCallback);
         this.slots = slots;
+        storage = mechanic.getProfile().getStorageProvider().createStorage(mechanic, getContext());
     }
     
-    public abstract Storage getStorage();
+    public abstract int getContext();
 
     protected abstract boolean isItemAllowed(ItemStack item);
 
     @Override
     public void loadInputOutputItems() {
-        if (getStorage() != null) {
-            loadStorageTypes(getStorage().getStored(), getStorage().getAmount(), slots);
+        if (storage != null) {
+            loadStorageTypes(storage.getStored(), storage.getAmount(), slots);
         }
     }
 
     public void updateAddedItems(int amount) {
-        updateAddedItems(getInventory(), amount, getStorage().getStored(), slots);
+        updateAddedItems(getInventory(), amount, storage.getStored(), slots);
     }
 
     public void updateRemovedItems(int amount) {
-        updateRemovedItems(getInventory(), amount, getStorage().getStored(), slots.stream().sorted(Collections.reverseOrder()).collect(Collectors.toList()));
+        updateRemovedItems(getInventory(), amount, storage.getStored(), slots.stream().sorted(Collections.reverseOrder()).collect(Collectors.toList()));
     }
 
     private boolean registerInteractionAndCheckFailed(ItemStack item) {
         if (item != null && item.getType() != Material.AIR) {
             // check if a player tries to add an item to the storage box which is not the one currently being stored
-            if (getStorage().getStored() != null && !item.isSimilar(getStorage().getStored())
+            if (storage.getStored() != null && !item.isSimilar(storage.getStored())
                     // check if this item is allowed to be stored
                     || !isItemAllowed(item)) {
                 return true;
             }
 
             // update stored stack
-            if (getStorage().getStored() == null) {
+            if (storage.getStored() == null) {
                 ItemStack stored = item.clone();
                 stored.setAmount(1);
-                getStorage().setStored(stored);
+                storage.setStored(stored);
             }
         }
 
@@ -75,16 +77,14 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
             return true;
         }
 
-        // check if all slots dragged over are just in the player's own inventory
-        if (event.getRawSlots().stream().allMatch(s -> event.getView().getInventory(s).getType() == InventoryType.PLAYER)
-                // check if none of the slots are in the storage box view
-                || event.getRawSlots().stream().noneMatch(slots::contains)) {
+        // check if all slots dragged over are in the storage view
+        if (!event.getRawSlots().stream().allMatch(s -> slots.contains(s) || event.getView().getInventory(s).equals(event.getWhoClicked().getOpenInventory().getBottomInventory()))) {
             // ... if it was, don't continue
-            return false;
+            return true;
         }
 
-        int amount = getStorage().getAmount();
-        if (amount == getStorage().getCapacity()) {
+        int amount = storage.getAmount();
+        if (amount == storage.getCapacity()) {
             return true;
         }
 
@@ -96,7 +96,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
                                 .orElse(0)
                 )
                 .sum();
-        boolean checkSize = amount + added > getStorage().getCapacity();
+        boolean checkSize = amount + added > storage.getCapacity();
 
         ItemStack cursor = event.getOldCursor();
         boolean cancel = false;
@@ -123,8 +123,8 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
             }
 
             // check if the storage box does not have enough capacity for these items
-            if (checkSize && amount > getStorage().getCapacity()) {
-                int subtract = amount - getStorage().getCapacity();
+            if (checkSize && amount > storage.getCapacity()) {
+                int subtract = amount - storage.getCapacity();
                 amount -= subtract;
                 added -= subtract;
                 item.setAmount(item.getAmount() - subtract);
@@ -134,7 +134,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         }
 
         // update storage amount for storage box
-        getStorage().setAmount(amount);
+        storage.setAmount(amount);
 
         // do manual work if there was too many items tried to be added
         if (cancel) {
@@ -190,9 +190,9 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         if (event.getClick().isLeftClick()) {
             // create a put function
             Consumer<Double> put = a -> {
-                int space = Math.min(getStorage().getCapacity() - getStorage().getAmount(), (int) a.doubleValue());
+                int space = Math.min(storage.getCapacity() - storage.getAmount(), (int) a.doubleValue());
                 // take all items from the player's inventory and put into the storage box
-                int left = updateRemovedItems(playerInv, space, getStorage().getStored(),
+                int left = updateRemovedItems(playerInv, space, storage.getStored(),
                         IntStream.range(0, playerInv.getSize())
                                 .boxed()
                                 .collect(Collectors.toList()));
@@ -200,13 +200,13 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
 
                 // update amount if we were able to add anything
                 if (amount > 0) {
-                    getStorage().setAmount(getStorage().getAmount() + amount);
+                    storage.setAmount(storage.getAmount() + amount);
                     updateAddedItems(amount);
                 }
             };
 
             Material stored = null;
-            if (getStorage().getStored() == null) {
+            if (storage.getStored() == null) {
                 // the storage box does not have any stored item
                 // find the item type in the player inventory which occurs the most
                 Map<Material, Integer> typeAmounts = new HashMap<>();
@@ -216,32 +216,32 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
                 if (highest != null) {
                     if (event.getClick().isShiftClick()) {
                         // update the stored amount and put into the storage box at (1)
-                        getStorage().setStored(new ItemStack(highest));
+                        storage.setStored(new ItemStack(highest));
                     } else {
                         stored = highest;
                         Consumer<Double> putCopy = put;
                         put = i -> {
-                            if (getStorage().getStored() == null) {
+                            if (storage.getStored() == null) {
                                 // the stored type has not changed while the player was editing the sign
                                 // just assume the highest item count is the same as when the sign was opened
-                                getStorage().setStored(new ItemStack(highest));
+                                storage.setStored(new ItemStack(highest));
                             }
                             putCopy.accept(i);
                         };
                     }
                 }
-            } else if (getStorage().getAmount() >= getStorage().getCapacity()) {
+            } else if (storage.getAmount() >= storage.getCapacity()) {
                 return;
             }
 
-            if (stored == null && getStorage().getStored() != null) {
-                stored = getStorage().getStored().getType();
+            if (stored == null && storage.getStored() != null) {
+                stored = storage.getStored().getType();
             }
 
             if (stored != null) {
                 // (1)
                 if (event.getClick().isShiftClick()) {
-                    put.accept((double) getStorage().getCapacity() - getStorage().getAmount());
+                    put.accept((double) storage.getCapacity() - storage.getAmount());
                 } else {
                     Material storedCopy = stored;
                     // evaluate total amount of the storage box stored item present in the player's inventory
@@ -251,21 +251,21 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
                             .mapToInt(ItemStack::getAmount)
                             .sum();
                     if (amount > 0) {
-                        openSignGuiAndCall((Player) event.getWhoClicked(), Math.min(amount, getStorage().getCapacity()) + "", put);
+                        openSignGuiAndCall((Player) event.getWhoClicked(), Math.min(amount, storage.getCapacity()) + "", put);
                     }
                 }
             }
         } else if (event.getClick().isRightClick()) {
-            if (getStorage().getStored() == null) {
+            if (storage.getStored() == null) {
                 // no items stored, nothing can be collected
                 return;
             }
 
             // create a take function
             Consumer<Double> take = a -> {
-                int boxAmount = (int) Math.min(a, getStorage().getAmount());
+                int boxAmount = (int) Math.min(a, storage.getAmount());
                 // put all items we can in the player's inventory from the storage box
-                int left = updateAddedItems(playerInv, boxAmount, getStorage().getStored(),
+                int left = updateAddedItems(playerInv, boxAmount, storage.getStored(),
                         IntStream.range(0, playerInv.getSize())
                                 .boxed()
                                 .collect(Collectors.toList()));
@@ -276,13 +276,13 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
                 }
 
                 updateRemovedItems(amount);
-                getStorage().setAmount(getStorage().getAmount() - amount);
+                storage.setAmount(storage.getAmount() - amount);
             };
 
             if (event.getClick().isShiftClick()) {
-                take.accept((double) getStorage().getAmount());
+                take.accept((double) storage.getAmount());
             } else {
-                openSignGuiAndCall((Player) event.getWhoClicked(), getStorage().getAmount() + "", take);
+                openSignGuiAndCall((Player) event.getWhoClicked(), storage.getAmount() + "", take);
             }
         }
     }
@@ -321,7 +321,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         }
 
         if (!event.isCancelled()) {
-            updateAmount(getStorage(), event.getWhoClicked(), slots, this::updateAddedItems);
+            updateAmount(storage, event.getWhoClicked(), slots, this::updateAddedItems);
         }
     }
 }

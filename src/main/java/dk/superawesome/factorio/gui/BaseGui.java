@@ -4,7 +4,6 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.util.Callback;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -12,7 +11,6 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.InventoryView;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -21,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, Listener {

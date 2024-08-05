@@ -27,9 +27,10 @@ public class MechanicSerializer {
         writeLong(stream, uuid.getLeastSignificantBits());
     }
 
-    public void writeItemStack(ByteArrayOutputStream stream, ItemStack item) {
+    public void writeItemStack(ByteArrayOutputStream stream, ItemStack item) throws IOException {
         if (item == null) {
             stream.write(0);
+            writeInt(stream, 0);
             return;
         }
 
@@ -37,16 +38,18 @@ public class MechanicSerializer {
         byte[] bytes = mat.getBytes(StandardCharsets.UTF_8);
         stream.write(bytes.length);
         stream.write(bytes, 0, bytes.length);
+        writeInt(stream, item.getAmount());
     }
 
-    public ItemStack readItemStack(ByteArrayInputStream stream) {
+    public ItemStack readItemStack(ByteArrayInputStream stream) throws IOException {
         int l = stream.read();
+        int a = readInt(stream);
         if (l > 0) {
             byte[] buf = new byte[l];
             int len = stream.read(buf, 0, l);
             if (len == l) {
                 String mat = new String(buf);
-                return new ItemStack(Material.valueOf(mat));
+                return new ItemStack(Material.valueOf(mat), a);
             }
         }
 

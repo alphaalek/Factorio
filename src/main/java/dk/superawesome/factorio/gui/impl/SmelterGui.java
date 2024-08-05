@@ -246,6 +246,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     public boolean onClickOpen(InventoryClickEvent event) {
         if (movedFromOtherInventory(event)) {
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY && event.getClickedInventory() != null) {
+
                 if (event.getClickedInventory() == getInventory()) {
                     if (INGREDIENT_SLOTS.contains(event.getRawSlot())) {
                         updateIngredientsPost = true;
@@ -259,6 +260,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                     if (item != null) {
                         ItemStack copy = item.clone();
                         int a = item.getAmount();
+
                         if (getMechanic().getIngredient() != null && getMechanic().getIngredient().isSimilar(item) || getMechanic().getIngredient() == null && getMechanic().canSmelt(item.getType())) {
                             addItemsToSlots(item, INGREDIENT_SLOTS);
                             getMechanic().setIngredientAmount(getMechanic().getIngredientAmount() + (a - item.getAmount()));

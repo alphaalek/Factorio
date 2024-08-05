@@ -35,8 +35,8 @@ public class GeneratorGui extends SingleStorageGui<GeneratorGui, Generator> {
     }
 
     @Override
-    public Storage getStorage() {
-        return getMechanic();
+    public int getContext() {
+        return 0;
     }
 
     @Override

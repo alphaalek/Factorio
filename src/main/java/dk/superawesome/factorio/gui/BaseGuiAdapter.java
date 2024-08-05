@@ -30,7 +30,11 @@ public class BaseGuiAdapter<G extends BaseGui<G>> extends BaseGui<G> {
 
     @Override
     public boolean onDrag(InventoryDragEvent event) {
-        return cancel;
+        if (event.getRawSlots().stream().anyMatch(i -> event.getView().getInventory(i).equals(getInventory()))) {
+            return cancel;
+        }
+
+        return false;
     }
 
     @Override
@@ -40,7 +44,7 @@ public class BaseGuiAdapter<G extends BaseGui<G>> extends BaseGui<G> {
 
     @Override
     public boolean onClickOpen(InventoryClickEvent event) {
-        return cancel;
+        return false;
     }
 
     @Override
