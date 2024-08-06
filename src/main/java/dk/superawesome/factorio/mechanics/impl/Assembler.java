@@ -102,7 +102,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
     public void pipePut(ItemCollection collection, PipePutEvent event) {
         ItemStack item = Optional.ofNullable(type).map(Types::getMat).map(ItemStack::new).orElse(null);
         if ((item == null || collection.has(item)) && ingredientAmount < getCapacity()) {
-            event.setTransfered(true);
+            event.setTransferred(true);
             ingredientAmount += this.<AssemblerGui>put(collection, getCapacity() - ingredientAmount, getGuiInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {

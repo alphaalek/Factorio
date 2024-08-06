@@ -54,7 +54,7 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Mone
         double take = Math.min(64, getCapacity() - moneyAmount);
         double amount = collection.take(take);
         moneyAmount += amount;
-        event.setTransfered(true);
+        event.setTransferred(true);
 
         EmeraldForgeGui gui = this.<EmeraldForgeGui>getGuiInUse().get();
         if (gui != null) {

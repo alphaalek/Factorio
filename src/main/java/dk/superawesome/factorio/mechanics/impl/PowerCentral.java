@@ -193,6 +193,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Thin
         double ratio = (outputs == 0 || signal.getOutputs(FROM_POWER_CENTRAL).isEmpty()) ? 1 : ((double)outputs) / signal.getOutputs(FROM_POWER_CENTRAL).size();
 
         double back = signalCost * ratio;
+
         energy += back;
         recentConsumption -= back;
     }

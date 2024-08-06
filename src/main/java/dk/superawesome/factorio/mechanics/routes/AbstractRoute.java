@@ -252,13 +252,12 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             Material mat = rel.getType();
             if (mat == Material.REPEATER) {
                 // check if this repeater continues the signal route or triggers an output
-                Repeater repeater = (Repeater) rel.getBlockData();
-                Block facing = rel.getRelative(repeater.getFacing().getOppositeFace());
-                if (!rel.getRelative(repeater.getFacing()).equals(from)) {
+                if (!BlockUtil.getPointingBlock(rel, false).equals(from)) {
                     // this repeater does not connect with the input
                     return;
                 }
 
+                Block facing = BlockUtil.getPointingBlock(rel, true);
                 // facing sticky piston - signal output (for power-central to mechanics)
                 if (facing.getType() == Material.STICKY_PISTON) {
                     add(relVec);
@@ -270,8 +269,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
             // comparator - signal output (for generator to power-central)
             } else if (mat == Material.COMPARATOR) {
-                Comparator comparator = (Comparator) rel.getBlockData();
-                Block facing = rel.getRelative(comparator.getFacing().getOppositeFace());
+                Block facing = BlockUtil.getPointingBlock(rel, true);
                 // check if the comparator is facing outwards
                 if (!facing.equals(from)) {
                     add(relVec);

@@ -56,7 +56,7 @@ public interface FuelMechanic {
         if (getFuel() != null && collection.has(new ItemStack(getFuel().getMaterial())) || getFuel() == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
 
             if (getFuelAmount() < getFuelCapacity()) {
-                event.setTransfered(true);
+                event.setTransferred(true);
                 int amount = container.put(collection, getFuelCapacity() - getFuelAmount(), inUse, doGui, new Container.HeapToStackAccess<>() {
                     @Override
                     public ItemStack get() {
@@ -124,10 +124,8 @@ public interface FuelMechanic {
             Location loc = BlockUtil.getRel(def, vec);
             Block block = loc.getBlock();
             if (block.getType() == Material.HOPPER) {
-                Hopper hopper = (Hopper) block.getBlockData();
-
                 // check if the hopper is facing towards the mechanic
-                if (manager.getMechanicPartially(block.getRelative(hopper.getFacing()).getLocation()) == this) {
+                if (manager.getMechanicPartially(BlockUtil.getPointingBlock(block, false).getLocation()) == this) {
                     Mechanic<?> mechanic = manager.getMechanicPartially(loc);
                     if (mechanic instanceof Collector collector) {
                         if (collector.handleInput(waste)) {

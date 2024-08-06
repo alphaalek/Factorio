@@ -25,7 +25,7 @@ public class PipePutEvent extends BlockEvent {
         return transferred;
     }
 
-    public void setTransfered(boolean transferred) {
+    public void setTransferred(boolean transferred) {
         this.transferred = transferred;
     }
 

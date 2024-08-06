@@ -10,6 +10,7 @@ public class Profiles {
     public static MechanicProfile<Collector> COLLECTOR;
     public static MechanicProfile<Constructor> CONSTRUCTOR;
     public static MechanicProfile<EmeraldForge> EMERALD_FORGE;
+    public static MechanicProfile<Gate> GATE;
     public static MechanicProfile<Generator> GENERATOR;
     public static MechanicProfile<Hopper> HOPPER;
     public static MechanicProfile<Smelter> SMELTER;
@@ -23,6 +24,7 @@ public class Profiles {
         COLLECTOR     = loadProfile(new CollectorProfile());
         CONSTRUCTOR   = loadProfile(new ConstructorProfile());
         EMERALD_FORGE = loadProfile(new EmeraldForgeProfile());
+        GATE          = loadProfile(new GateProfile());
         GENERATOR     = loadProfile(new GeneratorProfile());
         HOPPER        = loadProfile(new HopperProfile());
         SMELTER       = loadProfile(new SmelterProfile());

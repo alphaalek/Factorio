@@ -21,6 +21,7 @@ public class Buildings {
     public static Building COLLECTOR;
     public static Building CONSTRUCTOR;
     public static Building EMERALD_FORGE;
+    public static Building GATE;
     public static Building GENERATOR;
     public static Building SMELTER;
     public static Building STORAGE_BOX;
@@ -33,6 +34,7 @@ public class Buildings {
         COLLECTOR     = loadBuilding(new CollectorBuilding());
         CONSTRUCTOR   = loadBuilding(new ConstructorBuilding());
         EMERALD_FORGE = loadBuilding(new EmeraldForgeBuilding());
+        GATE          = loadBuilding(new GateBuilding());
         GENERATOR     = loadBuilding(new GeneratorBuilding());
         SMELTER       = loadBuilding(new SmelterBuilding());
         STORAGE_BOX   = loadBuilding(new StorageBoxBuilding());

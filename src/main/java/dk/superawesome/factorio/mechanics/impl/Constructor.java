@@ -1,6 +1,5 @@
 package dk.superawesome.factorio.mechanics.impl;
 
-import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.gui.impl.ConstructorGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
@@ -84,7 +83,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
 
             if (collection.has(req)) {
                 List<ItemStack> stacks = collection.take(req.getAmount());
-                event.setTransfered(true);
+                event.setTransferred(true);
                 if (!stacks.isEmpty() && stacks.get(0).isSimilar(craft)) {
                     // find an item which has a lower amount than the currently checked item
                     // this is done to ensure evenly distribution among the items in the crafting grid

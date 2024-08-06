@@ -2,20 +2,50 @@ package dk.superawesome.factorio.listeners;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.MechanicManager;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
+import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPistonEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+
+import java.util.List;
 
 public class PistonExtendListener implements Listener {
 
+    private boolean disallowPiston(BlockPistonEvent event, List<Block> blocks) {
+        MechanicManager manager = Factorio.get().getMechanicManager(event.getBlock().getWorld());
+        for (Block block : blocks) {
+            if (manager.getMechanicPartially(block.getLocation()) != null) {
+                return true;
+            }
+        }
+
+        for (Block block : blocks) {
+            if (!AbstractRoute.getCachedRoutes(event.getBlock().getWorld(), BlockUtil.getVec(block)).isEmpty()) {
+                return true;
+            }
+        }
+        if (!AbstractRoute.getCachedRoutes(event.getBlock().getWorld(), BlockUtil.getVec(event.getBlock())).isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
+
     @EventHandler
     public void onPistonExtend(BlockPistonExtendEvent event) {
-        MechanicManager manager = Factorio.get().getMechanicManager(event.getBlock().getWorld());
-        for (Block block : event.getBlocks()) {
-            if (manager.getMechanicPartially(block.getLocation()) != null) {
-                event.setCancelled(true);
-            }
+        if (disallowPiston(event, event.getBlocks())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPistonRetract(BlockPistonRetractEvent event) {
+        if (disallowPiston(event, event.getBlocks())) {
+            event.setCancelled(true);
         }
     }
 }

@@ -24,7 +24,7 @@ public class Routes {
     private static final RouteFactory<AbstractRoute.Pipe> transferRouteFactory = new RouteFactory.PipeRouteFactory();
     private static final RouteFactory<AbstractRoute.Signal> signalRouteFactory = new RouteFactory.SignalRouteFactory();
 
-    private static final BlockFace[] SIGNAL_EXPAND_DIRECTIONS = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
+    public static final BlockFace[] SIGNAL_EXPAND_DIRECTIONS = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
 
     public static boolean suckItems(Block start, PowerCentral source) {
         if (start.getType() != Material.STICKY_PISTON) {
@@ -45,10 +45,13 @@ public class Routes {
             return false;
         }
 
-        source.setEnergy(source.getEnergy() - event.getTransfer().getTransferEnergyCost());
-
         // start the pipe route
-        return startTransferRoute(start, event.getTransfer());
+        if (startTransferRoute(start, event.getTransfer())) {
+            source.setEnergy(source.getEnergy() - event.getTransfer().getTransferEnergyCost());
+            return true;
+        }
+
+        return false;
     }
 
     public static boolean transferEnergyToPowerCentral(Block start, Generator source) {
