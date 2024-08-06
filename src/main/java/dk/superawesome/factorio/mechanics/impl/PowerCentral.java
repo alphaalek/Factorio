@@ -18,6 +18,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class PowerCentral extends AbstractMechanic<PowerCentral> implements ThinkingMechanic, SignalSource, Lightable {
 
@@ -26,6 +29,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Thin
     private static final double SIGNAL_COST = 1d / 32d;
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
+    private final List<Block> signalStarters = new ArrayList<>();
 
     private boolean hasGraph;
     private double recentProduction;
@@ -63,6 +67,13 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Thin
         } else {
             // update block state
             updateLight();
+
+            // get signal starters
+            for (BlockFace face : Arrays.asList(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST)) {
+                if (getRotation() != face) {
+                    signalStarters.add(lever.getRelative(face));
+                }
+            }
         }
     }
 
@@ -75,7 +86,9 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Thin
     public void think() {
         double prev = energy;
         if (energy > 0) {
-            Routes.startSignalRoute(lever, this);
+            for (Block signalStarter : signalStarters) {
+                Routes.startSignalRoute(signalStarter, this);
+            }
 
             if (!turnedOn && energy < prev) {
                 turnedOn = true;

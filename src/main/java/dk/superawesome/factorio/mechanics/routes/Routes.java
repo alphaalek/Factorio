@@ -9,14 +9,13 @@ import dk.superawesome.factorio.mechanics.routes.events.PipeSuckEvent;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Optional;
+import java.util.List;
 
 public class Routes {
 
@@ -68,7 +67,7 @@ public class Routes {
     }
 
     private static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory) {
-        R route = AbstractRoute.getCachedRoute(start.getWorld(), BlockUtil.getVec(start));
+        R route = AbstractRoute.getCachedOriginRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
             route = createNewRoute(start, factory);
             AbstractRoute.addRouteToCache(start, route);
@@ -85,14 +84,6 @@ public class Routes {
     public static boolean startSignalRoute(Block start, SignalSource source) {
         return setupRoute(start, signalRouteFactory)
                 .start(source);
-    }
-
-    public static void unloadRoutes(Chunk chunk) {
-        for (AbstractRoute<?, ?> route : new ArrayList<>(AbstractRoute.getCachedRoutes(chunk.getWorld()))) {
-            route.unload(chunk);
-        }
-
-        // TODO: load again
     }
 
     public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R> factory) {
@@ -148,25 +139,30 @@ public class Routes {
 
         // check blocks in next tick, because we are calling this in a break/place event
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-            AbstractRoute<?, ?> route = AbstractRoute.getCachedRoute(block.getWorld(), BlockUtil.getVec(block));
-            if (route != null && block.getType() == Material.AIR) {
-                // the route was broken, remove it from cache
-                AbstractRoute.removeRouteFromCache(block.getWorld(), route);
+            List<AbstractRoute<?, ?>> routes = new ArrayList<>(AbstractRoute.getCachedRoutes(block.getWorld(), BlockUtil.getVec(block)));
+            if (!routes.isEmpty() && block.getType() == Material.AIR) {
+                for (AbstractRoute<?, ?> route : routes) {
+                    // the route was broken, remove it from cache
+                    AbstractRoute.removeRouteFromCache(block.getWorld(), route);
+                }
             }
 
+            List<AbstractRoute<?, ?>> modifiedRoutes = new ArrayList<>(routes);
             // iterate over all blocks around this block
             for (BlockVector relVec : getRelativeVecs(fromVec)) {
-                AbstractRoute<?, ?> relRoute = AbstractRoute.getCachedRoute(block.getWorld(), relVec);
+                List<AbstractRoute<?, ?>> relRoutes = new ArrayList<>(AbstractRoute.getCachedRoutes(block.getWorld(), relVec));
 
-                if (relRoute != null) {
-                    AbstractRoute.removeRouteFromCache(block.getWorld(), relRoute);
-                    route = relRoute;
+                if (!relRoutes.isEmpty()) {
+                    for (AbstractRoute<?, ?> relRoute : relRoutes) {
+                        AbstractRoute.removeRouteFromCache(block.getWorld(), relRoute);
+                        modifiedRoutes.add(relRoute);
+                    }
                 }
             }
 
             // setup again and connect routes
-            if (route != null) {
-                setupRoute(BlockUtil.getBlock(block.getWorld(), fromVec), route.getFactory());
+            for (AbstractRoute<?, ?> modifiedRoute : modifiedRoutes) {
+                setupRoute(BlockUtil.getBlock(block.getWorld(), modifiedRoute.getStart()), modifiedRoute.getFactory());
             }
         });
     }

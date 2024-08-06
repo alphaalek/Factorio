@@ -2,7 +2,6 @@ package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
-import dk.superawesome.factorio.mechanics.impl.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
@@ -20,11 +19,17 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends OutputEntry> {
 
-    private static final Map<World, Map<BlockVector, AbstractRoute<?, ?>>> cachedRoutes = new HashMap<>();
+    private static final Map<World, Map<BlockVector, List<AbstractRoute<?, ?>>>> cachedRoutes = new HashMap<>();
+    private static final Map<World, Map<BlockVector, AbstractRoute<?, ?>>> cachedOriginRoutes = new HashMap<>();
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R getCachedRoute(World world, BlockVector vec) {
-        return (R) cachedRoutes.computeIfAbsent(world, d -> new HashMap<>())
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R getCachedOriginRoute(World world, BlockVector vec) {
+        return (R) cachedOriginRoutes.computeIfAbsent(world, d -> new HashMap<>())
                 .get(new BlockVector(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ()));
+    }
+
+    public static List<AbstractRoute<?, ?>> getCachedRoutes(World world, BlockVector vec) {
+        return cachedRoutes.computeIfAbsent(world, d -> new HashMap<>())
+                .getOrDefault(new BlockVector(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ()), new ArrayList<>());
     }
 
     public static void addRouteToCache(Block start, AbstractRoute<?, ?> route) {
@@ -32,11 +37,11 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             cachedRoutes.put(start.getWorld(), new HashMap<>());
         }
 
-        if (!route.getLocations().isEmpty()) {
-            cachedRoutes.get(start.getWorld()).put(BlockUtil.getVec(start), route);
-        }
+        cachedOriginRoutes.get(start.getWorld()).put(BlockUtil.getVec(start), route);
         for (BlockVector loc : route.getLocations()) {
-            cachedRoutes.get(start.getWorld()).put(loc, route);
+            cachedRoutes.get(start.getWorld())
+                    .computeIfAbsent(loc, __ -> new ArrayList<>())
+                    .add(route);
         }
     }
 
@@ -45,14 +50,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return;
         }
 
-        cachedRoutes.get(world).remove(route.getStart());
+        cachedOriginRoutes.get(world).remove(route.getStart());
         for (BlockVector loc : route.getLocations()) {
-            cachedRoutes.get(world).remove(loc);
+            cachedRoutes.get(world).get(loc).remove(route);
         }
-    }
-
-    public static Collection<AbstractRoute<?, ?>> getCachedRoutes(World world) {
-        return cachedRoutes.containsKey(world) ? cachedRoutes.get(world).values() : Collections.emptyList();
     }
 
     public static class TransferOutputEntry implements OutputEntry {
@@ -228,6 +229,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
     public static class Signal extends AbstractRoute<Signal, SignalOutputEntry> {
 
+        private final Map<BlockVector, Integer> signals = new HashMap<>();
+
         public Signal(BlockVector start) {
             super(start);
         }
@@ -239,6 +242,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
         @Override
         public void search(Block from, Material fromMat, BlockVector relVec, Block rel) {
+            int signal = signals.getOrDefault(BlockUtil.getVec(from), 16);
             Material mat = rel.getType();
             if (mat == Material.REPEATER) {
                 // check if this repeater continues the signal route or triggers an output
@@ -257,6 +261,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 }
 
                 // expanding signal route
+                signals.put(relVec, 16); // resetting to 16 signal power
                 add(relVec);
                 Routes.expandRoute(this, rel);
             // comparator - signal output (for generator to power-central)
@@ -268,9 +273,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     add(relVec);
                     addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
                 }
-            } else if (mat == Material.REDSTONE_WIRE) {
+            } else if (mat == Material.REDSTONE_WIRE && signal > 1) {
                 // expanding signal route
                 add(relVec);
+                signals.put(relVec, signal - 1);
                 Routes.expandRoute(this, rel);
             }
         }

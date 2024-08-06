@@ -71,9 +71,7 @@ public final class Factorio extends JavaPlugin implements Listener {
         });
 
         // TODO
-        //  ensure world signal for signal outputs
         //  redstone route signal going up/down
-        //  add aggregator mechanic
     }
 
     @Override

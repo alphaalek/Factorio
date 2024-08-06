@@ -85,9 +85,6 @@ public class MechanicManager implements Listener {
                 unload(mechanic);
             }
         }
-
-        // unload all route blocks in this chunk
-        Routes.unloadRoutes(chunk);
     }
 
     public List<Mechanic<?>> getNearbyMechanics(Location loc) {
