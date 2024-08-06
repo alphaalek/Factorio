@@ -6,8 +6,6 @@ import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.transfer.Container;
-import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
-import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.routes.events.PipeSuckEvent;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
@@ -185,7 +183,7 @@ public class MechanicManager implements Listener {
 
         // place the blocks for this mechanic
         Buildings.build(sign.getWorld(), mechanic);
-        mechanic.blocksLoaded();
+        mechanic.onBlocksLoaded();
 
         // play sound
         sign.getWorld().playSound(sign.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.675f, 1f);
@@ -196,7 +194,7 @@ public class MechanicManager implements Listener {
         try {
             Mechanic<?> mechanic = loadMechanicFromSign(sign, (__, on) -> contextProvider.findAt(on.getLocation()));
             if (mechanic != null) {
-                mechanic.blocksLoaded();
+                mechanic.onBlocksLoaded();
             }
         } catch (SQLException | IOException ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to load mechanic at location " + sign.getLocation(), ex);
@@ -240,7 +238,6 @@ public class MechanicManager implements Listener {
         Bukkit.getPluginManager().callEvent(removeEvent);
         if (removeEvent.isCancelled()) {
             // this event was cancelled. (why though?)
-            player.sendMessage("§cFjernelse af maskinen blev afbrudt. Kontakt en udvikler.");
             return;
         }
 

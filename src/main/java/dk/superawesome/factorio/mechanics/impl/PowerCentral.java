@@ -59,7 +59,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Thin
     }
 
     @Override
-    public void blocksLoaded() {
+    public void onBlocksLoaded() {
         lever = getLocation().getBlock().getRelative(getRotation().getOppositeFace());
         if (lever.getType() != Material.LEVER) {
             // invalid power central

@@ -11,7 +11,7 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener {
 
     void unload();
 
-    void blocksLoaded();
+    void onBlocksLoaded();
 
     boolean exists();
 
@@ -27,5 +27,5 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener {
 
     MechanicProfile<M> getProfile();
 
-    <G extends BaseGui<G>> void openInventory(Player player);
+    <G extends BaseGui<G>> boolean openInventory(Player player);
 }

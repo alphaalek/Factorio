@@ -119,7 +119,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
                 }
                 return new ItemBuilder(item)
                         .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + type.getProduces() + " §8(§f$" + (StringUtil.formatDecimals(type.getProduces() / type.getRequires(), 2)) + " §epr. item§8)")
-                        .addFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_POTION_EFFECTS)
+                        .addFlags(ItemFlag.HIDE_ATTRIBUTES)
                         .build();
             }
 

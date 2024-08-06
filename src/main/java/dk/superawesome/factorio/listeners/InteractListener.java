@@ -31,7 +31,8 @@ public class InteractListener implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Block clicked = event.getClickedBlock();
-        if (clicked != null && (!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR)) {
+        if (clicked != null
+                && (!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
             // check if the player clicked on a mechanic
             MechanicManager manager = Factorio.get().getMechanicManager(clicked.getWorld());
             Mechanic<?> mechanic = manager.getMechanicPartially(clicked.getLocation());
@@ -56,8 +57,9 @@ public class InteractListener implements Listener {
                     }
 
                     // open the mechanic inventory
-                    event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_CHEST_OPEN, 0.375f, 0.5f);
-                    mechanic.openInventory(event.getPlayer());
+                    if (mechanic.openInventory(event.getPlayer())) {
+                        event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_CHEST_OPEN, 0.375f, 0.5f);
+                    }
                 }
             }
         }

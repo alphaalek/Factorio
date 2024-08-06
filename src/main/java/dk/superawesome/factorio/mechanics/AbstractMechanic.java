@@ -84,7 +84,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     }
 
     @Override
-    public void blocksLoaded() {
+    public void onBlocksLoaded() {
 
     }
 
@@ -95,7 +95,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     @Override
     public int getLevel() {
-        return 1;
+        return level.getLevel();
     }
 
     @Override
@@ -120,25 +120,28 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     @Override
     @SuppressWarnings("unchecked")
-    public <G extends BaseGui<G>> void openInventory(Player player) {
+    public <G extends BaseGui<G>> boolean openInventory(Player player) {
         if (getProfile() instanceof GuiMechanicProfile<M>) {
             BaseGui<?> inUse = this.inUse.get();
             // check for inventory already in use
             if (inUse != null) {
                 // check if the player is already looking in this inventory
                 if (inUse.getInventory().getViewers().contains(player)) {
-                    return;
+                    return false;
                 }
 
                 // open the inventory
                 player.openInventory(inUse.getInventory());
-                return;
+                return true;
             }
 
             // create a new inventory
             BaseGui<?> gui = ((GuiMechanicProfile<M>) getProfile()).<G>getGuiFactory().create((M) this, (AtomicReference<G>) this.inUse);
             player.openInventory(gui.getInventory());
+            return true;
         }
+
+        return false;
     }
 
     @Override

@@ -4,12 +4,10 @@ import de.rapha149.signgui.SignGUI;
 import de.rapha149.signgui.SignGUIAction;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
-import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.Management;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
-import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,11 +18,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.sql.SQLException;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Elements {
 
@@ -219,7 +214,6 @@ public class Elements {
             Bukkit.getPluginManager().callEvent(removeEvent);
             if (removeEvent.isCancelled()) {
                 // this event was cancelled. (why though?)
-                player.sendMessage("§cFjernelse af maskinen blev afbrudt. Kontakt en udvikler.");
                 return;
             }
 

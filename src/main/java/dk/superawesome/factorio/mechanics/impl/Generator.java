@@ -71,7 +71,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public void blocksLoaded() {
+    public void onBlocksLoaded() {
         lever = getLocation().getBlock().getRelative(getRotation().getOppositeFace());
         campfire = getLocation().getBlock().getRelative(0, 2, 0);
         if (lever.getType() != Material.LEVER || campfire.getType() != Material.CAMPFIRE) {

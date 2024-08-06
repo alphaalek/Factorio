@@ -117,14 +117,15 @@ public interface FuelMechanic {
     }
 
     default void handleWaste(Location def, Material waste) {
+        MechanicManager manager =  Factorio.get().getMechanicManager(def.getWorld());
+
         for (BlockVector vec : getWasteOutputs()) {
             // search for collectors to take the fuel waste
             Location loc = BlockUtil.getRel(def, vec);
             Block block = loc.getBlock();
             if (block.getType() == Material.HOPPER) {
-                MechanicManager manager =  Factorio.get().getMechanicManager(def.getWorld());
-
                 Hopper hopper = (Hopper) block.getBlockData();
+
                 // check if the hopper is facing towards the mechanic
                 if (manager.getMechanicPartially(block.getRelative(hopper.getFacing()).getLocation()) == this) {
                     Mechanic<?> mechanic = manager.getMechanicPartially(loc);
