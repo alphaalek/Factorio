@@ -10,6 +10,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Comparator;
 import org.bukkit.block.data.type.Repeater;
 import org.bukkit.util.BlockVector;
@@ -116,6 +117,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
     protected int currentId;
     protected final Array<Queue<P>> outputs = new Array<>();
     protected final Set<BlockVector> locations = new HashSet<>();
+    protected final Map<BlockVector, List<BlockVector>> visited = new HashMap<>();
 
     private final BlockVector start;
 
@@ -127,8 +129,12 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         return start;
     }
 
-    public boolean has(BlockVector vec) {
-        return locations.contains(vec);
+    public boolean hasVisited(BlockVector vec, BlockVector rel) {
+        return visited.containsKey(vec) && visited.get(vec).contains(rel);
+    }
+
+    public void visit(BlockVector vec, BlockVector rel) {
+        visited.computeIfAbsent(vec, __ -> new ArrayList<>()).add(rel);
     }
 
     public void add(BlockVector vec) {
@@ -260,10 +266,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     return;
                 }
 
-                // expanding signal route
-                signals.put(relVec, 16); // resetting to 16 signal power
-                add(relVec);
-                Routes.expandRoute(this, rel);
+                addWire(rel, relVec, 16);
+
             // comparator - signal output (for generator to power-central)
             } else if (mat == Material.COMPARATOR) {
                 Comparator comparator = (Comparator) rel.getBlockData();
@@ -273,12 +277,29 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     add(relVec);
                     addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
                 }
-            } else if (mat == Material.REDSTONE_WIRE && signal > 1) {
-                // expanding signal route
-                add(relVec);
-                signals.put(relVec, signal - 1);
-                Routes.expandRoute(this, rel);
+
+            // check for expand signal route
+            } else if (signal > 1) {
+                if (mat == Material.REDSTONE_WIRE) {
+                    addWire(rel, relVec, signal - 1);
+                } else {
+                    Block up = rel.getRelative(BlockFace.UP);
+                    Block down = rel.getRelative(BlockFace.DOWN);
+
+                    if (up.getType() == Material.REDSTONE_WIRE) {
+                        addWire(up, BlockUtil.getVec(up), signal - 1);
+                    }
+                    if (down.getType() == Material.REDSTONE_WIRE && from.getType() == Material.REDSTONE_WIRE) {
+                        addWire(down, BlockUtil.getVec(down), signal - 1);
+                    }
+                }
             }
+        }
+
+        private void addWire(Block rel, BlockVector relVec, int signal) {
+            add(relVec);
+            signals.put(relVec, signal);
+            Routes.expandRoute(this, rel);
         }
 
         @Override
