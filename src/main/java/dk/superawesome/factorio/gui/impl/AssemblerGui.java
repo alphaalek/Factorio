@@ -45,6 +45,13 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
             getInventory().setItem(i, new ItemStack(Material.PURPLE_STAINED_GLASS_PANE));
         }
         getInventory().setItem(34, new ItemBuilder(Material.PAPER).setName("§eVælg sammensætning").build());
+        loadAssemblerType();
+        registerEvent(34, e -> openChooseAssemblerGui((Player) e.getWhoClicked()));
+
+        super.loadItems();
+    }
+
+    public void loadAssemblerType() {
         if (getMechanic().getType() != null) {
             Assembler.Types type = getMechanic().getType();
             getInventory().setItem(16,
@@ -53,9 +60,6 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
                             .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + type.getProduces() + " §8(§f$" + (StringUtil.formatDecimals(type.getProduces() / type.getRequires(), 2)) + " §epr. item§8)")
                             .build());
         }
-        registerEvent(34, e -> openChooseAssemblerGui((Player) e.getWhoClicked()));
-
-        super.loadItems();
     }
 
     public void updateAddedIngredients(int amount) {
@@ -63,7 +67,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
     }
 
     public void updateRemovedIngredients(int amount) {
-        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getType().getMat()), STORAGE_SLOTS);
+        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getType().getMat()), reverseSlots(STORAGE_SLOTS));
     }
 
     public void updateAddedMoney(double amount) {
@@ -71,7 +75,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
     }
 
     public void updateRemovedMoney(double amount) {
-        updateRemovedItems(getInventory(), (int) amount, new ItemStack(Material.EMERALD), MONEY_SLOTS);
+        updateRemovedItems(getInventory(), (int) amount, new ItemStack(Material.EMERALD), reverseSlots(MONEY_SLOTS));
     }
 
     private void openChooseAssemblerGui(Player player) {

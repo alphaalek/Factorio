@@ -8,7 +8,10 @@ import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
@@ -79,10 +82,14 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
         ingredientAmount -= type.getRequires();
         moneyAmount += type.getProduces();
 
-        AssemblerGui gui = this.<AssemblerGui>getInUse().get();
+        AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
             gui.updateRemovedIngredients(type.getRequires());
             gui.updateAddedMoney(type.getProduces());
+
+            for (HumanEntity player : gui.getInventory().getViewers()) {
+                ((Player)player).playSound(getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.25f, 1f);
+            }
         }
     }
 
@@ -96,7 +103,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
         ItemStack item = Optional.ofNullable(type).map(Types::getMat).map(ItemStack::new).orElse(null);
         if ((item == null || collection.has(item)) && ingredientAmount < getCapacity()) {
             event.setTransfered(true);
-            ingredientAmount += this.<AssemblerGui>put(collection, Math.min(64, getCapacity() - ingredientAmount), getInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
+            ingredientAmount += this.<AssemblerGui>put(collection, Math.min(64, getCapacity() - ingredientAmount), getGuiInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return item;
@@ -121,6 +128,11 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
 
     public void setType(Types type) {
         this.type = type;
+
+        AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
+        if (gui != null) {
+            gui.loadAssemblerType();
+        }
     }
 
     public int getIngredientAmount() {
@@ -154,7 +166,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
         double take = Math.min(amount, moneyAmount);
         moneyAmount -= take;
 
-        AssemblerGui gui = this.<AssemblerGui>getInUse().get();
+        AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
             gui.updateRemovedMoney(take);
         }

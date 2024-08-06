@@ -56,7 +56,7 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Mone
         moneyAmount += amount;
         event.setTransfered(true);
 
-        EmeraldForgeGui gui = this.<EmeraldForgeGui>getInUse().get();
+        EmeraldForgeGui gui = this.<EmeraldForgeGui>getGuiInUse().get();
         if (gui != null) {
             gui.updateAddedMoney(amount);
         }

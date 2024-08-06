@@ -318,7 +318,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         }
     }
 
-    protected List<Integer> reverseSlots(List<Integer> slots) {
+    protected static List<Integer> reverseSlots(List<Integer> slots) {
         return IntStream.range(0, slots.size())
                 .boxed()
                 .map(slots::get)

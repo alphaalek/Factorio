@@ -53,7 +53,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements ItemColl
 
         if ((stored == null || collection.has(stored)) && amount < getCapacity()) {
             event.setTransfered(true);
-            amount += this.<StorageBoxGui>put(collection, Math.min(64, getCapacity() - amount), getInUse(), StorageBoxGui::updateAddedItems, new HeapToStackAccess<ItemStack>() {
+            amount += this.<StorageBoxGui>put(collection, Math.min(64, getCapacity() - amount), getGuiInUse(), StorageBoxGui::updateAddedItems, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return stored;
@@ -84,7 +84,8 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements ItemColl
 
     @Override
     public List<ItemStack> take(int amount) {
-        List<ItemStack> items = this.<StorageBoxGui>take(amount, stored, amount, getInUse(), g -> g.updateRemovedItems(amount), new HeapToStackAccess<Integer>() {
+
+        return this.<StorageBoxGui>take(Math.min(stored.getMaxStackSize(), amount), stored, this.amount, getGuiInUse(), g -> g.updateRemovedItems(amount), new HeapToStackAccess<Integer>() {
             @Override
             public Integer get() {
                 return StorageBox.this.amount;
@@ -92,15 +93,9 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements ItemColl
 
             @Override
             public void set(Integer val) {
-                StorageBox.this.amount -= val;
+                setAmount(StorageBox.this.amount - val);
             }
         });
-
-        if (this.amount == 0) {
-            this.stored = null;
-        }
-
-        return items;
     }
 
     @Override

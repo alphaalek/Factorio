@@ -3,18 +3,13 @@ package dk.superawesome.factorio.mechanics;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.util.TickThrottle;
-import dk.superawesome.factorio.util.TickValue;
 import dk.superawesome.factorio.util.db.Types;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
-import javax.annotation.processing.SupportedOptions;
 import java.io.IOException;
-import java.lang.ref.Reference;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
@@ -27,6 +22,8 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     protected final MechanicLevel level;
     protected final MechanicStorageContext context;
     protected final Management management;
+
+    private boolean exists = true;
 
     public AbstractMechanic(Location loc, BlockFace rotation, MechanicStorageContext context) {
         this.loc = loc;
@@ -69,6 +66,13 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
         } catch (Exception ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to save mechanic " + this + ", " + getLocation(), ex);
         }
+
+        exists = false;
+    }
+
+    @Override
+    public boolean exists() {
+        return exists;
     }
 
     public void load(MechanicStorageContext context) throws Exception {
@@ -110,7 +114,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     }
 
     @SuppressWarnings("unchecked")
-    public <G extends BaseGui<G>> AtomicReference<G> getInUse() {
+    public <G extends BaseGui<G>> AtomicReference<G> getGuiInUse() {
         return (AtomicReference<G>) inUse;
     }
 

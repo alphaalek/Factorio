@@ -1,12 +1,16 @@
 package dk.superawesome.factorio.mechanics.impl;
 
+import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.gui.impl.ConstructorGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
@@ -121,7 +125,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
             // set declined state and notify the user that this crafting is not possible yet
             if (!declinedState) {
                 declinedState = true;
-                ConstructorGui gui = this.<ConstructorGui>getInUse().get();
+                ConstructorGui gui = this.<ConstructorGui>getGuiInUse().get();
                 if (gui != null) {
                     gui.updateDeclinedState(true);
                 }
@@ -133,7 +137,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
         // remove declined state if set and crafting is available
         if (declinedState) {
             declinedState = false;
-            ConstructorGui gui = this.<ConstructorGui>getInUse().get();
+            ConstructorGui gui = this.<ConstructorGui>getGuiInUse().get();
             if (gui != null) {
                 gui.updateDeclinedState(false);
             }
@@ -173,9 +177,13 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
 
         storageAmount += recipeResult.getAmount();
 
-        ConstructorGui gui = this.<ConstructorGui>getInUse().get();
+        ConstructorGui gui = this.<ConstructorGui>getGuiInUse().get();
         if (gui != null) {
             gui.updateAddedItems(recipeResult.getAmount());
+
+            for (HumanEntity player : gui.getInventory().getViewers()) {
+                ((Player)player).playSound(getLocation(), Sound.BLOCK_WOOD_HIT, 0.5f, 1f);
+            }
         }
     }
 
@@ -191,7 +199,8 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
 
     @Override
     public List<ItemStack> take(int amount) {
-        List<ItemStack> items = this.<ConstructorGui>take(amount, storageType, storageAmount, getInUse(), g -> g.updateRemovedItems(amount), new HeapToStackAccess<Integer>() {
+
+        return this.<ConstructorGui>take(Math.min(storageType.getMaxStackSize(), amount), storageType, storageAmount, getGuiInUse(), g -> g.updateRemovedItems(amount), new HeapToStackAccess<Integer>() {
             @Override
             public Integer get() {
                 return storageAmount;
@@ -199,15 +208,9 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
 
             @Override
             public void set(Integer val) {
-                storageAmount -= val;
+                setStorageAmount(getStorageAmount() - val);
             }
         });
-
-        if (this.storageAmount == 0) {
-            this.storageType = null;
-        }
-
-        return items;
     }
 
     @Override
@@ -255,5 +258,9 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
 
     public void setStorageAmount(int amount) {
         this.storageAmount = amount;
+
+        if (this.storageAmount == 0) {
+            storageType = null;
+        }
     }
 }

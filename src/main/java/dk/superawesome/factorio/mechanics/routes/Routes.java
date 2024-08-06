@@ -16,6 +16,7 @@ import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class Routes {
 
@@ -145,25 +146,27 @@ public class Routes {
     public static void updateNearbyRoutes(Block block) {
         BlockVector fromVec = BlockUtil.getVec(block);
 
-        // check blocks in next tick, because we are calling this in a block/break event
+        // check blocks in next tick, because we are calling this in a break/place event
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
             AbstractRoute<?, ?> route = AbstractRoute.getCachedRoute(block.getWorld(), BlockUtil.getVec(block));
             if (route != null && block.getType() == Material.AIR) {
                 // the route was broken, remove it from cache
                 AbstractRoute.removeRouteFromCache(block.getWorld(), route);
-                route = null;
             }
 
             // iterate over all blocks around this block
             for (BlockVector relVec : getRelativeVecs(fromVec)) {
                 AbstractRoute<?, ?> relRoute = AbstractRoute.getCachedRoute(block.getWorld(), relVec);
 
-                // setup again and connect routes
-                if (relRoute != null && (route == null || !route.getLocations().contains(relVec))) {
+                if (relRoute != null) {
                     AbstractRoute.removeRouteFromCache(block.getWorld(), relRoute);
-                    setupRoute(BlockUtil.getBlock(block.getWorld(), relVec), relRoute.getFactory());
                     route = relRoute;
                 }
+            }
+
+            // setup again and connect routes
+            if (route != null) {
+                setupRoute(BlockUtil.getBlock(block.getWorld(), fromVec), route.getFactory());
             }
         });
     }

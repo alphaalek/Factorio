@@ -177,7 +177,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             if (CRAFTING_SLOTS.contains(event.getRawSlot()) && event.getClickedInventory() == getInventory()) {
                 if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
                     // update storage amount because this action can collect items from the storage slots
-                    updateAmount(getStorage(0), event.getWhoClicked(), STORAGE_SLOTS, this::updateAddedItems);
+                    updateAmount(getStorage(0), event.getWhoClicked(), STORAGE_SLOTS, this::updateRemovedItems);
                 }
 
                 getMechanic().getTickThrottle().throttle();
@@ -197,7 +197,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR
                     && event.getCursor() != null && getMechanic().getStorageType() != null && event.getCursor().isSimilar(getMechanic().getStorageType())) {
                 // update storage amount after this
-                updateAmount(getStorage(0), event.getWhoClicked(), STORAGE_SLOTS, this::updateAddedItems);
+                updateAmount(getStorage(0), event.getWhoClicked(), STORAGE_SLOTS, this::updateRemovedItems);
             }
         }
 

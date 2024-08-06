@@ -28,9 +28,8 @@ public class MechanicSerializer {
     }
 
     public void writeItemStack(ByteArrayOutputStream stream, ItemStack item) throws IOException {
-        if (item == null) {
+        if (item == null || item.getType() == Material.AIR) {
             stream.write(0);
-            writeInt(stream, 0);
             return;
         }
 
@@ -43,11 +42,12 @@ public class MechanicSerializer {
 
     public ItemStack readItemStack(ByteArrayInputStream stream) throws IOException {
         int l = stream.read();
-        int a = readInt(stream);
         if (l > 0) {
             byte[] buf = new byte[l];
             int len = stream.read(buf, 0, l);
-            if (len == l) {
+
+            int a = readInt(stream);
+            if (len == l && a > 0) {
                 String mat = new String(buf);
                 return new ItemStack(Material.valueOf(mat), a);
             }

@@ -105,7 +105,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
             if (state != FuelState.ABORT) {
                 availableEnergy = prevCurrentFuel != null ? prevCurrentFuel.getEnergyAmount() : prevFuel.getEnergyAmount(); // both can't be null, but has to check current fuel first
 
-                GeneratorGui gui = this.<GeneratorGui>getInUse().get();
+                GeneratorGui gui = this.<GeneratorGui>getGuiInUse().get();
                 if (gui != null) {
                     gui.updateFuelState();
                 }
@@ -150,7 +150,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
             return;
         }
 
-        this.<GeneratorGui>putFuel(collection, this, event, getInUse(), GeneratorGui::updateAddedItems);
+        this.<GeneratorGui>putFuel(collection, this, event, getGuiInUse(), GeneratorGui::updateAddedItems);
     }
 
     public double takeEnergy(double energy) {
@@ -253,7 +253,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public void removeFuel(int amount) {
-        GeneratorGui gui = this.<GeneratorGui>getInUse().get();
+        GeneratorGui gui = this.<GeneratorGui>getGuiInUse().get();
         if (gui != null) {
             gui.updateRemovedItems(amount);
         }

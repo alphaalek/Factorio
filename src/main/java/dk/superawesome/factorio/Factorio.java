@@ -1,10 +1,7 @@
 package dk.superawesome.factorio;
 
 import dk.superawesome.factorio.listeners.*;
-import dk.superawesome.factorio.mechanics.Management;
-import dk.superawesome.factorio.mechanics.MechanicManager;
-import dk.superawesome.factorio.mechanics.MechanicSerializer;
-import dk.superawesome.factorio.mechanics.MechanicStorageContext;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.db.DatabaseConnection;
 import dk.superawesome.factorio.mechanics.db.MechanicController;
 import dk.superawesome.factorio.util.Tick;
@@ -59,17 +56,19 @@ public final class Factorio extends JavaPlugin implements Listener {
 
         Tick.start();
 
-        // load all mechanics
-        for (World world : Bukkit.getWorlds()) {
-            for (Chunk chunk : world.getLoadedChunks()) {
-                for (BlockState state : chunk.getTileEntities()) {
-                    if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())) {
-                        // load this mechanic
-                        Bukkit.getScheduler().runTask(Factorio.get(), () -> Factorio.get().getMechanicManager(world).loadMechanic((Sign) state));
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+            // load all mechanics
+            for (World world : Bukkit.getWorlds()) {
+                for (Chunk chunk : world.getLoadedChunks()) {
+                    for (BlockState state : chunk.getTileEntities()) {
+                        if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())) {
+                            // load this mechanic
+                            getMechanicManager(world).loadMechanic((Sign) state);
+                        }
                     }
                 }
             }
-        }
+        });
 
         // TODO
         //  ensure world signal for signal outputs
@@ -101,5 +100,9 @@ public final class Factorio extends JavaPlugin implements Listener {
 
     public MechanicManager getMechanicManager(World world) {
         return mechanicManagers.computeIfAbsent(world, d -> new MechanicManager(world, contextProvider));
+    }
+
+    public MechanicManager getMechanicManagerFor(Mechanic<?> mechanic) {
+        return getMechanicManager(mechanic.getLocation().getWorld());
     }
 }

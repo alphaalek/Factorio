@@ -23,13 +23,13 @@ public class CollectorProfile implements MechanicProfile<Collector> {
     }
 
     @Override
-    public StorageProvider<Collector> getStorageProvider() {
-        return null;
+    public MechanicFactory<Collector> getFactory() {
+        return factory;
     }
 
     @Override
-    public MechanicFactory<Collector> getFactory() {
-        return factory;
+    public StorageProvider<Collector> getStorageProvider() {
+        return null;
     }
 
     @Override

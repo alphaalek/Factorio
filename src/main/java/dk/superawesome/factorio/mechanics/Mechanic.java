@@ -5,12 +5,15 @@ import dk.superawesome.factorio.util.TickThrottle;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
-public interface Mechanic<M extends Mechanic<M>> {
+public interface Mechanic<M extends Mechanic<M>> extends Listener {
 
     void unload();
 
     void blocksLoaded();
+
+    boolean exists();
 
     TickThrottle getTickThrottle();
 

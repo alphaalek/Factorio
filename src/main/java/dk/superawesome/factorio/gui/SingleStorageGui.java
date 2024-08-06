@@ -78,7 +78,8 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         }
 
         // check if all slots dragged over are in the storage view
-        if (!event.getRawSlots().stream().allMatch(s -> slots.contains(s) || event.getView().getInventory(s).equals(event.getWhoClicked().getOpenInventory().getBottomInventory()))) {
+        if (!event.getRawSlots().stream().allMatch(s -> slots.contains(s)
+                || event.getView().getInventory(s).equals(event.getWhoClicked().getOpenInventory().getBottomInventory()))) {
             // ... if it was, don't continue
             return true;
         }
@@ -321,7 +322,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         }
 
         if (!event.isCancelled()) {
-            updateAmount(storage, event.getWhoClicked(), slots, this::updateAddedItems);
+            updateAmount(storage, event.getWhoClicked(), slots, this::updateRemovedItems);
         }
     }
 }

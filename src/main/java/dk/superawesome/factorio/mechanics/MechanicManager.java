@@ -62,6 +62,7 @@ public class MechanicManager implements Listener {
         }
 
         mechanics.put(BlockUtil.getVec(loc), mechanic);
+        Bukkit.getPluginManager().registerEvents(mechanic, Factorio.get());
 
         return mechanic;
     }

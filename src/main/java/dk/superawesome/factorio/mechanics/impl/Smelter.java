@@ -99,7 +99,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         }
 
         if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(i -> canSmelt(i.getType()))) {
-            ingredientAmount += this.<SmelterGui>put(collection, Math.min(64, level.getInt(INGREDIENT_CAPACITY) - ingredientAmount), getInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
+            ingredientAmount += this.<SmelterGui>put(collection, Math.min(64, level.getInt(INGREDIENT_CAPACITY) - ingredientAmount), getGuiInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
                 @Override
                 public ItemStack get() {
                     return ingredient;
@@ -116,7 +116,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
             }
         }
 
-        this.<SmelterGui>putFuel(collection, this, event, getInUse(), SmelterGui::updateAddedFuel);
+        this.<SmelterGui>putFuel(collection, this, event, getGuiInUse(), SmelterGui::updateAddedFuel);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
             // set declined state and notify the user that this smelting is not possible yet
             if (!declinedState) {
                 declinedState = true;
-                SmelterGui gui = this.<SmelterGui>getInUse().get();
+                SmelterGui gui = this.<SmelterGui>getGuiInUse().get();
                 if (gui != null) {
                     gui.updateDeclinedState(true);
                 }
@@ -177,7 +177,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         // remove declined state if set and smelting is available
         if (declinedState) {
             declinedState = false;
-            SmelterGui gui = this.<SmelterGui>getInUse().get();
+            SmelterGui gui = this.<SmelterGui>getGuiInUse().get();
             if (gui != null) {
                 gui.updateDeclinedState(false);
             }
@@ -206,7 +206,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         ingredientAmount -= 1;
         storageAmount += smeltResult.getAmount();
 
-        SmelterGui gui = this.<SmelterGui>getInUse().get();
+        SmelterGui gui = this.<SmelterGui>getGuiInUse().get();
         if (gui != null) {
             gui.updateRemovedIngredients(1);
             gui.updateAddedStorage(smeltResult.getAmount());
@@ -232,7 +232,8 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public List<ItemStack> take(int amount) {
-        List<ItemStack> items = this.<SmelterGui>take(amount, storageType, storageAmount, getInUse(), g -> g.updateRemovedStorage(amount), new HeapToStackAccess<Integer>() {
+
+        return this.<SmelterGui>take(Math.min(storageType.getMaxStackSize(), amount), storageType, storageAmount, getGuiInUse(), g -> g.updateRemovedStorage(amount), new HeapToStackAccess<Integer>() {
             @Override
             public Integer get() {
                 return storageAmount;
@@ -240,15 +241,9 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
             @Override
             public void set(Integer val) {
-                storageAmount -= val;
+                setStorageAmount(storageAmount - val);
             }
         });
-
-        if (this.storageAmount == 0) {
-            this.storageType = null;
-        }
-
-        return items;
     }
 
     @Override
@@ -283,6 +278,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
         if (this.ingredientAmount == 0) {
             ingredient = null;
+            cachedSmeltResult = null;
         }
     }
 
@@ -338,6 +334,10 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     public void setStorageAmount(int amount) {
         this.storageAmount = amount;
+
+        if (this.storageAmount == 0) {
+            storageType = null;
+        }
     }
 
     public float getCurrentFuelAmount() {
@@ -351,7 +351,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public void removeFuel(int amount) {
-        SmelterGui gui = this.<SmelterGui>getInUse().get();
+        SmelterGui gui = this.<SmelterGui>getGuiInUse().get();
         if (gui != null) {
             gui.updateRemovedFuel(amount);
         }

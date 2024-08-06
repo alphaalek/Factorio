@@ -240,13 +240,14 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         @Override
         public void search(Block from, Material fromMat, BlockVector relVec, Block rel) {
             Material mat = rel.getType();
-
-            boolean expand = false;
             if (mat == Material.REPEATER) {
                 // check if this repeater continues the signal route or triggers an output
                 Repeater repeater = (Repeater) rel.getBlockData();
                 Block facing = rel.getRelative(repeater.getFacing().getOppositeFace());
-                expand = true;
+                if (!rel.getRelative(repeater.getFacing()).equals(from)) {
+                    // this repeater does not connect with the input
+                    return;
+                }
 
                 // facing sticky piston - signal output (for power-central to mechanics)
                 if (facing.getType() == Material.STICKY_PISTON) {
@@ -254,6 +255,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.FROM_POWER_CENTRAL);
                     return;
                 }
+
+                // expanding signal route
+                add(relVec);
+                Routes.expandRoute(this, rel);
             // comparator - signal output (for generator to power-central)
             } else if (mat == Material.COMPARATOR) {
                 Comparator comparator = (Comparator) rel.getBlockData();
@@ -263,10 +268,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     add(relVec);
                     addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
                 }
-                return;
-            }
-
-            if (mat == Material.REDSTONE_WIRE || expand) {
+            } else if (mat == Material.REDSTONE_WIRE) {
+                // expanding signal route
                 add(relVec);
                 Routes.expandRoute(this, rel);
             }

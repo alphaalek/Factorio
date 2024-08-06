@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.transfer;
 
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public interface Container<C extends TransferCollection> {
         while (taken < amount && taken < storedAmount) {
             ItemStack item = stored.clone();
             int a = Math.min(item.getMaxStackSize(), Math.min(storedAmount, amount) - taken);
+            Bukkit.broadcastMessage("Take " + amount + " Has " + storedAmount + " Took " + a);
 
             taken += a;
             item.setAmount(a);

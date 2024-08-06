@@ -310,7 +310,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                 }
             }
 
-            if ((event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD || event.getAction() == InventoryAction.HOTBAR_SWAP)) {
+            if (event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD || event.getAction() == InventoryAction.HOTBAR_SWAP) {
                 ItemStack hotbarItem = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
 
                 if (INGREDIENT_SLOTS.contains(event.getRawSlot())) {
