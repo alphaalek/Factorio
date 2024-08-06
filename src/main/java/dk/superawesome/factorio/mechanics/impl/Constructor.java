@@ -200,7 +200,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
     @Override
     public List<ItemStack> take(int amount) {
 
-        return this.<ConstructorGui>take(Math.min(storageType.getMaxStackSize(), amount), storageType, storageAmount, getGuiInUse(), g -> g.updateRemovedItems(amount), new HeapToStackAccess<Integer>() {
+        return this.<ConstructorGui>take(Math.min(storageType.getMaxStackSize(), amount), storageType, storageAmount, getGuiInUse(), ConstructorGui::updateRemovedItems, new HeapToStackAccess<>() {
             @Override
             public Integer get() {
                 return storageAmount;

@@ -99,7 +99,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         }
 
         if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(i -> canSmelt(i.getType()))) {
-            ingredientAmount += this.<SmelterGui>put(collection, Math.min(64, level.getInt(INGREDIENT_CAPACITY) - ingredientAmount), getGuiInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
+            ingredientAmount += this.<SmelterGui>put(collection, level.getInt(INGREDIENT_CAPACITY) - ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
                 @Override
                 public ItemStack get() {
                     return ingredient;
@@ -233,7 +233,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     @Override
     public List<ItemStack> take(int amount) {
 
-        return this.<SmelterGui>take(Math.min(storageType.getMaxStackSize(), amount), storageType, storageAmount, getGuiInUse(), g -> g.updateRemovedStorage(amount), new HeapToStackAccess<Integer>() {
+        return this.<SmelterGui>take(Math.min(storageType.getMaxStackSize(), amount), storageType, storageAmount, getGuiInUse(), SmelterGui::updateRemovedStorage, new HeapToStackAccess<>() {
             @Override
             public Integer get() {
                 return storageAmount;

@@ -5,6 +5,7 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -53,7 +54,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements ItemColl
 
         if ((stored == null || collection.has(stored)) && amount < getCapacity()) {
             event.setTransfered(true);
-            amount += this.<StorageBoxGui>put(collection, Math.min(64, getCapacity() - amount), getGuiInUse(), StorageBoxGui::updateAddedItems, new HeapToStackAccess<ItemStack>() {
+            amount += this.<StorageBoxGui>put(collection, getCapacity() - amount, getGuiInUse(), StorageBoxGui::updateAddedItems, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return stored;
@@ -84,8 +85,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements ItemColl
 
     @Override
     public List<ItemStack> take(int amount) {
-
-        return this.<StorageBoxGui>take(Math.min(stored.getMaxStackSize(), amount), stored, this.amount, getGuiInUse(), g -> g.updateRemovedItems(amount), new HeapToStackAccess<Integer>() {
+        return this.<StorageBoxGui>take(Math.min(stored.getMaxStackSize(), amount), stored, this.amount, getGuiInUse(), StorageBoxGui::updateRemovedItems, new HeapToStackAccess<>() {
             @Override
             public Integer get() {
                 return StorageBox.this.amount;

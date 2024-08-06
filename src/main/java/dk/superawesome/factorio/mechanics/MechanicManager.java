@@ -149,6 +149,11 @@ public class MechanicManager implements Listener {
     }
 
     public MechanicBuildResponse buildMechanic(Sign sign, Player owner) {
+        Block pointing = BlockUtil.getPointingBlock(sign.getBlock(), true);
+        if (pointing != null && getMechanicPartially(pointing.getLocation()) != null) {
+            return MechanicBuildResponse.ALREADY_EXISTS;
+        }
+
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
         Mechanic<?> mechanic;
         try {
@@ -162,17 +167,19 @@ public class MechanicManager implements Listener {
         }
 
         MechanicBuildEvent event = new MechanicBuildEvent(owner, mechanic);
-        Bukkit.getPluginManager().callEvent(event);
         verify: {
             MechanicBuildResponse response;
-            if (event.isCancelled()) {
-                response = MechanicBuildResponse.ABORT;
-            } else if (!Buildings.checkCanBuild(mechanic)) {
+            if (!Buildings.checkCanBuild(mechanic)) {
                 response = MechanicBuildResponse.NOT_PLACED_BLOCKS;
             } else if (!Buildings.hasSpaceFor(sign.getBlock(), mechanic)) {
                 response = MechanicBuildResponse.NOT_ENOUGH_SPACE;
             } else {
-                break verify;
+                Bukkit.getPluginManager().callEvent(event);
+                if (event.isCancelled()) {
+                    response = MechanicBuildResponse.ABORT;
+                } else {
+                    break verify;
+                }
             }
 
             unload(mechanic);

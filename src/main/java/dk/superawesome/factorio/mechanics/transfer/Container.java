@@ -21,24 +21,23 @@ public interface Container<C extends TransferCollection> {
 
     int getCapacity();
 
-    default <G extends BaseGui<G>> List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicReference<G> inUse, Consumer<G> doGui, HeapToStackAccess<Integer> updater) {
+    default <G extends BaseGui<G>> List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, HeapToStackAccess<Integer> updater) {
         List<ItemStack> items = new ArrayList<>();
         int taken = 0;
         while (taken < amount && taken < storedAmount) {
             ItemStack item = stored.clone();
             int a = Math.min(item.getMaxStackSize(), Math.min(storedAmount, amount) - taken);
-            Bukkit.broadcastMessage("Take " + amount + " Has " + storedAmount + " Took " + a);
 
             taken += a;
             item.setAmount(a);
             items.add(item);
         }
 
-        updater.set(taken);
         G gui = inUse.get();
         if (gui != null) {
-            doGui.accept(gui);
+            doGui.accept(gui, taken);
         }
+        updater.set(taken);
 
         return items;
     }

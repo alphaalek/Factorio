@@ -37,6 +37,7 @@ public class SignChangeListener implements Listener {
                             break build;
                         }
 
+                        case ALREADY_EXISTS -> event.getPlayer().sendMessage("§cDer er allerede en maskine her.");
                         case ERROR -> event.getPlayer().sendMessage("§cDer skete en fejl under oprettelse af maskinen.");
                         case ABORT -> event.getPlayer().sendMessage("§cOprettelse af maskinen blev afbrudt. Kontakt en udvikler.");
                         case NOT_ENOUGH_SPACE -> event.getPlayer().sendMessage("§cDer er ikke nok plads til at bygge maskinen.");

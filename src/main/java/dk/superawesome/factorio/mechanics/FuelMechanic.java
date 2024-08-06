@@ -57,7 +57,7 @@ public interface FuelMechanic {
 
             if (getFuelAmount() < getFuelCapacity()) {
                 event.setTransfered(true);
-                int amount = container.put(collection, Math.min(64, getFuelCapacity() - getFuelAmount()), inUse, doGui, new Container.HeapToStackAccess<>() {
+                int amount = container.put(collection, getFuelCapacity() - getFuelAmount(), inUse, doGui, new Container.HeapToStackAccess<>() {
                     @Override
                     public ItemStack get() {
                         return getFuel() == null ? null : new ItemStack(getFuel().getMaterial());

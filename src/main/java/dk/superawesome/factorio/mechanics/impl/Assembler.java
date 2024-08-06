@@ -103,7 +103,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
         ItemStack item = Optional.ofNullable(type).map(Types::getMat).map(ItemStack::new).orElse(null);
         if ((item == null || collection.has(item)) && ingredientAmount < getCapacity()) {
             event.setTransfered(true);
-            ingredientAmount += this.<AssemblerGui>put(collection, Math.min(64, getCapacity() - ingredientAmount), getGuiInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
+            ingredientAmount += this.<AssemblerGui>put(collection, getCapacity() - ingredientAmount, getGuiInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return item;
