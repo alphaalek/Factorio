@@ -289,7 +289,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     if (up.getType() == Material.REDSTONE_WIRE) {
                         addWire(up, BlockUtil.getVec(up), signal - 1);
                     }
-                    if (down.getType() == Material.REDSTONE_WIRE && from.getType() == Material.REDSTONE_WIRE) {
+                    if (from.getType() == Material.REDSTONE_WIRE && (down.getType() == Material.REDSTONE_WIRE || down.getType() == Material.REPEATER)) {
                         addWire(down, BlockUtil.getVec(down), signal - 1);
                     }
                 }
