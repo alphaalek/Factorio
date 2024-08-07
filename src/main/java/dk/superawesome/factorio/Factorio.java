@@ -5,6 +5,7 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.db.DatabaseConnection;
 import dk.superawesome.factorio.mechanics.db.MechanicController;
 import dk.superawesome.factorio.util.Tick;
+import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Tag;
@@ -25,7 +26,7 @@ public final class Factorio extends JavaPlugin implements Listener {
 
     private static Factorio instance;
 
-    private final Map<World, MechanicManager> mechanicManagers = new HashMap<>();
+    private final Map<String, MechanicManager> mechanicManagers = new HashMap<>();
     private final MechanicSerializer mechanicSerializer = new MechanicSerializer();
     private MechanicStorageContext.Provider contextProvider;
 
@@ -45,7 +46,7 @@ public final class Factorio extends JavaPlugin implements Listener {
 
         for (World world : Bukkit.getServer().getWorlds()) {
             MechanicManager mm = new MechanicManager(world, contextProvider);
-            mechanicManagers.put(world, mm);
+            mechanicManagers.put(world.getName(), mm);
         }
 
         Bukkit.getPluginManager().registerEvents(new ChunkLoadListener(), this);
@@ -56,14 +57,16 @@ public final class Factorio extends JavaPlugin implements Listener {
 
         Tick.start();
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+        Bukkit.getScheduler().runTask(this, () -> {
             // load all mechanics
             for (World world : Bukkit.getWorlds()) {
+                MechanicManager manager = getMechanicManager(world);
                 for (Chunk chunk : world.getLoadedChunks()) {
                     for (BlockState state : chunk.getTileEntities()) {
-                        if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())) {
+                        if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())
+                                && manager.getMechanicAt(BlockUtil.getPointingBlock(state.getBlock(), false).getLocation()) == null) {
                             // load this mechanic
-                            getMechanicManager(world).loadMechanic((Sign) state);
+                            manager.loadMechanic((Sign) state);
                         }
                     }
                 }
@@ -94,7 +97,7 @@ public final class Factorio extends JavaPlugin implements Listener {
     }
 
     public MechanicManager getMechanicManager(World world) {
-        return mechanicManagers.computeIfAbsent(world, d -> new MechanicManager(world, contextProvider));
+        return mechanicManagers.computeIfAbsent(world.getName(), d -> new MechanicManager(world, contextProvider));
     }
 
     public MechanicManager getMechanicManagerFor(Mechanic<?> mechanic) {

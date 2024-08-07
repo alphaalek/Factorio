@@ -5,7 +5,7 @@ import dk.superawesome.factorio.mechanics.AbstractMechanic;
 import dk.superawesome.factorio.mechanics.MechanicProfile;
 import dk.superawesome.factorio.mechanics.MechanicStorageContext;
 import dk.superawesome.factorio.mechanics.Profiles;
-import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
+import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.mechanics.transfer.MoneyContainer;
 import org.bukkit.Location;

@@ -14,6 +14,7 @@ public class Profiles {
     public static MechanicProfile<Generator> GENERATOR;
     public static MechanicProfile<Hopper> HOPPER;
     public static MechanicProfile<Smelter> SMELTER;
+    public static MechanicProfile<Splitter> SPLITTER;
     public static MechanicProfile<StorageBox> STORAGE_BOX;
     public static MechanicProfile<PowerCentral> POWER_CENTRAL;
 
@@ -28,6 +29,7 @@ public class Profiles {
         GENERATOR     = loadProfile(new GeneratorProfile());
         HOPPER        = loadProfile(new HopperProfile());
         SMELTER       = loadProfile(new SmelterProfile());
+        SPLITTER      = loadProfile(new SplitterProfile());
         STORAGE_BOX   = loadProfile(new StorageBoxProfile());
         POWER_CENTRAL = loadProfile(new PowerCentralProfile());
     }

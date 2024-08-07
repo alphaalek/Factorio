@@ -2,7 +2,7 @@ package dk.superawesome.factorio.mechanics.impl;
 
 import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
+import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
@@ -154,6 +154,16 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
     @Override
     public boolean isTransferEmpty() {
         return Math.ceil(moneyAmount) == 0;
+    }
+
+    @Override
+    public int getMaxTransfer() {
+        return type.getMat().getMaxStackSize();
+    }
+
+    @Override
+    public int getTransferAmount() {
+        return ingredientAmount;
     }
 
     @Override

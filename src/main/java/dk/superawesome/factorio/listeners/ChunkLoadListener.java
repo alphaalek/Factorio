@@ -1,6 +1,8 @@
 package dk.superawesome.factorio.listeners;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.mechanics.MechanicManager;
+import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Tag;
 import org.bukkit.World;
@@ -15,13 +17,16 @@ public class ChunkLoadListener implements Listener {
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
-        World world = event.getWorld();
-        for (BlockState state : event.getChunk().getTileEntities()) {
-            if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())) {
-                // load this mechanic
-                Bukkit.getScheduler().runTask(Factorio.get(), () -> Factorio.get().getMechanicManager(world).loadMechanic((Sign) state));
+        MechanicManager manager = Factorio.get().getMechanicManager(event.getWorld());
+        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+            for (BlockState state : event.getChunk().getTileEntities()) {
+                if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())
+                        && manager.getMechanicAt(BlockUtil.getPointingBlock(state.getBlock(), false).getLocation()) == null) {
+                    // load this mechanic
+                    manager.loadMechanic((Sign) state);
+                }
             }
-        }
+        });
     }
 
     @EventHandler

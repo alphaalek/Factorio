@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.routes.events;
+package dk.superawesome.factorio.mechanics.routes.events.pipe;
 
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import org.bukkit.block.Block;

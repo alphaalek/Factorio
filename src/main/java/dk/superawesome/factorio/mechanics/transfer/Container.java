@@ -1,15 +1,13 @@
 package dk.superawesome.factorio.mechanics.transfer;
 
 import dk.superawesome.factorio.gui.BaseGui;
-import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
-import org.bukkit.Bukkit;
+import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public interface Container<C extends TransferCollection> {
 

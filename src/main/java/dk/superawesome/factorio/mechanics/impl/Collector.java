@@ -72,6 +72,16 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
     }
 
     @Override
+    public int getMaxTransfer() {
+        return collected.getMaxStackSize();
+    }
+
+    @Override
+    public int getTransferAmount() {
+        return collected.getAmount();
+    }
+
+    @Override
     public double getTransferEnergyCost() {
         return 1d / 8d;
     }

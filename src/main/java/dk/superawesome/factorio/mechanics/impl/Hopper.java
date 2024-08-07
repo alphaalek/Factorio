@@ -4,7 +4,7 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
+import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.util.statics.BlockUtil;

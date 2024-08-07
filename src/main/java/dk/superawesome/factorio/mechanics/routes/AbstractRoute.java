@@ -2,7 +2,7 @@ package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
-import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
+import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
@@ -11,8 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.type.Comparator;
-import org.bukkit.block.data.type.Repeater;
 import org.bukkit.util.BlockVector;
 
 import java.util.*;
@@ -23,7 +21,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
     private static final Map<World, Map<BlockVector, List<AbstractRoute<?, ?>>>> cachedRoutes = new HashMap<>();
     private static final Map<World, Map<BlockVector, AbstractRoute<?, ?>>> cachedOriginRoutes = new HashMap<>();
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R getCachedOriginRoute(World world, BlockVector vec) {
+    public static <R extends AbstractRoute<R, ? extends OutputEntry>> R getCachedOriginRoute(World world, BlockVector vec) {
         return (R) cachedOriginRoutes.computeIfAbsent(world, d -> new HashMap<>())
                 .get(new BlockVector(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ()));
     }
@@ -46,7 +44,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
     }
 
-    public static void removeRouteFromCache(World world, AbstractRoute<?, ?> route) {
+    public static <R extends AbstractRoute<R, ? extends OutputEntry>> void removeRouteFromCache(World world, AbstractRoute<?, ?> route) {
         if (cachedRoutes.isEmpty()) {
             return;
         }
@@ -55,6 +53,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         for (BlockVector loc : route.getLocations()) {
             cachedRoutes.get(world).get(loc).remove(route);
         }
+
+        ((R) route).getFactory().callRemoveEvent((R) route);
     }
 
     public static class TransferOutputEntry implements OutputEntry {
@@ -155,19 +155,6 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
     public void addOutput(World world, BlockVector vec) {
         addOutput(world, vec, 0);
-    }
-
-    public void unload(Chunk chunk) {
-        locations.removeIf(vec -> BlockUtil.getBlock(chunk.getWorld(), vec).getChunk().equals(chunk));
-        for (Queue<P> outputs : this.outputs) {
-            if (outputs != null) {
-                outputs.removeIf(output -> BlockUtil.getBlock(chunk.getWorld(), output.getVec()).getChunk().equals(chunk));
-            }
-        }
-
-        if (locations.isEmpty()) {
-            removeRouteFromCache(chunk.getWorld(), this);
-        }
     }
 
     public abstract RouteFactory<R> getFactory();

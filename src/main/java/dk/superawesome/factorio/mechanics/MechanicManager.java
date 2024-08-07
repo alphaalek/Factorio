@@ -6,8 +6,8 @@ import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.transfer.Container;
-import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
-import dk.superawesome.factorio.mechanics.routes.events.PipeSuckEvent;
+import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
+import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.db.Query;
 import dk.superawesome.factorio.util.db.Types;
@@ -19,7 +19,9 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
@@ -74,6 +76,9 @@ public class MechanicManager implements Listener {
 
         // finally unload this mechanic
         mechanic.unload();
+        for (HandlerList list : HandlerList.getHandlerLists()) {
+            list.unregister(mechanic);
+        }
     }
 
     public void unloadMechanics(Chunk chunk) {
@@ -91,7 +96,7 @@ public class MechanicManager implements Listener {
         BlockVector ori = BlockUtil.getVec(loc);
         // iterate over the nearby blocks and check if there is any root mechanic block
         for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 2; y++) {
+            for (int y = -2; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
                     BlockVector rel = (BlockVector) new BlockVector(ori).add(new Vector(x, y, z));
                     if (this.mechanics.containsKey(rel)) {

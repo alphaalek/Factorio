@@ -3,7 +3,7 @@ package dk.superawesome.factorio.mechanics;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.mechanics.impl.Collector;
-import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
+import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
@@ -12,7 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.type.Hopper;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockVector;
 

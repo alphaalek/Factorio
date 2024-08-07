@@ -2,7 +2,7 @@ package dk.superawesome.factorio.mechanics.impl;
 
 import dk.superawesome.factorio.gui.impl.StorageBoxGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.routes.events.PipePutEvent;
+import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Location;
@@ -103,6 +103,11 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements ItemColl
     }
 
     @Override
+    public int getMaxTransfer() {
+        return stored.getMaxStackSize();
+    }
+
+    @Override
     public boolean isContainerEmpty() {
         return stored == null;
     }
@@ -120,7 +125,12 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements ItemColl
         this.stored = stack;
     }
 
+    @Override
     public int getAmount() {
+        return amount;
+    }
+
+    public int getTransferAmount() {
         return amount;
     }
 
