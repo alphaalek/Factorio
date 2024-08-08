@@ -68,7 +68,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         protected final BlockVector vec;
 
         private TransferOutputEntry(World world, BlockVector vec) {
-            this.vec = vec;
+            this.vec = BlockUtil.getVec(BlockUtil.getPointingBlock(BlockUtil.getBlock(world, vec), false));
             this.world = world;
         }
 
@@ -78,8 +78,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             }
             this.lastRunId = runId;
 
-            Block block = BlockUtil.getBlock(world, vec);
-            PipePutEvent event = new PipePutEvent(BlockUtil.getPointingBlock(block, false), collection);
+            PipePutEvent event = new PipePutEvent(BlockUtil.getBlock(world, vec), collection);
             Bukkit.getPluginManager().callEvent(event);
 
             return event.transferred();
