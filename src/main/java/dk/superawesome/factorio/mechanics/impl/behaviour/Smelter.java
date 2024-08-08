@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
@@ -121,7 +122,10 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public int getCapacity() {
-        return level.get(ItemCollection.CAPACITY_MARK);
+        return level.getInt(ItemCollection.CAPACITY_MARK) *
+                Optional.ofNullable(storageType)
+                        .map(ItemStack::getMaxStackSize)
+                        .orElse(64);
     }
 
     @Override

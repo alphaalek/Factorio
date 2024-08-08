@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.profiles;
+package dk.superawesome.factorio.mechanics.profiles.behaviour;
 
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
@@ -52,7 +52,7 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(64 * 35, 64 * 125, 64 * 175, 64 * 250, 64 * 500))
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(35, 125, 175, 250, 500))
                 .build();
     }
 

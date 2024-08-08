@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
+import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.AbstractMechanic;
 import dk.superawesome.factorio.mechanics.MechanicProfile;
 import dk.superawesome.factorio.mechanics.MechanicStorageContext;
@@ -9,12 +10,14 @@ import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.util.statics.BlockUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Repeater;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 
 public class Gate extends AbstractMechanic<Gate> implements ItemContainer {
@@ -30,8 +33,8 @@ public class Gate extends AbstractMechanic<Gate> implements ItemContainer {
         return Profiles.GATE;
     }
 
-    @Override
-    public void onBlocksLoaded() {
+    private void checkSignal() {
+        this.open = true;
         for (BlockFace face : Routes.SIGNAL_EXPAND_DIRECTIONS) {
             Block block = loc.getBlock().getRelative(face);
             if (block.getType() == Material.REPEATER) {
@@ -44,11 +47,26 @@ public class Gate extends AbstractMechanic<Gate> implements ItemContainer {
         }
     }
 
+    @Override
+    public void onBlocksLoaded() {
+        checkSignal();
+    }
+
     @EventHandler
     public void onRedstoneInput(BlockRedstoneEvent event) {
         if (event.getBlock().getType() == Material.REPEATER) {
             if (BlockUtil.getPointingBlock(event.getBlock(), true).getLocation().equals(loc)) {
                 this.open = event.getNewCurrent() == 0;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        for (BlockFace face : Routes.RELATIVES) {
+            if (loc.getBlock().getRelative(face).equals(event.getBlock())) {
+                Bukkit.getScheduler().runTask(Factorio.get(), this::checkSignal);
+                break;
             }
         }
     }
@@ -62,7 +80,7 @@ public class Gate extends AbstractMechanic<Gate> implements ItemContainer {
     public void pipePut(ItemCollection collection, PipePutEvent event) {
         // only continue pipe route if the gate is open
         if (open) {
-            if (Routes.startTransferRoute(loc.getBlock(), collection)) {
+            if (Routes.startTransferRoute(loc.getBlock(), collection, false)) {
                 event.setTransferred(true);
             }
         }

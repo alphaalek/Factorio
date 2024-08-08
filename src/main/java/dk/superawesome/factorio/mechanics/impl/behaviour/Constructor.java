@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class Constructor extends AbstractMechanic<Constructor> implements ThinkingMechanic, ItemCollection, ItemContainer {
@@ -106,7 +107,10 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
 
     @Override
     public int getCapacity() {
-        return level.get(ItemCollection.CAPACITY_MARK);
+        return level.getInt(ItemCollection.CAPACITY_MARK) *
+                Optional.ofNullable(storageType)
+                        .map(ItemStack::getMaxStackSize)
+                        .orElse(64);
     }
 
     @Override

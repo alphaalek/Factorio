@@ -30,15 +30,8 @@ public class Routes {
     public static final BlockFace[] RELATIVES = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
     public static boolean suckItems(Block start, PowerCentral source) {
-        if (start.getType() != Material.STICKY_PISTON) {
-            return false;
-        }
-
         // we will suck items out of the mechanic that the sticky piston is pointing towards
         Block from = BlockUtil.getPointingBlock(start, false);
-        if (from == null) {
-            return false;
-        }
 
         PipeSuckEvent event = new PipeSuckEvent(from);
         Bukkit.getPluginManager().callEvent(event);
@@ -49,7 +42,7 @@ public class Routes {
         }
 
         // start the pipe route
-        if (startTransferRoute(start, event.getTransfer())) {
+        if (startTransferRoute(start, event.getTransfer(), false)) {
             source.setEnergy(source.getEnergy() - event.getTransfer().getTransferEnergyCost());
             return true;
         }
@@ -76,34 +69,34 @@ public class Routes {
         return true;
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory) {
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = AbstractRoute.getCachedOriginRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
-            route = createNewRoute(start, factory);
+            route = createNewRoute(start, factory, onlyExpandIfOriginValid);
             AbstractRoute.addRouteToCache(start.getWorld(), route);
         }
 
         return route;
     }
 
-    public static boolean startTransferRoute(Block start, TransferCollection collection) {
-        return setupRoute(start, transferRouteFactory)
+    public static boolean startTransferRoute(Block start, TransferCollection collection, boolean onlyExpandIfOriginValid) {
+        return setupRoute(start, transferRouteFactory, onlyExpandIfOriginValid)
                 .start(collection);
     }
 
-    public static boolean startSignalRoute(Block start, SignalSource source) {
-        return setupRoute(start, signalRouteFactory)
+    public static boolean startSignalRoute(Block start, SignalSource source, boolean onlyExpandIfOriginValid) {
+        return setupRoute(start, signalRouteFactory, onlyExpandIfOriginValid)
                 .start(source);
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R> factory) {
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = factory.create(BlockUtil.getVec(start));
-        expandRoute(route, start);
+        startRoute(route, start, onlyExpandIfOriginValid);
 
         return route;
     }
 
-    public static void expandRoute(AbstractRoute<?, ?> route, Block from) {
+    public static void startRoute(AbstractRoute<?, ?> route, Block from, boolean onlyExpandIfOriginValid) {
         BlockVector fromVec = BlockUtil.getVec(from);
         Material fromMat = from.getType();
 
@@ -113,17 +106,17 @@ public class Routes {
             route.search(from, fromMat, fromVec, from);
 
             // the origin vector was not added to the route, stop expanding
-            if (!route.getLocations().contains(fromVec)) {
-                disallowFurtherExpanding: {
-                    // ... however allow the origin block to be a sticky piston for pipes
-                    if (route instanceof AbstractRoute.Pipe && from.getType() == Material.STICKY_PISTON) {
-                        break disallowFurtherExpanding;
-                    }
-
-                    return;
-                }
+            if (!route.getLocations().contains(fromVec) && onlyExpandIfOriginValid) {
+                return;
             }
         }
+
+        expandRoute(route, from);
+    }
+
+    public static void expandRoute(AbstractRoute<?, ?> route, Block from) {
+        BlockVector fromVec = BlockUtil.getVec(from);
+        Material fromMat = from.getType();
 
         // iterate over all blocks around this block
         for (BlockFace face : route instanceof AbstractRoute.Signal ? SIGNAL_EXPAND_DIRECTIONS : RELATIVES) {
@@ -137,10 +130,10 @@ public class Routes {
         }
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> void setupForcibly(Block block, RouteFactory<R> factory) {
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> void setupForcibly(Block block, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         updateNearbyRoutes(block, modified -> {
             if (modified.isEmpty()) {
-                setupRoute(block, factory);
+                setupRoute(block, factory, onlyExpandIfOriginValid);
             }
         });
     }
@@ -195,7 +188,7 @@ public class Routes {
 
             // setup again and connect routes
             for (AbstractRoute<?, ?> modifiedRoute : modifiedRoutes) {
-                setupRoute(BlockUtil.getBlock(block.getWorld(), modifiedRoute.getStart()), modifiedRoute.getFactory());
+                setupRoute(BlockUtil.getBlock(block.getWorld(), modifiedRoute.getStart()), modifiedRoute.getFactory(), true);
             }
             if (modifiedRoutesFunction != null) {
                 modifiedRoutesFunction.accept(modifiedRoutes);

@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.profiles;
+package dk.superawesome.factorio.mechanics.profiles.behaviour;
 
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
@@ -78,7 +78,7 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(1)
-                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(64 * 11))
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(11))
                 .build();
     }
 

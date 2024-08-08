@@ -32,7 +32,7 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
     public boolean handleInput(Material item) {
         Block above = getLocation().getBlock().getRelative(BlockFace.UP);
         collected = new ItemStack(item);
-        Routes.startTransferRoute(above, this);
+        Routes.startTransferRoute(above, this, true);
 
         // if the collected field is null, it means that the item was collected by some container
         boolean didCollect = collected == null;

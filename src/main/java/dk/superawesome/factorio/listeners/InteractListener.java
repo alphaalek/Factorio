@@ -33,7 +33,7 @@ public class InteractListener implements Listener {
         if (event.getClickedBlock() != null) {
             MechanicManager manager = Factorio.get().getMechanicManager(event.getClickedBlock().getWorld());
             Mechanic<?> mechanic = manager.getMechanicPartially(event.getClickedBlock().getLocation());
-            if (mechanic != null && (!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR)) {
+            if (mechanic != null && mechanic.getProfile() instanceof GuiMechanicProfile<?> && (!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR)) {
                 event.setCancelled(true);
                 interactMechanic(event.getPlayer(), mechanic);
             }

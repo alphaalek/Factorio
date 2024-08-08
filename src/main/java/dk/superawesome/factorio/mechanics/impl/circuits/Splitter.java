@@ -48,17 +48,17 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
                 continue;
             }
 
-            Routes.setupForcibly(block, Routes.transferRouteFactory);
+            Routes.setupForcibly(block, Routes.transferRouteFactory, true);
         }
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         for (BlockFace face : Routes.RELATIVES) {
-            Block block = BlockUtil.getRel(loc, face.getDirection()).getBlock();
+            Block block = loc.getBlock().getRelative(face);
             if (block.equals(event.getBlock())) {
                 // try to setup a new pipe route
-                Routes.setupForcibly(block, Routes.transferRouteFactory);
+                Routes.setupForcibly(block, Routes.transferRouteFactory, true);
                 break;
             }
         }
@@ -159,7 +159,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
                     public double getTransferEnergyCost() {
                         return collection.getTransferEnergyCost();
                     }
-                });
+                }, true);
 
                 if (!event.transferred()) {
                     event.setTransferred(transferred);

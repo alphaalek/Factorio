@@ -1,26 +1,25 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.mechanics.impl.behaviour.*;
-import dk.superawesome.factorio.mechanics.impl.circuits.Collector;
-import dk.superawesome.factorio.mechanics.impl.circuits.Gate;
-import dk.superawesome.factorio.mechanics.impl.circuits.Hopper;
-import dk.superawesome.factorio.mechanics.impl.circuits.Splitter;
-import dk.superawesome.factorio.mechanics.profiles.*;
+import dk.superawesome.factorio.mechanics.impl.circuits.*;
+import dk.superawesome.factorio.mechanics.profiles.behaviour.*;
+import dk.superawesome.factorio.mechanics.profiles.circuits.*;
 import dk.superawesome.factorio.util.Array;
 
 public class Profiles {
 
-    public static MechanicProfile<Assembler> ASSEMBLER;
-    public static MechanicProfile<Collector> COLLECTOR;
-    public static MechanicProfile<Constructor> CONSTRUCTOR;
-    public static MechanicProfile<EmeraldForge> EMERALD_FORGE;
-    public static MechanicProfile<Gate> GATE;
-    public static MechanicProfile<Generator> GENERATOR;
-    public static MechanicProfile<Hopper> HOPPER;
-    public static MechanicProfile<Smelter> SMELTER;
-    public static MechanicProfile<Splitter> SPLITTER;
-    public static MechanicProfile<StorageBox> STORAGE_BOX;
-    public static MechanicProfile<PowerCentral> POWER_CENTRAL;
+    public static final MechanicProfile<Assembler> ASSEMBLER;
+    public static final MechanicProfile<Collector> COLLECTOR;
+    public static final MechanicProfile<Constructor> CONSTRUCTOR;
+    public static final MechanicProfile<EmeraldForge> EMERALD_FORGE;
+    public static final MechanicProfile<Filter> FILTER;
+    public static final MechanicProfile<Gate> GATE;
+    public static final MechanicProfile<Generator> GENERATOR;
+    public static final MechanicProfile<Hopper> HOPPER;
+    public static final MechanicProfile<Smelter> SMELTER;
+    public static final MechanicProfile<Splitter> SPLITTER;
+    public static final MechanicProfile<StorageBox> STORAGE_BOX;
+    public static final MechanicProfile<PowerCentral> POWER_CENTRAL;
 
     static {
         profiles = new Array<>();
@@ -29,6 +28,7 @@ public class Profiles {
         COLLECTOR     = loadProfile(new CollectorProfile());
         CONSTRUCTOR   = loadProfile(new ConstructorProfile());
         EMERALD_FORGE = loadProfile(new EmeraldForgeProfile());
+        FILTER        = loadProfile(new FilterProfile());
         GATE          = loadProfile(new GateProfile());
         GENERATOR     = loadProfile(new GeneratorProfile());
         HOPPER        = loadProfile(new HopperProfile());

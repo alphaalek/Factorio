@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class StorageBox extends AbstractMechanic<StorageBox> implements ItemCollection, ItemContainer, Storage {
@@ -69,7 +70,10 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements ItemColl
 
     @Override
     public int getCapacity() {
-        return level.get(ItemCollection.CAPACITY_MARK);
+        return level.getInt(ItemCollection.CAPACITY_MARK) *
+                Optional.ofNullable(stored)
+                        .map(ItemStack::getMaxStackSize)
+                        .orElse(64);
     }
 
     @Override

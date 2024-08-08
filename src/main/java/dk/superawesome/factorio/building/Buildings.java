@@ -17,15 +17,15 @@ import java.util.List;
 
 public class Buildings {
 
-    public static Building ASSEMBLER;
-    public static Building COLLECTOR;
-    public static Building CONSTRUCTOR;
-    public static Building EMERALD_FORGE;
-    public static Building GATE;
-    public static Building GENERATOR;
-    public static Building SMELTER;
-    public static Building STORAGE_BOX;
-    public static Building POWER_CENTRAL;
+    public static final Building ASSEMBLER;
+    public static final Building COLLECTOR;
+    public static final Building CONSTRUCTOR;
+    public static final Building EMERALD_FORGE;
+    public static final Building GATE;
+    public static final Building GENERATOR;
+    public static final Building SMELTER;
+    public static final Building STORAGE_BOX;
+    public static final Building POWER_CENTRAL;
 
     static {
         buildings = new Array<>();

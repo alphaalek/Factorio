@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
@@ -27,7 +28,6 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Thin
     private static final double SIGNAL_COST = 1d / 32d;
 
     private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
-    private final List<Block> signalStarters = new ArrayList<>();
 
     private boolean hasGraph;
     private double recentProduction;
@@ -62,16 +62,10 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Thin
         if (lever.getType() != Material.LEVER) {
             // invalid power central
             Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
+            Buildings.remove(loc.getWorld(), this);
         } else {
             // update block state
             updateLight();
-
-            // get signal starters
-            for (BlockFace face : Arrays.asList(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST)) {
-                if (getRotation() != face) {
-                    signalStarters.add(lever.getRelative(face));
-                }
-            }
         }
     }
 
@@ -84,9 +78,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Thin
     public void think() {
         double prev = energy;
         if (energy > 0) {
-            for (Block signalStarter : signalStarters) {
-                Routes.startSignalRoute(signalStarter, this);
-            }
+            Routes.startSignalRoute(lever, this, false);
 
             if (!turnedOn && energy < prev) {
                 turnedOn = true;

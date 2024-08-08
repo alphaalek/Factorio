@@ -119,7 +119,11 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
 
     @Override
     public int getCapacity() {
-        return level.getInt(ItemCollection.CAPACITY_MARK);
+        return level.getInt(ItemCollection.CAPACITY_MARK) *
+                Optional.ofNullable(type)
+                        .map(Types::getMat)
+                        .map(Material::getMaxStackSize)
+                        .orElse(64);
     }
 
     public Types getType() {
@@ -153,7 +157,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
 
     @Override
     public boolean isTransferEmpty() {
-        return Math.ceil(moneyAmount) == 0;
+        return ((int)moneyAmount) == 0;
     }
 
     @Override
@@ -206,7 +210,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
         ENCHANTING_TABLE(Material.ENCHANTING_TABLE, 3, 30),
         SEA_LANTERN(Material.SEA_LANTERN, 3, 7),
         JUKEBOX(Material.JUKEBOX, 9, 18),
-        GOLDEN_HOE(Material.GOLDEN_HOE, 8, 15),
+        GOLDEN_HOE(Material.GOLDEN_HOE, 8, 14),
         SUSPICIOUS_STEW(Material.SUSPICIOUS_STEW, 8, 32),
         FLINT_AND_STEAL(Material.FLINT_AND_STEEL, 4, 3),
         BOOK_AND_QUILL(Material.WRITABLE_BOOK, 9, 9),
@@ -217,7 +221,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
         BROWN_GLASS(Material.BROWN_STAINED_GLASS, 8, 1),
         BEACON(Material.BEACON, 2, 640),
         COMPASS(Material.COMPASS, 7, 11.5),
-        GHAST_TEAR(Material.GHAST_TEAR, 3, 8),
+        SOUL_CAMPFIRE(Material.SOUL_CAMPFIRE, 28, 2),
         MILK_BUCKET(Material.MILK_BUCKET, 4, 5.5),
         ;
 

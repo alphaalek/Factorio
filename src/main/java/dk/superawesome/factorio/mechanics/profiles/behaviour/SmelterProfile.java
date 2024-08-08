@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.profiles;
+package dk.superawesome.factorio.mechanics.profiles.behaviour;
 
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
@@ -109,9 +109,9 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(1)
-                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(64 * 11))
-                .mark(Smelter.INGREDIENT_CAPACITY, Array.fromData(64 * 10))
-                .mark(Smelter.FUEL_CAPACITY, Array.fromData(64 * 10))
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(11))
+                .mark(Smelter.INGREDIENT_CAPACITY, Array.fromData(10))
+                .mark(Smelter.FUEL_CAPACITY, Array.fromData(10))
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.impl.GeneratorGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
@@ -21,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -76,6 +78,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
         if (lever.getType() != Material.LEVER || campfire.getType() != Material.CAMPFIRE) {
             // invalid generator
             Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
+            Buildings.remove(loc.getWorld(), this);
             return;
         }
 
@@ -115,7 +118,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
         // try to transfer energy if the generator has any energy available
         if (availableEnergy > 0) {
             double prevProvideEnergy = availableEnergy;
-            Routes.startSignalRoute(lever, this);
+            Routes.startSignalRoute(lever, this, false);
 
             if (availableEnergy == prevProvideEnergy && turnedOn) {
                 // the generator was not able to transfer any energy, although it has energy to provide, so turn off
@@ -184,7 +187,11 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public int getCapacity() {
-        return level.getInt(ItemCollection.CAPACITY_MARK);
+        return level.getInt(ItemCollection.CAPACITY_MARK) *
+                Optional.ofNullable(fuel)
+                        .map(Fuel::getMaterial)
+                        .map(Material::getMaxStackSize)
+                        .orElse(64);
     }
 
     @Override

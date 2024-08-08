@@ -183,14 +183,18 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
             // piston = pipe output
             if (mat == Material.PISTON) {
-                add(relVec);
-                addOutput(from.getWorld(), relVec);
+                // ... however only if the piston is not pointing towards the block where the pipe search came from
+                if (!BlockUtil.getPointingBlock(rel, false).equals(from)) {
+                    add(relVec);
+                    addOutput(from.getWorld(), relVec);
+                }
             // glass = pipe expand
             } else if (
                     mat == Material.GLASS
                     || BlockUtil.anyStainedGlass.test(mat)
                         && (fromMat == mat
                             || fromMat == Material.GLASS
+                            // if this route is allowing to expand if the origin route is invalid, check for a sticky piston
                             || fromMat == Material.STICKY_PISTON
                         )
             ) {
