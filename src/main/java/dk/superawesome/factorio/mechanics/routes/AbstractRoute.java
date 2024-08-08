@@ -208,11 +208,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         public boolean start(TransferCollection collection) {
             int runId = currentId++;
 
-            boolean transferredAny = false;
+            boolean transferred = false;
             for (TransferOutputEntry entry : outputs.get(0, LinkedList::new)) {
-                boolean transferred = entry.handle(runId, collection);
-                if (!transferredAny && transferred) {
-                    transferredAny = true;
+                if (entry.handle(runId, collection)) {
+                    transferred = true;
                 }
 
                 if (collection.isTransferEmpty()) {
@@ -220,7 +219,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 }
             }
 
-            return transferredAny;
+            return transferred;
         }
     }
 

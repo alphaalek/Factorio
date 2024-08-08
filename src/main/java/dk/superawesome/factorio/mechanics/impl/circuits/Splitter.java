@@ -124,7 +124,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
             Block block = blockIterator.next();
 
             if (!collection.isTransferEmpty()) {
-                Routes.startTransferRoute(block, new ItemCollection() {
+                boolean transferred = Routes.startTransferRoute(block, new ItemCollection() {
                     @Override
                     public boolean has(ItemStack stack) {
                         return collection.has(stack);
@@ -160,6 +160,10 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
                         return collection.getTransferEnergyCost();
                     }
                 });
+
+                if (!event.transferred()) {
+                    event.setTransferred(transferred);
+                }
             }
         }
     }
