@@ -30,37 +30,12 @@ public class InteractListener implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        Block clicked = event.getClickedBlock();
-        if (clicked != null
-                && (!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)) {
-            // check if the player clicked on a mechanic
-            MechanicManager manager = Factorio.get().getMechanicManager(clicked.getWorld());
-            Mechanic<?> mechanic = manager.getMechanicPartially(clicked.getLocation());
-            if (mechanic != null) {
-                if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) {
-                    event.setCancelled(true);
-                }
-
-                if (mechanic.getProfile() instanceof GuiMechanicProfile<?>) {
-                    // check if the player has access to open this mechanic
-                    if (!mechanic.getManagement().hasAccess(event.getPlayer(), Management.OPEN)) {
-                        // ensure no double messages for blocks that calls interact event twice (e.g. interacting with Power Central)
-                        if (interactedPlayers.get().contains(event.getPlayer().getUniqueId())) {
-                            return;
-                        }
-                        interactedPlayers.get().add(event.getPlayer().getUniqueId());
-
-                        // no access
-                        event.getPlayer().sendMessage("§cDu har ikke adgang til at åbne denne maskine!");
-                        event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 0.5f);
-                        return;
-                    }
-
-                    // open the mechanic inventory
-                    if (mechanic.openInventory(event.getPlayer())) {
-                        event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.BLOCK_CHEST_OPEN, 0.375f, 0.5f);
-                    }
-                }
+        if (event.getClickedBlock() != null) {
+            MechanicManager manager = Factorio.get().getMechanicManager(event.getClickedBlock().getWorld());
+            Mechanic<?> mechanic = manager.getMechanicPartially(event.getClickedBlock().getLocation());
+            if (mechanic != null && (!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR)) {
+                event.setCancelled(true);
+                interactMechanic(event.getPlayer(), mechanic);
             }
         }
     }
@@ -74,6 +49,30 @@ public class InteractListener implements Listener {
                 Factorio.get().getMechanicManager(event.getBlock().getWorld()).removeMechanic(event.getPlayer(), mechanic);
             } else {
                 event.setCancelled(true);
+                interactMechanic(event.getPlayer(), mechanic);
+            }
+        }
+    }
+
+    private void interactMechanic(Player player, Mechanic<?> mechanic) {
+        if (mechanic.getProfile() instanceof GuiMechanicProfile<?>) {
+            // check if the player has access to open this mechanic
+            if (!mechanic.getManagement().hasAccess(player, Management.OPEN)) {
+                // ensure no double messages for blocks that calls interact event twice (e.g. interacting with Power Central)
+                if (interactedPlayers.get().contains(player.getUniqueId())) {
+                    return;
+                }
+                interactedPlayers.get().add(player.getUniqueId());
+
+                // no access
+                player.sendMessage("§cDu har ikke adgang til at åbne denne maskine!");
+                player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 0.5f);
+                return;
+            }
+
+            // open the mechanic inventory
+            if (mechanic.openInventory(player)) {
+                player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, 0.375f, 0.5f);
             }
         }
     }

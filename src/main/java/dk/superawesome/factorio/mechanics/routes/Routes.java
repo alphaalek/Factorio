@@ -20,6 +20,8 @@ import java.util.function.Consumer;
 
 public class Routes {
 
+    public static final int DEFAULT_CONTEXT = 0;
+
     public static final RouteFactory<AbstractRoute.Pipe> transferRouteFactory = new RouteFactory.PipeRouteFactory();
     public static final RouteFactory<AbstractRoute.Signal> signalRouteFactory = new RouteFactory.SignalRouteFactory();
 

@@ -66,7 +66,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
 
     @EventHandler
     public void onPipeBuild(PipeBuildEvent event) {
-        if (!event.getRoute().getOutputs(0).isEmpty()) {
+        if (!event.getRoute().getOutputs(Routes.DEFAULT_CONTEXT).isEmpty()) {
             // iterate over blocks nearby and check if the route origin block is matching the block at the location of this splitter
             for (BlockFace face : Routes.RELATIVES) {
                 if (event.getRoute().getStart().equals(BlockUtil.getVec(BlockUtil.getRel(loc, face.getDirection())))) {

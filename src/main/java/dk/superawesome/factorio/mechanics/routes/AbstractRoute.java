@@ -157,7 +157,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
     }
 
     public void addOutput(World world, BlockVector vec) {
-        addOutput(world, vec, 0);
+        addOutput(world, vec, Routes.DEFAULT_CONTEXT);
     }
 
     public abstract RouteFactory<R> getFactory();
@@ -208,7 +208,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             int runId = currentId++;
 
             boolean transferred = false;
-            for (TransferOutputEntry entry : outputs.get(0, LinkedList::new)) {
+            for (TransferOutputEntry entry : outputs.get(Routes.DEFAULT_CONTEXT, LinkedList::new)) {
                 if (entry.handle(runId, collection)) {
                     transferred = true;
                 }
