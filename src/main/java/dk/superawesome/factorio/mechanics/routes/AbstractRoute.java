@@ -31,16 +31,20 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 .getOrDefault(new BlockVector(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ()), new ArrayList<>());
     }
 
-    public static void addRouteToCache(Block start, AbstractRoute<?, ?> route) {
+    public static <R extends AbstractRoute<R, ? extends OutputEntry>> void addRouteToCache(World world, AbstractRoute<?, ?> route) {
         if (cachedRoutes.isEmpty()) {
-            cachedRoutes.put(start.getWorld(), new HashMap<>());
+            cachedRoutes.put(world, new HashMap<>());
         }
 
-        cachedOriginRoutes.get(start.getWorld()).put(BlockUtil.getVec(start), route);
-        for (BlockVector loc : route.getLocations()) {
-            cachedRoutes.get(start.getWorld())
-                    .computeIfAbsent(loc, __ -> new ArrayList<>())
-                    .add(route);
+        if (!route.getLocations().isEmpty()) {
+            cachedOriginRoutes.get(world).put(route.getStart(), route);
+            for (BlockVector loc : route.getLocations()) {
+                cachedRoutes.get(world)
+                        .computeIfAbsent(loc, __ -> new ArrayList<>())
+                        .add(route);
+            }
+
+            ((R) route).getFactory().callBuildEvent((R) route);
         }
     }
 
@@ -51,7 +55,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
         cachedOriginRoutes.get(world).remove(route.getStart());
         for (BlockVector loc : route.getLocations()) {
-            cachedRoutes.get(world).get(loc).remove(route);
+            cachedRoutes.get(world).getOrDefault(loc, new ArrayList<>()).remove(route);
         }
 
         ((R) route).getFactory().callRemoveEvent((R) route);

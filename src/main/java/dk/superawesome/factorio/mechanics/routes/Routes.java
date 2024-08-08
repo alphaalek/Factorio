@@ -78,7 +78,7 @@ public class Routes {
         R route = AbstractRoute.getCachedOriginRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
             route = createNewRoute(start, factory);
-            AbstractRoute.addRouteToCache(start, route);
+            AbstractRoute.addRouteToCache(start.getWorld(), route);
         }
 
         return route;
@@ -98,8 +98,6 @@ public class Routes {
         R route = factory.create(BlockUtil.getVec(start));
         expandRoute(route, start);
 
-        factory.callBuildEvent(route);
-
         return route;
     }
 
@@ -115,7 +113,7 @@ public class Routes {
             // the origin vector was not added to the route, stop expanding
             if (!route.getLocations().contains(fromVec)) {
                 disallowFurtherExpanding: {
-                    // however allow the origin block to be a sticky piston for pipes
+                    // ... however allow the origin block to be a sticky piston for pipes
                     if (route instanceof AbstractRoute.Pipe && from.getType() == Material.STICKY_PISTON) {
                         break disallowFurtherExpanding;
                     }
@@ -153,13 +151,11 @@ public class Routes {
         // check blocks in next tick, because we are calling this in a break/place event
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
             List<AbstractRoute<?, ?>> routes = new ArrayList<>(AbstractRoute.getCachedRoutes(block.getWorld(), BlockUtil.getVec(block)));
-            if (!routes.isEmpty()) {
-                for (AbstractRoute<?, ?> route : routes) {
-                    AbstractRoute.removeRouteFromCache(block.getWorld(), route);
-                }
+            for (AbstractRoute<?, ?> route : routes) {
+                AbstractRoute.removeRouteFromCache(block.getWorld(), route);
             }
 
-            List<AbstractRoute<?, ?>> modifiedRoutes = new ArrayList<>(routes);
+            List<AbstractRoute<?, ?>> modifiedRoutes = new ArrayList<>();
             modifiedRoutes.addAll(routes);
             // iterate over all blocks around this block
             for (int x = -1; x <= 1; x++) {

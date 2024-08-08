@@ -11,7 +11,6 @@ import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeRemoveEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.util.statics.BlockUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -21,12 +20,15 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 public class Splitter extends AbstractMechanic<Splitter> implements ItemContainer {
 
     private final List<Block> outputBlocks = new ArrayList<>();
+    private int currentStartIndex;
 
     public Splitter(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -64,7 +66,6 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
 
     @EventHandler
     public void onPipeBuild(PipeBuildEvent event) {
-        // allow only routes which has an output
         if (!event.getRoute().getOutputs(0).isEmpty()) {
             // iterate over blocks nearby and check if the route origin block is matching the block at the location of this splitter
             for (BlockFace face : Routes.RELATIVES) {
@@ -86,14 +87,42 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
         return false;
     }
 
+    private Iterator<Block> createEvenRemainderDistribution() {
+        return new Iterator<>() {
+
+            final int endIndexExclusive = currentStartIndex + outputBlocks.size();
+            int currentIndex = currentStartIndex;
+
+            {
+                currentStartIndex++;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return currentIndex < endIndexExclusive;
+            }
+
+            @Override
+            public Block next() {
+                return outputBlocks.get(currentIndex++ % outputBlocks.size());
+            }
+        };
+    }
+
     @Override
     public void pipePut(ItemCollection collection, PipePutEvent event) {
         if (outputBlocks.isEmpty()) {
             return;
         }
 
-        int newAmount = (int) Math.ceil(((double) Math.min(collection.getMaxTransfer(), collection.getTransferAmount())) / outputBlocks.size());
-        for (Block block : outputBlocks) {
+        int total = Math.min(collection.getMaxTransfer(), collection.getTransferAmount());
+        int each = (int) Math.floor(((double) total) / outputBlocks.size());
+        AtomicInteger remainder = new AtomicInteger(total - each * outputBlocks.size());
+
+        Iterator<Block> blockIterator = remainder.get() > 0 ? createEvenRemainderDistribution() : outputBlocks.iterator();
+        while (blockIterator.hasNext()) {
+            Block block = blockIterator.next();
+
             if (!collection.isTransferEmpty()) {
                 Routes.startTransferRoute(block, new ItemCollection() {
                     @Override
@@ -108,7 +137,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
 
                     @Override
                     public List<ItemStack> take(int amount) {
-                        return collection.take(newAmount);
+                        return collection.take(Math.min(amount, each + Math.max(0, remainder.getAndDecrement())));
                     }
 
                     @Override
