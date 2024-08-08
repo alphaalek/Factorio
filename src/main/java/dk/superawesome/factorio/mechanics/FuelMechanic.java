@@ -2,7 +2,7 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
-import dk.superawesome.factorio.mechanics.impl.Collector;
+import dk.superawesome.factorio.mechanics.impl.circuits.Collector;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;

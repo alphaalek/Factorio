@@ -1,24 +1,18 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.gui.GuiElement;
-import dk.superawesome.factorio.gui.Elements;
 import dk.superawesome.factorio.gui.MechanicGui;
-import dk.superawesome.factorio.mechanics.impl.PowerCentral;
+import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;

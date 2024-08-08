@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.impl;
+package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.gui.impl.StorageBoxGui;
 import dk.superawesome.factorio.mechanics.*;

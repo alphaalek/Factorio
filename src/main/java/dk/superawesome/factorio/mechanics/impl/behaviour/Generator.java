@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.impl;
+package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.impl.GeneratorGui;

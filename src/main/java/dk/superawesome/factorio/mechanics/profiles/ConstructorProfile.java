@@ -5,7 +5,7 @@ import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
 import dk.superawesome.factorio.gui.impl.ConstructorGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.impl.Constructor;
+import dk.superawesome.factorio.mechanics.impl.behaviour.Constructor;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;

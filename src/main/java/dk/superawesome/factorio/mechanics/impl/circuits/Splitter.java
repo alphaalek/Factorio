@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.impl;
+package dk.superawesome.factorio.mechanics.impl.circuits;
 
 import dk.superawesome.factorio.mechanics.AbstractMechanic;
 import dk.superawesome.factorio.mechanics.MechanicProfile;

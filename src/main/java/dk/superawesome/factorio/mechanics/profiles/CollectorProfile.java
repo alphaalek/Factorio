@@ -3,8 +3,7 @@ package dk.superawesome.factorio.mechanics.profiles;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.impl.Assembler;
-import dk.superawesome.factorio.mechanics.impl.Collector;
+import dk.superawesome.factorio.mechanics.impl.circuits.Collector;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 

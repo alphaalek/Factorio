@@ -2,8 +2,8 @@ package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.MechanicGui;
-import dk.superawesome.factorio.mechanics.impl.Assembler;
-import dk.superawesome.factorio.mechanics.impl.Constructor;
+import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
+import dk.superawesome.factorio.mechanics.impl.behaviour.Constructor;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -19,7 +19,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BinaryOperator;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;

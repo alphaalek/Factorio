@@ -4,7 +4,7 @@ import dk.superawesome.factorio.api.events.MoneyCollectEvent;
 import dk.superawesome.factorio.gui.Elements;
 import dk.superawesome.factorio.gui.GuiElement;
 import dk.superawesome.factorio.gui.MechanicGui;
-import dk.superawesome.factorio.mechanics.impl.EmeraldForge;
+import dk.superawesome.factorio.mechanics.impl.behaviour.EmeraldForge;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;

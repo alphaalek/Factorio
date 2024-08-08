@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.impl;
+package dk.superawesome.factorio.mechanics.impl.circuits;
 
 import dk.superawesome.factorio.mechanics.AbstractMechanic;
 import dk.superawesome.factorio.mechanics.MechanicProfile;
@@ -6,7 +6,6 @@ import dk.superawesome.factorio.mechanics.MechanicStorageContext;
 import dk.superawesome.factorio.mechanics.Profiles;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

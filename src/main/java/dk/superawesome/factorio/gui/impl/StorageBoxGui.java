@@ -1,8 +1,7 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.gui.SingleStorageGui;
-import dk.superawesome.factorio.mechanics.Storage;
-import dk.superawesome.factorio.mechanics.impl.StorageBox;
+import dk.superawesome.factorio.mechanics.impl.behaviour.StorageBox;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

@@ -5,7 +5,7 @@ import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
 import dk.superawesome.factorio.gui.impl.PowerCentralGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.impl.PowerCentral;
+import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
 import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;

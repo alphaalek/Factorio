@@ -1,12 +1,10 @@
-package dk.superawesome.factorio.mechanics.impl;
+package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.gui.impl.PowerCentralGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.statics.BlockUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

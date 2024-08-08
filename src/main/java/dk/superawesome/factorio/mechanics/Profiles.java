@@ -1,6 +1,10 @@
 package dk.superawesome.factorio.mechanics;
 
-import dk.superawesome.factorio.mechanics.impl.*;
+import dk.superawesome.factorio.mechanics.impl.behaviour.*;
+import dk.superawesome.factorio.mechanics.impl.circuits.Collector;
+import dk.superawesome.factorio.mechanics.impl.circuits.Gate;
+import dk.superawesome.factorio.mechanics.impl.circuits.Hopper;
+import dk.superawesome.factorio.mechanics.impl.circuits.Splitter;
 import dk.superawesome.factorio.mechanics.profiles.*;
 import dk.superawesome.factorio.util.Array;
 
