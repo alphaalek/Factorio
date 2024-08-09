@@ -24,7 +24,7 @@ public class BaseGuiAdapter<G extends BaseGui<G>> extends BaseGui<G> {
     }
 
     @Override
-    public void onClose(Player player) {
+    public void onClose(Player player, boolean anyViewersLeft) {
 
     }
 

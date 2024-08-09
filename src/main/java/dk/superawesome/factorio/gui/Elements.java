@@ -77,7 +77,7 @@ public class Elements {
                 }
 
                 @Override
-                public void onClose(Player player) {
+                public void onClose(Player player, boolean anyViewersLeft) {
                     Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                         if (player.isOnline() && !player.getOpenInventory().getType().isCreatable()) {
                             mechanic.openInventory(player);

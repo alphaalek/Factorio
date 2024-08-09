@@ -212,11 +212,13 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
     }
 
     @Override
-    public void onClose(Player player) {
-        for (BukkitTask task : this.tasks) {
-            task.cancel();
-        }
+    public void onClose(Player player, boolean anyViewersLeft) {
+        if (!anyViewersLeft) {
+            for (BukkitTask task : this.tasks) {
+                task.cancel();
+            }
 
-        getMechanic().setHasGraph(false);
+            getMechanic().setHasGraph(false);
+        }
     }
 }

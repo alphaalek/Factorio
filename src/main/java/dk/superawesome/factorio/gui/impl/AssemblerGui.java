@@ -84,7 +84,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
             }
 
             @Override
-            public void onClose(Player player) {
+            public void onClose(Player player, boolean anyViewersLeft) {
                 Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                     if (player.isOnline()) {
                         getMechanic().openInventory(player);
