@@ -63,61 +63,33 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
     public static class TransferOutputEntry implements OutputEntry {
 
-        private int lastRunId = -1;
-        protected final World world;
-        protected final BlockVector vec;
+        protected final Block block;
 
         private TransferOutputEntry(World world, BlockVector vec) {
-            this.vec = BlockUtil.getVec(BlockUtil.getPointingBlock(BlockUtil.getBlock(world, vec), false));
-            this.world = world;
+            this.block = BlockUtil.getPointingBlock(BlockUtil.getBlock(world, vec), false);
         }
 
-        public boolean handle(int runId, TransferCollection collection) {
-            if (lastRunId == runId) {
-                return false;
-            }
-            this.lastRunId = runId;
-
-            PipePutEvent event = new PipePutEvent(BlockUtil.getBlock(world, vec), collection);
+        public boolean handle(TransferCollection collection) {
+            PipePutEvent event = new PipePutEvent(block, collection);
             Bukkit.getPluginManager().callEvent(event);
 
             return event.transferred();
-        }
-
-        @Override
-        public BlockVector getVec() {
-            return vec;
         }
     }
 
     public static class SignalOutputEntry implements OutputEntry {
 
-        private int lastRunId = -1;
-        protected final World world;
-        protected final BlockVector vec;
+        protected final Block block;
 
         private SignalOutputEntry(World world, BlockVector vec) {
-            this.vec = vec;
-            this.world = world;
+            this.block = BlockUtil.getBlock(world, vec);
         }
 
-        public boolean handle(int runId, SignalSource source) {
-            if (runId == lastRunId) {
-                return false;
-            }
-            this.lastRunId = runId;
-
-            Block block = BlockUtil.getBlock(world, vec);
+        public boolean handle(SignalSource source) {
             return source.handleOutput(block);
-        }
-
-        @Override
-        public BlockVector getVec() {
-            return vec;
         }
     }
 
-    protected int currentId;
     protected final Array<Queue<P>> outputs = new Array<>();
     protected final Set<BlockVector> locations = new HashSet<>();
     protected final Map<BlockVector, List<BlockVector>> visited = new HashMap<>();
@@ -209,11 +181,9 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
 
         public boolean start(TransferCollection collection) {
-            int runId = currentId++;
-
             boolean transferred = false;
             for (TransferOutputEntry entry : outputs.get(Routes.DEFAULT_CONTEXT, LinkedList::new)) {
-                if (entry.handle(runId, collection)) {
+                if (entry.handle(collection)) {
                     transferred = true;
                 }
 
@@ -299,8 +269,6 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
 
         public boolean start(SignalSource source) {
-            int runId = currentId++;
-
             if (!source.preSignal(this)) {
                 return false;
             }
@@ -308,12 +276,12 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             // handle signal outputs
             int mechanics = 0;
             for (SignalOutputEntry entry : outputs.get(source.getContext(), LinkedList::new)) {
-                if (entry.handle(runId, source)) {
+                if (entry.handle(source)) {
                     mechanics++;
                 }
             }
 
-            // power related mechanic stress
+            // handle power related mechanic stress
             if (outputs.get(source.getContext()).isEmpty() || mechanics < outputs.get(source.getContext()).size()) {
                 source.postSignal(this, mechanics);
             }

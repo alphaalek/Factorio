@@ -11,6 +11,8 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener {
 
     void unload();
 
+    void save();
+
     void onBlocksLoaded();
 
     boolean exists();

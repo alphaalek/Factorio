@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
@@ -139,6 +140,15 @@ public class MechanicManager implements Listener {
             Mechanic<?> mechanic = getMechanicAt(event.getBlock().getLocation());
             if (mechanic instanceof Container && ((Container<?>)mechanic).accepts(event.getTransfer())) {
                 doTransfer((Container<?>) mechanic, event.getTransfer(), event);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onWorldSave(WorldSaveEvent event) {
+        if (event.getWorld().equals(this.world)) {
+            for (Mechanic<?> mechanic : mechanics.values()) {
+                mechanic.save();
             }
         }
     }

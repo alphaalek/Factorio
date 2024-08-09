@@ -50,6 +50,12 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     @Override
     public void unload() {
+        save();
+        exists = false;
+    }
+
+    @Override
+    public void save() {
         try {
             // ensure record exists
             if (!this.context.hasContext()) {
@@ -66,8 +72,6 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
         } catch (Exception ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to save mechanic " + this + ", " + getLocation(), ex);
         }
-
-        exists = false;
     }
 
     @Override
