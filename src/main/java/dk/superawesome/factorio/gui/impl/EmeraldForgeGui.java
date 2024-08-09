@@ -49,7 +49,8 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
     @Override
     public void loadInputOutputItems() {
         int amount = (int) Math.round(getMechanic().getMoneyAmount());
-        displayed += amount;
+        displayed = amount;
+        clearSlots(STORAGE_SLOTS);
         loadStorageTypes(new ItemStack(Material.EMERALD), amount, STORAGE_SLOTS);
     }
 
@@ -63,7 +64,7 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
     private void ensureCorrectDisplay() {
         int displayAmount = (int) getMechanic().getMoneyAmount();
         if (displayed > displayAmount) {
-            updateRemovedItems(getInventory(), displayed - displayAmount, new ItemStack(Material.EMERALD), STORAGE_SLOTS);
+            updateRemovedItems(getInventory(), displayed - displayAmount, new ItemStack(Material.EMERALD), reverseSlots(STORAGE_SLOTS));
         } else if (displayed < displayAmount) {
             updateAddedItems(getInventory(), displayAmount - displayed, new ItemStack(Material.EMERALD), STORAGE_SLOTS);
         }
@@ -90,7 +91,7 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
 
             int displayAmount = (int) Math.round(moneyAmount);
             displayed -= displayAmount;
-            updateRemovedItems(getInventory(), displayAmount, new ItemStack(Material.EMERALD), STORAGE_SLOTS);
+            updateRemovedItems(getInventory(), displayAmount, new ItemStack(Material.EMERALD), reverseSlots(STORAGE_SLOTS));
             getMechanic().setMoneyAmount(getMechanic().getMoneyAmount() - moneyAmount);
             ensureCorrectDisplay();
 

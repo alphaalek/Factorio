@@ -41,6 +41,12 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         this(mechanic, inUseReference, initCallback, mechanic.toString());
     }
 
+    protected void clearSlots(List<Integer> slots) {
+        for (int slot : slots) {
+            getInventory().setItem(slot, null);
+        }
+    }
+
     @Override
     public void loadItems() {
         int i = 0;
@@ -305,6 +311,8 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
     }
 
     protected void loadStorageTypes(ItemStack stored, int amount, List<Integer> slots) {
+        clearSlots(slots);
+
         int left = amount;
         int i = 0;
         while (left > 0 && i < slots.size()) {

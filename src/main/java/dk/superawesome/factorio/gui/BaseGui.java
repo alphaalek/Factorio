@@ -82,7 +82,7 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
             boolean anyViewersLeft = holder.getInventory().getViewers().stream().anyMatch(p -> p != player);
             gui.onClose(player, anyViewersLeft);
 
-            // clear usage if no other player has this gui open
+            // clear usage if no other player has this gui opene
             if (!anyViewersLeft) {
                 gui.clearInUse();
             }
