@@ -11,8 +11,6 @@ import java.util.UUID;
 
 public class Management {
 
-    public static Management ALL_ACCESS = new Management(null, new ArrayList<>());
-
     public static int OPEN = 1;
     public static int LEVEL_UP = 2;
     public static int DELETE = 4;
@@ -85,11 +83,6 @@ public class Management {
     }
 
     public boolean hasAccess(Player player, int access) {
-        // check for all access
-        if (this == ALL_ACCESS) {
-            return true;
-        }
-
         UUID uuid = player.getUniqueId();
         if (this.owner.equals(uuid)) {
             return (OWNER_ACCESS & access) > 0;

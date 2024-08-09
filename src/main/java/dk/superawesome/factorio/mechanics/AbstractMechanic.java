@@ -64,9 +64,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
             // save data for this mechanic
             this.context.getController().setLevel(this.loc, this.level.getLevel());
-            if (this.management != Management.ALL_ACCESS) {
-                this.context.uploadManagement(this.management);
-            }
+            this.context.uploadManagement(this.management);
 
             save(this.context);
         } catch (Exception ex) {

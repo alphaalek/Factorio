@@ -67,34 +67,23 @@ public class MechanicController {
 
     public MechanicStorageContext findAt(Location loc) throws SQLException, IOException {
         Management management = managementSerializer.deserialize(MechanicStorageContext.decode(getManagement(loc)));
-        return new MechanicStorageContext(this, loc, management != null ? management : Management.ALL_ACCESS);
+        if (management == null) {
+            throw new IOException("Failed to get management");
+        }
+
+        return new MechanicStorageContext(this, loc, management);
     }
 
     public MechanicStorageContext create(Location loc, BlockFace rot, String type, UUID owner) throws SQLException, IOException {
-        Management management;
-        Query query;
-        if (owner != null) {
-            management = new Management(owner);
-
-            query = new Query(
-                    "INSERT INTO mechanics (type, location, rotation, management) " +
-                    "VALUES (?, ?, ?, ?)"
-                    )
-                    .add(type)
-                    .add(Types.LOCATION.convert(loc))
-                    .add(rot.name())
-                    .add(MechanicStorageContext.encode(managementSerializer.serialize(management)));
-        } else {
-            management = Management.ALL_ACCESS;
-
-            query = new Query(
-                    "INSERT INTO mechanics (type, location, rotation) " +
-                    "VALUES (?, ?, ?)"
-                    )
-                    .add(type)
-                    .add(Types.LOCATION.convert(loc))
-                    .add(rot.name());
-        }
+        Management management = new Management(owner);
+        Query query = new Query(
+                "INSERT INTO mechanics (type, location, rotation, management) " +
+                "VALUES (?, ?, ?, ?)"
+                )
+                .add(type)
+                .add(Types.LOCATION.convert(loc))
+                .add(rot.name())
+                .add(MechanicStorageContext.encode(managementSerializer.serialize(management)));
         query.execute(this.connection);
 
         return new MechanicStorageContext(this, loc, management);
