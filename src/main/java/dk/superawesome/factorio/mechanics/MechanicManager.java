@@ -157,16 +157,41 @@ public class MechanicManager implements Listener {
         ((Container<C>)container).pipePut((C) collection, event);
     }
 
+    public Optional<MechanicProfile<?>> getProfileFrom(Sign sign) {
+        if (!sign.getSide(Side.FRONT).getLine(0).trim().startsWith("[")
+                || !sign.getSide(Side.FRONT).getLine(0).trim().endsWith("]")) {
+            return Optional.empty();
+        }
+        String type = sign.getSide(Side.FRONT).getLine(0).trim().substring(1, sign.getSide(Side.FRONT).getLine(0).trim().length() - 1);
+
+        Optional<MechanicProfile<?>> profile = Profiles.getProfiles()
+                .stream()
+                .filter(b -> b.getName().equalsIgnoreCase(type))
+                .findFirst();
+        if (profile.isPresent()) {
+            // fix lowercase/uppercase and my headache
+            sign.getSide(Side.FRONT).setLine(0, "[" + profile.get().getName() + "]");
+            sign.update();
+        }
+
+        return profile;
+    }
+
     public MechanicBuildResponse buildMechanic(Sign sign, Player owner) {
+        Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
+        if (profile.isEmpty()) {
+            return MechanicBuildResponse.NO_SUCH;
+        }
+
         Block pointing = BlockUtil.getPointingBlock(sign.getBlock(), true);
         if (pointing != null && getMechanicPartially(pointing.getLocation()) != null) {
             return MechanicBuildResponse.ALREADY_EXISTS;
         }
 
-        BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
         Mechanic<?> mechanic;
         try {
-            mechanic = loadMechanicFromSign(sign, (type, on) -> contextProvider.create(on.getLocation(), rotation, type, owner.getUniqueId()));
+            BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
+            mechanic = loadMechanicFromSign(profile.get(), sign, (type, on) -> contextProvider.create(on.getLocation(), rotation, type, owner.getUniqueId()));
             if (mechanic == null) {
                 return MechanicBuildResponse.NO_SUCH;
             }
@@ -206,35 +231,19 @@ public class MechanicManager implements Listener {
 
     public void loadMechanic(Sign sign) {
         try {
-            Mechanic<?> mechanic = loadMechanicFromSign(sign, (__, on) -> contextProvider.findAt(on.getLocation()));
-            if (mechanic != null) {
-                mechanic.onBlocksLoaded();
+            Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
+            if (profile.isPresent()) {
+                Mechanic<?> mechanic = loadMechanicFromSign(profile.get(), sign, (__, on) -> contextProvider.findAt(on.getLocation()));
+                if (mechanic != null) {
+                    mechanic.onBlocksLoaded();
+                }
             }
         } catch (SQLException | IOException ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to load mechanic at location " + sign.getLocation(), ex);
         }
     }
 
-    private Mechanic<?> loadMechanicFromSign(Sign sign, Query.CheckedBiFunction<String, Block, MechanicStorageContext> context) throws IOException, SQLException {
-        // check if this sign is related to a mechanic
-        if (!sign.getSide(Side.FRONT).getLine(0).trim().startsWith("[")
-                || !sign.getSide(Side.FRONT).getLine(0).trim().endsWith("]")) {
-            return null;
-        }
-        String type = sign.getSide(Side.FRONT).getLine(0).trim().substring(1, sign.getSide(Side.FRONT).getLine(0).trim().length() - 1);
-
-        Optional<MechanicProfile<?>> mechanicProfile = Profiles.getProfiles()
-                .stream()
-                .filter(b -> b.getName().equalsIgnoreCase(type))
-                .findFirst();
-        if (!mechanicProfile.isPresent()) {
-            return null;
-        }
-        MechanicProfile<?> profile = mechanicProfile.get();
-        // fix lowercase/uppercase and my headache
-        sign.getSide(Side.FRONT).setLine(0, "[" + profile.getName() + "]");
-        sign.update();
-
+    private Mechanic<?> loadMechanicFromSign(MechanicProfile<?> profile, Sign sign, Query.CheckedBiFunction<String, Block, MechanicStorageContext> context) throws IOException, SQLException {
         // get the block which the sign is hanging on, because this block is the root of the mechanic
         Block on = BlockUtil.getPointingBlock(sign.getBlock(), true);
         if (on == null) {

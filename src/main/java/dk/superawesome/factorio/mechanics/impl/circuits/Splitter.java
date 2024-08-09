@@ -113,7 +113,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
             return;
         }
 
-        int total = Math.min(collection.getMaxTransfer(), collection.getTransferAmount());
+        int total = Math.min(collection.getMaxTransfer() * outputBlocks.size(), collection.getTransferAmount());
         int each = (int) Math.floor(((double) total) / outputBlocks.size());
         AtomicInteger remainder = new AtomicInteger(total - each * outputBlocks.size());
 
