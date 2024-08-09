@@ -4,7 +4,7 @@ import dk.superawesome.factorio.util.TickThrottle;
 
 public interface ThinkingMechanic {
 
-    ThinkDelayHandler getDelayHandler();
+    DelayHandler getThinkDelayHandler();
 
     void think();
 

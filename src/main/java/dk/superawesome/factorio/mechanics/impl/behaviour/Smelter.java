@@ -39,7 +39,8 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
             new BlockVector(-1, 1, 0)
     );
 
-    private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
+    private final DelayHandler thinkDelayHandler = new DelayHandler(20);
+    private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
     private ItemStack ingredient;
     private int ingredientAmount;
@@ -155,7 +156,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     @Override
-    public ThinkDelayHandler getDelayHandler() {
+    public DelayHandler getThinkDelayHandler() {
         return thinkDelayHandler;
     }
 
@@ -253,6 +254,11 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     @Override
     public boolean isTransferEmpty() {
         return storageType == null;
+    }
+
+    @Override
+    public DelayHandler getTransferDelayHandler() {
+        return transferDelayHandler;
     }
 
     @Override

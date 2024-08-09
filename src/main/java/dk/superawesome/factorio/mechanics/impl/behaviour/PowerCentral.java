@@ -17,9 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class PowerCentral extends AbstractMechanic<PowerCentral> implements ThinkingMechanic, SignalSource, Lightable {
 
@@ -27,7 +24,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Thin
 
     private static final double SIGNAL_COST = 1d / 32d;
 
-    private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
+    private final DelayHandler thinkDelayHandler = new DelayHandler(20);
 
     private boolean hasGraph;
     private double recentProduction;
@@ -109,7 +106,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Thin
     }
 
     @Override
-    public ThinkDelayHandler getDelayHandler() {
+    public DelayHandler getThinkDelayHandler() {
         return thinkDelayHandler;
     }
 

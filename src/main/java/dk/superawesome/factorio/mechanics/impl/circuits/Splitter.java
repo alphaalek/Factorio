@@ -1,9 +1,6 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
-import dk.superawesome.factorio.mechanics.AbstractMechanic;
-import dk.superawesome.factorio.mechanics.MechanicProfile;
-import dk.superawesome.factorio.mechanics.MechanicStorageContext;
-import dk.superawesome.factorio.mechanics.Profiles;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeBuildEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -20,6 +17,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -143,6 +141,11 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
                     @Override
                     public boolean isTransferEmpty() {
                         return collection.isTransferEmpty();
+                    }
+
+                    @Override
+                    public DelayHandler getTransferDelayHandler() {
+                        return collection.getTransferDelayHandler();
                     }
 
                     @Override

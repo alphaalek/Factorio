@@ -22,7 +22,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldSaveEvent;
-import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
@@ -50,7 +49,7 @@ public class MechanicManager implements Listener {
 
     public void handleThinking() {
         for (ThinkingMechanic thinking : thinkingMechanics) {
-            if (!thinking.getTickThrottle().isThrottled() && thinking.getDelayHandler().ready()) {
+            if (!thinking.getTickThrottle().isThrottled() && thinking.getThinkDelayHandler().ready()) {
                 thinking.think();
             }
         }

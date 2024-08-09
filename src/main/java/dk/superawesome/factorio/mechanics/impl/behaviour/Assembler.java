@@ -23,7 +23,8 @@ import java.util.Optional;
 
 public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMechanic, ItemContainer, MoneyCollection {
 
-    private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
+    private final DelayHandler thinkDelayHandler = new DelayHandler(20);
+    private final DelayHandler transferDelayHandler = new DelayHandler(10);
     private Types type;
     private int ingredientAmount;
     private double moneyAmount;
@@ -63,7 +64,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
     }
 
     @Override
-    public ThinkDelayHandler getDelayHandler() {
+    public DelayHandler getThinkDelayHandler() {
         return thinkDelayHandler;
     }
 
@@ -158,6 +159,11 @@ public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMe
     @Override
     public boolean isTransferEmpty() {
         return ((int)moneyAmount) == 0;
+    }
+
+    @Override
+    public DelayHandler getTransferDelayHandler() {
+        return transferDelayHandler;
     }
 
     @Override

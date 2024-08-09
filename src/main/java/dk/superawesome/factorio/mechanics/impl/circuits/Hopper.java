@@ -16,7 +16,7 @@ import org.bukkit.event.EventHandler;
 
 public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic {
 
-    private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
+    private final DelayHandler thinkDelayHandler = new DelayHandler(20);
 
     private ItemCollection takeMechanic;
     private ItemContainer putMechanic;
@@ -37,7 +37,7 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
     }
 
     @Override
-    public ThinkDelayHandler getDelayHandler() {
+    public DelayHandler getThinkDelayHandler() {
         return thinkDelayHandler;
     }
 

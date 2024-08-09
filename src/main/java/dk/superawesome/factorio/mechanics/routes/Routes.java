@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.mechanics.DelayHandler;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Generator;
@@ -16,10 +17,10 @@ import org.bukkit.util.BlockVector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class Routes {
-
 
     public static final RouteFactory<AbstractRoute.Pipe> transferRouteFactory = new RouteFactory.PipeRouteFactory();
     public static final RouteFactory<AbstractRoute.Signal> signalRouteFactory = new RouteFactory.SignalRouteFactory();
@@ -35,6 +36,7 @@ public class Routes {
         PipeSuckEvent event = new PipeSuckEvent(from);
         Bukkit.getPluginManager().callEvent(event);
         if (event.getTransfer() == null
+                || !event.getTransfer().getTransferDelayHandler().ready()
                 || event.getTransfer().isTransferEmpty()
                 || source.getEnergy() < event.getTransfer().getTransferEnergyCost()) {
             return false;

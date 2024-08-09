@@ -22,7 +22,8 @@ import java.util.function.Predicate;
 
 public class Constructor extends AbstractMechanic<Constructor> implements ThinkingMechanic, ItemCollection, ItemContainer {
 
-    private final ThinkDelayHandler thinkDelayHandler = new ThinkDelayHandler(20);
+    private final DelayHandler thinkDelayHandler = new DelayHandler(20);
+    private final DelayHandler transferDelayHandler = new DelayHandler(10);
     private final ItemStack[] craftingGridItems = new ItemStack[9];
     private ItemStack recipeResult;
     private ItemStack storageType;
@@ -114,7 +115,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
     }
 
     @Override
-    public ThinkDelayHandler getDelayHandler() {
+    public DelayHandler getThinkDelayHandler() {
         return thinkDelayHandler;
     }
 
@@ -219,6 +220,11 @@ public class Constructor extends AbstractMechanic<Constructor> implements Thinki
     @Override
     public boolean isTransferEmpty() {
         return storageType == null;
+    }
+
+    @Override
+    public DelayHandler getTransferDelayHandler() {
+        return transferDelayHandler;
     }
 
     @Override

@@ -17,6 +17,8 @@ import java.util.function.Predicate;
 
 public class StorageBox extends AbstractMechanic<StorageBox> implements ItemCollection, ItemContainer, Storage {
 
+    private final DelayHandler transferDelayHandler = new DelayHandler(10);
+
     private ItemStack stored;
     private int amount;
 
@@ -104,6 +106,11 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements ItemColl
     @Override
     public boolean isTransferEmpty() {
         return stored == null;
+    }
+
+    @Override
+    public DelayHandler getTransferDelayHandler() {
+        return transferDelayHandler;
     }
 
     @Override

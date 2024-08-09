@@ -2,12 +2,14 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.util.Tick;
 
-public class ThinkDelayHandler {
+public class DelayHandler {
+
+    public static DelayHandler NO_DELAY = new DelayHandler(0);
 
     private int delay;
-    private int lastThinkingTick = -1;
+    private int lastCheckTick = -1;
 
-    public ThinkDelayHandler(int delay) {
+    public DelayHandler(int delay) {
         this.delay = delay;
     }
 
@@ -17,8 +19,8 @@ public class ThinkDelayHandler {
 
     public boolean ready() {
         int current = Tick.get();
-        if (lastThinkingTick == -1 || current - lastThinkingTick >= delay) {
-            lastThinkingTick = current;
+        if (lastCheckTick == -1 || current - lastCheckTick >= delay) {
+            lastCheckTick = current;
             return true;
         }
 

@@ -1,9 +1,6 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
-import dk.superawesome.factorio.mechanics.AbstractMechanic;
-import dk.superawesome.factorio.mechanics.MechanicProfile;
-import dk.superawesome.factorio.mechanics.MechanicStorageContext;
-import dk.superawesome.factorio.mechanics.Profiles;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import org.bukkit.Location;
@@ -68,6 +65,11 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
     @Override
     public boolean isTransferEmpty() {
         return collected != null;
+    }
+
+    @Override
+    public DelayHandler getTransferDelayHandler() {
+        return DelayHandler.NO_DELAY;
     }
 
     @Override
