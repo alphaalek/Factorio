@@ -44,7 +44,7 @@ public class BaseGuiAdapter<G extends BaseGui<G>> extends BaseGui<G> {
 
     @Override
     public boolean onClickOpen(InventoryClickEvent event) {
-        return false;
+        return cancel && movedFromOtherInventory(event);
     }
 
     @Override
