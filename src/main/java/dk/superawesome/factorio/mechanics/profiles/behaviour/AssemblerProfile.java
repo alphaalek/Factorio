@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.profiles.behaviour;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
+import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
@@ -37,10 +38,8 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
 
     @Override
     public StorageProvider<Assembler> getStorageProvider() {
-        return new StorageProvider<Assembler>() {
-            @Override
-            public Storage createStorage(Assembler mechanic, int context) {
-                return new Storage() {
+        return StorageProvider.Builder.<Assembler>makeContext()
+                .set(SingleStorageGui.CONTEXT, AssemblerGui.STORAGE_SLOTS, mechanic -> new Storage() {
                     @Override
                     public ItemStack getStored() {
                         return Optional.ofNullable(mechanic.getType()).map(Assembler.Types::getMat).map(ItemStack::new).orElse(null);
@@ -66,9 +65,8 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
                     public int getCapacity() {
                         return mechanic.getCapacity();
                     }
-                };
-            }
-        };
+                })
+                .build();
     }
 
     @Override

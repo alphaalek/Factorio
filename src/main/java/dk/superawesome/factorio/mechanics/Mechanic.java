@@ -7,6 +7,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 public interface Mechanic<M extends Mechanic<M>> extends Listener {
 
     void unload();
@@ -29,5 +31,5 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener {
 
     MechanicProfile<M> getProfile();
 
-    <G extends BaseGui<G>> boolean openInventory(Player player);
+    <G extends BaseGui<G>> AtomicReference<G> getGuiInUse();
 }

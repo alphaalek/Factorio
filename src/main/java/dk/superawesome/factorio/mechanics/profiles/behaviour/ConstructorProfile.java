@@ -36,10 +36,8 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
 
     @Override
     public StorageProvider<Constructor> getStorageProvider() {
-        return new StorageProvider<Constructor>() {
-            @Override
-            public Storage createStorage(Constructor mechanic, int context) {
-                return new Storage() {
+        return StorageProvider.Builder.<Constructor>makeContext()
+                .set(ConstructorGui.STORAGE_CONTEXT, ConstructorGui.STORAGE_SLOTS, mechanic -> new Storage() {
                     @Override
                     public ItemStack getStored() {
                         return mechanic.getStorageType();
@@ -64,9 +62,8 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
                     public int getCapacity() {
                         return mechanic.getCapacity();
                     }
-                };
-            }
-        };
+                })
+                .build();
     }
 
     @Override

@@ -5,9 +5,9 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
+import dk.superawesome.factorio.util.TagVerifier;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
@@ -24,13 +24,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
+public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, AccessibleMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
-    public static final int INGREDIENT_STORAGE_CONTEXT = 0;
-    public static final int FUEL_STORAGE_CONTEXT = 1;
-    public static final int STORED_STORAGE_CONTEXT = 2;
-
-    public static final int INGREDIENT_CAPACITY = 1;
+    public static final int INGREDIENT_CAPACITY_MARK = 1;
     private static final List<BlockVector> WASTE_OUTPUT_RELATIVES = Arrays.asList(
             new BlockVector(0, 2, 0),
             new BlockVector(0, 1, 1),
@@ -100,8 +96,8 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
             return;
         }
 
-        if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(i -> canSmelt(i.getType()))) {
-            ingredientAmount += this.<SmelterGui>put(collection, level.getInt(INGREDIENT_CAPACITY) - ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
+        if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(i -> canSmelt(i))) {
+            ingredientAmount += this.<SmelterGui>put(collection, level.getInt(INGREDIENT_CAPACITY_MARK) - ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
                 @Override
                 public ItemStack get() {
                     return ingredient;
@@ -139,13 +135,13 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         return WASTE_OUTPUT_RELATIVES;
     }
 
-    public boolean canSmelt(Material type) {
+    public boolean canSmelt(ItemStack item) {
         Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
         while (recipeIterator.hasNext()) {
             Recipe recipe = recipeIterator.next();
 
             if (recipe instanceof FurnaceRecipe furnaceRecipe) {
-                if (furnaceRecipe.getInput().getType() == type) {
+                if (furnaceRecipe.getInput().isSimilar(item) || TagVerifier.checkHighestTag(furnaceRecipe.getInput(), item)) {
                     cachedSmeltResult = furnaceRecipe.getResult();
                     return true;
                 }
@@ -221,6 +217,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         // the smelter does not have any ingredients left, clear up
         if (ingredientAmount == 0) {
             ingredient = null;
+            cachedSmeltResult = null;
             smeltResult = null;
         }
     }
@@ -299,6 +296,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         if (this.ingredientAmount == 0) {
             ingredient = null;
             cachedSmeltResult = null;
+            smeltResult = null;
         }
     }
 

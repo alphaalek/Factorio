@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.profiles.behaviour;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
+import dk.superawesome.factorio.gui.impl.ConstructorGui;
 import dk.superawesome.factorio.gui.impl.StorageBoxGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.StorageBox;
@@ -12,6 +13,8 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
 
@@ -35,12 +38,9 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
 
     @Override
     public StorageProvider<StorageBox> getStorageProvider() {
-        return new StorageProvider<StorageBox>() {
-            @Override
-            public Storage createStorage(StorageBox mechanic, int context) {
-                return mechanic;
-            }
-        };
+        return StorageProvider.Builder.<StorageBox>makeContext()
+                .set(StorageBoxGui.STORAGE_CONTEXT, IntStream.range(0, StorageBoxGui.STORED_SIZE).boxed().collect(Collectors.toList()), m -> m)
+                .build();
     }
 
     @Override

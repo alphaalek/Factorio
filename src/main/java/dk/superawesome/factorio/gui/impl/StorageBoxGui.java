@@ -3,6 +3,7 @@ package dk.superawesome.factorio.gui.impl;
 import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.mechanics.impl.behaviour.StorageBox;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,7 +14,9 @@ import java.util.stream.IntStream;
 
 public class StorageBoxGui extends SingleStorageGui<StorageBoxGui, StorageBox> {
 
-    private static final int STORED_SIZE = 35;
+    public static final int STORAGE_CONTEXT = 0;
+
+    public static final int STORED_SIZE = 35;
 
     public StorageBoxGui(StorageBox mechanic, AtomicReference<StorageBoxGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder(), IntStream.range(0, STORED_SIZE).boxed().collect(Collectors.toList()));

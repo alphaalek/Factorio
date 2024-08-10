@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class Assembler extends AbstractMechanic<Assembler> implements ThinkingMechanic, ItemContainer, MoneyCollection {
+public class Assembler extends AbstractMechanic<Assembler> implements AccessibleMechanic, ThinkingMechanic, ItemContainer, MoneyCollection {
 
     private final DelayHandler thinkDelayHandler = new DelayHandler(20);
     private final DelayHandler transferDelayHandler = new DelayHandler(10);

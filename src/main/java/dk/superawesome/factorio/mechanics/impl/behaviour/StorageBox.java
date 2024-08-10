@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class StorageBox extends AbstractMechanic<StorageBox> implements ItemCollection, ItemContainer, Storage {
+public class StorageBox extends AbstractMechanic<StorageBox> implements AccessibleMechanic, ItemCollection, ItemContainer, Storage {
 
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 

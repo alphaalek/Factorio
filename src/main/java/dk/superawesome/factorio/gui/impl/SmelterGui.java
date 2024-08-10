@@ -21,9 +21,13 @@ import java.util.stream.Stream;
 
 public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
-    private static final List<Integer> INGREDIENT_SLOTS = Arrays.asList(9, 10, 18, 19, 27, 28, 36, 37, 45, 46);
-    private static final List<Integer> FUEL_SLOTS = Arrays.asList(12, 13, 21, 22, 30, 31, 39, 40, 48, 49);
-    private static final List<Integer> STORAGE_SLOTS = Arrays.asList(6, 7, 8, 15, 16, 17, 24, 25, 26, 33, 34);
+    public static final int INGREDIENT_CONTEXT = 0;
+    public static final int FUEL_CONTEXT = 1;
+    public static final int STORED_CONTEXT = 2;
+
+    public static final List<Integer> INGREDIENT_SLOTS = Arrays.asList(9, 10, 18, 19, 27, 28, 36, 37, 45, 46);
+    public static final List<Integer> FUEL_SLOTS = Arrays.asList(12, 13, 21, 22, 30, 31, 39, 40, 48, 49);
+    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(6, 7, 8, 15, 16, 17, 24, 25, 26, 33, 34);
 
     public SmelterGui(Smelter mechanic, AtomicReference<SmelterGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder());
@@ -138,7 +142,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         for (ItemStack item : event.getNewItems().values()) {
             // disallow if ingredient is not allowed
             if (modifyIngredients
-                    && (getMechanic().getIngredient() != null && !getMechanic().getIngredient().isSimilar(item) || getMechanic().getIngredient() == null && !getMechanic().canSmelt(item.getType()))) {
+                    && (getMechanic().getIngredient() != null && !getMechanic().getIngredient().isSimilar(item) || getMechanic().getIngredient() == null && !getMechanic().canSmelt(item))) {
                 return true;
             }
 
@@ -185,7 +189,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             }
 
             if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
-                if (getMechanic().getIngredient() != null && getMechanic().getIngredient().isSimilar(event.getCursor()) || getMechanic().getIngredient() == null && getMechanic().canSmelt(event.getCursor().getType())) {
+                if (getMechanic().getIngredient() != null && getMechanic().getIngredient().isSimilar(event.getCursor()) || getMechanic().getIngredient() == null && getMechanic().canSmelt(event.getCursor())) {
                     updateIngredientsPost = true;
 
                     // update ingredient if not set
@@ -223,7 +227,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         }
 
         if (STORAGE_SLOTS.contains(event.getRawSlot())) {
-            return handleOnlyCollectInteraction(event, getStorage(Smelter.STORED_STORAGE_CONTEXT));
+            return handleOnlyCollectInteraction(event, getStorage(STORED_CONTEXT));
         }
 
         return true;
@@ -260,7 +264,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                         ItemStack copy = item.clone();
                         int a = item.getAmount();
 
-                        if (getMechanic().getIngredient() != null && getMechanic().getIngredient().isSimilar(item) || getMechanic().getIngredient() == null && getMechanic().canSmelt(item.getType())) {
+                        if (getMechanic().getIngredient() != null && getMechanic().getIngredient().isSimilar(item) || getMechanic().getIngredient() == null && getMechanic().canSmelt(item)) {
                             addItemsToSlots(item, INGREDIENT_SLOTS);
                             getMechanic().setIngredientAmount(getMechanic().getIngredientAmount() + (a - item.getAmount()));
 
@@ -319,7 +323,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                     }
 
                     // check if this action can be performed
-                    if (find(INGREDIENT_SLOTS).size() <= 1 && getMechanic().canSmelt(hotbarItem.getType())) {
+                    if (find(INGREDIENT_SLOTS).size() <= 1 && getMechanic().canSmelt(hotbarItem)) {
                         updateIngredientsPost = true;
 
                         // update ingredient if not set or not equal
@@ -357,7 +361,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
                 // check hotbar swap interaction for storage slots
                 if (STORAGE_SLOTS.contains(event.getRawSlot())
-                        && !handleOnlyHotbarCollectInteraction(event, getStorage(Smelter.STORED_STORAGE_CONTEXT))) {
+                        && !handleOnlyHotbarCollectInteraction(event, getStorage(STORED_CONTEXT))) {
                     return false;
                 }
 

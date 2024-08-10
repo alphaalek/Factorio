@@ -1,10 +1,7 @@
 package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.gui.impl.EmeraldForgeGui;
-import dk.superawesome.factorio.mechanics.AbstractMechanic;
-import dk.superawesome.factorio.mechanics.MechanicProfile;
-import dk.superawesome.factorio.mechanics.MechanicStorageContext;
-import dk.superawesome.factorio.mechanics.Profiles;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.mechanics.transfer.MoneyContainer;
@@ -16,7 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements MoneyContainer {
+public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements AccessibleMechanic, MoneyContainer {
 
     private double moneyAmount;
 

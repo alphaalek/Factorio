@@ -79,13 +79,7 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
 
     private static void closeGui(InventoryHolder holder, Player player) {
         if (holder instanceof BaseGui<?> gui) {
-            boolean anyViewersLeft = holder.getInventory().getViewers().stream().anyMatch(p -> p != player);
-            gui.onClose(player, anyViewersLeft);
-
-            // clear usage if no other player has this gui opene
-            if (!anyViewersLeft) {
-                gui.clearInUse();
-            }
+            gui.onClose(player, gui.handleClose(player));
 
             // play close sound if the player didn't instantly open a new inventory
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
@@ -94,6 +88,17 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
                 }
             });
         }
+    }
+
+    public boolean handleClose(Player player) {
+        boolean anyViewersLeft = inventory.getViewers().stream().anyMatch(p -> p != player);
+
+        // clear usage if no other player has this gui open
+        if (!anyViewersLeft) {
+            clearInUse();
+        }
+
+        return anyViewersLeft;
     }
 
     protected static int DOUBLE_CHEST = 54;

@@ -36,68 +36,61 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
 
     @Override
     public StorageProvider<Smelter> getStorageProvider() {
-        return new StorageProvider<Smelter>() {
-            @Override
-            public Storage createStorage(Smelter mechanic, int context) {
-                if (context == 0) {
-                    return new Storage() {
-                        @Override
-                        public ItemStack getStored() {
-                            return mechanic.getIngredient();
-                        }
+        return StorageProvider.Builder.<Smelter>makeContext()
+                .set(SmelterGui.INGREDIENT_CONTEXT, SmelterGui.INGREDIENT_SLOTS, mechanic -> new Storage() {
+                    @Override
+                    public ItemStack getStored() {
+                        return mechanic.getIngredient();
+                    }
 
-                        @Override
-                        public void setStored(ItemStack stored) {
-                            mechanic.setIngredient(stored);
-                        }
+                    @Override
+                    public void setStored(ItemStack stored) {
+                        mechanic.setIngredient(stored);
+                    }
 
-                        @Override
-                        public int getAmount() {
-                            return mechanic.getIngredientAmount();
-                        }
+                    @Override
+                    public int getAmount() {
+                        return mechanic.getIngredientAmount();
+                    }
 
-                        @Override
-                        public void setAmount(int amount) {
-                            mechanic.setIngredientAmount(amount);
-                        }
+                    @Override
+                    public void setAmount(int amount) {
+                        mechanic.setIngredientAmount(amount);
+                    }
 
-                        @Override
-                        public int getCapacity() {
-                            return mechanic.getCapacity();
-                        }
-                    };
-                } else if (context == 1) {
-                    return mechanic.convertFuelStorage();
-                } else {
-                    return new Storage() {
-                        @Override
-                        public ItemStack getStored() {
-                            return mechanic.getStorageType();
-                        }
+                    @Override
+                    public int getCapacity() {
+                        return mechanic.getCapacity();
+                    }
+                })
+                .set(SmelterGui.FUEL_CONTEXT, SmelterGui.FUEL_SLOTS, FuelMechanic::convertFuelStorage)
+                .set(SmelterGui.STORED_CONTEXT, SmelterGui.STORAGE_SLOTS, mechanic -> new Storage() {
+                    @Override
+                    public ItemStack getStored() {
+                        return mechanic.getStorageType();
+                    }
 
-                        @Override
-                        public void setStored(ItemStack stored) {
-                            mechanic.setStorageType(stored);
-                        }
+                    @Override
+                    public void setStored(ItemStack stored) {
+                        mechanic.setStorageType(stored);
+                    }
 
-                        @Override
-                        public int getAmount() {
-                            return mechanic.getStorageAmount();
-                        }
+                    @Override
+                    public int getAmount() {
+                        return mechanic.getStorageAmount();
+                    }
 
-                        @Override
-                        public void setAmount(int amount) {
-                            mechanic.setStorageAmount(amount);
-                        }
+                    @Override
+                    public void setAmount(int amount) {
+                        mechanic.setStorageAmount(amount);
+                    }
 
-                        @Override
-                        public int getCapacity() {
-                            return mechanic.getCapacity();
-                        }
-                    };
-                }
-            }
-        };
+                    @Override
+                    public int getCapacity() {
+                        return mechanic.getCapacity();
+                    }
+                })
+                .build();
     }
 
     @Override
@@ -110,7 +103,7 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
         return MechanicLevel.Registry.Builder
                 .make(1)
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(11))
-                .mark(Smelter.INGREDIENT_CAPACITY, Array.fromData(10))
+                .mark(Smelter.INGREDIENT_CAPACITY_MARK, Array.fromData(10))
                 .mark(Smelter.FUEL_CAPACITY, Array.fromData(10))
                 .build();
     }

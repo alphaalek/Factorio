@@ -4,6 +4,7 @@ import de.rapha149.signgui.SignGUI;
 import de.rapha149.signgui.SignGUIAction;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
+import dk.superawesome.factorio.mechanics.AccessibleMechanic;
 import dk.superawesome.factorio.mechanics.Management;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.transfer.Container;
@@ -44,10 +45,12 @@ public class Elements {
 
         @Override
         public void handle(InventoryClickEvent event, Player player, MechanicGui<?, ?> gui) {
-            player.openInventory(createGui(gui.getMechanic()).getInventory());
+            if (gui.getMechanic() instanceof AccessibleMechanic accessible) {
+                player.openInventory(createGui(gui.getMechanic(), accessible).getInventory());
+            }
         }
 
-        private <G extends BaseGui<G>> BaseGui<G> createGui(Mechanic<?> mechanic) {
+        private <G extends BaseGui<G>> BaseGui<G> createGui(Mechanic<?> mechanic, AccessibleMechanic accesible) {
             return new PaginatedGui<G, OfflinePlayer>(new BaseGui.InitCallbackHolder(), null, SIZE, TITLE, true, 3 * 9 - 1) {
 
                 {
@@ -80,7 +83,7 @@ public class Elements {
                 public void onClose(Player player, boolean anyViewersLeft) {
                     Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                         if (player.isOnline() && !player.getOpenInventory().getType().isCreatable()) {
-                            mechanic.openInventory(player);
+                            accesible.openInventory(mechanic, player);
                         }
                     });
                 }

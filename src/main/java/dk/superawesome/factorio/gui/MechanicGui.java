@@ -41,12 +41,6 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         this(mechanic, inUseReference, initCallback, mechanic.toString());
     }
 
-    protected void clearSlots(List<Integer> slots) {
-        for (int slot : slots) {
-            getInventory().setItem(slot, null);
-        }
-    }
-
     @Override
     public void loadItems() {
         int i = 0;
@@ -136,7 +130,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         return items;
     }
 
-    protected Storage getStorage(int context) {
+    public Storage getStorage(int context) {
         StorageProvider<M> provider = mechanic.getProfile().getStorageProvider();
         if (provider != null) {
             return provider.createStorage(mechanic, context);
@@ -186,31 +180,41 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         return false;
     }
 
-    protected void updateAmount(Storage storage, HumanEntity adder, List<Integer> slots, Consumer<Integer> leftover) {
+    public int calculateAmount(List<Integer> slots) {
+        return findItems(slots).stream().mapToInt(ItemStack::getAmount).sum();
+    }
+
+    protected void updateAmount(Storage storage, Inventory source, List<Integer> slots, Consumer<Integer> leftover) {
         getMechanic().getTickThrottle().throttle();
 
-        int before = findItems(slots).stream().mapToInt(ItemStack::getAmount).sum();
+        int before = calculateAmount(slots);
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
             // get the difference in items of the storage box inventory view
-            int after = findItems(slots).stream().mapToInt(ItemStack::getAmount).sum();
+            int after = calculateAmount(slots);
             int diff = after - before;
 
-            // check if the storage box has enough space for these items
-            if (after > before && storage.getAmount() + diff > storage.getCapacity()) {
-                // evaluate leftovers
-                int left = storage.getAmount() + diff - storage.getCapacity();
-                leftover.accept(left);
-                storage.setAmount(storage.getCapacity());
-
-                // add leftovers to player inventory again
-                ItemStack item = storage.getStored().clone();
-                item.setAmount(left);
-                adder.getInventory().addItem(item);
-            } else {
-                // update storage amount in storage box
-                storage.setAmount(storage.getAmount() + diff);
-            }
+            updateAmount(storage, source, diff, leftover);
         });
+    }
+
+    protected void updateAmount(Storage storage, Inventory source, int diff, Consumer<Integer> leftover) {
+        getMechanic().getTickThrottle().throttle();
+
+        // check if the storage box has enough space for these items
+        if (diff > 0 && storage.getAmount() + diff > storage.getCapacity()) {
+            // evaluate leftovers
+            int left = storage.getAmount() + diff - storage.getCapacity();
+            leftover.accept(left);
+            storage.setAmount(storage.getCapacity());
+
+            // add leftovers to player inventory again
+            ItemStack item = storage.getStored().clone();
+            item.setAmount(left);
+            source.addItem(item);
+        } else {
+            // update storage amount in storage box
+            storage.setAmount(storage.getAmount() + diff);
+        }
     }
 
     protected int updateAddedItems(Inventory inventory, int amount, ItemStack stored, List<Integer> slots) {
@@ -273,8 +277,6 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
     }
 
     protected void addItemsToSlots(ItemStack item, List<Integer> slots) {
-        // find all the crafting grid items where the item can be added to
-
         int left = item.getAmount();
         int i = 0;
         while (left > 0 && i < slots.size()) {
@@ -326,7 +328,13 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         }
     }
 
-    protected static List<Integer> reverseSlots(List<Integer> slots) {
+    protected void clearSlots(List<Integer> slots) {
+        for (int slot : slots) {
+            getInventory().setItem(slot, null);
+        }
+    }
+
+    public static List<Integer> reverseSlots(List<Integer> slots) {
         return IntStream.range(0, slots.size())
                 .boxed()
                 .map(slots::get)

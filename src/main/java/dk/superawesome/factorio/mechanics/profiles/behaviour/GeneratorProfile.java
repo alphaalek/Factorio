@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.profiles.behaviour;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
+import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.gui.impl.GeneratorGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Generator;
@@ -35,12 +36,9 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
 
     @Override
     public StorageProvider<Generator> getStorageProvider() {
-        return new StorageProvider<Generator>() {
-            @Override
-            public Storage createStorage(Generator mechanic, int context) {
-                return mechanic.convertFuelStorage();
-            }
-        };
+        return StorageProvider.Builder.<Generator>makeContext()
+                .set(SingleStorageGui.CONTEXT, GeneratorGui.STORAGE_SLOTS, FuelMechanic::convertFuelStorage)
+                .build();
     }
 
     @Override

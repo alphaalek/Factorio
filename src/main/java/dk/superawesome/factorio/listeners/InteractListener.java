@@ -2,10 +2,7 @@ package dk.superawesome.factorio.listeners;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Matcher;
-import dk.superawesome.factorio.mechanics.GuiMechanicProfile;
-import dk.superawesome.factorio.mechanics.Management;
-import dk.superawesome.factorio.mechanics.Mechanic;
-import dk.superawesome.factorio.mechanics.MechanicManager;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.util.Tick;
 import dk.superawesome.factorio.util.TickValue;
 import org.bukkit.Bukkit;
@@ -55,7 +52,7 @@ public class InteractListener implements Listener {
     }
 
     private void interactMechanic(Player player, Mechanic<?> mechanic) {
-        if (mechanic.getProfile() instanceof GuiMechanicProfile<?>) {
+        if (mechanic instanceof AccessibleMechanic accessible) {
             // check if the player has access to open this mechanic
             if (!mechanic.getManagement().hasAccess(player, Management.OPEN)) {
                 // ensure no double messages for blocks that calls interact event twice (e.g. interacting with Power Central)
@@ -71,7 +68,7 @@ public class InteractListener implements Listener {
             }
 
             // open the mechanic inventory
-            if (mechanic.openInventory(player)) {
+            if (accessible.openInventory(mechanic, player)) {
                 player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, 0.375f, 0.5f);
             }
         }

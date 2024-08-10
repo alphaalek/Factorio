@@ -18,7 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class PowerCentral extends AbstractMechanic<PowerCentral> implements ThinkingMechanic, SignalSource, Lightable {
+public class PowerCentral extends AbstractMechanic<PowerCentral> implements AccessibleMechanic, ThinkingMechanic, SignalSource, Lightable {
 
     public static final int CAPACITY = 0;
 

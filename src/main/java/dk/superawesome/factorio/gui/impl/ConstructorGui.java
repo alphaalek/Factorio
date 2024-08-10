@@ -4,54 +4,35 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Constructor;
+import dk.superawesome.factorio.util.TagVerifier;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.*;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
+    public static final int STORAGE_CONTEXT = 0;
+
     private static final int GRID_WIDTH = 3;
     private static final int GRID_HEIGHT = 3;
     private static final List<Integer> CRAFTING_SLOTS = Arrays.asList(10, 11, 12, 19, 20, 21, 28, 29, 30);
-    private static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34);
+    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34);
 
     private static final List<Recipe> commonRecipes = new ArrayList<>();
-    private static final List<Tag<Material>> materialTags = new ArrayList<>();
 
     static {
         for (Assembler.Types type : Assembler.Types.values()) {
             addRecipesFor(new ItemStack(type.getMat()));
-        }
-
-        try {
-            Class<?> clazz = Class.forName(Tag.class.getName());
-            for (Field field : clazz.getDeclaredFields()) {
-                Object val = field.get(null);
-                if (val instanceof Tag<?> tag) {
-                    if (Arrays.stream(((ParameterizedType) tag.getClass().getGenericSuperclass()).getActualTypeArguments())
-                            .map(Type::getTypeName)
-                            .anyMatch(t -> Material.class.getName().equals(t))) {
-                        materialTags.add((Tag<Material>) tag);
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "Failed to acquire material tags", ex);
         }
     }
 
@@ -176,7 +157,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             if (CRAFTING_SLOTS.contains(event.getRawSlot()) && event.getClickedInventory() == getInventory()) {
                 if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
                     // update storage amount because this action can collect items from the storage slots
-                    updateAmount(getStorage(0), event.getWhoClicked(), STORAGE_SLOTS, this::updateRemovedItems);
+                    updateAmount(getStorage(0), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
                 }
 
                 getMechanic().getTickThrottle().throttle();
@@ -196,7 +177,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR
                     && event.getCursor() != null && getMechanic().getStorageType() != null && event.getCursor().isSimilar(getMechanic().getStorageType())) {
                 // update storage amount after this
-                updateAmount(getStorage(0), event.getWhoClicked(), STORAGE_SLOTS, this::updateRemovedItems);
+                updateAmount(getStorage(0), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
             }
         }
 
@@ -290,40 +271,6 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         return getOffer(getUpperCorner());
     }
 
-    private boolean handleUnspecific(ItemStack ingredient, ItemStack offer) {
-        if (ingredient != null && offer != null && ingredient.hasItemMeta()) {
-            Material mat = ingredient.getType();
-            Material offerMat = offer.getType();
-
-            // get all materials from the tags where the ingredient is tagged
-            List<Material> materials = new ArrayList<>();
-            for (Tag<Material> tag : materialTags) {
-                if (tag.isTagged(mat)) {
-                    materials.addAll(tag.getValues());
-                }
-            }
-
-            // ... get the material occurring the most of the values from these tags
-            List<Map.Entry<Material, Long>> mostOccur = materials.stream().collect(Collectors.groupingBy(i -> i, Collectors.counting()))
-                    .entrySet().stream()
-                    .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                    .toList();
-            long prev = 0;
-            for (Map.Entry<Material, Long> entry : mostOccur) {
-                if (entry.getValue() >= prev) {
-                    prev = entry.getValue();
-                    if (offerMat == entry.getKey()) {
-                        return true;
-                    }
-                    continue;
-                }
-                return false;
-            }
-        }
-
-        return false;
-    }
-
     private void updateCrafting() {
         for (int i = 0; i < 9; i++) {
             getMechanic().getCraftingGridItems()[i] = getInventory().getItem(CRAFTING_SLOTS.get(i));
@@ -374,7 +321,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                         if (req == null && at != null) {
                             break;
                         }
-                        if (req != null && !req.isSimilar(at) && !handleUnspecific(req, at)) {
+                        if (req != null && !req.isSimilar(at) && !TagVerifier.checkHighestTag(req, at)) {
                             break;
                         }
 
@@ -406,7 +353,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                         while (ingredientsIterator.hasNext()) {
                             ItemStack ingredient = ingredientsIterator.next();
 
-                            if (ingredient.isSimilar(at) || handleUnspecific(ingredient, at)) {
+                            if (ingredient.isSimilar(at) || TagVerifier.checkHighestTag(ingredient, at)) {
                                 ingredientsIterator.remove();
                                 offerIterator.remove();
                                 break;

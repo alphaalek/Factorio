@@ -4,6 +4,7 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.gui.PaginatedGui;
 import dk.superawesome.factorio.gui.SingleStorageGui;
+import dk.superawesome.factorio.mechanics.AccessibleMechanic;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import dk.superawesome.factorio.util.statics.StringUtil;
@@ -22,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
-    private static final List<Integer> STORAGE_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
+    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
     private static final List<Integer> MONEY_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40);
 
     public AssemblerGui(Assembler mechanic, AtomicReference<AssemblerGui> inUseReference) {
@@ -87,7 +88,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
             public void onClose(Player player, boolean anyViewersLeft) {
                 Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                     if (player.isOnline()) {
-                        getMechanic().openInventory(player);
+                        ((AccessibleMechanic) getMechanic()).openInventory(getMechanic(), player);
                     }
                 });
             }

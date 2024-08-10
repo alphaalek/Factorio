@@ -21,8 +21,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<M>> extends MechanicGui<G, M> {
-    
+public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<M>> extends MechanicGui<G, M> implements MechanicStorageGui {
+
+    public static final int CONTEXT = 0;
+
     private final List<Integer> slots;
     private final Storage storage;
     
@@ -38,9 +40,24 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
 
     @Override
     public void loadInputOutputItems() {
-        if (storage != null) {
+        if (storage.getStored() != null) {
             loadStorageTypes(storage.getStored(), storage.getAmount(), slots);
         }
+    }
+
+    @Override
+    public int getInputContext() {
+        return CONTEXT;
+    }
+
+    @Override
+    public int getOutputContext() {
+        return CONTEXT;
+    }
+
+    @Override
+    public MechanicGui<?, ?> getMechanicGui() {
+        return this;
     }
 
     public void updateAddedItems(int amount) {
@@ -322,7 +339,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         }
 
         if (!event.isCancelled()) {
-            updateAmount(storage, event.getWhoClicked(), slots, this::updateRemovedItems);
+            updateAmount(storage, event.getWhoClicked().getInventory(), slots, this::updateRemovedItems);
         }
     }
 }
