@@ -1,11 +1,15 @@
 package dk.superawesome.factorio.mechanics.impl.behaviour;
 
+import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.api.events.AssemblerTypeRequestEvent;
 import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
+import dk.superawesome.factorio.util.statics.StringUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -18,14 +22,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class Assembler extends AbstractMechanic<Assembler> implements AccessibleMechanic, ThinkingMechanic, ItemContainer, MoneyCollection {
 
     private final DelayHandler thinkDelayHandler = new DelayHandler(20);
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
-    private Types type;
+    private Type type;
     private int ingredientAmount;
     private double moneyAmount;
 
@@ -39,7 +45,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         ByteArrayInputStream data = context.getData();
         ItemStack item = context.getSerializer().readItemStack(data);
         if (item != null) {
-            this.type = Types.getType(item.getType()).orElse(null);
+            this.type = Types.getLoadedType(Types.getTypeFromMaterial(item.getType()).orElseThrow(IllegalArgumentException::new));
         }
         this.ingredientAmount = context.getSerializer().readInt(data);
         this.moneyAmount = context.getSerializer().readDouble(data);
@@ -49,7 +55,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         context.getSerializer().writeItemStack(stream,
                 Optional.ofNullable(this.type)
-                        .map(Types::getMat)
+                        .map(Type::getMat)
                         .map(ItemStack::new)
                         .orElse(null));
         context.getSerializer().writeInt(stream, this.ingredientAmount);
@@ -73,20 +79,20 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         // check if an assembler type is chosen, if not, don't continue
         if (type == null
                 // check if the assembler has enough ingredients to assemble, if not, don't continue
-                || ingredientAmount < type.getRequires()
+                || ingredientAmount < type.requires()
                 // check if the assembler has enough space for money, if not, don't continue
-                || moneyAmount + type.getProduces() > getCapacity()) {
+                || moneyAmount + type.produces() > getCapacity()) {
             return;
         }
 
         // do the assembling
-        ingredientAmount -= type.getRequires();
-        moneyAmount += type.getProduces();
+        ingredientAmount -= type.requires();
+        moneyAmount += type.produces();
 
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
-            gui.updateRemovedIngredients(type.getRequires());
-            gui.updateAddedMoney(type.getProduces());
+            gui.updateRemovedIngredients(type.requires());
+            gui.updateAddedMoney(type.produces());
 
             for (HumanEntity player : gui.getInventory().getViewers()) {
                 ((Player)player).playSound(getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.25f, 1f);
@@ -101,7 +107,10 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public void pipePut(ItemCollection collection, PipePutEvent event) {
-        ItemStack item = Optional.ofNullable(type).map(Types::getMat).map(ItemStack::new).orElse(null);
+        ItemStack item = Optional.ofNullable(type)
+                .map(Type::getMat)
+                .map(ItemStack::new)
+                .orElse(null);
         if ((item == null || collection.has(item)) && ingredientAmount < getCapacity()) {
             event.setTransferred(true);
             ingredientAmount += this.<AssemblerGui>put(collection, getCapacity() - ingredientAmount, getGuiInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
@@ -112,7 +121,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
                 @Override
                 public void set(ItemStack val) {
-                    type = Types.getType(val.getType()).orElse(null);
+                    type = Types.getLoadedType(Types.getTypeFromMaterial(val.getType()).orElseThrow(IllegalArgumentException::new));
                 }
             });
         }
@@ -122,17 +131,17 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     public int getCapacity() {
         return level.getInt(ItemCollection.CAPACITY_MARK) *
                 Optional.ofNullable(type)
-                        .map(Types::getMat)
+                        .map(Type::getMat)
                         .map(Material::getMaxStackSize)
                         .orElse(64);
     }
 
-    public Types getType() {
+    public Type getType() {
         return this.type;
     }
 
     public void setType(Types type) {
-        this.type = type;
+        this.type = Types.getLoadedType(type);
 
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
@@ -168,7 +177,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public int getMaxTransfer() {
-        return type.getMat().getMaxStackSize();
+        return type.type().getMat().getMaxStackSize();
     }
 
     @Override
@@ -192,6 +201,25 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         }
 
         return take;
+    }
+
+    public record Type(Types type, int requires, double produces) {
+
+        public Material getMat() {
+            return type.getMat();
+        }
+
+        public Types getType() {
+            return type;
+        }
+
+        public double getProduces() {
+            return produces;
+        }
+
+        public int getRequires() {
+            return requires;
+        }
     }
 
     public enum Types {
@@ -231,6 +259,35 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         MILK_BUCKET(Material.MILK_BUCKET, 4, 5.5),
         ;
 
+        private static final long ONE_HOUR_DELAY_TICKS = (long) 20 * 60 * 60;
+
+        public static long LAST_UPDATE = System.currentTimeMillis();
+
+        private static final List<Type> types = new ArrayList<>();
+
+        static {
+            requestTypes();
+            Bukkit.getScheduler().runTaskTimer(Factorio.get(), Assembler.Types::requestTypes, ONE_HOUR_DELAY_TICKS, ONE_HOUR_DELAY_TICKS);
+        }
+
+        private static void requestTypes() {
+            types.clear();
+            for (Types type : Types.values()) {
+                AssemblerTypeRequestEvent requestEvent = new AssemblerTypeRequestEvent(type);
+                Bukkit.getPluginManager().callEvent(requestEvent);
+                Bukkit.broadcastMessage("Requested price, got " + StringUtil.formatDecimals(requestEvent.getProduces(), 2) + " Default: " + StringUtil.formatDecimals(requestEvent.getType().getProduces(), 2));
+                types.add(new Type(type, requestEvent.getRequires(), requestEvent.getProduces()));
+            }
+        }
+
+        public static List<Type> getTypes() {
+            return types;
+        }
+
+        public static Type getLoadedType(Types type) {
+            return types.stream().filter(t -> t.type() == type).findFirst().orElseThrow(IllegalArgumentException::new);
+        }
+
         private final Material mat;
         private final int requires;
         private final double produces;
@@ -253,7 +310,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
             return produces;
         }
 
-        public static Optional<Types> getType(Material mat) {
+        public static Optional<Types> getTypeFromMaterial(Material mat) {
             return Arrays.stream(values()).filter(t -> t.getMat().equals(mat)).findFirst();
         }
     }

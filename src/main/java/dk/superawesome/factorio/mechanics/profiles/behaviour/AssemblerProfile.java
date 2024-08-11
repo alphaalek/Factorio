@@ -42,12 +42,15 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
                 .set(SingleStorageGui.CONTEXT, AssemblerGui.STORAGE_SLOTS, mechanic -> new Storage() {
                     @Override
                     public ItemStack getStored() {
-                        return Optional.ofNullable(mechanic.getType()).map(Assembler.Types::getMat).map(ItemStack::new).orElse(null);
+                        return Optional.ofNullable(mechanic.getType())
+                                .map(Assembler.Type::getMat)
+                                .map(ItemStack::new)
+                                .orElse(null);
                     }
 
                     @Override
                     public void setStored(ItemStack stored) {
-                        Optional<Assembler.Types> type = Assembler.Types.getType(stored.getType());
+                        Optional<Assembler.Types> type = Assembler.Types.getTypeFromMaterial(stored.getType());
                         type.ifPresent(mechanic::setType);
                     }
 

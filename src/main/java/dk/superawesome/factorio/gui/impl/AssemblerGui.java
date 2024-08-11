@@ -4,8 +4,8 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.gui.PaginatedGui;
 import dk.superawesome.factorio.gui.SingleStorageGui;
-import dk.superawesome.factorio.mechanics.AccessibleMechanic;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
+import dk.superawesome.factorio.util.DurationFormatter;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
@@ -51,12 +51,29 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
     public void loadAssemblerType() {
         if (getMechanic().getType() != null) {
-            Assembler.Types type = getMechanic().getType();
+            Assembler.Type type = getMechanic().getType();
             getInventory().setItem(16,
-                    new ItemBuilder(type.getMat())
+                    new ItemBuilder(getAssemblerTypeItem(type))
                             .makeGlowing()
-                            .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + type.getProduces() + " §8(§f$" + (StringUtil.formatDecimals(type.getProduces() / type.getRequires(), 2)) + " §epr. item§8)")
                             .build());
+        }
+    }
+
+    private ItemStack getAssemblerTypeItem(Assembler.Type type) {
+        return new ItemBuilder(type.type().getMat())
+                .addLore("").addLore("§eSammensætter §fx" + type.requires() + " §etil §f$" + StringUtil.formatDecimals(type.produces(), 2) + " §8(§f$" + (StringUtil.formatDecimals(type.produces() / type.requires(), 2)) + " §epr. item§8)")
+                .addLore(format(type) + " §8Sidst opdateret: " + DurationFormatter.toDuration(System.currentTimeMillis() - Assembler.Types.LAST_UPDATE))
+                .addFlags(ItemFlag.HIDE_ATTRIBUTES)
+                .build();
+    }
+
+    private String format(Assembler.Type type) {
+        if (type.getProduces() > type.getType().getProduces()) {
+            return "§a+" + (StringUtil.formatDecimals(1 - type.getProduces() / type.getType().getProduces(), 2)) + "%";
+        } else if (type.getProduces() < type.getType().getProduces()) {
+            return "§c-" + (StringUtil.formatDecimals(1 - type.getType().getProduces() / type.getProduces(), 2)) + "%";
+        } else {
+            return "§e~0%";
         }
     }
 
@@ -77,7 +94,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
     }
 
     private void openChooseAssemblerGui(Player player) {
-        player.openInventory(new PaginatedGui<AssemblerGui, Assembler.Types>(new BaseGui.InitCallbackHolder(), null, 36, "Vælg Sammensætning", true, 3 * 9) {
+        player.openInventory(new PaginatedGui<AssemblerGui, Assembler.Type>(new BaseGui.InitCallbackHolder(), null, 36, "Vælg Sammensætning", true, 3 * 9) {
 
             {
                 // call init callback when loaded
@@ -88,7 +105,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
             public void onClose(Player player, boolean anyViewersLeft) {
                 Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                     if (player.isOnline()) {
-                        ((AccessibleMechanic) getMechanic()).openInventory(getMechanic(), player);
+                        getMechanic().openInventory(getMechanic(), player);
                     }
                 });
             }
@@ -103,28 +120,26 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
             }
 
             @Override
-            public List<Assembler.Types> getValues() {
-                return Arrays.asList(Assembler.Types.values());
+            public List<Assembler.Type> getValues() {
+                return Assembler.Types.getTypes();
             }
 
             @Override
-            public ItemStack getItemFrom(Assembler.Types type) {
-                ItemStack item = new ItemStack(type.getMat());
+            public ItemStack getItemFrom(Assembler.Type type) {
+                ItemStack item = getAssemblerTypeItem(type);
                 if (getMechanic().getType() != null && getMechanic().getType().equals(type)) {
-                    item = new ItemBuilder(item)
+                    return new ItemBuilder(item)
                             .makeGlowing()
                             .build();
                 }
-                return new ItemBuilder(item)
-                        .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + type.getProduces() + " §8(§f$" + (StringUtil.formatDecimals(type.getProduces() / type.getRequires(), 2)) + " §epr. item§8)")
-                        .addFlags(ItemFlag.HIDE_ATTRIBUTES)
-                        .build();
+
+                return item;
             }
 
             @Override
             public boolean onClickIn(InventoryClickEvent event) {
                 if (event.getSlot() < 27 && event.getCurrentItem() != null) {
-                    Optional<Assembler.Types> typeOptional = Assembler.Types.getType(event.getCurrentItem().getType());
+                    Optional<Assembler.Types> typeOptional = Assembler.Types.getTypeFromMaterial(event.getCurrentItem().getType());
                     Player player = (Player) event.getWhoClicked();
                     if (typeOptional.isPresent()) {
                         // do not allow to change the assembler type if the assembler still have items
@@ -166,7 +181,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
     @Override
     protected boolean isItemAllowed(ItemStack item) {
-        return Assembler.Types.getType(item.getType()).isPresent();
+        return Assembler.Types.getTypeFromMaterial(item.getType()).isPresent();
     }
 
     @Override
