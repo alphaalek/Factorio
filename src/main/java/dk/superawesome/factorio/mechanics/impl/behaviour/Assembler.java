@@ -229,7 +229,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         PISTON(Material.PISTON, 9, 9),
         RABBIT_STEW(Material.RABBIT_STEW, 8, 64),
         TARGET(Material.TARGET, 9, 7.25),
-        COOKIE(Material.COOKIE, 32, 1),
+        COOKIE(Material.COOKIE, 32, 2),
         DAYLIGHT(Material.DAYLIGHT_DETECTOR, 9, 9),
         HOPPER(Material.HOPPER, 4, 9),
         FISH(Material.COOKED_SALMON, 5, 7.15),
@@ -255,7 +255,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         BROWN_GLASS(Material.BROWN_STAINED_GLASS, 8, 1),
         BEACON(Material.BEACON, 2, 640),
         COMPASS(Material.COMPASS, 7, 11.35),
-        SOUL_CAMPFIRE(Material.SOUL_CAMPFIRE, 16, 2),
+        SOUL_CAMPFIRE(Material.SOUL_CAMPFIRE, 13, 4),
         MILK_BUCKET(Material.MILK_BUCKET, 4, 5.5),
         ;
 
@@ -271,11 +271,11 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         }
 
         private static void requestTypes() {
+            LAST_UPDATE = System.currentTimeMillis();
             types.clear();
             for (Types type : Types.values()) {
                 AssemblerTypeRequestEvent requestEvent = new AssemblerTypeRequestEvent(type);
                 Bukkit.getPluginManager().callEvent(requestEvent);
-                Bukkit.broadcastMessage("Requested price, got " + StringUtil.formatDecimals(requestEvent.getProduces(), 2) + " Default: " + StringUtil.formatDecimals(requestEvent.getType().getProduces(), 2));
                 types.add(new Type(type, requestEvent.getRequires(), requestEvent.getProduces()));
             }
         }

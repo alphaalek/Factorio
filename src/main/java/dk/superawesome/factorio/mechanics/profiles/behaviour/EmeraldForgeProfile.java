@@ -47,7 +47,7 @@ public class EmeraldForgeProfile implements GuiMechanicProfile<EmeraldForge> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(1)
-                .mark(MoneyCollection.CAPACITY_MARK, Array.fromData(64 * 8))
+                .mark(MoneyCollection.CAPACITY_MARK, Array.fromData(10_000))
                 .build();
     }
 

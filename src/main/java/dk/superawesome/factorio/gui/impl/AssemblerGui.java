@@ -62,16 +62,16 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
     private ItemStack getAssemblerTypeItem(Assembler.Type type) {
         return new ItemBuilder(type.type().getMat())
                 .addLore("").addLore("§eSammensætter §fx" + type.requires() + " §etil §f$" + StringUtil.formatDecimals(type.produces(), 2) + " §8(§f$" + (StringUtil.formatDecimals(type.produces() / type.requires(), 2)) + " §epr. item§8)")
-                .addLore(format(type) + " §8Sidst opdateret: " + DurationFormatter.toDuration(System.currentTimeMillis() - Assembler.Types.LAST_UPDATE))
+                .addLore(format(type) + " §8Sidst opdateret " + DurationFormatter.toDuration(System.currentTimeMillis() - Assembler.Types.LAST_UPDATE) + " siden")
                 .addFlags(ItemFlag.HIDE_ATTRIBUTES)
                 .build();
     }
 
     private String format(Assembler.Type type) {
         if (type.getProduces() > type.getType().getProduces()) {
-            return "§a+" + (StringUtil.formatDecimals(1 - type.getProduces() / type.getType().getProduces(), 2)) + "%";
+            return "§a+" + (StringUtil.formatDecimals((type.getProduces() / type.getType().getProduces() - 1) * 100, 2)) + "%";
         } else if (type.getProduces() < type.getType().getProduces()) {
-            return "§c-" + (StringUtil.formatDecimals(1 - type.getType().getProduces() / type.getProduces(), 2)) + "%";
+            return "§c-" + (StringUtil.formatDecimals((type.getType().getProduces() / type.getProduces() - 1) * 100, 2)) + "%";
         } else {
             return "§e~0%";
         }
