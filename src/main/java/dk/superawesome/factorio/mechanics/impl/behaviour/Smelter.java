@@ -5,7 +5,6 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
-import dk.superawesome.factorio.util.TagVerifier;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -141,7 +140,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
             Recipe recipe = recipeIterator.next();
 
             if (recipe instanceof FurnaceRecipe furnaceRecipe) {
-                if (furnaceRecipe.getInput().isSimilar(item) || TagVerifier.checkHighestTag(furnaceRecipe.getInput(), item)) {
+                if (furnaceRecipe.getInputChoice().test(item)) {
                     cachedSmeltResult = furnaceRecipe.getResult();
                     return true;
                 }

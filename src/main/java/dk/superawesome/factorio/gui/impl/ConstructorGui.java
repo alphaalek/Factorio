@@ -4,7 +4,6 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Constructor;
-import dk.superawesome.factorio.util.TagVerifier;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -301,36 +300,36 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                 // this means the recipe has a specific shape which needs to be inserted into the grid
                 if (recipe instanceof ShapedRecipe shaped) {
                     // get the ingredients matrix required for this recipe
-                    List<ItemStack> ingredients = Arrays.stream(shaped.getShape())
+                    List<RecipeChoice> choices = Arrays.stream(shaped.getShape())
                             .map(r -> new StringBuilder()
                                     .append(r)
                                     .append(new String(new char[3 - r.length()])
                                             .replaceAll("\0", " "))
                             )
                             .flatMap(r -> r.chars().mapToObj(c -> (char) c))
-                            .map(c -> shaped.getIngredientMap().get(c))
+                            .map(c -> shaped.getChoiceMap().get(c))
                             .collect(Collectors.toList());
 
                     List<ItemStack> offer = getOffer();
 
                     // check if the ingredients for the recipe matches the items in the crafting grid
-                    for (int i = 0; i < ingredients.size(); i++) {
+                    for (int i = 0; i < choices.size(); i++) {
                         ItemStack at = offer.get(i);
-                        ItemStack req = ingredients.get(i);
+                        RecipeChoice req = choices.get(i);
 
                         if (req == null && at != null) {
                             break;
                         }
-                        if (req != null && !req.isSimilar(at) && !TagVerifier.checkHighestTag(req, at)) {
+                        if (req != null && (at == null || !req.test(at))) {
                             break;
                         }
 
                         offer.set(i, null);
-                        ingredients.set(i, null);
+                        choices.set(i, null);
                     }
 
                     // notify a match success if all items matched
-                    if (ingredients.stream().allMatch(Objects::isNull)
+                    if (choices.stream().allMatch(Objects::isNull)
                             && offer.stream().allMatch(Objects::isNull)) {
                         match = true;
                     }
@@ -339,7 +338,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                 // check for shapeless recipe
                 // this means that the recipe doesn't care what order and position the ingredients are inserted into the grid
                 if (recipe instanceof ShapelessRecipe shapeless) {
-                    List<ItemStack> ingredients = shapeless.getIngredientList();
+                    List<RecipeChoice> choices = shapeless.getChoiceList();
                     List<ItemStack> offer = getOffer(CRAFTING_SLOTS.get(0)).stream()
                             .filter(Objects::nonNull)
                             .collect(Collectors.toList()); // can't use Stream#toList because that returns an immutable list
@@ -349,26 +348,26 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                     while (offerIterator.hasNext()) {
                         ItemStack at = offerIterator.next();
 
-                        Iterator<ItemStack> ingredientsIterator = ingredients.iterator();
-                        while (ingredientsIterator.hasNext()) {
-                            ItemStack ingredient = ingredientsIterator.next();
+                        Iterator<RecipeChoice> choiceIterator = choices.iterator();
+                        while (choiceIterator.hasNext()) {
+                            RecipeChoice choice = choiceIterator.next();
 
-                            if (ingredient.isSimilar(at) || TagVerifier.checkHighestTag(ingredient, at)) {
-                                ingredientsIterator.remove();
+                            if (choice.test(at)) {
+                                choiceIterator.remove();
                                 offerIterator.remove();
                                 break;
                             }
                         }
 
                         // if either we have checked all the ingredients or items in the crafting grid, we will break the search
-                        if (offer.isEmpty() || ingredients.isEmpty()) {
+                        if (offer.isEmpty() || choices.isEmpty()) {
                             break;
                         }
                     }
 
                     // notify a match success if no required ingredients are left and no more items are inserted into
                     // the grid than what is needed in the recipe
-                    if (offer.isEmpty() && ingredients.isEmpty()) {
+                    if (offer.isEmpty() && choices.isEmpty()) {
                         match = true;
                     }
                 }
