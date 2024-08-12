@@ -10,6 +10,7 @@ public class Profiles {
 
     public static final MechanicProfile<Assembler> ASSEMBLER;
     public static final MechanicProfile<Collector> COLLECTOR;
+    public static final MechanicProfile<Comparator> COMPARATOR;
     public static final MechanicProfile<Constructor> CONSTRUCTOR;
     public static final MechanicProfile<EmeraldForge> EMERALD_FORGE;
     public static final MechanicProfile<Filter> FILTER;
@@ -26,6 +27,7 @@ public class Profiles {
 
         ASSEMBLER     = loadProfile(new AssemblerProfile());
         COLLECTOR     = loadProfile(new CollectorProfile());
+        COMPARATOR    = loadProfile(new ComparatorProfile());
         CONSTRUCTOR   = loadProfile(new ConstructorProfile());
         EMERALD_FORGE = loadProfile(new EmeraldForgeProfile());
         FILTER        = loadProfile(new FilterProfile());

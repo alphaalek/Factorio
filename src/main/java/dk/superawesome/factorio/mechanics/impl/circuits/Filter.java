@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.map.MinecraftFont;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,10 +56,9 @@ public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
                     .map(this::findItem)
                     .forEach(filter::add);
         }
-        filter.removeAll(Collections.singleton(null));
 
-        if (filter.isEmpty()) {
-            Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
+        if (filter.isEmpty() || filter.contains(null)) {
+            Factorio.get().getMechanicManager(loc.getWorld()).unload(this);
             Buildings.remove(loc.getWorld(), this);
 
             Player owner = Bukkit.getPlayer(management.getOwner());

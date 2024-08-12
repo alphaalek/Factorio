@@ -246,7 +246,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             } else if (signal > 1) {
                 if (mat == Material.REDSTONE_WIRE) {
                     addWire(rel, relVec, signal - 1);
-                } else if (mat.isSolid() && mat.isOccluding()) {
+                    return;
+                }
+
+                if (mat.isSolid() && mat.isOccluding()) {
                     add(relVec);
                     for (BlockFace face : Routes.SIGNAL_EXPAND_DIRECTIONS) {
                         Block sourceRel = rel.getRelative(face);

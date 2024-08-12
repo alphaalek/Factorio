@@ -19,6 +19,7 @@ public class Buildings {
 
     public static final Building ASSEMBLER;
     public static final Building COLLECTOR;
+    public static final Building COMPARATOR;
     public static final Building CONSTRUCTOR;
     public static final Building EMERALD_FORGE;
     public static final Building GATE;
@@ -32,6 +33,7 @@ public class Buildings {
 
         ASSEMBLER     = loadBuilding(new AssemblerBuilding());
         COLLECTOR     = loadBuilding(new CollectorBuilding());
+        COMPARATOR    = loadBuilding(new ComparatorBuilding());
         CONSTRUCTOR   = loadBuilding(new ConstructorBuilding());
         EMERALD_FORGE = loadBuilding(new EmeraldForgeBuilding());
         GATE          = loadBuilding(new GateBuilding());

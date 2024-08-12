@@ -1,6 +1,5 @@
 package dk.superawesome.factorio.mechanics.routes;
 
-import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeBuildEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeRemoveEvent;
 import dk.superawesome.factorio.mechanics.routes.events.signal.SignalBuildEvent;
