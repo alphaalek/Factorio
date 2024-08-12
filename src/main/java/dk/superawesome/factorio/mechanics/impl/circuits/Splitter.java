@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeBuildEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -67,7 +68,13 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
         if (!event.getRoute().getOutputs(Routes.DEFAULT_CONTEXT).isEmpty()) {
             // iterate over blocks nearby and check if the route origin block is matching the block at the location of this splitter
             for (BlockFace face : Routes.RELATIVES) {
-                if (event.getRoute().getStart().equals(BlockUtil.getVec(BlockUtil.getRel(loc, face.getDirection())))) {
+                if (event.getRoute().getStart().equals(BlockUtil.getVec(BlockUtil.getRel(loc, face.getDirection())))
+                        // check if the output blocks already registered does not connect to same route as the one built
+                        && outputBlocks.stream()
+                                .map(BlockUtil::getVec)
+                                .flatMap(v -> AbstractRoute.getCachedRoutes(loc.getWorld(), v).stream())
+                                .flatMap(r -> r.getLocations().stream())
+                                .noneMatch(event.getRoute().getStart()::equals)) {
                     outputBlocks.add(BlockUtil.getBlock(loc.getWorld(), event.getRoute().getStart()));
                     break;
                 }
