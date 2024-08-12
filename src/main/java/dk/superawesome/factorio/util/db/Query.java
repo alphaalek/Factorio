@@ -39,7 +39,7 @@ public class Query {
         return null;
     }
 
-    public <V> V executeQuery(DatabaseConnection connection, Query.CheckedFunction<ResultSet, V> function) throws SQLException {
+    public <V> V executeQuery(DatabaseConnection connection, CheckedFunction<ResultSet, V> function) throws SQLException {
         return create(connection, s -> {
             ResultSet set = s.executeQuery();
             V val = null;

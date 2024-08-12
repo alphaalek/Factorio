@@ -76,6 +76,9 @@ public class MechanicController {
 
     public MechanicStorageContext create(Location loc, BlockFace rot, String type, UUID owner) throws SQLException, IOException {
         Management management = new Management(owner);
+
+        Bukkit.broadcastMessage("Create at " + loc);
+
         Query query = new Query(
                 "INSERT INTO mechanics (type, location, rotation, management) " +
                 "VALUES (?, ?, ?, ?)"
