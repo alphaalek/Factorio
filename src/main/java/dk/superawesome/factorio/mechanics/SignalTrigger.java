@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Switch;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
@@ -29,8 +28,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
         block.setBlockData(lever);
     }
 
-    @EventHandler
-    public void onBlockPlace(BlockPlaceEvent event) {
+    protected void onBlockPlace(BlockPlaceEvent event) {
         if (event.getBlock().getType() == Material.LEVER) {
             for (BlockFace face : Routes.RELATIVES) {
                 if (loc.getBlock().getRelative(face).equals(event.getBlock())) {
@@ -45,8 +43,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
         }
     }
 
-    @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
+    protected void onBlockBreak(BlockBreakEvent event) {
         if (event.getBlock().getType() == Material.LEVER) {
             for (BlockFace face : Routes.RELATIVES) {
                 if (loc.getBlock().getRelative(face).equals(event.getBlock())) {
