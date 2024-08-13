@@ -22,7 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 
-public class Gate extends AbstractMechanic<Gate> implements Container {
+public class Gate extends AbstractMechanic<Gate> implements Container<TransferCollection> {
 
     private boolean open = true;
 
