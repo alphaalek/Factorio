@@ -52,9 +52,7 @@ public interface FuelMechanic {
 
     default <G extends BaseGui<G>> void putFuel(ItemCollection collection, Container<? extends TransferCollection> container, PipePutEvent event, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui) {
         if (getFuel() != null && collection.has(new ItemStack(getFuel().getMaterial())) || getFuel() == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
-
             if (getFuelAmount() < getFuelCapacity()) {
-                event.setTransferred(true);
                 int amount = container.put(collection, getFuelCapacity() - getFuelAmount(), inUse, doGui, new Container.HeapToStackAccess<>() {
                     @Override
                     public ItemStack get() {
@@ -67,7 +65,10 @@ public interface FuelMechanic {
                     }
                 });
 
-                setFuelAmount(getFuelAmount() + amount);
+                if (amount > 0) {
+                    event.setTransferred(true);
+                    setFuelAmount(getFuelAmount() + amount);
+                }
             }
         }
     }

@@ -7,8 +7,10 @@ import dk.superawesome.factorio.mechanics.MechanicStorageContext;
 import dk.superawesome.factorio.mechanics.Profiles;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
+import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
+import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -20,7 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 
-public class Gate extends AbstractMechanic<Gate> implements ItemContainer {
+public class Gate extends AbstractMechanic<Gate> implements Container {
 
     private boolean open = true;
 
@@ -72,12 +74,17 @@ public class Gate extends AbstractMechanic<Gate> implements ItemContainer {
     }
 
     @Override
+    public boolean accepts(TransferCollection collection) {
+        return true;
+    }
+
+    @Override
     public boolean isContainerEmpty() {
         return true;
     }
 
     @Override
-    public void pipePut(ItemCollection collection, PipePutEvent event) {
+    public void pipePut(TransferCollection collection, PipePutEvent event) {
         // only continue pipe route if the gate is open
         if (open) {
             if (Routes.startTransferRoute(loc.getBlock(), collection, false)) {

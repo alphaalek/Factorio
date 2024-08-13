@@ -5,6 +5,7 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
@@ -85,7 +86,6 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
             if (collection.has(req)) {
                 List<ItemStack> stacks = collection.take(req.getAmount());
-                event.setTransferred(true);
                 if (!stacks.isEmpty() && stacks.get(0).isSimilar(craft)) {
                     // find an item which has a lower amount than the currently checked item
                     // this is done to ensure evenly distribution among the items in the crafting grid
@@ -100,7 +100,11 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
                         }
                     }
 
+                    int prev = craft.getAmount();
                     craft.setAmount(Math.min(craft.getMaxStackSize(), craft.getAmount() + stacks.get(0).getAmount()));
+                    if (prev < craft.getAmount()) {
+                        event.setTransferred(true);
+                    }
                 }
             }
         }

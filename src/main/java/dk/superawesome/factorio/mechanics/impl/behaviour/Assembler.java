@@ -112,8 +112,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
                 .map(ItemStack::new)
                 .orElse(null);
         if ((item == null || collection.has(item)) && ingredientAmount < getCapacity()) {
-            event.setTransferred(true);
-            ingredientAmount += this.<AssemblerGui>put(collection, getCapacity() - ingredientAmount, getGuiInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
+            int add = this.<AssemblerGui>put(collection, getCapacity() - ingredientAmount, getGuiInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {
                     return item;
@@ -124,6 +123,11 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
                     type = Types.getLoadedType(Types.getTypeFromMaterial(val.getType()).orElseThrow(IllegalArgumentException::new));
                 }
             });
+
+            if (add > 0) {
+                ingredientAmount += add;
+                event.setTransferred(true);
+            }
         }
     }
 

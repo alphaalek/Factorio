@@ -24,10 +24,7 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MinecraftFont;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
 
@@ -56,8 +53,9 @@ public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
                     .map(this::findItem)
                     .forEach(filter::add);
         }
+        filter.removeAll(Collections.singletonList(null));
 
-        if (filter.isEmpty() || filter.contains(null)) {
+        if (filter.isEmpty()) {
             Factorio.get().getMechanicManager(loc.getWorld()).unload(this);
             Buildings.remove(loc.getWorld(), this);
 
@@ -65,6 +63,26 @@ public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
             if (owner != null) {
                 owner.sendMessage("§cUgyldig item valgt!");
             }
+        } else {
+            // get all lines except the first
+            for (int i = 1; i < 4; i++) {
+                String line = sign.getSide(Side.FRONT).getLine(i);
+                StringBuilder builder = new StringBuilder();
+                Arrays.stream(line.split(","))
+                        .map(String::trim)
+                        .map(this::findItem)
+                        .filter(Objects::nonNull)
+                        .peek(__ -> builder.append(","))
+                        .forEach(item -> builder.append(item.getType().name().toLowerCase()));
+
+                if (!builder.isEmpty()) {
+                    sign.getSide(Side.FRONT).setLine(i, builder.substring(1));
+                } else if (!line.isEmpty())  {
+                    sign.getSide(Side.FRONT).setLine(i, "");
+                }
+            }
+
+            sign.update();
         }
     }
 

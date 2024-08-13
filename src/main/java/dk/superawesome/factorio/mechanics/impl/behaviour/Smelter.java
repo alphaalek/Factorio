@@ -99,7 +99,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         }
 
         if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(this::canSmelt)) {
-            ingredientAmount += this.<SmelterGui>put(collection, getIngredientCapacity() - ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
+            int add = this.<SmelterGui>put(collection, getIngredientCapacity() - ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
                 @Override
                 public ItemStack get() {
                     return ingredient;
@@ -110,6 +110,10 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
                     ingredient = stack;
                 }
             });
+            if (add > 0) {
+                ingredientAmount += add;
+                event.setTransferred(true);
+            }
 
             if (smeltResult == null) {
                 smeltResult = cachedSmeltResult;

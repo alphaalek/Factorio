@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics.db;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.mechanics.Management;
 import dk.superawesome.factorio.mechanics.MechanicSerializer;
 import dk.superawesome.factorio.mechanics.MechanicStorageContext;
@@ -75,6 +76,10 @@ public class MechanicController {
     }
 
     public MechanicStorageContext create(Location loc, BlockFace rot, String type, UUID owner) throws SQLException, IOException {
+        if (exists(loc)) {
+            deleteAt(loc);
+        }
+
         Management management = new Management(owner);
 
         Query query = new Query(
