@@ -72,13 +72,15 @@ public class Comparator extends SignalTrigger<Comparator> implements ThinkingMec
     }
 
     @EventHandler
+    @Override
     public void onBlockPlace(BlockPlaceEvent event) {
-        super.onBlockPlace(event);
+        super.handleBlockPlace(event);
     }
 
     @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
-        super.onBlockBreak(event);
+    @Override
+    public void onBlockBreak(BlockBreakEvent event)  {
+        super.handleBlockBreak(event);
     }
 
     @EventHandler

@@ -104,7 +104,7 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
                 .make(1)
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(11))
                 .mark(Smelter.INGREDIENT_CAPACITY_MARK, Array.fromData(10))
-                .mark(Smelter.FUEL_CAPACITY, Array.fromData(10))
+                .mark(Smelter.FUEL_CAPACITY_MARK, Array.fromData(10))
                 .build();
     }
 

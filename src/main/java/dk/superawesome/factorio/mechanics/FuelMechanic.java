@@ -25,7 +25,6 @@ import java.util.function.BiConsumer;
 
 public interface FuelMechanic {
 
-    int FUEL_CAPACITY = 2;
 
     Fuel getFuel();
 

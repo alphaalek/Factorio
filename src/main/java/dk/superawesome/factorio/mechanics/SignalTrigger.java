@@ -28,7 +28,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
         block.setBlockData(lever);
     }
 
-    protected void onBlockPlace(BlockPlaceEvent event) {
+    protected void handleBlockPlace(BlockPlaceEvent event) {
         if (event.getBlock().getType() == Material.LEVER) {
             for (BlockFace face : Routes.RELATIVES) {
                 if (loc.getBlock().getRelative(face).equals(event.getBlock())) {
@@ -43,7 +43,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
         }
     }
 
-    protected void onBlockBreak(BlockBreakEvent event) {
+    protected void handleBlockBreak(BlockBreakEvent event) {
         if (event.getBlock().getType() == Material.LEVER) {
             for (BlockFace face : Routes.RELATIVES) {
                 if (loc.getBlock().getRelative(face).equals(event.getBlock())) {
@@ -53,4 +53,8 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
             }
         }
     }
+
+    public abstract void onBlockPlace(BlockPlaceEvent event);
+
+    public abstract void onBlockBreak(BlockBreakEvent event);
 }

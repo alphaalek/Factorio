@@ -7,6 +7,7 @@ import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
@@ -26,6 +27,8 @@ import java.util.function.Predicate;
 public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, AccessibleMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
     public static final int INGREDIENT_CAPACITY_MARK = 1;
+    public static final int FUEL_CAPACITY_MARK = 2;
+
     private static final List<BlockVector> WASTE_OUTPUT_RELATIVES = Arrays.asList(
             new BlockVector(0, 2, 0),
             new BlockVector(0, 1, 1),
@@ -95,8 +98,8 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
             return;
         }
 
-        if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(i -> canSmelt(i))) {
-            ingredientAmount += this.<SmelterGui>put(collection, level.getInt(INGREDIENT_CAPACITY_MARK) - ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
+        if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(this::canSmelt)) {
+            ingredientAmount += this.<SmelterGui>put(collection, getIngredientCapacity() - ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
                 @Override
                 public ItemStack get() {
                     return ingredient;
@@ -126,7 +129,18 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public int getFuelCapacity() {
-        return level.getInt(FUEL_CAPACITY);
+        return level.getInt(FUEL_CAPACITY_MARK) *
+                Optional.ofNullable(fuel)
+                        .map(Fuel::getMaterial)
+                        .map(Material::getMaxStackSize)
+                        .orElse(64);
+    }
+
+    public int getIngredientCapacity() {
+        return level.getInt(INGREDIENT_CAPACITY_MARK) *
+                Optional.ofNullable(ingredient)
+                        .map(ItemStack::getMaxStackSize)
+                        .orElse(64);
     }
 
     @Override

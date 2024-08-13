@@ -14,6 +14,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends OutputEntry> {
@@ -75,6 +76,11 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
             return event.transferred();
         }
+
+        @Override
+        public BlockVector getVec() {
+            return BlockUtil.getVec(block);
+        }
     }
 
     public static class SignalOutputEntry implements OutputEntry {
@@ -87,6 +93,11 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
         public boolean handle(SignalSource source) {
             return source.handleOutput(block);
+        }
+
+        @Override
+        public BlockVector getVec() {
+            return BlockUtil.getVec(block);
         }
     }
 
