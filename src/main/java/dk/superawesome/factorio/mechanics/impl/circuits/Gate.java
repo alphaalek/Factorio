@@ -39,12 +39,10 @@ public class Gate extends AbstractMechanic<Gate> implements Container<TransferCo
         this.open = true;
         for (BlockFace face : Routes.SIGNAL_EXPAND_DIRECTIONS) {
             Block block = loc.getBlock().getRelative(face);
-            if (block.getType() == Material.REPEATER) {
-                if (BlockUtil.getPointingBlock(block, true).getLocation().equals(loc)) {
-                    if (((Repeater)block.getBlockData()).isPowered()) {
-                        this.open = false;
-                    }
-                }
+            if (block.getType() == Material.REPEATER &&
+                    BlockUtil.getPointingBlock(block, true).getLocation().equals(loc)
+                    && ((Repeater)block.getBlockData()).isPowered()) {
+                this.open = false;
             }
         }
     }
@@ -56,10 +54,9 @@ public class Gate extends AbstractMechanic<Gate> implements Container<TransferCo
 
     @EventHandler
     public void onRedstoneInput(BlockRedstoneEvent event) {
-        if (event.getBlock().getType() == Material.REPEATER) {
-            if (BlockUtil.getPointingBlock(event.getBlock(), true).getLocation().equals(loc)) {
-                this.open = event.getNewCurrent() == 0;
-            }
+        if (event.getBlock().getType() == Material.REPEATER
+                && BlockUtil.getPointingBlock(event.getBlock(), true).getLocation().equals(loc)) {
+            this.open = event.getNewCurrent() == 0;
         }
     }
 
@@ -86,10 +83,8 @@ public class Gate extends AbstractMechanic<Gate> implements Container<TransferCo
     @Override
     public void pipePut(TransferCollection collection, PipePutEvent event) {
         // only continue pipe route if the gate is open
-        if (open) {
-            if (Routes.startTransferRoute(loc.getBlock(), collection, false)) {
-                event.setTransferred(true);
-            }
+        if (open && Routes.startTransferRoute(loc.getBlock(), collection, false)) {
+            event.setTransferred(true);
         }
     }
 

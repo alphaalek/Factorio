@@ -6,8 +6,7 @@ import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeBuildEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeRemoveEvent;
-import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
-import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
+import dk.superawesome.factorio.mechanics.transfer.*;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -25,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
-public class Splitter extends AbstractMechanic<Splitter> implements ItemContainer {
+public class Splitter extends AbstractMechanic<Splitter> implements Container<TransferCollection> {
 
     private final List<Block> outputBlocks = new ArrayList<>();
     private int currentStartIndex;
@@ -89,8 +88,13 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
     }
 
     @Override
-    public boolean isContainerEmpty() {
+    public boolean accepts(TransferCollection collection) {
         return false;
+    }
+
+    @Override
+    public boolean isContainerEmpty() {
+        return true;
     }
 
     private Iterator<Block> createEvenRemainderDistribution() {
@@ -116,7 +120,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
     }
 
     @Override
-    public void pipePut(ItemCollection collection, PipePutEvent event) {
+    public void pipePut(TransferCollection collection, PipePutEvent event) {
         if (outputBlocks.isEmpty()) {
             return;
         }
@@ -130,48 +134,84 @@ public class Splitter extends AbstractMechanic<Splitter> implements ItemContaine
             Block block = blockIterator.next();
 
             if (!collection.isTransferEmpty()) {
-                boolean transferred = Routes.startTransferRoute(block, new ItemCollection() {
-                    @Override
-                    public boolean has(ItemStack stack) {
-                        return collection.has(stack);
-                    }
+                TransferCollection wrappedCollection;
+                if (collection instanceof ItemCollection itemCollection) {
+                    wrappedCollection = new ItemCollection() {
+                        @Override
+                        public boolean has(ItemStack stack) {
+                            return itemCollection.has(stack);
+                        }
 
-                    @Override
-                    public boolean has(Predicate<ItemStack> stack) {
-                        return collection.has(stack);
-                    }
+                        @Override
+                        public boolean has(Predicate<ItemStack> stack) {
+                            return itemCollection.has(stack);
+                        }
 
-                    @Override
-                    public List<ItemStack> take(int amount) {
-                        return collection.take(Math.min(amount, each + Math.max(0, remainder.getAndDecrement())));
-                    }
+                        @Override
+                        public List<ItemStack> take(int amount) {
+                            return itemCollection.take(Math.min(amount, each + Math.max(0, remainder.getAndDecrement())));
+                        }
 
-                    @Override
-                    public boolean isTransferEmpty() {
-                        return collection.isTransferEmpty();
-                    }
+                        @Override
+                        public boolean isTransferEmpty() {
+                            return itemCollection.isTransferEmpty();
+                        }
 
-                    @Override
-                    public DelayHandler getTransferDelayHandler() {
-                        return collection.getTransferDelayHandler();
-                    }
+                        @Override
+                        public DelayHandler getTransferDelayHandler() {
+                            return itemCollection.getTransferDelayHandler();
+                        }
 
-                    @Override
-                    public int getMaxTransfer() {
-                        return collection.getMaxTransfer();
-                    }
+                        @Override
+                        public int getMaxTransfer() {
+                            return itemCollection.getMaxTransfer();
+                        }
 
-                    @Override
-                    public int getTransferAmount() {
-                        return collection.getTransferAmount();
-                    }
+                        @Override
+                        public int getTransferAmount() {
+                            return itemCollection.getTransferAmount();
+                        }
 
-                    @Override
-                    public double getTransferEnergyCost() {
-                        return collection.getTransferEnergyCost();
-                    }
-                }, true);
+                        @Override
+                        public double getTransferEnergyCost() {
+                            return itemCollection.getTransferEnergyCost();
+                        }
+                    };
+                } else if (collection instanceof MoneyCollection moneyCollection) {
+                    wrappedCollection = new MoneyCollection() {
+                        @Override
+                        public double take(double amount) {
+                            return moneyCollection.take(amount);
+                        }
 
+                        @Override
+                        public boolean isTransferEmpty() {
+                            return moneyCollection.isTransferEmpty();
+                        }
+
+                        @Override
+                        public DelayHandler getTransferDelayHandler() {
+                            return moneyCollection.getTransferDelayHandler();
+                        }
+
+                        @Override
+                        public int getMaxTransfer() {
+                            return moneyCollection.getMaxTransfer();
+                        }
+
+                        @Override
+                        public int getTransferAmount() {
+                            return moneyCollection.getTransferAmount();
+                        }
+
+                        @Override
+                        public double getTransferEnergyCost() {
+                            return moneyCollection.getTransferEnergyCost();
+                        }
+                    };
+                } else continue;
+
+                boolean transferred = Routes.startTransferRoute(block, wrappedCollection, true);
                 if (!event.transferred()) {
                     event.setTransferred(transferred);
                 }
