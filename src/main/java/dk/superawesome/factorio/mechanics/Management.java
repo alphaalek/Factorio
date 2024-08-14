@@ -19,7 +19,6 @@ public class Management {
     public static int MEMBER_ACCESS = OPEN | LEVEL_UP;
     public static int OWNER_ACCESS = MEMBER_ACCESS | DELETE | MODIFY_MEMBERS;
 
-
     public static class Serializer implements dk.superawesome.factorio.util.Serializer<Management> {
 
         private final MechanicSerializer mechanicSerializer;
