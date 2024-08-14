@@ -46,15 +46,35 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
 
     @Override
     public void loadInputOutputItems() {
-        int amount = (int) Math.round(getMechanic().getMoneyAmount());
+        int amount = (int) Math.ceil(getMechanic().getMoneyAmount());
         clearSlots(STORAGE_SLOTS);
 
-        if (amount > STORAGE_SLOTS.size() * 64) {
-            int blocksAmount = (int) Math.floor(((double) amount) / 9);
-            amount -= blocksAmount;
-            loadStorageTypes(new ItemStack(Material.EMERALD_BLOCK), blocksAmount, STORAGE_SLOTS);
+        // first load normal emeralds
+        int left = loadStorageTypes(new ItemStack(Material.EMERALD), amount, STORAGE_SLOTS);
+        if (left > 0) {
+            // then evaluate amount of emerald blocks we can display
+            int blocks = 0, slot = 0;
+            while (left > 9 && slot < STORAGE_SLOTS.size()) {
+                ItemStack item = getInventory().getItem(STORAGE_SLOTS.get(slot));
+
+                blocks++;
+                left -= 9;
+
+                if (item != null && item.getAmount() == 64) {
+                    left += 64;
+                    item.setAmount(0);
+                }
+
+                if (left < 9) {
+                    if (item == null) {
+                        break;
+                    }
+                    slot++;
+                }
+            }
+
+            loadStorageTypesWithoutClear(new ItemStack(Material.EMERALD_BLOCK), blocks, STORAGE_SLOTS);
         }
-        loadStorageTypes(new ItemStack(Material.EMERALD), amount, STORAGE_SLOTS);
     }
 
     private void handleTakeMoney(InventoryClickEvent event) {

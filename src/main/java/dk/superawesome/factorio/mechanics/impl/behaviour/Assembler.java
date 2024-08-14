@@ -81,7 +81,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
                 // check if the assembler has enough ingredients to assemble, if not, don't continue
                 || ingredientAmount < type.requires()
                 // check if the assembler has enough space for money, if not, don't continue
-                || moneyAmount + type.produces() > getCapacity()) {
+                || moneyAmount + type.produces() > getMoneyCapacity()) {
             return;
         }
 
@@ -138,6 +138,10 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
                         .map(Type::getMat)
                         .map(Material::getMaxStackSize)
                         .orElse(64);
+    }
+
+    public double getMoneyCapacity() {
+        return level.getDouble(MoneyCollection.CAPACITY_MARK);
     }
 
     public Type getType() {

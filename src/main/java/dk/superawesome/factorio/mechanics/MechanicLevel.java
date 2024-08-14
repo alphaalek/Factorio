@@ -23,15 +23,15 @@ public class MechanicLevel {
             private final int levels;
             private final Array<Array<Object>> data = new Array<>();
 
-            public Builder mark(int mark, Array<Object> levels) {
-                Object last = null;
+            public <T> Builder mark(int mark, Array<T> levels) {
+                T last = null;
                 for (int i = 0; i < this.levels; i++) {
                     Array<Object> data = this.data.get(i, Array::new);
 
                     if (levels.has(i)) {
                         last = levels.get(i);
                     }
-                    Object l = last;
+                    T l = last;
                     data.set(mark, levels.getOr(i, () -> l));
                 }
 

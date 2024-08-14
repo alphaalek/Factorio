@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
     public static final List<Integer> STORAGE_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
-    private static final List<Integer> MONEY_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40);
+    private static final List<Integer> MONEY_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40, 46, 47, 48, 49);
 
     public AssemblerGui(Assembler mechanic, AtomicReference<AssemblerGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder(), STORAGE_SLOTS);
@@ -33,7 +33,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
     @Override
     public void loadItems() {
-        for (int i : Arrays.asList(0, 5, 6, 8, 9, 14, 18, 23, 24, 26, 27, 32, 33, 35, 36, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50)) {
+        for (int i : Arrays.asList(0, 5, 6, 8, 9, 14, 18, 23, 24, 26, 27, 32, 33, 35, 36, 41, 42, 43, 44, 45, 50)) {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
         for (int i : Arrays.asList(7, 15, 17, 25)) {

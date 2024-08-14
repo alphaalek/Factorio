@@ -311,9 +311,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         }
     }
 
-    protected void loadStorageTypes(ItemStack stored, int amount, List<Integer> slots) {
-        clearSlots(slots);
-
+    protected int loadStorageTypesWithoutClear(ItemStack stored, int amount, List<Integer> slots) {
         int left = amount;
         int i = 0;
         while (left > 0 && i < slots.size()) {
@@ -325,6 +323,14 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
 
             getInventory().setItem(slots.get(i++), item);
         }
+
+        return left;
+    }
+
+    protected int loadStorageTypes(ItemStack stored, int amount, List<Integer> slots) {
+        clearSlots(slots);
+
+        return loadStorageTypesWithoutClear(stored, amount, slots);
     }
 
     protected void clearSlots(List<Integer> slots) {

@@ -8,6 +8,7 @@ import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -82,6 +83,7 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
         return MechanicLevel.Registry.Builder
                 .make(1)
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(8))
+                .mark(MoneyCollection.CAPACITY_MARK, Array.fromData(64 * 12d))
                 .build();
     }
 
