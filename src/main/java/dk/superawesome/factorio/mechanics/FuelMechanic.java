@@ -6,6 +6,7 @@ import dk.superawesome.factorio.mechanics.impl.circuits.Collector;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
+import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Location;
@@ -24,7 +25,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
 public interface FuelMechanic {
-
 
     Fuel getFuel();
 
@@ -50,13 +50,13 @@ public interface FuelMechanic {
 
     Location getLocation();
 
-    default <G extends BaseGui<G>> void putFuel(ItemCollection collection, Container<? extends TransferCollection> container, PipePutEvent event, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui) {
+    default <G extends BaseGui<G>> void putFuel(ItemCollection collection, ItemContainer container, PipePutEvent event, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui) {
         if (getFuel() != null && collection.has(new ItemStack(getFuel().getMaterial())) || getFuel() == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
             if (getFuelAmount() < getFuelCapacity()) {
                 int amount = container.put(collection, getFuelCapacity() - getFuelAmount(), inUse, doGui, new Container.HeapToStackAccess<>() {
                     @Override
                     public ItemStack get() {
-                        return getFuel() == null ? null : new ItemStack(getFuel().getMaterial());
+                        return Optional.ofNullable(getFuel()).map(Fuel::getMaterial).map(ItemStack::new).orElse(null);
                     }
 
                     @Override
