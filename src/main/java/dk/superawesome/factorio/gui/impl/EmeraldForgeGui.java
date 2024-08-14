@@ -23,8 +23,6 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
 
     private static final List<Integer> STORAGE_SLOTS = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34);
 
-    private int displayed;
-
     public EmeraldForgeGui(EmeraldForge mechanic, AtomicReference<EmeraldForgeGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder());
         initCallback.call();
@@ -49,25 +47,14 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
     @Override
     public void loadInputOutputItems() {
         int amount = (int) Math.round(getMechanic().getMoneyAmount());
-        displayed = amount;
         clearSlots(STORAGE_SLOTS);
-        loadStorageTypes(new ItemStack(Material.EMERALD), amount, STORAGE_SLOTS);
-    }
 
-    public void updateAddedMoney(double amount) {
-        int displayAmount = (int) Math.round(amount);
-        displayed += displayAmount;
-        updateAddedItems(getInventory(), displayAmount, new ItemStack(Material.EMERALD), STORAGE_SLOTS);
-        ensureCorrectDisplay();
-    }
-
-    private void ensureCorrectDisplay() {
-        int displayAmount = (int) getMechanic().getMoneyAmount();
-        if (displayed > displayAmount) {
-            updateRemovedItems(getInventory(), displayed - displayAmount, new ItemStack(Material.EMERALD), reverseSlots(STORAGE_SLOTS));
-        } else if (displayed < displayAmount) {
-            updateAddedItems(getInventory(), displayAmount - displayed, new ItemStack(Material.EMERALD), STORAGE_SLOTS);
+        if (amount > STORAGE_SLOTS.size() * 64) {
+            int blocksAmount = (int) Math.floor(((double) amount) / 9);
+            amount -= blocksAmount;
+            loadStorageTypes(new ItemStack(Material.EMERALD_BLOCK), blocksAmount, STORAGE_SLOTS);
         }
+        loadStorageTypes(new ItemStack(Material.EMERALD), amount, STORAGE_SLOTS);
     }
 
     private void handleTakeMoney(InventoryClickEvent event) {
@@ -89,11 +76,8 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
                 return;
             }
 
-            int displayAmount = (int) Math.round(moneyAmount);
-            displayed -= displayAmount;
-            updateRemovedItems(getInventory(), displayAmount, new ItemStack(Material.EMERALD), reverseSlots(STORAGE_SLOTS));
             getMechanic().setMoneyAmount(getMechanic().getMoneyAmount() - moneyAmount);
-            ensureCorrectDisplay();
+            loadInputOutputItems();
 
             player.sendMessage("§eDu tog §f$" + StringUtil.formatDecimals(moneyAmount, 2) + "§e fra maskinens inventar.");
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1f);

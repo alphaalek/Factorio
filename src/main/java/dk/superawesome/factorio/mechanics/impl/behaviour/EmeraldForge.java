@@ -55,7 +55,7 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
 
         EmeraldForgeGui gui = this.<EmeraldForgeGui>getGuiInUse().get();
         if (gui != null) {
-            gui.updateAddedMoney(amount);
+            gui.loadInputOutputItems();
         }
     }
 
