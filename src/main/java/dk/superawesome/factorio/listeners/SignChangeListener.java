@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class SignChangeListener implements Listener {
 
@@ -26,6 +27,7 @@ public class SignChangeListener implements Listener {
         if (manager.getMechanicPartially(event.getBlock().getLocation()) != null) {
             event.setCancelled(true);
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
+            Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                 MechanicBuildResponse response = manager.buildMechanic((Sign) event.getBlock().getState(), event.getPlayer());
                 build: {
@@ -33,6 +35,7 @@ public class SignChangeListener implements Listener {
                         case SUCCESS -> {
                             Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
                             event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
+                            event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(on.getType()));
                             break build;
                         }
                         case NO_SUCH -> {
