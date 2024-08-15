@@ -1,6 +1,15 @@
 package dk.superawesome.factorio.mechanics.transfer;
 
-import org.bukkit.Material;
+import dk.superawesome.factorio.gui.BaseGui;
+import dk.superawesome.factorio.gui.MechanicStorageGui;
+import dk.superawesome.factorio.mechanics.Mechanic;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
 public interface FluidContainer extends Container<FluidCollection> {
 
@@ -8,18 +17,47 @@ public interface FluidContainer extends Container<FluidCollection> {
         return collection instanceof FluidCollection;
     }
 
+    default <G extends BaseGui<G>> List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, HeapToStackAccess<Integer> updater) {
+        List<ItemStack> items = new ArrayList<>();
+        int taken = 0;
+        while (taken < amount && taken < storedAmount) {
+            ItemStack item = stored.clone();
+            int a = Math.min(item.getMaxStackSize(), Math.min(storedAmount, amount) - taken);
 
-    int getCapacity();
+            taken += a;
+            item.setAmount(a);
+            items.add(item);
+        }
 
-    int getAmount();
+        G gui = inUse.get();
+        if (gui != null) {
+            doGui.accept(gui, taken);
+        }
+        updater.set(taken);
 
-    void setAmount(int amount);
+        return items;
+    }
 
-    void addAmount(int amount);
+    default <G extends BaseGui<G>> int put(FluidCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, HeapToStackAccess<ItemStack> access) {
+        List<ItemStack> items = from.take(take);
+        int add = 0;
+        for (ItemStack item : items) {
+            add += item.getAmount();
 
-    void removeAmount(int amount);
+            if (access.get() == null) {
+                ItemStack type = item.clone();
+                type.setAmount(1);
+                access.set(type);
+            }
+        }
 
-    void setFluidType(Material fluidType);
+        if (add > 0) {
+            G gui = inUse.get();
+            if (gui != null) {
+                doGui.accept(gui, add);
+            }
+        }
 
-    Material getFluidType();
+        return add;
+    }
 }

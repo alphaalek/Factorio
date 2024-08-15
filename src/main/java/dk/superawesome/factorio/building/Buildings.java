@@ -4,7 +4,6 @@ import dk.superawesome.factorio.building.impl.*;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;

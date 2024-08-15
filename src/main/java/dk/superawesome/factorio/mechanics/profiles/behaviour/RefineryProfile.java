@@ -3,15 +3,9 @@ package dk.superawesome.factorio.mechanics.profiles.behaviour;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
-import dk.superawesome.factorio.gui.SingleStorageGui;
-import dk.superawesome.factorio.gui.impl.GeneratorGui;
 import dk.superawesome.factorio.gui.impl.RefineryGui;
-import dk.superawesome.factorio.gui.impl.SmelterGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
-import dk.superawesome.factorio.mechanics.impl.behaviour.Generator;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Refinery;
-import dk.superawesome.factorio.mechanics.impl.behaviour.Smelter;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;
@@ -47,13 +41,12 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
             .set(RefineryGui.EMPTY_BOTTLE_CONTEXT, RefineryGui.BOTTLES_SLOTS, mechanic -> new Storage() {
                 @Override
                 public ItemStack getStored() {
-                    return mechanic.getBottleResult().getBottleStack();
+                    return mechanic.getBottleType();
                 }
 
                 @Override
                 public void setStored(ItemStack stored) {
-                    Optional<Refinery.Bottle> bottle = Refinery.Bottle.getBottleFromMaterial(stored.getType());
-                    bottle.ifPresent(mechanic::setBottleResult);
+                    mechanic.setBottleType(stored);
                 }
 
                 @Override

@@ -51,16 +51,6 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
     }
 
     @Override
-    public boolean has(ItemStack stack) {
-        return fluid != null && stack.isSimilar(fluid);
-    }
-
-    @Override
-    public boolean has(Predicate<ItemStack> stack) {
-        return fluid != null && stack.test(fluid);
-    }
-
-    @Override
     public List<ItemStack> take(int amount) {
         ItemStack item = fluid.clone();
         if (level > amount) {
@@ -76,6 +66,16 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
         }
 
         return Collections.singletonList(item);
+    }
+
+    @Override
+    public boolean hasFluid(FluidType fluidType) {
+        return fluid != null && fluid.getType().equals(fluidType.getMaterial());
+    }
+
+    @Override
+    public boolean hasFluid(Predicate<FluidType> fluidType) {
+        return fluid != null && fluidType.test(FluidType.valueOf(fluid.getType().name()));
     }
 
     private void updateCauldronLevel() {
