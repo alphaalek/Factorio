@@ -21,6 +21,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
 
+    public static final int EMPTY_BOTTLE_CONTEXT = 0;
+    public static final int FILLED_BOTTLE_CONTEXT = 1;
+
+
     public static final List<Integer> BOTTLES_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
     public static final List<Integer> FILLED_BOTTLES_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40, 46, 47, 48, 49);
 
@@ -46,7 +50,12 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
     }
 
     public void loadLiquidSlots() {
-        ItemStack liquidGlass = getMechanic().getBottleResult().getLiquidStack().getType().equals(Material.LAVA) ? new ItemStack(Material.ORANGE_STAINED_GLASS_PANE) : new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE);
+        ItemStack liquidGlass;
+        if (getMechanic().getBottleResult() != null)
+            liquidGlass = getMechanic().getBottleResult().getLiquidStack().getType().equals(Material.LAVA) ? new ItemStack(Material.ORANGE_STAINED_GLASS_PANE) : new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE);
+        else
+            liquidGlass = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE);
+
         for (int i : Arrays.asList(19, 20, 21, 22)) {
             getInventory().setItem(i, liquidGlass);
         }
