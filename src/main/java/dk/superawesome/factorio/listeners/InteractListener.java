@@ -56,14 +56,14 @@ public class InteractListener implements Listener {
 
     private void interactMechanic(Player player, Mechanic<?> mechanic) {
         if (mechanic instanceof AccessibleMechanic accessible) {
+            // ensure no double messages for blocks that calls interact event twice (e.g. interacting with Power Central)
+            if (interactedPlayers.get().contains(player.getUniqueId())) {
+                return;
+            }
+            interactedPlayers.get().add(player.getUniqueId());
+
             // check if the player has access to open this mechanic
             if (!mechanic.getManagement().hasAccess(player, Management.OPEN)) {
-                // ensure no double messages for blocks that calls interact event twice (e.g. interacting with Power Central)
-                if (interactedPlayers.get().contains(player.getUniqueId())) {
-                    return;
-                }
-                interactedPlayers.get().add(player.getUniqueId());
-
                 // no access
                 player.sendMessage("§cDu har ikke adgang til at åbne denne maskine!");
                 player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 0.5f);
