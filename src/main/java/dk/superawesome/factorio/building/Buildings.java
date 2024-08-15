@@ -116,6 +116,7 @@ public class Buildings {
     }
 
     public static void remove(World world, Mechanic<?> mechanic) {
+        Material signMaterial = mechanic.getLocation().getBlock().getRelative(mechanic.getRotation()).getType();
         if (mechanic.getProfile().getBuilding() instanceof Buildable) {
             for (Location relLoc : getLocations(mechanic)) {
                 world.getBlockAt(relLoc).setType(Material.AIR, false); // don't apply physics
@@ -125,6 +126,6 @@ public class Buildings {
             sign.setType(Material.AIR);
         }
 
-        world.dropItemNaturally(mechanic.getLocation(), new ItemStack(Material.OAK_SIGN));
+        world.dropItemNaturally(mechanic.getLocation(), new ItemStack(signMaterial));
     }
 }
