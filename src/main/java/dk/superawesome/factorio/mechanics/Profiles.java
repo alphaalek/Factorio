@@ -21,6 +21,8 @@ public class Profiles {
     public static final MechanicProfile<Splitter> SPLITTER;
     public static final MechanicProfile<StorageBox> STORAGE_BOX;
     public static final MechanicProfile<PowerCentral> POWER_CENTRAL;
+    public static final MechanicProfile<Refinery> REFINERY;
+    public static final MechanicProfile<Cauldron> CAULDRON;
 
     static {
         profiles = new Array<>();
@@ -38,6 +40,8 @@ public class Profiles {
         SPLITTER      = loadProfile(new SplitterProfile());
         STORAGE_BOX   = loadProfile(new StorageBoxProfile());
         POWER_CENTRAL = loadProfile(new PowerCentralProfile());
+        REFINERY     = loadProfile(new RefineryProfile());
+        CAULDRON     = loadProfile(new CauldronProfile());
     }
 
     private static final Array<MechanicProfile<?>> profiles;

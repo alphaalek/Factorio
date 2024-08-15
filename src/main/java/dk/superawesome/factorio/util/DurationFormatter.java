@@ -14,7 +14,7 @@ public class DurationFormatter {
             TimeUnit.MINUTES.toMillis(1),
             TimeUnit.SECONDS.toMillis(1) );
     public static final List<String> TIMES_WORDS = Arrays.asList("år", "måned", "dag", "time", "minut", "sekund");
-    public static final List<String> TIMES_WORDS_PLURAL = Arrays.asList("år", "måneder", "dag", "timer", "minutter", "sekunder");
+    public static final List<String> TIMES_WORDS_PLURAL = Arrays.asList("år", "måneder", "dage", "timer", "minutter", "sekunder");
 
     public static String toDuration(long duration) {
         StringBuilder res = new StringBuilder();

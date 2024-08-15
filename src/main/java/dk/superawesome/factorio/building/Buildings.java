@@ -23,10 +23,12 @@ public class Buildings {
     public static final Building CONSTRUCTOR;
     public static final Building EMERALD_FORGE;
     public static final Building GATE;
+    public static final Building CAULDRON;
     public static final Building GENERATOR;
     public static final Building SMELTER;
     public static final Building STORAGE_BOX;
     public static final Building POWER_CENTRAL;
+    public static final Building REFINERY;
 
     static {
         buildings = new Array<>();
@@ -37,10 +39,12 @@ public class Buildings {
         CONSTRUCTOR   = loadBuilding(new ConstructorBuilding());
         EMERALD_FORGE = loadBuilding(new EmeraldForgeBuilding());
         GATE          = loadBuilding(new GateBuilding());
+        CAULDRON      = loadBuilding(new CauldronBuilding());
         GENERATOR     = loadBuilding(new GeneratorBuilding());
         SMELTER       = loadBuilding(new SmelterBuilding());
         STORAGE_BOX   = loadBuilding(new StorageBoxBuilding());
         POWER_CENTRAL = loadBuilding(new PowerCentralBuilding());
+        REFINERY      = loadBuilding(new RefineryBuilding());
     }
 
     private static final Array<Building> buildings;
