@@ -3,12 +3,9 @@ package dk.superawesome.factorio.listeners;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Matcher;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.util.Tick;
 import dk.superawesome.factorio.util.TickValue;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,7 +13,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +26,7 @@ public class InteractListener implements Listener {
         if (event.getClickedBlock() != null) {
             MechanicManager manager = Factorio.get().getMechanicManager(event.getClickedBlock().getWorld());
             Mechanic<?> mechanic = manager.getMechanicPartially(event.getClickedBlock().getLocation());
-            if (mechanic != null && (!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR)) {
+            if (mechanic != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && (!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR)) {
                 event.setCancelled(true);
 
                 if (mechanic.getProfile() instanceof GuiMechanicProfile<?>) {

@@ -2,20 +2,17 @@ package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Buildings;
-import dk.superawesome.factorio.gui.impl.EmeraldForgeGui;
-import dk.superawesome.factorio.gui.impl.RefineryGui;
-import dk.superawesome.factorio.gui.impl.SmelterGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
-import dk.superawesome.factorio.mechanics.transfer.*;
+import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
+import dk.superawesome.factorio.mechanics.transfer.FluidContainer;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.BrewingStand;
+import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -24,11 +21,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMechanic, FluidContainer, ItemCollection, Lightable {
 
@@ -36,10 +31,8 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     private Block brewingStand;
 
     private int bottleAmount;
+    private ItemStack bottleType;
 
-    private boolean declinedState;
-
-    private Bottle bottleResult;
     private ItemStack storageType;
     private int storageAmount;
 
@@ -52,10 +45,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     public void load(MechanicStorageContext context) throws Exception {
         ByteArrayInputStream str = context.getData();
         this.bottleAmount = context.getSerializer().readInt(str);
-        ItemStack item = context.getSerializer().readItemStack(str);
-        if (item != null) {
-            this.bottleResult = Bottle.getBottleFromMaterial(item.getType()).orElseThrow(IllegalArgumentException::new);
-        }
+        this.bottleType = context.getSerializer().readItemStack(str);
         this.storageType = context.getSerializer().readItemStack(str);
         this.storageAmount = context.getSerializer().readInt(str);
     }
@@ -64,12 +54,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     public void save(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
         context.getSerializer().writeInt(str, this.bottleAmount);
-        context.getSerializer().writeItemStack(str,
-            Optional.ofNullable(this.bottleResult)
-                .map(Bottle::getOutputStack)
-                .map(ItemStack::new)
-                .orElse(null));
-
+        context.getSerializer().writeItemStack(str, this.bottleType);
         context.getSerializer().writeItemStack(str, this.storageType);
         context.getSerializer().writeInt(str, this.storageAmount);
 
@@ -89,42 +74,11 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
                 .orElse(64);
     }
 
-    // FluidContainer vv
-    @Override
-    public int getAmount() {
-        return bottleAmount;
-    }
-
-    @Override
-    public void setAmount(int amount) {
-    }
-
-    @Override
-    public void addAmount(int amount) {
-        bottleAmount += amount;
-    }
-
-    @Override
-    public void removeAmount(int amount) {
-        bottleAmount = Math.max(0, bottleAmount - amount);
-    }
-
-    @Override
-    public void setFluidType(Material fluidType) {
-        bottleResult = Bottle.getBottleFromMaterial(fluidType).orElseThrow(IllegalArgumentException::new);
-    }
-
-    @Override
-    public Material getFluidType() {
-        return bottleResult.getLiquidStack().getType();
-    }
-    // FluidContainer ^^
-
     @Override
     public void onBlocksLoaded() {
         brewingStand = getLocation().getBlock().getRelative(0, 1, 0);
         if (brewingStand.getType() != Material.BREWING_STAND) {
-            // invalid generator
+            // Remove the mechanic if the brewing stand is missing
             Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
             Buildings.remove(loc.getWorld(), this);
             return;
@@ -194,13 +148,12 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         return 1d;
     }
 
-    public Bottle getBottleResult() {
-        return bottleResult;
+    public ItemStack getBottleType() {
+        return bottleType;
     }
 
-    public void setBottleResult(Bottle bottle) {
-        this.bottleResult = bottle;
-        this.<RefineryGui>getGuiInUse().get().loadLiquidSlots();
+    public void setBottleType(ItemStack bottleType) {
+        this.bottleType = bottleType;
     }
 
     public ItemStack getStorageType() {
@@ -223,10 +176,6 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         }
     }
 
-    public boolean isDeclined() {
-        return declinedState;
-    }
-
     public int getBottleAmount() {
         return bottleAmount;
     }
@@ -238,85 +187,29 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     @Override
     public void updateLight() {
         if (loc.getWorld() != null) {
-            BlockData data = this.brewingStand.getBlockData();
-            if (data instanceof BrewingStand brewingStandData) {
-                double storage = (double) storageAmount / (double) getCapacity();
+//                double storage = (double) storageAmount / (double) getCapacity();
+            double storage = 1.0;
+            org.bukkit.block.BrewingStand brewingStand = (org.bukkit.block.BrewingStand) this.brewingStand.getState();
+            BrewerInventory inventory = brewingStand.getInventory();
 
-                // Reset all bottles
-                brewingStandData.setBottle(0, false);
-                brewingStandData.setBottle(1, false);
-                brewingStandData.setBottle(2, false);
+            ItemStack waterBottle = new ItemStack(Material.POTION);
+            PotionMeta meta = (PotionMeta) waterBottle.getItemMeta();
+            meta.setBasePotionData(new PotionData(PotionType.WATER));
+            waterBottle.setItemMeta(meta);
 
-                if (storage > 0.66) {
-                    brewingStandData.setBottle(2, true); // Turn on the third bottle
-                }
-                if (storage > 0.33) {
-                    brewingStandData.setBottle(1, true); // Turn on the second bottle
-                }
-                if (storage > 0) {
-                    brewingStandData.setBottle(0, true); // Turn on the first bottle
-                }
-
-                this.brewingStand.setBlockData(brewingStandData);
-            }
-        }
-    }
-
-    public enum Bottle {
-        LAVA_BUCKET(Material.BUCKET, Material.LAVA, () -> new ItemStack(Material.LAVA_BUCKET), 3),
-        WATER_BUCKET(Material.BUCKET, Material.WATER, () -> new ItemStack(Material.WATER_BUCKET), 3),
-
-        WATER_BOTTLE(Material.GLASS_BOTTLE, Material.WATER, () -> {
-            ItemStack bottle = new ItemStack(Material.POTION, 1);
-            ItemMeta meta = bottle.getItemMeta();
-            ((PotionMeta) meta).setBasePotionData(new PotionData(PotionType.WATER));
-            bottle.setItemMeta(meta);
-            return bottle;
-        }, 1),
-        ;
-
-        private final Material bottleType;
-        private final Material liquidType;
-        private final ItemStack output;
-        private final int capacity;
-        Bottle(Material bottleType, Material liquidType, Supplier<ItemStack> output, int capacity) {
-            this.bottleType = bottleType;
-            this.liquidType = liquidType;
-            this.output = output.get();
-            this.capacity = capacity;
-        }
-
-        public static List<Bottle> getBottles() {
-            return Arrays.asList(Bottle.values());
-        }
-
-        public static Optional<Bottle> getBottleFromLiquid(Material type) {
-            return getBottles().stream().filter(b -> b.liquidType == type).findFirst();
-        }
-
-        public static Optional<Bottle> getBottleFromMaterial(Material type) {
-            return getBottles().stream().filter(b -> b.output.getType() == type).findFirst();
-        }
-
-        public int getCapacity() {
-            return capacity;
-        }
-
-        public ItemStack getBottleStack() {
-            return new ItemStack(bottleType);
-        }
-
-        public ItemStack getLiquidStack() {
-            return new ItemStack(liquidType);
-        }
-
-        public ItemStack getOutputStack() {
-            return new ItemStack(output);
-        }
-
-        @Override
-        public String toString() {
-            return name().toLowerCase().replace("_", " ");
+            inventory.setItem(0, waterBottle); // Venstre flaske
+            inventory.setItem(1, waterBottle); // Midterste flaske
+            inventory.setItem(2, waterBottle); // Højre flaske
+//            if (storage > 0.66) {
+//                brewingStandData.setBottle(2, true); // Turn on the third bottle
+//            }
+//            if (storage > 0.33) {
+//                brewingStandData.setBottle(1, true); // Turn on the second bottle
+//            }
+//            if (storage > 0) {
+//                brewingStandData.setBottle(0, true); // Turn on the first bottle
+//            }
+            brewingStand.update();
         }
     }
 }
