@@ -65,11 +65,10 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
                     item.setAmount(0);
                 }
 
-                if (left < 9) {
-                    if (item == null) {
-                        break;
-                    }
+                if (blocks % 64 == 0 && left >= 9) {
                     slot++;
+                } else if (left < 9) {
+                    break;
                 }
             }
 

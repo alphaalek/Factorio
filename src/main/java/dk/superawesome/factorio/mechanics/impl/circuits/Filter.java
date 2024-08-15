@@ -10,7 +10,6 @@ import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
-import dk.superawesome.factorio.util.Array;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,7 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.map.MinecraftFont;
 
 import java.util.*;
 
@@ -42,7 +40,9 @@ public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        Bukkit.getScheduler().runTask(Factorio.get(), () -> loadItems((Sign) event.getBlock().getState()));
+        if (event.getBlock().equals(loc.getBlock())) {
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> loadItems((Sign) event.getBlock().getState()));
+        }
     }
 
     private void loadItems(Sign sign) {
