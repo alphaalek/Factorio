@@ -71,32 +71,32 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
                     return mechanic.getCapacity();
                 }
             })
-            .set(SingleStorageGui.CONTEXT, RefineryGui.FILLED_BOTTLES_SLOTS, mechanic -> new Storage() {
-                @Override
-                public ItemStack getStored() {
-                    return mechanic.getStorageType();
-                }
-
-                @Override
-                public void setStored(ItemStack stored) {
-                    mechanic.setStorageType(stored);
-                }
-
-                @Override
-                public int getAmount() {
-                    return mechanic.getStorageAmount();
-                }
-
-                @Override
-                public void setAmount(int amount) {
-                    mechanic.setStorageAmount(amount);
-                }
-
-                @Override
-                public int getCapacity() {
-                    return mechanic.getCapacity();
-                }
-            })
+//            .set(SingleStorageGui.CONTEXT, RefineryGui.FILLED_BOTTLES_SLOTS, mechanic -> new Storage() {
+//                @Override
+//                public ItemStack getStored() {
+//                    return mechanic.getStorageType();
+//                }
+//
+//                @Override
+//                public void setStored(ItemStack stored) {
+//                    mechanic.setStorageType(stored);
+//                }
+//
+//                @Override
+//                public int getAmount() {
+//                    return mechanic.getStorageAmount();
+//                }
+//
+//                @Override
+//                public void setAmount(int amount) {
+//                    mechanic.setStorageAmount(amount);
+//                }
+//
+//                @Override
+//                public int getCapacity() {
+//                    return mechanic.getCapacity();
+//                }
+//            })
             .build();
     }
 

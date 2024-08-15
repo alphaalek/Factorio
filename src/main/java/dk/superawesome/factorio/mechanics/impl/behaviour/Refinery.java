@@ -2,14 +2,12 @@ package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Buildings;
+import dk.superawesome.factorio.gui.impl.EmeraldForgeGui;
 import dk.superawesome.factorio.gui.impl.RefineryGui;
 import dk.superawesome.factorio.gui.impl.SmelterGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
-import dk.superawesome.factorio.mechanics.transfer.FluidContainer;
-import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
-import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
-import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
+import dk.superawesome.factorio.mechanics.transfer.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -32,9 +30,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMechanic, ThinkingMechanic, ItemCollection, FluidContainer, Lightable {
+public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMechanic, FluidContainer, ItemCollection, Lightable {
 
-    private final DelayHandler thinkDelayHandler = new DelayHandler(20);
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
     private Block brewingStand;
 
@@ -124,42 +121,6 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     // FluidContainer ^^
 
     @Override
-    public DelayHandler getThinkDelayHandler() {
-        return thinkDelayHandler;
-    }
-
-    @Override
-    public void think() {
-        // check if the refinery has any liquid in storage
-        // if it has, check for bucket/bottle from the storage box we is connected to.
-        // pick a recipe we want to go for
-        // check if we have the ingredients for the recipe
-        // if we have the ingredients, check if we have the fuel for the recipe
-        // if we have the fuel, start the refining process
-        if (storageType != null) {
-            // set declined state and notify the user that this smelting is not possible yet
-            if (!declinedState) {
-                declinedState = true;
-                SmelterGui gui = this.<SmelterGui>getGuiInUse().get();
-                if (gui != null) {
-                    gui.updateDeclinedState(true);
-                }
-            }
-
-            return;
-        }
-
-        // remove declined state if set and smelting is available
-        if (declinedState) {
-            declinedState = false;
-            RefineryGui gui = this.<RefineryGui>getGuiInUse().get();
-            if (gui != null) {
-                gui.updateDeclinedState(false);
-            }
-        }
-    }
-
-    @Override
     public void onBlocksLoaded() {
         brewingStand = getLocation().getBlock().getRelative(0, 1, 0);
         if (brewingStand.getType() != Material.BREWING_STAND) {
@@ -224,7 +185,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     }
 
     @Override
-    public void pipePut(TransferCollection collection, PipePutEvent event) {
+    public void pipePut(FluidCollection collection, PipePutEvent event) {
 
     }
 

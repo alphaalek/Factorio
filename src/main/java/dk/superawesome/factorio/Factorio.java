@@ -55,7 +55,6 @@ public final class Factorio extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new SignChangeListener(), this);
         Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
         Bukkit.getPluginManager().registerEvents(new ShopManager(), this);
-        Bukkit.getPluginManager().registerEvents(new CauldronLevelChangeListener(), this);
 
         Tick.start();
 

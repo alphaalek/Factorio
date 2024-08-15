@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Levelled;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,11 +33,14 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
         return Profiles.CAULDRON;
     }
 
+    @EventHandler
     public void onCauldronLevelChange(CauldronLevelChangeEvent event) {
-        this.level = event.getNewLevel();
-        if (level == 0) this.fluid = null;
-        else
-            this.fluid = event.getNewState().getType() == Material.WATER_CAULDRON ? new ItemStack(Material.WATER) : new ItemStack(Material.LAVA);
+        if (event.getBlock().getLocation().equals(loc)) {
+            this.level = event.getNewLevel();
+            if (level == 0) this.fluid = null;
+            else
+                this.fluid = event.getNewState().getType() == Material.WATER_CAULDRON ? new ItemStack(Material.WATER) : new ItemStack(Material.LAVA);
+        }
     }
 
     @Override
