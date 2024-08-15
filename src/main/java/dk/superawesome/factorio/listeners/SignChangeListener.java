@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.listeners;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.building.Matcher;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.MechanicBuildResponse;
 import dk.superawesome.factorio.mechanics.MechanicManager;
@@ -25,17 +26,16 @@ public class SignChangeListener implements Listener {
         if (manager.getMechanicPartially(event.getBlock().getLocation()) != null) {
             event.setCancelled(true);
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
-            Material preType = BlockUtil.getPointingBlock(event.getBlock(), true).getType();
+            Material type = BlockUtil.getPointingBlock(event.getBlock(), true).getType();
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                 MechanicBuildResponse response = manager.buildMechanic((Sign) event.getBlock().getState(), event.getPlayer());
                 build: {
                     switch (response) {
                         case SUCCESS -> {
                             Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
-                            Material afterType = BlockUtil.getPointingBlock(event.getBlock(), true).getType();
                             event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
-                            if (!(preType.equals(afterType))) {
-                                event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(preType));
+                            if (!(mechanic.getProfile().getBuilding() instanceof Matcher)) {
+                                event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(type));
                             }
                             break build;
                         }

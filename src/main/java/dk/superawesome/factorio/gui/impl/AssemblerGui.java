@@ -67,7 +67,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
                 .build();
     }
 
-    private String format(Assembler.Type type) {
+    public static String format(Assembler.Type type) {
         if (type.getProduces() > type.getType().getProduces()) {
             return "§a+" + (StringUtil.formatDecimals((type.getProduces() / type.getType().getProduces() - 1) * 100, 2)) + "%";
         } else if (type.getProduces() < type.getType().getProduces()) {

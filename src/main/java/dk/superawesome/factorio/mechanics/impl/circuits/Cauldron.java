@@ -1,6 +1,5 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
-import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
 import org.bukkit.Bukkit;
@@ -10,7 +9,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Levelled;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
