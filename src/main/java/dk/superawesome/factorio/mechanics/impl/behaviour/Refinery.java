@@ -1,21 +1,14 @@
 package dk.superawesome.factorio.mechanics.impl.behaviour;
 
-import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
 import dk.superawesome.factorio.mechanics.transfer.FluidContainer;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.inventory.BrewerInventory;
+import org.bukkit.block.data.type.BrewingStand;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,10 +18,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMechanic, FluidContainer, ItemCollection, Lightable {
+public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMechanic, FluidContainer, ItemCollection {
 
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
-    private Block brewingStand;
 
     private int bottleAmount;
     private ItemStack bottleType;
@@ -72,20 +64,6 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
             Optional.ofNullable(storageType)
                 .map(ItemStack::getMaxStackSize)
                 .orElse(64);
-    }
-
-    @Override
-    public void onBlocksLoaded() {
-        brewingStand = getLocation().getBlock().getRelative(0, 1, 0);
-        if (brewingStand.getType() != Material.BREWING_STAND) {
-            // Remove the mechanic if the brewing stand is missing
-            Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
-            Buildings.remove(loc.getWorld(), this);
-            return;
-        }
-
-        // update block state
-        updateLight();
     }
 
     @Override
@@ -182,34 +160,5 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     public void setBottleAmount(int amount) {
         this.bottleAmount = amount;
-    }
-
-    @Override
-    public void updateLight() {
-        if (loc.getWorld() != null) {
-//                double storage = (double) storageAmount / (double) getCapacity();
-            double storage = 1.0;
-            org.bukkit.block.BrewingStand brewingStand = (org.bukkit.block.BrewingStand) this.brewingStand.getState();
-            BrewerInventory inventory = brewingStand.getInventory();
-
-            ItemStack waterBottle = new ItemStack(Material.POTION);
-            PotionMeta meta = (PotionMeta) waterBottle.getItemMeta();
-            meta.setBasePotionData(new PotionData(PotionType.WATER));
-            waterBottle.setItemMeta(meta);
-
-            inventory.setItem(0, waterBottle); // Venstre flaske
-            inventory.setItem(1, waterBottle); // Midterste flaske
-            inventory.setItem(2, waterBottle); // Højre flaske
-//            if (storage > 0.66) {
-//                brewingStandData.setBottle(2, true); // Turn on the third bottle
-//            }
-//            if (storage > 0.33) {
-//                brewingStandData.setBottle(1, true); // Turn on the second bottle
-//            }
-//            if (storage > 0) {
-//                brewingStandData.setBottle(0, true); // Turn on the first bottle
-//            }
-            brewingStand.update();
-        }
     }
 }

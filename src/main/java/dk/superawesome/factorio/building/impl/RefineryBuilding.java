@@ -15,11 +15,8 @@ import java.util.function.BiConsumer;
 public class RefineryBuilding implements Building, Buildable {
 
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
-            (b, r) -> b.setType(Material.BEE_NEST),
-            (b, r) -> {
-                b.setType(Material.BREWING_STAND);
-                rotate(b, r);
-            },
+            (b, r) -> b.setType(Material.LOOM),
+            (b, r) -> b.setType(Material.LODESTONE),
             (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */
     );
 
