@@ -10,7 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.Tag;
-import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,15 +25,18 @@ public class SignChangeListener implements Listener {
         if (manager.getMechanicPartially(event.getBlock().getLocation()) != null) {
             event.setCancelled(true);
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
-            Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
+            Material preType = BlockUtil.getPointingBlock(event.getBlock(), true).getType();
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                 MechanicBuildResponse response = manager.buildMechanic((Sign) event.getBlock().getState(), event.getPlayer());
                 build: {
                     switch (response) {
                         case SUCCESS -> {
                             Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
+                            Material afterType = BlockUtil.getPointingBlock(event.getBlock(), true).getType();
                             event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
-                            event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(on.getType()));
+                            if (!(preType.equals(afterType))) {
+                                event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(preType));
+                            }
                             break build;
                         }
                         case NO_SUCH -> {
