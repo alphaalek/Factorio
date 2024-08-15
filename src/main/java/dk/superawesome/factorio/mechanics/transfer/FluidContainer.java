@@ -2,7 +2,7 @@ package dk.superawesome.factorio.mechanics.transfer;
 
 import org.bukkit.Material;
 
-public interface FluidContainer extends Container<TransferCollection> {
+public interface FluidContainer extends Container<FluidCollection> {
 
     default boolean accepts(TransferCollection collection) {
         return collection instanceof FluidCollection;
