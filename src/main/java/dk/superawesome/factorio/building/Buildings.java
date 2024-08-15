@@ -120,16 +120,17 @@ public class Buildings {
     }
 
     public static void remove(World world, Mechanic<?> mechanic) {
-        Material signMaterial = mechanic.getLocation().getBlock().getRelative(mechanic.getRotation()).getType();
+        Block sign = mechanic.getLocation().getBlock().getRelative(mechanic.getRotation());
+        for (ItemStack drops : sign.getDrops()) {
+            world.dropItemNaturally(mechanic.getLocation(), drops);
+        }
+
         if (mechanic.getProfile().getBuilding() instanceof Buildable) {
             for (Location relLoc : getLocations(mechanic)) {
                 world.getBlockAt(relLoc).setType(Material.AIR, false); // don't apply physics
             }
         } else {
-            Block sign = mechanic.getLocation().getBlock().getRelative(mechanic.getRotation());
             sign.setType(Material.AIR);
         }
-
-        world.dropItemNaturally(mechanic.getLocation(), new ItemStack(signMaterial));
     }
 }
