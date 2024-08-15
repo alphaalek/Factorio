@@ -44,7 +44,7 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
     @Override
     public StorageProvider<Refinery> getStorageProvider() {
         return StorageProvider.Builder.<Refinery>makeContext()
-            .set(SingleStorageGui.CONTEXT, RefineryGui.BOTTLES_SLOTS, mechanic -> new Storage() {
+            .set(RefineryGui.EMPTY_BOTTLE_CONTEXT, RefineryGui.BOTTLES_SLOTS, mechanic -> new Storage() {
                 @Override
                 public ItemStack getStored() {
                     return mechanic.getBottleResult().getBottleStack();
@@ -71,32 +71,32 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
                     return mechanic.getCapacity();
                 }
             })
-//            .set(SingleStorageGui.CONTEXT, RefineryGui.FILLED_BOTTLES_SLOTS, mechanic -> new Storage() {
-//                @Override
-//                public ItemStack getStored() {
-//                    return mechanic.getStorageType();
-//                }
-//
-//                @Override
-//                public void setStored(ItemStack stored) {
-//                    mechanic.setStorageType(stored);
-//                }
-//
-//                @Override
-//                public int getAmount() {
-//                    return mechanic.getStorageAmount();
-//                }
-//
-//                @Override
-//                public void setAmount(int amount) {
-//                    mechanic.setStorageAmount(amount);
-//                }
-//
-//                @Override
-//                public int getCapacity() {
-//                    return mechanic.getCapacity();
-//                }
-//            })
+            .set(RefineryGui.FILLED_BOTTLE_CONTEXT, RefineryGui.FILLED_BOTTLES_SLOTS, mechanic -> new Storage() {
+                @Override
+                public ItemStack getStored() {
+                    return mechanic.getStorageType();
+                }
+
+                @Override
+                public void setStored(ItemStack stored) {
+                    mechanic.setStorageType(stored);
+                }
+
+                @Override
+                public int getAmount() {
+                    return mechanic.getStorageAmount();
+                }
+
+                @Override
+                public void setAmount(int amount) {
+                    mechanic.setStorageAmount(amount);
+                }
+
+                @Override
+                public int getCapacity() {
+                    return mechanic.getCapacity();
+                }
+            })
             .build();
     }
 
