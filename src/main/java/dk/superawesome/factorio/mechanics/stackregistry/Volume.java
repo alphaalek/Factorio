@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics;
+package dk.superawesome.factorio.mechanics.stackregistry;
 
 import org.bukkit.Material;
 

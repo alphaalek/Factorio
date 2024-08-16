@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics;
+package dk.superawesome.factorio.mechanics.stackregistry;
 
 public enum Fluid {
 

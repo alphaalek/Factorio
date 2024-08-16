@@ -1,13 +1,9 @@
 package dk.superawesome.factorio.gui.impl;
 
-import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.gui.SingleStorageGui;
-import dk.superawesome.factorio.mechanics.Volume;
-import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
+import dk.superawesome.factorio.mechanics.stackregistry.Volume;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Refinery;
-import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;

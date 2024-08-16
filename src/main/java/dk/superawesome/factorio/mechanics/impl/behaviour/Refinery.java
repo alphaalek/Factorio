@@ -1,9 +1,11 @@
 package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.gui.impl.RefineryGui;
-import dk.superawesome.factorio.gui.impl.SmelterGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
+import dk.superawesome.factorio.mechanics.stackregistry.Filled;
+import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
+import dk.superawesome.factorio.mechanics.stackregistry.Volume;
 import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
 import dk.superawesome.factorio.mechanics.transfer.FluidContainer;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;

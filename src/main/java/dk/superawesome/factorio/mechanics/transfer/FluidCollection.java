@@ -1,6 +1,6 @@
 package dk.superawesome.factorio.mechanics.transfer;
 
-import dk.superawesome.factorio.mechanics.Fluid;
+import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
 
 public interface FluidCollection extends TransferCollection {
 

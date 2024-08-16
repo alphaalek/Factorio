@@ -2,7 +2,7 @@ package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.MechanicGui;
-import dk.superawesome.factorio.mechanics.Fuel;
+import dk.superawesome.factorio.mechanics.stackregistry.Fuel;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Smelter;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;

@@ -1,21 +1,14 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
 import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
 
 import static org.bukkit.event.block.CauldronLevelChangeEvent.ChangeReason.UNKNOWN;
 

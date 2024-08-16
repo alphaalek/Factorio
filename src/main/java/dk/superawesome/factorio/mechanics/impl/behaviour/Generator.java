@@ -6,6 +6,7 @@ import dk.superawesome.factorio.gui.impl.GeneratorGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
+import dk.superawesome.factorio.mechanics.stackregistry.Fuel;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Location;
