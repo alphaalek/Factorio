@@ -11,7 +11,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.Tag;
+import org.bukkit.block.Block;
+import org.bukkit.block.Container;
 import org.bukkit.block.Sign;
+import org.bukkit.block.TileState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
@@ -26,9 +29,10 @@ public class SignChangeListener implements Listener {
         if (manager.getMechanicPartially(event.getBlock().getLocation()) != null) {
             event.setCancelled(true);
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
-            Material type = BlockUtil.getPointingBlock(event.getBlock(), true).getType();
-            if (!type.isOccluding() || !type.isSolid()) {
+            Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
+            if (on == null || on.getState() instanceof TileState) {
                 event.getPlayer().sendMessage("§cDu kan ikke placere en maskine på denne block!");
+                event.setCancelled(true);
                 return;
             }
 
@@ -40,7 +44,7 @@ public class SignChangeListener implements Listener {
                             Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
                             event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
                             if (!(mechanic.getProfile().getBuilding() instanceof Matcher)) {
-                                event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(type));
+                                event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(on.getType()));
                             }
                             break build;
                         }
