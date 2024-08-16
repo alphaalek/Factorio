@@ -41,12 +41,12 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
             .set(RefineryGui.EMPTY_BOTTLE_CONTEXT, RefineryGui.BOTTLES_SLOTS, mechanic -> new Storage() {
                 @Override
                 public ItemStack getStored() {
-                    return mechanic.getBottleType();
+                    return Optional.ofNullable(mechanic.getVolume()).map(Volume::getMat).map(ItemStack::new).orElse(null);
                 }
 
                 @Override
                 public void setStored(ItemStack stored) {
-                    mechanic.setBottleType(stored);
+                    mechanic.setVolume(Volume.getType(stored.getType()).orElse(null));
                 }
 
                 @Override
@@ -67,27 +67,27 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
             .set(RefineryGui.FILLED_BOTTLE_CONTEXT, RefineryGui.FILLED_BOTTLES_SLOTS, mechanic -> new Storage() {
                 @Override
                 public ItemStack getStored() {
-                    return mechanic.getStorageType();
+                    return null;
                 }
 
                 @Override
                 public void setStored(ItemStack stored) {
-                    mechanic.setStorageType(stored);
+
                 }
 
                 @Override
                 public int getAmount() {
-                    return mechanic.getStorageAmount();
+                    return 0;
                 }
 
                 @Override
                 public void setAmount(int amount) {
-                    mechanic.setStorageAmount(amount);
+
                 }
 
                 @Override
                 public int getCapacity() {
-                    return mechanic.getCapacity();
+                    return 0;
                 }
             })
             .build();

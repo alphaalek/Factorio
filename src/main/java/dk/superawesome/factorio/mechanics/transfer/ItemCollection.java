@@ -1,8 +1,12 @@
 package dk.superawesome.factorio.mechanics.transfer;
 
+import dk.superawesome.factorio.gui.BaseGui;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 public interface ItemCollection extends TransferCollection {
@@ -14,4 +18,25 @@ public interface ItemCollection extends TransferCollection {
     boolean has(Predicate<ItemStack> stack);
 
     List<ItemStack> take(int amount);
+
+    default <G extends BaseGui<G>> List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, Container.HeapToStackAccess<Integer> updater) {
+        List<ItemStack> items = new ArrayList<>();
+        int taken = 0;
+        while (taken < amount && taken < storedAmount) {
+            ItemStack item = stored.clone();
+            int a = Math.min(item.getMaxStackSize(), Math.min(storedAmount, amount) - taken);
+
+            taken += a;
+            item.setAmount(a);
+            items.add(item);
+        }
+
+        G gui = inUse.get();
+        if (gui != null) {
+            doGui.accept(gui, taken);
+        }
+        updater.set(taken);
+
+        return items;
+    }
 }

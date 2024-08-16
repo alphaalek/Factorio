@@ -208,7 +208,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     @Override
     public List<ItemStack> take(int amount) {
 
-        return this.<ConstructorGui>take(Math.min(storageType.getMaxStackSize(), amount), storageType, storageAmount, getGuiInUse(), ConstructorGui::updateRemovedItems, new HeapToStackAccess<>() {
+        return this.<ConstructorGui>take(Math.min(getMaxTransfer(), amount), storageType, storageAmount, getGuiInUse(), ConstructorGui::updateRemovedItems, new HeapToStackAccess<>() {
             @Override
             public Integer get() {
                 return storageAmount;

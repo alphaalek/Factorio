@@ -5,6 +5,7 @@ import dk.superawesome.factorio.building.Matcher;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.MechanicBuildResponse;
 import dk.superawesome.factorio.mechanics.MechanicManager;
+import dk.superawesome.factorio.mechanics.impl.circuits.Cauldron;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
@@ -16,13 +17,14 @@ import org.bukkit.block.Container;
 import org.bukkit.block.Sign;
 import org.bukkit.block.TileState;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class SignChangeListener implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onSignUpdate(SignChangeEvent event) {
         MechanicManager manager = Factorio.get().getMechanicManager(event.getBlock().getWorld());
 
@@ -30,9 +32,12 @@ public class SignChangeListener implements Listener {
             event.setCancelled(true);
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
             Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
-            if (on == null || on.getState() instanceof TileState) {
+            if (manager.getProfileFrom((Sign) event.getBlock().getState()).isPresent()
+                    && (on == null || on.getState() instanceof TileState)) {
                 event.getPlayer().sendMessage("§cDu kan ikke placere en maskine på denne block!");
                 event.setCancelled(true);
+                event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(event.getPlayer().getInventory().getItemInMainHand().getType()));
+                event.getBlock().setType(Material.AIR);
                 return;
             }
 
@@ -60,6 +65,7 @@ public class SignChangeListener implements Listener {
 
                     event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                     event.getBlock().setType(Material.AIR);
+                    event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(event.getPlayer().getInventory().getItemInMainHand().getType()));
                 }
             });
         }

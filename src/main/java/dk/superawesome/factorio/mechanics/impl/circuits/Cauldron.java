@@ -21,8 +21,8 @@ import static org.bukkit.event.block.CauldronLevelChangeEvent.ChangeReason.UNKNO
 
 public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollection {
 
-    private int level = 0;
-    private ItemStack fluid = null;
+    private int fluidAmount;
+    private Fluid fluid;
 
     public Cauldron(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -35,11 +35,15 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
 
     @EventHandler
     public void onCauldronLevelChange(CauldronLevelChangeEvent event) {
-        if (event.getBlock().getLocation().equals(loc)) {
-            this.level = event.getNewLevel();
-            if (level == 0) this.fluid = null;
-            else
-                this.fluid = event.getNewState().getType() == Material.WATER_CAULDRON ? new ItemStack(Material.WATER) : new ItemStack(Material.LAVA);
+        if (event.getBlock().equals(loc.getBlock())) {
+            this.fluidAmount = ((Levelled)event.getBlock().getBlockData()).getLevel() + 1;
+
+            if (this.fluid == null) {
+                switch (event.getBlock().getType()) {
+                    case WATER_CAULDRON -> this.fluid = Fluid.WATER;
+                    case LAVA_CAULDRON -> this.fluid = Fluid.LAVA;
+                }
+            }
         }
     }
 
@@ -51,44 +55,8 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
     }
 
     @Override
-    public List<ItemStack> take(int amount) {
-        ItemStack item = fluid.clone();
-        if (level > amount) {
-            item.setAmount(amount);
-        }
-
-        level = Math.max(0, level - item.getAmount());
-        if (level == 0) {
-            fluid = null;
-        } else {
-            fluid.setAmount(level);
-            updateCauldronLevel();
-        }
-
-        return Collections.singletonList(item);
-    }
-
-    @Override
-    public boolean hasFluid(FluidType fluidType) {
-        return fluid != null && fluid.getType().equals(fluidType.getMaterial());
-    }
-
-    @Override
-    public boolean hasFluid(Predicate<FluidType> fluidType) {
-        return fluid != null && fluidType.test(FluidType.valueOf(fluid.getType().name()));
-    }
-
-    private void updateCauldronLevel() {
-        Block block = loc.getBlock();
-        BlockData data = block.getBlockData();
-        ((Levelled) data).setLevel(level);
-        block.setBlockData(data);
-        block.getState().update();
-    }
-
-    @Override
     public boolean isTransferEmpty() {
-        return level == 0;
+        return fluidAmount == 0;
     }
 
     @Override
@@ -98,16 +66,33 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
 
     @Override
     public int getMaxTransfer() {
-        return fluid.getMaxStackSize();
+        return fluid.getMaxTransfer();
     }
 
     @Override
     public int getTransferAmount() {
-        return level;
+        return fluidAmount;
     }
 
     @Override
     public double getTransferEnergyCost() {
         return 1d / 4d;
+    }
+
+    @Override
+    public boolean hasFluid(Fluid fluid) {
+        return this.fluid == fluid;
+    }
+
+    @Override
+    public int take(int amount) {
+        int take = Math.min(this.fluidAmount, amount);
+        this.fluidAmount -= take;
+
+        if (this.fluidAmount == 0) {
+            this.fluid = null;
+        }
+
+        return take;
     }
 }

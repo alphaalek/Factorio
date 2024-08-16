@@ -1,13 +1,15 @@
 package dk.superawesome.factorio.mechanics.impl.behaviour;
 
+import dk.superawesome.factorio.gui.impl.RefineryGui;
+import dk.superawesome.factorio.gui.impl.SmelterGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
 import dk.superawesome.factorio.mechanics.transfer.FluidContainer;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.type.BrewingStand;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
@@ -22,11 +24,11 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
-    private int bottleAmount;
-    private ItemStack bottleType;
+    private int volumeAmount;
+    private Volume volume;
 
-    private ItemStack storageType;
-    private int storageAmount;
+    private int filledAmount;
+    private Filled filled;
 
     public Refinery(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -36,19 +38,43 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     @Override
     public void load(MechanicStorageContext context) throws Exception {
         ByteArrayInputStream str = context.getData();
-        this.bottleAmount = context.getSerializer().readInt(str);
-        this.bottleType = context.getSerializer().readItemStack(str);
-        this.storageType = context.getSerializer().readItemStack(str);
-        this.storageAmount = context.getSerializer().readInt(str);
+
+        this.volumeAmount = context.getSerializer().readInt(str);
+        ItemStack volume = context.getSerializer().readItemStack(str);
+        if (volume != null) {
+            this.volume = Volume.getType(volume.getType()).orElse(null);
+        }
+
+        this.filledAmount = context.getSerializer().readInt(str);
+        ItemStack filledVolumeStack = context.getSerializer().readItemStack(str);
+        int fluidOrdinal = context.getSerializer().readInt(str);
+        if (filledVolumeStack != null) {
+            Volume filledVolume = Volume.getType(filledVolumeStack.getType()).orElse(null);
+            if (filledVolume != null) {
+                this.filled = new Filled(filledVolume, Fluid.values()[fluidOrdinal]);
+            }
+        }
     }
 
     @Override
     public void save(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
-        context.getSerializer().writeInt(str, this.bottleAmount);
-        context.getSerializer().writeItemStack(str, this.bottleType);
-        context.getSerializer().writeItemStack(str, this.storageType);
-        context.getSerializer().writeInt(str, this.storageAmount);
+
+        context.getSerializer().writeInt(str, this.volumeAmount);
+        if (this.volume != null) {
+            context.getSerializer().writeItemStack(str, new ItemStack(this.volume.getMat()));
+        } else {
+            context.getSerializer().writeItemStack(str, null);
+        }
+
+        context.getSerializer().writeInt(str, this.filledAmount);
+        if (this.filled != null) {
+            context.getSerializer().writeItemStack(str, new ItemStack(this.filled.volume().getMat()));
+            context.getSerializer().writeInt(str, this.filled.fluid().ordinal());
+        } else {
+            context.getSerializer().writeItemStack(str, null);
+            context.getSerializer().writeInt(str, -1);
+        }
 
         context.uploadData(str);
     }
@@ -61,39 +87,21 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     @Override
     public int getCapacity() {
         return level.getInt(ItemCollection.CAPACITY_MARK) *
-            Optional.ofNullable(storageType)
-                .map(ItemStack::getMaxStackSize)
+            Optional.ofNullable(filled)
+                .map(Filled::volume)
+                .map(Volume::getMat)
+                .map(Material::getMaxStackSize)
                 .orElse(64);
     }
 
     @Override
-    public boolean has(ItemStack stack) {
-        return has(i -> i.isSimilar(stack) && storageAmount >= stack.getAmount());
-    }
+    public void pipePut(FluidCollection collection, PipePutEvent event) {
 
-    @Override
-    public boolean has(Predicate<ItemStack> stack) {
-        return storageType != null && stack.test(storageType);
-    }
-
-    @Override
-    public List<ItemStack> take(int amount) {
-        ItemStack item = storageType.clone();
-        if (storageAmount > amount) {
-            item.setAmount(amount);
-        }
-
-        storageAmount = Math.max(0, storageAmount - item.getAmount());
-        if (storageAmount == 0) {
-            storageType = null;
-        }
-
-        return List.of(item);
     }
 
     @Override
     public boolean isTransferEmpty() {
-        return storageType == null;
+        return filled == null;
     }
 
     @Override
@@ -103,22 +111,17 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public int getMaxTransfer() {
-        return storageType.getMaxStackSize();
+        return filled.volume().getMat().getMaxStackSize();
     }
 
     @Override
     public int getTransferAmount() {
-        return storageAmount;
+        return filledAmount;
     }
 
     @Override
     public boolean isContainerEmpty() {
-        return storageAmount == 0;
-    }
-
-    @Override
-    public void pipePut(FluidCollection collection, PipePutEvent event) {
-
+        return filledAmount == 0 && volumeAmount == 0;
     }
 
     @Override
@@ -126,39 +129,84 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         return 1d;
     }
 
-    public ItemStack getBottleType() {
-        return bottleType;
+    @Override
+    public boolean has(ItemStack stack) {
+        return has(i -> i.isSimilar(stack) && volumeAmount >= stack.getAmount());
     }
 
-    public void setBottleType(ItemStack bottleType) {
-        this.bottleType = bottleType;
+    @Override
+    public boolean has(Predicate<ItemStack> stack) {
+        return volume != null && stack.test(new ItemStack(volume.getMat()));
     }
 
-    public ItemStack getStorageType() {
-        return storageType;
+    @Override
+    public List<ItemStack> take(int amount) {
+        return this.<RefineryGui>take(Math.min(getMaxTransfer(), amount), new ItemStack(filled.volume().getMat()), filledAmount, getGuiInUse(), RefineryGui::updateRemovedFilled, new HeapToStackAccess<>() {
+            @Override
+            public Integer get() {
+                return filledAmount;
+            }
+
+            @Override
+            public void set(Integer val) {
+                setFilledAmount(filledAmount - val);
+            }
+        });
     }
 
-    public void setStorageType(ItemStack stack) {
-        this.storageType = stack;
+    public Volume getVolume() {
+        return volume;
     }
 
-    public int getStorageAmount() {
-        return storageAmount;
+    public void setVolume(Volume volume) {
+        this.volume = volume;
+
+        if (this.volume == null) {
+            this.volumeAmount = 0;
+        }
     }
 
-    public void setStorageAmount(int amount) {
-        this.storageAmount = amount;
+    public int getVolumeAmount() {
+        return volumeAmount;
+    }
 
-        if (this.storageAmount == 0) {
-            storageType = null;
+    public void setVolumeAmount(int amount) {
+        this.volumeAmount = amount;
+
+        if (this.volumeAmount == 0) {
+            volume = null;
+        }
+    }
+
+    public Filled getFilled() {
+        return filled;
+    }
+
+    public void setFilled(Filled filled) {
+        this.filled = filled;
+
+        if (this.filled == null) {
+            filledAmount = 0;
+        }
+    }
+
+    public int getFilledAmount() {
+        return filledAmount;
+    }
+
+    public void setFilledAmount(int amount) {
+        this.filledAmount = amount;
+
+        if (this.filledAmount == 0) {
+            filled = null;
         }
     }
 
     public int getBottleAmount() {
-        return bottleAmount;
+        return volumeAmount;
     }
 
     public void setBottleAmount(int amount) {
-        this.bottleAmount = amount;
+        this.volumeAmount = amount;
     }
 }

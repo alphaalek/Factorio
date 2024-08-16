@@ -252,7 +252,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     @Override
     public List<ItemStack> take(int amount) {
 
-        return this.<SmelterGui>take(Math.min(storageType.getMaxStackSize(), amount), storageType, storageAmount, getGuiInUse(), SmelterGui::updateRemovedStorage, new HeapToStackAccess<>() {
+        return this.<SmelterGui>take(Math.min(getMaxTransfer(), amount), storageType, storageAmount, getGuiInUse(), SmelterGui::updateRemovedStorage, new HeapToStackAccess<>() {
             @Override
             public Integer get() {
                 return storageAmount;
