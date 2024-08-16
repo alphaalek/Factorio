@@ -27,7 +27,7 @@ public class SignChangeListener implements Listener {
             event.setCancelled(true);
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
             Material type = BlockUtil.getPointingBlock(event.getBlock(), true).getType();
-            if (!type.isTransparent() || !type.isSolid()) {
+            if (!type.isOccluding() || !type.isSolid()) {
                 event.getPlayer().sendMessage("§cDu kan ikke placere en maskine på denne block!");
                 return;
             }
