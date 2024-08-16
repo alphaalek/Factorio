@@ -1,12 +1,11 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
+import dk.superawesome.factorio.mechanics.stackregistry.*;
 import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Levelled;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
 
@@ -29,7 +28,7 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
     @EventHandler
     public void onCauldronLevelChange(CauldronLevelChangeEvent event) {
         if (event.getBlock().equals(loc.getBlock())) {
-            this.fluidAmount = ((Levelled)event.getBlock().getBlockData()).getLevel() + 1;
+            this.fluidAmount = event.getNewLevel();
 
             if (this.fluid == null) {
                 switch (event.getBlock().getType()) {
@@ -78,7 +77,7 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
     }
 
     @Override
-    public int take(int amount) {
+    public FluidStack take(int amount) {
         int take = Math.min(this.fluidAmount, amount);
         this.fluidAmount -= take;
 
@@ -86,6 +85,8 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
             this.fluid = null;
         }
 
-        return take;
+        Filled.getFilledState(Volume.BUCKET, fluid);
+
+        return new FluidStack(fluid, take);
     }
 }

@@ -1,8 +1,8 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.gui.SingleStorageGui;
-import dk.superawesome.factorio.mechanics.stackregistry.Volume;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Refinery;
+import dk.superawesome.factorio.mechanics.stackregistry.Volume;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,8 +16,8 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
     public static final int FILLED_BOTTLE_CONTEXT = 1;
 
 
-    public static final List<Integer> BOTTLES_SLOTS = Arrays.asList(10, 11, 12, 19, 20, 21, 28, 29, 30, 37, 38, 39);
-    public static final List<Integer> FILLED_BOTTLES_SLOTS = Arrays.asList(14, 15, 16, 23, 24, 25, 32, 33, 34, 41, 42, 43);
+    public static final List<Integer> BOTTLES_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
+    public static final List<Integer> FILLED_BOTTLES_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40, 46, 47, 48, 49);
 
     public RefineryGui(Refinery mechanic, AtomicReference<RefineryGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder(), BOTTLES_SLOTS);
@@ -46,7 +46,19 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
         return Volume.getType(item.getType()).isPresent();
     }
 
-    public void updateRemovedFilled(int amount) {
+    public void updateAddedEmpty(int amount) {
+        updateAddedItems(getInventory(), amount, new ItemStack(getMechanic().getVolume().getMat()), BOTTLES_SLOTS);
+    }
 
+    public void updateRemovedEmpty(int amount) {
+        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getVolume().getMat()), BOTTLES_SLOTS);
+    }
+
+    public void updateAddedFilled(int amount) {
+        updateAddedItems(getInventory(), amount, getMechanic().getFilled().getOutputItemStack(), FILLED_BOTTLES_SLOTS);
+    }
+
+    public void updateRemovedFilled(int amount) {
+        updateRemovedItems(getInventory(), amount, getMechanic().getFilled().getOutputItemStack(), FILLED_BOTTLES_SLOTS);
     }
 }

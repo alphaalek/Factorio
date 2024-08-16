@@ -4,7 +4,7 @@ public enum Fluid {
 
     WATER(3),
 
-    LAVA(2)
+    LAVA(3)
     ;
 
     private final int maxTransfer;

@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics.transfer;
 
 import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
+import dk.superawesome.factorio.mechanics.stackregistry.FluidStack;
 
 public interface FluidCollection extends TransferCollection {
 
@@ -8,5 +9,5 @@ public interface FluidCollection extends TransferCollection {
 
     boolean hasFluid(Fluid fluid);
 
-    int take(int amount);
+    FluidStack take(int amount);
 }

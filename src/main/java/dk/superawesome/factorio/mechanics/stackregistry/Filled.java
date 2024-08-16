@@ -1,5 +1,44 @@
 package dk.superawesome.factorio.mechanics.stackregistry;
 
-public record Filled(Volume volume, Fluid fluid) {
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
+
+public enum Filled {
+
+    WATER_BUCKET(Volume.BUCKET, Fluid.WATER),
+    LAVA_BUCKET(Volume.BUCKET, Fluid.LAVA),
+    WATER_BOTTLE(Volume.BOTTLE, Fluid.WATER);
+
+    private final Volume volume;
+    private final Fluid fluid;
+
+    Filled(Volume volume, Fluid fluid) {
+        this.volume = volume;
+        this.fluid = fluid;
+    }
+
+    public static Filled getFilledState(Volume volume, Fluid fluid) {
+        return Arrays.stream(values())
+            .filter(filled -> filled.getVolume().equals(volume) && filled.getFluid().equals(fluid))
+            .findFirst().orElse(null);
+    }
+
+    public ItemStack getOutputItemStack() {
+        return switch (this) {
+            case WATER_BUCKET -> new ItemStack(Material.WATER_BUCKET);
+            case LAVA_BUCKET -> new ItemStack(Material.LAVA_BUCKET);
+            case WATER_BOTTLE -> new ItemStack(Material.POTION);
+            default -> null;
+        };
+    }
+
+    public Volume getVolume() {
+        return volume;
+    }
+
+    public Fluid getFluid() {
+        return fluid;
+    }
 }
