@@ -3,9 +3,7 @@ package dk.superawesome.factorio.mechanics.impl.behaviour;
 import dk.superawesome.factorio.gui.impl.RefineryGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
-import dk.superawesome.factorio.mechanics.stackregistry.Filled;
-import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
-import dk.superawesome.factorio.mechanics.stackregistry.Volume;
+import dk.superawesome.factorio.mechanics.stackregistry.*;
 import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
 import dk.superawesome.factorio.mechanics.transfer.FluidContainer;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
@@ -23,6 +21,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMechanic, FluidContainer, ItemCollection {
+
+    private static final int VOLUME_MARK = 1;
 
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
@@ -53,7 +53,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         if (filledVolumeStack != null) {
             Volume filledVolume = Volume.getType(filledVolumeStack.getType()).orElse(null);
             if (filledVolume != null) {
-                this.filled = new Filled(filledVolume, Fluid.values()[fluidOrdinal]);
+                this.filled = Filled.getFilledState(filledVolume, Fluid.values()[fluidOrdinal]);
             }
         }
     }
@@ -71,8 +71,8 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
         context.getSerializer().writeInt(str, this.filledAmount);
         if (this.filled != null) {
-            context.getSerializer().writeItemStack(str, new ItemStack(this.filled.volume().getMat()));
-            context.getSerializer().writeInt(str, this.filled.fluid().ordinal());
+            context.getSerializer().writeItemStack(str, new ItemStack(this.filled.getVolume().getMat()));
+            context.getSerializer().writeInt(str, this.filled.getFluid().ordinal());
         } else {
             context.getSerializer().writeItemStack(str, null);
             context.getSerializer().writeInt(str, -1);
@@ -86,11 +86,19 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         return Profiles.REFINERY;
     }
 
+    public int getVolumeCapacity() {
+        return level.getInt(VOLUME_MARK) *
+            Optional.ofNullable(volume)
+                .map(Volume::getMat)
+                .map(Material::getMaxStackSize)
+                .orElse(64);
+    }
+
     @Override
     public int getCapacity() {
         return level.getInt(ItemCollection.CAPACITY_MARK) *
             Optional.ofNullable(filled)
-                .map(Filled::volume)
+                .map(Filled::getVolume)
                 .map(Volume::getMat)
                 .map(Material::getMaxStackSize)
                 .orElse(64);
@@ -98,7 +106,37 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public void pipePut(FluidCollection collection, PipePutEvent event) {
+        if (tickThrottle.isThrottled()) {
+            return;
+        }
 
+        // get bucket or bottle from item collection
+        if (collection instanceof ItemCollection itemCollection) {
+            if (itemCollection.isTransferEmpty()) {
+                return;
+            }
+
+            //put(collection, getIngredientCapacity() - ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
+            this.<RefineryGui>put(null, getVolumeCapacity() - volumeAmount, getGuiInUse(), RefineryGui::updateAddedFilled, new HeapToStackAccess<>() {
+                @Override
+                public FluidStack get() {
+                    return null;
+                }
+
+                @Override
+                public void set(FluidStack val) {
+                    setVolumeAmount(volumeAmount + val.getAmount());
+                }
+            });
+        } else {
+            // its a fluid collection
+
+        }
+
+        // no empty bottle or not enough fluid to fill a bottle
+        if (volume == null || volume.getFluidRequires() > collection.getTransferAmount()) {
+            return;
+        }
     }
 
     @Override
@@ -113,7 +151,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public int getMaxTransfer() {
-        return filled.volume().getMat().getMaxStackSize();
+        return filled.getVolume().getMat().getMaxStackSize();
     }
 
     @Override
@@ -143,17 +181,20 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public List<ItemStack> take(int amount) {
-        return this.<RefineryGui>take(Math.min(getMaxTransfer(), amount), new ItemStack(filled.volume().getMat()), filledAmount, getGuiInUse(), RefineryGui::updateRemovedFilled, new HeapToStackAccess<>() {
-            @Override
-            public Integer get() {
-                return filledAmount;
-            }
+        if (filled != null) {
+            return this.<RefineryGui>take(Math.min(getMaxTransfer(), amount), filled.getOutputItemStack(), filledAmount, getGuiInUse(), RefineryGui::updateRemovedFilled, new HeapToStackAccess<>() {
+                @Override
+                public Integer get() {
+                    return filledAmount;
+                }
 
-            @Override
-            public void set(Integer val) {
-                setFilledAmount(filledAmount - val);
-            }
-        });
+                @Override
+                public void set(Integer val) {
+                    setFilledAmount(filledAmount - val);
+                }
+            });
+        }
+        return List.of();
     }
 
     public Volume getVolume() {
