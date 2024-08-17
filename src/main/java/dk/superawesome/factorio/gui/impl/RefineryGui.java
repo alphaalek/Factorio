@@ -54,17 +54,16 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
         return Volume.getType(item.getType()).isPresent();
     }
 
-    public void updateAddedEmpty(int amount) {
+    public void updateAddedVolume(int amount) {
         updateAddedItems(getInventory(), amount, new ItemStack(getMechanic().getVolume().getMat()), BOTTLES_SLOTS);
     }
 
-    public void updateRemovedEmpty(int amount) {
+    public void updateRemovedVolume(int amount) {
         updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getVolume().getMat()), reverseSlots(BOTTLES_SLOTS));
     }
 
     public void updateAddedFilled(int amount) {
         updateAddedItems(getInventory(), amount, getMechanic().getFilled().getOutputItemStack(), FILLED_BOTTLES_SLOTS);
-        updateRemovedEmpty(amount);
     }
 
     public void updateRemovedFilled(int amount) {

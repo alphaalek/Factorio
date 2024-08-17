@@ -43,7 +43,7 @@ public enum Filled {
             case WATER_BOTTLE -> {
                 ItemStack bottle = new ItemStack(Material.POTION);
                 ItemMeta meta = bottle.getItemMeta();
-                ((PotionMeta) meta).setBasePotionData(new PotionData(PotionType.WATER));
+                ((PotionMeta) meta).setBasePotionType(PotionType.WATER);
                 bottle.setItemMeta(meta);
                 yield bottle;
             }

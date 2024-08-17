@@ -7,10 +7,7 @@ import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.stackregistry.Filled;
 import dk.superawesome.factorio.mechanics.stackregistry.FluidStack;
 import dk.superawesome.factorio.mechanics.stackregistry.Volume;
-import dk.superawesome.factorio.mechanics.transfer.Container;
-import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
-import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
-import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
+import dk.superawesome.factorio.mechanics.transfer.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -37,6 +34,96 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     private int filledAmount;
     private Filled filled;
+
+    private final ItemContainer delegatedItemContainer = new ItemContainer() {
+
+        @Override
+        public boolean isContainerEmpty() {
+            return volume == null;
+        }
+
+        @Override
+        public void pipePut(ItemCollection collection, PipePutEvent event) {
+            ItemStack item = Optional.ofNullable(volume)
+                    .map(Volume::getMat)
+                    .map(ItemStack::new)
+                    .orElse(null);
+            if ((item == null || collection.has(item)) && volumeAmount < getVolumeCapacity()) {
+                //TODO: remember to check for filled items and it's different output
+//                Filled filled1 = Filled.getFilledState(volume, filled.getFluid()).orElse(null);
+//                if (filledAmount > 0 && filled1 != null && !filled1.getOutputItemStack().isSimilar(filled.getOutputItemStack())) {
+//                    return;
+//                }
+                int add = this.<RefineryGui>put(collection, getVolumeCapacity() - volumeAmount, getGuiInUse(), RefineryGui::updateAddedVolume, new HeapToStackAccess<ItemStack>() {
+                    @Override
+                    public ItemStack get() {
+                        if (volume == null || volumeAmount == 0) {
+                            return null;
+                        } else {
+                            return new ItemStack(volume.getMat());
+                        }
+                    }
+
+                    @Override
+                    public void set(ItemStack stack) {
+                        volume = Volume.getType(stack.getType()).orElse(null);
+                    }
+                });
+
+                if (add > 0) {
+                    volumeAmount += add;
+                    event.setTransferred(true);
+                }
+            }
+        }
+
+        @Override
+        public int getCapacity() {
+            return getVolumeCapacity();
+        }
+    };
+
+    private final FluidContainer delegatedFluidContainer = new FluidContainer() {
+
+        @Override
+        public boolean isContainerEmpty() {
+            return true; // always empty, because no fluid will be stored inside the mechanic
+        }
+
+        @Override
+        public void pipePut(FluidCollection collection, PipePutEvent event) {
+            // no empty bottle or not enough fluid to fill a bottle
+            if (volumeAmount == 0 || volume == null || volume.getFluidRequires() > collection.getTransferAmount()) {
+                return;
+            }
+
+            if ((filled == null || collection.hasFluid(filled.getFluid())) && filledAmount < getCapacity()) {
+                // is an allowed combination
+                if (Filled.getFilledState(volume, collection.getFluid()).isEmpty()) {
+                    return;
+                }
+                event.setTransferred(true);
+                int putAmount = Refinery.this.<RefineryGui>putFluid(collection, getCapacity() - filledAmount, getGuiInUse(), RefineryGui::updateAddedFilled, new HeapToStackAccess<>() {
+                    @Override
+                    public ItemStack get() {
+                        return filled == null ? null : filled.getOutputItemStack();
+                    }
+
+                    @Override
+                    public void set(ItemStack stack) {
+                        filled = Filled.getFilledStateByOutputItemStack(stack).orElse(null);
+                    }
+                });
+                setFilledAmount(getFilledAmount() + putAmount);
+                setBottleAmount(getBottleAmount() - putAmount);
+            }
+        }
+
+        @Override
+        public int getCapacity() {
+            return -1; // no capacity needed, because no fluid will be stored inside the mechanic
+        }
+    };
 
     public Refinery(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -114,73 +201,11 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
             return;
         }
 
-        // get a bucket or bottle from an item collection
         if (collection instanceof ItemCollection itemCollection) {
-            if (itemCollection.isTransferEmpty()) {
-                return;
-            }
-            if ((volume == null || itemCollection.has(new ItemStack(volume.getMat()))) && volumeAmount < getVolumeCapacity()) {
-                //TODO: remember to check for filled items and it's different output
-//                Filled filled1 = Filled.getFilledState(volume, filled.getFluid()).orElse(null);
-//                if (filledAmount > 0 && filled1 != null && !filled1.getOutputItemStack().isSimilar(filled.getOutputItemStack())) {
-//                    return;
-//                }
-                event.setTransferred(true);
-                volumeAmount += this.<RefineryGui>put(itemCollection, getVolumeCapacity() - volumeAmount, getGuiInUse(), RefineryGui::updateAddedEmpty, new HeapToStackAccess<>() {
-                    @Override
-                    public ItemStack get() {
-                        if (volume == null || volumeAmount == 0) {
-                            return null;
-                        } else {
-                            return new ItemStack(volume.getMat());
-                        }
-                    }
-
-                    @Override
-                    public void set(ItemStack stack) {
-                        volume = Volume.getType(stack.getType()).orElse(null);
-                    }
-                });
-            }
-
+            delegatedItemContainer.pipePut(itemCollection, event);
         } else if (collection instanceof FluidCollection fluidCollection) {
-            // its fluid collection
-
-            // no empty bottle or not enough fluid to fill a bottle
-            if (volumeAmount == 0 || volume == null || volume.getFluidRequires() > collection.getTransferAmount()) {
-                return;
-            }
-
-            if ((filled == null || fluidCollection.hasFluid(filled.getFluid())) && filledAmount < getCapacity()) {
-                // is an allowed combination
-                if (Filled.getFilledState(volume, fluidCollection.getFluid()).isEmpty()) {
-                    return;
-                }
-                event.setTransferred(true);
-                int putAmount = this.<RefineryGui>put(fluidCollection, getCapacity() - filledAmount, getGuiInUse(), RefineryGui::updateAddedFilled, new HeapToStackAccess<>() {
-                    @Override
-                    public ItemStack get() {
-                        return filled == null ? null : filled.getOutputItemStack();
-                    }
-
-                    @Override
-                    public void set(ItemStack stack) {
-                        filled = Filled.getFilledStateByOutputItemStack(stack).orElse(null);
-                    }
-                });
-                setFilledAmount(getFilledAmount() + putAmount);
-                setBottleAmount(getBottleAmount() - putAmount);
-            }
+            delegatedFluidContainer.pipePut(fluidCollection, event);
         }
-    }
-
-    private <G extends BaseGui<G>> int put(TransferCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, HeapToStackAccess<ItemStack> access) {
-        if (from instanceof FluidCollection fluidCollection) {
-            return putFluid(fluidCollection, take, inUse, doGui, access);
-        } else if (from instanceof ItemCollection itemCollection) {
-            return putItem(itemCollection, take, inUse, doGui, access);
-        }
-        return 0;
     }
 
     private <G extends BaseGui<G>> int putFluid(FluidCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, HeapToStackAccess<ItemStack> access) {
@@ -196,29 +221,6 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
             if (fluidStack.getAmount() >= volume.getFluidRequires()) {
                 add += 1;
                 fluidStack.setAmount(fluidStack.getAmount() - volume.getFluidRequires());
-            }
-        }
-
-        if (add > 0) {
-            G gui = inUse.get();
-            if (gui != null) {
-                doGui.accept(gui, add);
-            }
-        }
-
-        return add;
-    }
-
-    private <G extends BaseGui<G>> int putItem(ItemCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, HeapToStackAccess<ItemStack> access) {
-        List<ItemStack> items = from.take(take);
-        int add = 0;
-        for (ItemStack item : items) {
-            add += item.getAmount();
-
-            if (access.get() == null) {
-                ItemStack type = item.clone();
-                type.setAmount(1);
-                access.set(type);
             }
         }
 
@@ -259,7 +261,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public boolean isContainerEmpty() {
-        return filledAmount == 0 && volumeAmount == 0;
+        return delegatedFluidContainer.isContainerEmpty() && delegatedItemContainer.isContainerEmpty();
     }
 
     @Override
