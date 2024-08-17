@@ -2,10 +2,8 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.util.Array;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public interface StorageProvider<M extends Mechanic<M>> {
 

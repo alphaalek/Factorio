@@ -3,7 +3,6 @@ package dk.superawesome.factorio.mechanics.profiles.behaviour;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
-import dk.superawesome.factorio.gui.impl.ConstructorGui;
 import dk.superawesome.factorio.gui.impl.StorageBoxGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.StorageBox;

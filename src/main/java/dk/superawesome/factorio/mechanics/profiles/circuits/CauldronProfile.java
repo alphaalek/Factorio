@@ -4,7 +4,6 @@ import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.circuits.Cauldron;
-import dk.superawesome.factorio.mechanics.impl.circuits.Gate;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 

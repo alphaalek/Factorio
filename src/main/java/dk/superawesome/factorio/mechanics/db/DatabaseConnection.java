@@ -1,7 +1,6 @@
 package dk.superawesome.factorio.mechanics.db;
 
 import dk.superawesome.factorio.Factorio;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.sql.Connection;

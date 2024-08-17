@@ -8,7 +8,6 @@ import dk.superawesome.factorio.gui.MechanicStorageGui;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.mechanics.transfer.VirtualOneWayContainer;
 import dk.superawesome.factorio.util.statics.BlockUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

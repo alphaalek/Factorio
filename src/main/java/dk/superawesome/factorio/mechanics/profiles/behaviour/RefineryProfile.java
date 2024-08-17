@@ -7,7 +7,6 @@ import dk.superawesome.factorio.gui.impl.RefineryGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Refinery;
 import dk.superawesome.factorio.mechanics.stackregistry.Filled;
-import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
 import dk.superawesome.factorio.mechanics.stackregistry.Volume;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.util.Array;

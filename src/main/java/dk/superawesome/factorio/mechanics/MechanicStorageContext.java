@@ -3,7 +3,6 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.mechanics.db.MechanicController;
 import dk.superawesome.factorio.util.db.Query;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 

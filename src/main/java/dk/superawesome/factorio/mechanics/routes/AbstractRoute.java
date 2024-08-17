@@ -1,12 +1,11 @@
 package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.mechanics.SignalSource;
-import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
+import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -14,7 +13,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends OutputEntry> {

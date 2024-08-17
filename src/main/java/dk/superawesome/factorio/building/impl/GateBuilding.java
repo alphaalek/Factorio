@@ -8,7 +8,6 @@ import org.bukkit.Tag;
 import org.bukkit.util.BlockVector;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 

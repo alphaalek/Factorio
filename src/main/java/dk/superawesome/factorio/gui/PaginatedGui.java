@@ -1,7 +1,6 @@
 package dk.superawesome.factorio.gui;
 
 import dk.superawesome.factorio.util.Callback;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;

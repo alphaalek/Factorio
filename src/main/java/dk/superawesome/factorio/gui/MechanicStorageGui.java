@@ -2,7 +2,6 @@ package dk.superawesome.factorio.gui;
 
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.Storage;
-import dk.superawesome.factorio.mechanics.StorageProvider;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 

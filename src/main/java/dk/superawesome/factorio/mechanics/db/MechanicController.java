@@ -1,14 +1,12 @@
 package dk.superawesome.factorio.mechanics.db;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.mechanics.Management;
 import dk.superawesome.factorio.mechanics.MechanicSerializer;
 import dk.superawesome.factorio.mechanics.MechanicStorageContext;
 import dk.superawesome.factorio.util.Serializer;
 import dk.superawesome.factorio.util.db.Query;
 import dk.superawesome.factorio.util.db.Types;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
@@ -17,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 public class MechanicController {

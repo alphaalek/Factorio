@@ -4,7 +4,6 @@ import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.util.TickThrottle;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import java.util.concurrent.atomic.AtomicReference;
