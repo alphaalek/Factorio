@@ -37,6 +37,14 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
     }
 
     @Override
+    public void loadInputOutputItems() {
+        super.loadInputOutputItems();
+
+        if (getMechanic().getFilled() != null)
+            loadStorageTypes(getMechanic().getFilled().getOutputItemStack(), getMechanic().getFilledAmount(), FILLED_BOTTLES_SLOTS);
+    }
+
+    @Override
     public int getContext() {
         return 0;
     }
@@ -51,14 +59,15 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
     }
 
     public void updateRemovedEmpty(int amount) {
-        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getVolume().getMat()), BOTTLES_SLOTS);
+        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getVolume().getMat()), reverseSlots(BOTTLES_SLOTS));
     }
 
     public void updateAddedFilled(int amount) {
         updateAddedItems(getInventory(), amount, getMechanic().getFilled().getOutputItemStack(), FILLED_BOTTLES_SLOTS);
+        updateRemovedEmpty(amount);
     }
 
     public void updateRemovedFilled(int amount) {
-        updateRemovedItems(getInventory(), amount, getMechanic().getFilled().getOutputItemStack(), FILLED_BOTTLES_SLOTS);
+        updateRemovedItems(getInventory(), amount, getMechanic().getFilled().getOutputItemStack(), reverseSlots(FILLED_BOTTLES_SLOTS));
     }
 }

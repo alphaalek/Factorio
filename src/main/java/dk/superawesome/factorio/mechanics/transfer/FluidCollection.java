@@ -9,5 +9,7 @@ public interface FluidCollection extends TransferCollection {
 
     boolean hasFluid(Fluid fluid);
 
+    Fluid getFluid();
+
     FluidStack take(int amount);
 }

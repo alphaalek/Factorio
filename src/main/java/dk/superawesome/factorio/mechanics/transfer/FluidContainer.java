@@ -19,7 +19,7 @@ public interface FluidContainer extends Container<FluidCollection> {
             add = fluidStack.getAmount();
 
             if (access.get() == null) {
-                FluidStack type = fluidStack.clone();
+                FluidStack type = new FluidStack(fluidStack.getFluid(), fluidStack.getAmount());
                 type.setAmount(1);
                 access.set(type);
             }

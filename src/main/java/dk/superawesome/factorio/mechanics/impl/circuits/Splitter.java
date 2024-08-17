@@ -211,45 +211,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
                             return moneyCollection.getTransferEnergyCost();
                         }
                     };
-                } else if (collection instanceof FluidCollection fluidCollection) {
-                    wrappedCollection = new FluidCollection() {
-                        @Override
-                        public boolean hasFluid(Fluid fluid) {
-                            return fluidCollection.hasFluid(fluid);
-                        }
-
-                        @Override
-                        public FluidStack take(int amount) {
-                            return fluidCollection.take(amount);
-                        }
-
-                        @Override
-                        public boolean isTransferEmpty() {
-                            return fluidCollection.isTransferEmpty();
-                        }
-
-                        @Override
-                        public DelayHandler getTransferDelayHandler() {
-                            return fluidCollection.getTransferDelayHandler();
-                        }
-
-                        @Override
-                        public int getMaxTransfer() {
-                            return fluidCollection.getMaxTransfer();
-                        }
-
-                        @Override
-                        public int getTransferAmount() {
-                            return fluidCollection.getTransferAmount();
-                        }
-
-                        @Override
-                        public double getTransferEnergyCost() {
-                            return fluidCollection.getTransferEnergyCost();
-                        }
-                    };
-                }
-                else continue;
+                } else continue;
 
                 boolean transferred = Routes.startTransferRoute(block, wrappedCollection, true);
                 if (!event.transferred()) {

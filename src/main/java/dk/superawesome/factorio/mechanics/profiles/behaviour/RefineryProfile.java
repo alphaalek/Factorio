@@ -6,6 +6,8 @@ import dk.superawesome.factorio.gui.GuiFactory;
 import dk.superawesome.factorio.gui.impl.RefineryGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Refinery;
+import dk.superawesome.factorio.mechanics.stackregistry.Filled;
+import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
 import dk.superawesome.factorio.mechanics.stackregistry.Volume;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.util.Array;
@@ -42,12 +44,15 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
             .set(RefineryGui.EMPTY_BOTTLE_CONTEXT, RefineryGui.BOTTLES_SLOTS, mechanic -> new Storage() {
                 @Override
                 public ItemStack getStored() {
-                    return Optional.ofNullable(mechanic.getVolume()).map(Volume::getMat).map(ItemStack::new).orElse(null);
+                    return Optional.ofNullable(mechanic.getVolume()).
+                        map(Volume::getMat).
+                        map(ItemStack::new).
+                        orElse(null);
                 }
 
                 @Override
                 public void setStored(ItemStack stored) {
-                    mechanic.setVolume(Volume.getType(stored.getType()).orElse(null));
+                    Volume.getType(stored.getType()).ifPresent(mechanic::setVolume);
                 }
 
                 @Override
@@ -62,33 +67,35 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
 
                 @Override
                 public int getCapacity() {
-                    return mechanic.getCapacity();
+                    return mechanic.getVolumeCapacity();
                 }
             })
             .set(RefineryGui.FILLED_BOTTLE_CONTEXT, RefineryGui.FILLED_BOTTLES_SLOTS, mechanic -> new Storage() {
                 @Override
                 public ItemStack getStored() {
-                    return null;
+                    return Optional.ofNullable(mechanic.getFilled()).
+                        map(Filled::getOutputItemStack).
+                        orElse(null);
                 }
 
                 @Override
                 public void setStored(ItemStack stored) {
-
+                    Filled.getFilledStateByOutputItemStack(stored).ifPresent(mechanic::setFilled);
                 }
 
                 @Override
                 public int getAmount() {
-                    return 0;
+                    return mechanic.getFilledAmount();
                 }
 
                 @Override
                 public void setAmount(int amount) {
-
+                    mechanic.setFilledAmount(amount);
                 }
 
                 @Override
                 public int getCapacity() {
-                    return 0;
+                    return mechanic.getCapacity();
                 }
             })
             .build();
@@ -104,6 +111,7 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
         return MechanicLevel.Registry.Builder
                 .make(1)
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(12))
+                .mark(Refinery.VOLUME_MARK, Array.fromData(8))
                 .build();
     }
 

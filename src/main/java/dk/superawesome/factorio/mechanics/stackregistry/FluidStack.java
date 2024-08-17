@@ -2,7 +2,7 @@ package dk.superawesome.factorio.mechanics.stackregistry;
 
 public class FluidStack {
 
-    private final Fluid fluid;
+    private Fluid fluid;
     private int amount;
 
     public FluidStack(Fluid fluid, int amount) {
@@ -12,6 +12,10 @@ public class FluidStack {
 
     public Fluid getFluid() {
         return fluid;
+    }
+
+    public void setFluid(Fluid fluid) {
+        this.fluid = fluid;
     }
 
     public int getAmount() {
@@ -27,10 +31,6 @@ public class FluidStack {
     }
 
     public boolean isFull() {
-        return amount == fluid.getMaxTransfer();
-    }
-
-    public FluidStack clone() {
-        return new FluidStack(fluid, amount);
+        return fluid != null && amount == fluid.getMaxTransfer();
     }
 }
