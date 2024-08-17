@@ -215,18 +215,6 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         public Material getMat() {
             return type.getMat();
         }
-
-        public Types getType() {
-            return type;
-        }
-
-        public double getProduces() {
-            return produces;
-        }
-
-        public int getRequires() {
-            return requires;
-        }
     }
 
     public enum Types {

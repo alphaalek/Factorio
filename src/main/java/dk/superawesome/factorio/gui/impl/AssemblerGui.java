@@ -68,10 +68,10 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
     }
 
     public static String format(Assembler.Type type) {
-        if (type.getProduces() > type.getType().getProduces()) {
-            return "§a+" + (StringUtil.formatDecimals((type.getProduces() / type.getType().getProduces() - 1) * 100, 2)) + "%";
-        } else if (type.getProduces() < type.getType().getProduces()) {
-            return "§c-" + (StringUtil.formatDecimals((type.getType().getProduces() / type.getProduces() - 1) * 100, 2)) + "%";
+        if (type.produces() > type.type().getProduces()) {
+            return "§a+" + (StringUtil.formatDecimals((type.produces() / type.type().getProduces() - 1) * 100, 2)) + "%";
+        } else if (type.produces() < type.type().getProduces()) {
+            return "§c-" + (StringUtil.formatDecimals((type.type().getProduces() / type.produces() - 1) * 100, 2)) + "%";
         } else {
             return "§e~0%";
         }
