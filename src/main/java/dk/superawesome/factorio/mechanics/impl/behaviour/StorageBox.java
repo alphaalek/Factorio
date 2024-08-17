@@ -90,7 +90,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
 
     @Override
     public List<ItemStack> take(int amount) {
-        return this.<StorageBoxGui>take(Math.min(stored.getMaxStackSize(), amount), stored, this.amount, getGuiInUse(), StorageBoxGui::updateRemovedItems, new HeapToStackAccess<>() {
+        return this.<StorageBoxGui>take(Math.min(getMaxTransfer(), amount), stored, this.amount, getGuiInUse(), StorageBoxGui::updateRemovedItems, new HeapToStackAccess<>() {
             @Override
             public Integer get() {
                 return StorageBox.this.amount;

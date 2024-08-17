@@ -54,7 +54,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws IOException, SQLException {
+    public void load(MechanicStorageContext context) throws IOException, SQLException, ClassNotFoundException {
         ByteArrayInputStream str = context.getData();
 
         loadFuel(context, str);

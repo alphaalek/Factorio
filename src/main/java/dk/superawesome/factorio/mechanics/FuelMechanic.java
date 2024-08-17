@@ -137,7 +137,7 @@ public interface FuelMechanic {
         }
     }
 
-    default void loadFuel(MechanicStorageContext context, ByteArrayInputStream str) throws IOException {
+    default void loadFuel(MechanicStorageContext context, ByteArrayInputStream str) throws IOException, ClassNotFoundException {
         ItemStack fuel = context.getSerializer().readItemStack(str);
         if (fuel != null) {
             setFuel(Fuel.getFuel(fuel.getType()));

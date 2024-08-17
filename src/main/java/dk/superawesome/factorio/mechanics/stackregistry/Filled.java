@@ -4,50 +4,48 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public enum Filled {
 
-    WATER_BUCKET(Volume.BUCKET, Fluid.WATER),
-    LAVA_BUCKET(Volume.BUCKET, Fluid.LAVA),
-    WATER_BOTTLE(Volume.BOTTLE, Fluid.WATER);
+    WATER_BUCKET(Volume.BUCKET, Fluid.WATER, () -> new ItemStack(Material.WATER_BUCKET)),
+    LAVA_BUCKET(Volume.BUCKET, Fluid.LAVA, () -> new ItemStack(Material.LAVA_BUCKET)),
+    WATER_BOTTLE(Volume.BOTTLE, Fluid.WATER, () -> {
+        ItemStack bottle = new ItemStack(Material.POTION);
+        ItemMeta meta = bottle.getItemMeta();
+        ((PotionMeta) meta).setBasePotionType(PotionType.WATER);
+        bottle.setItemMeta(meta);
+        return bottle;
+    });
 
     private final Volume volume;
     private final Fluid fluid;
+    private final Supplier<ItemStack> stack;
 
-    Filled(Volume volume, Fluid fluid) {
+    Filled(Volume volume, Fluid fluid, Supplier<ItemStack> stack) {
         this.volume = volume;
         this.fluid = fluid;
+        this.stack = stack;
     }
 
     public static Optional<Filled> getFilledState(Volume volume, Fluid fluid) {
         return Arrays.stream(values())
-            .filter(filled -> filled.getVolume().equals(volume) && filled.getFluid().equals(fluid))
-            .findFirst();
+                .filter(filled -> filled.getVolume().equals(volume) && filled.getFluid().equals(fluid))
+                .findFirst();
     }
 
-    public static Optional<Filled> getFilledStateByOutputItemStack(ItemStack itemStack) {
+    public static Optional<Filled> getFilledStateByStack(ItemStack itemStack) {
         return Arrays.stream(values())
-            .filter(filled -> filled.getOutputItemStack().isSimilar(itemStack))
-            .findFirst();
+                .filter(filled -> filled.getOutputItemStack().isSimilar(itemStack))
+                .findFirst();
     }
 
     public ItemStack getOutputItemStack() {
-        return switch (this) {
-            case WATER_BUCKET -> new ItemStack(Material.WATER_BUCKET);
-            case LAVA_BUCKET -> new ItemStack(Material.LAVA_BUCKET);
-            case WATER_BOTTLE -> {
-                ItemStack bottle = new ItemStack(Material.POTION);
-                ItemMeta meta = bottle.getItemMeta();
-                ((PotionMeta) meta).setBasePotionType(PotionType.WATER);
-                bottle.setItemMeta(meta);
-                yield bottle;
-            }
-        };
+        return stack.get();
     }
 
     public Volume getVolume() {

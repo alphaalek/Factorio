@@ -40,7 +40,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws SQLException, IOException {
+    public void load(MechanicStorageContext context) throws SQLException, IOException, ClassNotFoundException {
         ByteArrayInputStream data = context.getData();
         ItemStack item = context.getSerializer().readItemStack(data);
         if (item != null) {

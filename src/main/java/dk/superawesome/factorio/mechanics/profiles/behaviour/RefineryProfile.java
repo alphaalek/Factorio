@@ -79,7 +79,7 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
 
                 @Override
                 public void setStored(ItemStack stored) {
-                    Filled.getFilledStateByOutputItemStack(stored).ifPresent(mechanic::setFilled);
+                    Filled.getFilledStateByStack(stored).ifPresent(mechanic::setFilled);
                 }
 
                 @Override

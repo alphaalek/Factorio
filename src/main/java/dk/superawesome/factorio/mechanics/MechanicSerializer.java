@@ -1,8 +1,10 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.util.db.Query;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -26,21 +28,30 @@ public class MechanicSerializer {
         writeLong(stream, uuid.getLeastSignificantBits());
     }
 
-    public void writeItemStack(ByteArrayOutputStream stream, ItemStack item) throws IOException {
-        if (item == null || item.getType() == Material.AIR) {
+    public void writeItemStack(ByteArrayOutputStream stream, ItemStack stack) throws IOException {
+        if (stack == null || stack.getType() == Material.AIR) {
             stream.write(0);
             return;
         }
 
-        String mat = item.getType().name();
+        String mat = stack.getType().name();
         byte[] bytes = mat.getBytes(StandardCharsets.UTF_8);
         stream.write(bytes.length);
         stream.write(bytes, 0, bytes.length);
-        writeInt(stream, item.getAmount());
+        writeInt(stream, stack.getAmount());
+
+        if (stack.hasItemMeta()) {
+            writeInt(stream, 1);
+            ObjectOutputStream output = new ObjectOutputStream(stream);
+            output.writeObject(stack.getItemMeta());
+        } else {
+            writeInt(stream, 0);
+        }
     }
 
-    public ItemStack readItemStack(ByteArrayInputStream stream) throws IOException {
+    public ItemStack readItemStack(ByteArrayInputStream stream) throws IOException, ClassNotFoundException {
         int l = stream.read();
+        boolean hasMeta = stream.read() == 1;
         if (l > 0) {
             byte[] buf = new byte[l];
             int len = stream.read(buf, 0, l);
@@ -48,7 +59,14 @@ public class MechanicSerializer {
             int a = readInt(stream);
             if (len == l && a > 0) {
                 String mat = new String(buf);
-                return new ItemStack(Material.valueOf(mat), a);
+                ItemStack stack = new ItemStack(Material.valueOf(mat), a);
+
+                if (hasMeta) {
+                    ObjectInputStream input = new ObjectInputStream(stream);
+                    stack.setItemMeta((ItemMeta) input.readObject());
+                }
+
+                return stack;
             }
         }
 

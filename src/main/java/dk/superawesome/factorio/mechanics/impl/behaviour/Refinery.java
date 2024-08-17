@@ -111,7 +111,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
                     @Override
                     public void set(ItemStack stack) {
-                        filled = Filled.getFilledStateByOutputItemStack(stack).orElse(null);
+                        filled = Filled.getFilledStateByStack(stack).orElse(null);
                     }
                 });
                 setFilledAmount(getFilledAmount() + putAmount);
@@ -143,7 +143,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         this.filledAmount = context.getSerializer().readInt(str);
         ItemStack filledStack = context.getSerializer().readItemStack(str);
         if (filledStack != null) {
-            this.filled = Filled.getFilledStateByOutputItemStack(filledStack).orElse(null);
+            this.filled = Filled.getFilledStateByStack(filledStack).orElse(null);
             if (this.filled == null) {
                 // invalid filled state
                 this.filledAmount = 0;
@@ -179,20 +179,20 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     public int getVolumeCapacity() {
         return level.getInt(VOLUME_MARK) *
-            Optional.ofNullable(volume)
-                .map(Volume::getMat)
-                .map(Material::getMaxStackSize)
-                .orElse(64);
+                Optional.ofNullable(volume)
+                        .map(Volume::getMat)
+                        .map(Material::getMaxStackSize)
+                        .orElse(64);
     }
 
     @Override
     public int getCapacity() {
         return level.getInt(ItemCollection.CAPACITY_MARK) *
-            Optional.ofNullable(filled)
-                .map(Filled::getVolume)
-                .map(Volume::getMat)
-                .map(Material::getMaxStackSize)
-                .orElse(64);
+                Optional.ofNullable(filled)
+                        .map(Filled::getVolume)
+                        .map(Volume::getMat)
+                        .map(Material::getMaxStackSize)
+                        .orElse(64);
     }
 
     @Override
@@ -281,20 +281,17 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public List<ItemStack> take(int amount) {
-        if (filledAmount > 0) {
-            return this.<RefineryGui>take(Math.min(getMaxTransfer(), amount), filled.getOutputItemStack(), filledAmount, getGuiInUse(), RefineryGui::updateRemovedFilled, new HeapToStackAccess<>() {
-                @Override
-                public Integer get() {
-                    return filledAmount;
-                }
+        return this.<RefineryGui>take(Math.min(getMaxTransfer(), amount), filled.getOutputItemStack(), filledAmount, getGuiInUse(), RefineryGui::updateRemovedFilled, new HeapToStackAccess<>() {
+            @Override
+            public Integer get() {
+                return filledAmount;
+            }
 
-                @Override
-                public void set(Integer val) {
-                    setFilledAmount(filledAmount - val);
-                }
-            });
-        }
-        return List.of();
+            @Override
+            public void set(Integer val) {
+                setFilledAmount(filledAmount - val);
+            }
+        });
     }
 
     public Volume getVolume() {
