@@ -6,6 +6,8 @@ import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeBuildEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeRemoveEvent;
+import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
+import dk.superawesome.factorio.mechanics.stackregistry.FluidStack;
 import dk.superawesome.factorio.mechanics.transfer.*;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
@@ -209,7 +211,45 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
                             return moneyCollection.getTransferEnergyCost();
                         }
                     };
-                } else continue;
+                } else if (collection instanceof FluidCollection fluidCollection) {
+                    wrappedCollection = new FluidCollection() {
+                        @Override
+                        public boolean hasFluid(Fluid fluid) {
+                            return fluidCollection.hasFluid(fluid);
+                        }
+
+                        @Override
+                        public FluidStack take(int amount) {
+                            return fluidCollection.take(amount);
+                        }
+
+                        @Override
+                        public boolean isTransferEmpty() {
+                            return fluidCollection.isTransferEmpty();
+                        }
+
+                        @Override
+                        public DelayHandler getTransferDelayHandler() {
+                            return fluidCollection.getTransferDelayHandler();
+                        }
+
+                        @Override
+                        public int getMaxTransfer() {
+                            return fluidCollection.getMaxTransfer();
+                        }
+
+                        @Override
+                        public int getTransferAmount() {
+                            return fluidCollection.getTransferAmount();
+                        }
+
+                        @Override
+                        public double getTransferEnergyCost() {
+                            return fluidCollection.getTransferEnergyCost();
+                        }
+                    };
+                }
+                else continue;
 
                 boolean transferred = Routes.startTransferRoute(block, wrappedCollection, true);
                 if (!event.transferred()) {
