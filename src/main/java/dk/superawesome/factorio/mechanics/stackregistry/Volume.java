@@ -28,7 +28,7 @@ public enum Volume {
         return fluidRequires;
     }
 
-    public static Optional<Volume> getType(Material type) {
+    public static Optional<Volume> getTypeFromMaterial(Material type) {
         return Arrays.stream(values()).filter(volume -> volume.getMat().equals(type)).findFirst();
     }
 }

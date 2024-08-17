@@ -12,15 +12,15 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
 
-    public static final int EMPTY_BOTTLE_CONTEXT = 0;
-    public static final int FILLED_BOTTLE_CONTEXT = 1;
+    public static final int VOLUME_CONTEXT = 0;
+    public static final int FILLED_CONTEXT = 1;
 
 
-    public static final List<Integer> BOTTLES_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
-    public static final List<Integer> FILLED_BOTTLES_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40, 46, 47, 48, 49);
+    public static final List<Integer> VOLUME_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
+    public static final List<Integer> FILLED_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40, 46, 47, 48, 49);
 
     public RefineryGui(Refinery mechanic, AtomicReference<RefineryGui> inUseReference) {
-        super(mechanic, inUseReference, new InitCallbackHolder(), BOTTLES_SLOTS);
+        super(mechanic, inUseReference, new InitCallbackHolder(), VOLUME_SLOTS);
         initCallback.call();
     }
 
@@ -41,32 +41,32 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
         super.loadInputOutputItems();
 
         if (getMechanic().getFilled() != null)
-            loadStorageTypes(getMechanic().getFilled().getOutputItemStack(), getMechanic().getFilledAmount(), FILLED_BOTTLES_SLOTS);
+            loadStorageTypes(getMechanic().getFilled().getOutputItemStack(), getMechanic().getFilledAmount(), FILLED_SLOTS);
     }
 
     @Override
     public int getContext() {
-        return 0;
+        return VOLUME_CONTEXT;
     }
 
     @Override
     protected boolean isItemAllowed(ItemStack item) {
-        return Volume.getType(item.getType()).isPresent();
+        return Volume.getTypeFromMaterial(item.getType()).isPresent();
     }
 
     public void updateAddedVolume(int amount) {
-        updateAddedItems(getInventory(), amount, new ItemStack(getMechanic().getVolume().getMat()), BOTTLES_SLOTS);
+        updateAddedItems(getInventory(), amount, new ItemStack(getMechanic().getVolume().getMat()), VOLUME_SLOTS);
     }
 
     public void updateRemovedVolume(int amount) {
-        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getVolume().getMat()), reverseSlots(BOTTLES_SLOTS));
+        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getVolume().getMat()), reverseSlots(VOLUME_SLOTS));
     }
 
     public void updateAddedFilled(int amount) {
-        updateAddedItems(getInventory(), amount, getMechanic().getFilled().getOutputItemStack(), FILLED_BOTTLES_SLOTS);
+        updateAddedItems(getInventory(), amount, getMechanic().getFilled().getOutputItemStack(), FILLED_SLOTS);
     }
 
     public void updateRemovedFilled(int amount) {
-        updateRemovedItems(getInventory(), amount, getMechanic().getFilled().getOutputItemStack(), reverseSlots(FILLED_BOTTLES_SLOTS));
+        updateRemovedItems(getInventory(), amount, getMechanic().getFilled().getOutputItemStack(), reverseSlots(FILLED_SLOTS));
     }
 }

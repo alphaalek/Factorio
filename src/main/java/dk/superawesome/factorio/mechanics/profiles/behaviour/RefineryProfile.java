@@ -40,28 +40,28 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
     @Override
     public StorageProvider<Refinery> getStorageProvider() {
         return StorageProvider.Builder.<Refinery>makeContext()
-            .set(RefineryGui.EMPTY_BOTTLE_CONTEXT, RefineryGui.BOTTLES_SLOTS, mechanic -> new Storage() {
+            .set(RefineryGui.VOLUME_CONTEXT, RefineryGui.VOLUME_SLOTS, mechanic -> new Storage() {
                 @Override
                 public ItemStack getStored() {
-                    return Optional.ofNullable(mechanic.getVolume()).
-                        map(Volume::getMat).
-                        map(ItemStack::new).
-                        orElse(null);
+                    return Optional.ofNullable(mechanic.getVolume())
+                            .map(Volume::getMat)
+                            .map(ItemStack::new)
+                            .orElse(null);
                 }
 
                 @Override
                 public void setStored(ItemStack stored) {
-                    Volume.getType(stored.getType()).ifPresent(mechanic::setVolume);
+                    Volume.getTypeFromMaterial(stored.getType()).ifPresent(mechanic::setVolume);
                 }
 
                 @Override
                 public int getAmount() {
-                    return mechanic.getBottleAmount();
+                    return mechanic.getVolumeAmount();
                 }
 
                 @Override
                 public void setAmount(int amount) {
-                    mechanic.setBottleAmount(amount);
+                    mechanic.setVolumeAmount(amount);
                 }
 
                 @Override
@@ -69,7 +69,7 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
                     return mechanic.getVolumeCapacity();
                 }
             })
-            .set(RefineryGui.FILLED_BOTTLE_CONTEXT, RefineryGui.FILLED_BOTTLES_SLOTS, mechanic -> new Storage() {
+            .set(RefineryGui.FILLED_CONTEXT, RefineryGui.FILLED_SLOTS, mechanic -> new Storage() {
                 @Override
                 public ItemStack getStored() {
                     return Optional.ofNullable(mechanic.getFilled()).
