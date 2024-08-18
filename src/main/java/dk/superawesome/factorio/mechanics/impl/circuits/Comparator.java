@@ -23,10 +23,7 @@ import java.util.List;
 
 public class Comparator extends SignalTrigger<Comparator> implements ThinkingMechanic {
 
-    private final List<Block> levers = new ArrayList<>();
-
     private TransferCollection collectionTrigger;
-    private boolean powered;
 
     public Comparator(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -49,9 +46,7 @@ public class Comparator extends SignalTrigger<Comparator> implements ThinkingMec
             powered = false;
         } else return;
 
-        for (Block lever : levers) {
-            triggerLever(lever, powered);
-        }
+        triggerLevers();
     }
 
     @Override

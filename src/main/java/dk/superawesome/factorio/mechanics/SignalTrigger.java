@@ -6,8 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Switch;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,18 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
         Switch lever = (Switch) block.getBlockData();
         lever.setPowered(powered);
         block.setBlockData(lever);
+    }
+
+    @EventHandler
+    public void onLeverPull(PlayerInteractEvent event) {
+        if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.LEVER) {
+            for (BlockFace face : Routes.RELATIVES) {
+                if (loc.getBlock().getRelative(face).equals(event.getClickedBlock())) {
+                    powered = !((Switch)loc.getBlock().getRelative(face).getBlockData()).isPowered();
+                    break;
+                }
+            }
+        }
     }
 
     protected void handleBlockPlace(BlockPlaceEvent event) {
@@ -57,4 +71,10 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     public abstract void onBlockPlace(BlockPlaceEvent event);
 
     public abstract void onBlockBreak(BlockBreakEvent event);
+
+    protected void triggerLevers() {
+        for (Block lever : levers) {
+            triggerLever(lever, powered);
+        }
+    }
 }
