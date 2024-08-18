@@ -2,8 +2,8 @@ package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Refinery;
+import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
 import dk.superawesome.factorio.mechanics.stackregistry.Volume;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -30,18 +30,33 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
         for (int i : Arrays.asList(0, 5, 6, 7, 8, 9, 14, 15, 16, 17, 18, 23, 24, 25, 26, 27, 32, 33, 34, 35, 36, 41, 42, 43, 44, 45, 50)) {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
-        for (int i : Arrays.asList(19, 20, 21, 22)) {
-            getInventory().setItem(i, new ItemStack(Material.BLUE_STAINED_GLASS_PANE));
-        }
+        loadFluidGlass();
 
         super.loadItems();
+    }
+
+    private void loadFluidGlass() {
+        if (getMechanic().getFilled() == null)
+            for (int i : Arrays.asList(19, 20, 21, 22)) {
+                getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+            }
+        else {
+            Fluid fluid = getMechanic().getFilled().getFluid();
+            ItemStack fluidGlass = switch (fluid) {
+                case WATER -> new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE);
+                case LAVA -> new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
+                case SNOW -> new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
+            };
+            for (int i : Arrays.asList(19, 20, 21, 22)) {
+                getInventory().setItem(i, fluidGlass);
+            }
+        }
     }
 
     @Override
     public void loadInputOutputItems() {
         super.loadInputOutputItems();
 
-        Bukkit.broadcastMessage(getMechanic().getFilled() + " " + getMechanic().getFilledAmount());
         if (getMechanic().getFilled() != null) {
             loadStorageTypes(getMechanic().getFilled().getOutputItemStack(), getMechanic().getFilledAmount(), FILLED_SLOTS);
         }
