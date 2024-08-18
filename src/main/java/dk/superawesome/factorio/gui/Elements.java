@@ -166,6 +166,15 @@ public class Elements {
                     if (item != null && item.getType() == Material.PLAYER_HEAD && item.hasItemMeta()) {
                         String name = item.getItemMeta().getDisplayName();
                         UUID uuid = Bukkit.getOfflinePlayer(name).getUniqueId();
+                        if (mechanic.getManagement().getOwner().equals(uuid)) {
+                            if (player.getUniqueId().equals(uuid)) {
+                                player.sendMessage("§cDu kan ikke fjerne dig selv fra maskinen!");
+                            } else {
+                                player.sendMessage("§cDu kan ikke fjerne ejeren af maskinen!");
+                            }
+                            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+                            return true;
+                        }
                         mechanic.getManagement().getMembers().remove(uuid);
                         loadView();
 
