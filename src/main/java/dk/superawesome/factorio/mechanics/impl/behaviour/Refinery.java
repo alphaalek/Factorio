@@ -6,7 +6,6 @@ import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.stackregistry.Filled;
 import dk.superawesome.factorio.mechanics.stackregistry.Volume;
 import dk.superawesome.factorio.mechanics.transfer.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -99,9 +98,6 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
             }
 
             if ((filled == null || collection.hasFluid(filled.getFluid())) && filledAmount < Refinery.this.getCapacity()) {
-                filledAmount++;
-                setVolumeAmount(volumeAmount - 1); // can potentially be zero
-
                 if (filled == null) {
                     // update filled type if not set
                     filled = Filled.getFilledState(volume, collection.getFluid()).orElseThrow(IllegalStateException::new);
@@ -109,6 +105,10 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
                 // take fluid after updating filled state if not set
                 collection.take(volume.getFluidRequires());
+
+                // update filled amount
+                filledAmount++;
+                setVolumeAmount(volumeAmount - 1);
 
                 // update items in gui if in use
                 RefineryGui gui = Refinery.this.<RefineryGui>getGuiInUse().get();
