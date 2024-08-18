@@ -60,10 +60,14 @@ public class Elements {
 
                 @Override
                 public List<OfflinePlayer> getValues() {
-                    return mechanic.getManagement().getMembers().stream()
+                    List<OfflinePlayer> members = new ArrayList<>();
+                    members.add(Bukkit.getOfflinePlayer(mechanic.getManagement().getOwner()));
+                    mechanic.getManagement().getMembers().stream()
                             .map(Bukkit::getOfflinePlayer)
                             .sorted(Collections.reverseOrder(Comparator.comparing(p -> Optional.ofNullable(p.getName()).orElse(""))))
-                            .collect(Collectors.toList());
+                            .forEach(members::add);
+
+                    return members;
                 }
 
                 @Override
@@ -129,18 +133,10 @@ public class Elements {
                                     if (!name.isEmpty()) {
                                         List<OfflinePlayer> members = getValues();
                                         // check if this player is already a member
-                                        if (
-                                            // check owner
-                                            (Optional.ofNullable(mechanic.getManagement().getOwner())
-                                                    .map(Bukkit::getOfflinePlayer)
-                                                    .map(OfflinePlayer::getName)
-                                                    .orElse("").equalsIgnoreCase(name)
-                                                    ||
-                                            // check members
-                                            members.stream()
-                                                    .map(OfflinePlayer::getName)
-                                                    .filter(Objects::nonNull)
-                                                    .anyMatch(name::equalsIgnoreCase))) {
+                                        if (members.stream()
+                                                .map(OfflinePlayer::getName)
+                                                .filter(Objects::nonNull)
+                                                .anyMatch(name::equalsIgnoreCase)) {
                                             player.sendMessage("§cSpilleren " + name + " er allerede medlem af maskinen!");
                                             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                                             return post;
