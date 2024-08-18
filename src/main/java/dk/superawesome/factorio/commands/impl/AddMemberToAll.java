@@ -18,6 +18,7 @@ public class AddMemberToAll extends AbstractCommand {
         MechanicManager manager = Factorio.get().getMechanicManager(player.getWorld());
         List<Mechanic<?>> owned = manager.getAllMechanics().stream()
                 .filter(m -> m.getManagement().hasAccess(player, Management.MODIFY_MEMBERS))
+                .filter(m -> !player.isOp() || m.getManagement().getOwner().equals(player.getUniqueId()))
                 .toList();
         if (owned.isEmpty()) {
             player.sendMessage("§cDu har ingen maskiner i verdenen " + player.getWorld().getName() + ".");

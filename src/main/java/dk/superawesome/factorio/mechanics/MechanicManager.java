@@ -227,6 +227,15 @@ public class MechanicManager implements Listener {
         Buildings.build(sign.getWorld(), mechanic);
         mechanic.onBlocksLoaded();
 
+        try {
+            for (UUID defaultMember : Factorio.get().getMechanicController().getDefaultMembersFor(owner.getUniqueId())) {
+                mechanic.getManagement().getMembers().add(defaultMember);
+            }
+        } catch (SQLException ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "A SQL error occurred!", ex);
+            owner.sendMessage("§cDer opstod en fejl ved tilføjelse af standard medlemmer.");
+        }
+
         // play sound
         sign.getWorld().playSound(sign.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.675f, 1f);
         return MechanicBuildResponse.SUCCESS;

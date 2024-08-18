@@ -23,7 +23,7 @@ public class ListDefaultMembers extends AbstractCommand {
 
             player.sendMessage("§eDu har følgende standard medlemmer for dine nybyggede maskiner (" + members.size() + "):");
             for (UUID member : members) {
-                player.sendMessage(" " + Bukkit.getOfflinePlayer(member).getName() + " (" + member + ")");
+                player.sendMessage(" §e" + Bukkit.getOfflinePlayer(member).getName() + " (" + member + ")");
             }
         } catch (SQLException ex) {
             Bukkit.getLogger().log(Level.SEVERE, "A SQL error occurred!", ex);

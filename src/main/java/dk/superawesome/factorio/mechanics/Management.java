@@ -5,9 +5,7 @@ import org.bukkit.entity.Player;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Management {
 
@@ -31,7 +29,7 @@ public class Management {
         public Management deserialize(ByteArrayInputStream stream) throws IOException {
             UUID owner = mechanicSerializer.readUUID(stream);
 
-            List<UUID> members = new ArrayList<>();
+            Set<UUID> members = new HashSet<>();
             int size = mechanicSerializer.readInt(stream);
             for (int i = 0; i < size; i++) {
                 UUID member = mechanicSerializer.readUUID(stream);
@@ -62,22 +60,22 @@ public class Management {
     }
 
     private final UUID owner;
-    private final List<UUID> members;
+    private final Set<UUID> members;
 
-    public Management(UUID owner, List<UUID> members) {
+    public Management(UUID owner, Set<UUID> members) {
         this.owner = owner;
         this.members = members;
     }
 
     public Management(UUID owner) {
-        this(owner, new ArrayList<>());
+        this(owner, new HashSet<>());
     }
 
     public UUID getOwner() {
         return this.owner;
     }
 
-    public List<UUID> getMembers() {
+    public Set<UUID> getMembers() {
         return this.members;
     }
 

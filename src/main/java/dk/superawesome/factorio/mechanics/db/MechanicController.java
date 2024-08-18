@@ -43,8 +43,8 @@ public class MechanicController {
         Query createDefualtMembers = new Query(
                 "CREATE TABLE IF NOT EXISTS mechanics_defaultMembers (" +
                 "id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, " +
-                "playerId INT NOT NULL, " +
-                "defaultMemberPlayerId INT NOT NULL);");
+                "playerUUID VARCHAR(36) NOT NULL, " +
+                "defaultMemberPlayerUUID VARCHAR(36) NOT NULL)");
 
         try {
             createMechanics.execute(this.connection);
@@ -64,10 +64,9 @@ public class MechanicController {
 
     public List<UUID> getDefaultMembersFor(UUID uuid) throws SQLException {
         Query query = new Query(
-                "SELECT p.uuid AS member " +
-                "FROM mechanics_defaultMembers dm " +
-                "LEFT JOIN players p ON p.id = dm.playerId " +
-                "WHERE p.uuid = ?")
+                "SELECT defaultMemberPlayerUUID AS member " +
+                "FROM mechanics_defaultMembers " +
+                "WHERE playerUUID = ?")
                 .add(uuid.toString());
 
         List<UUID> members = new ArrayList<>();
@@ -81,28 +80,24 @@ public class MechanicController {
                 .orElse(members);
     }
 
-    public void addDefaultMemberFor(UUID uuid, UUID member) throws SQLException {
+    public boolean addDefaultMemberFor(UUID uuid, UUID member) throws SQLException {
         Query query = new Query(
-                "INSERT INTO mechanics_defaultMembers dm (playerId, defaultMemberPlayerId) " +
-                "SELECT p1.id, p2.id " +
-                "FROM players p1, players p2 " +
-                "WHERE p1.uuid = ? AND p2.uuid = ?")
+                "INSERT INTO mechanics_defaultMembers (playerUUID, defaultMemberPlayerUUID) " +
+                "VALUES (?, ?)")
                 .add(uuid.toString())
                 .add(member.toString());
 
-        query.execute(this.connection);
+        return query.execute(this.connection);
     }
 
-    public void removeDefaultMemberFor(UUID uuid, UUID member) throws SQLException {
+    public boolean removeDefaultMemberFor(UUID uuid, UUID member) throws SQLException {
         Query query = new Query(
-                "DELETE FROM mechanics_defaultMembers dm " +
-                "WHERE p1.uuid = ? AND p2.uuid = ? " +
-                "LEFT JOIN players p1 ON p1.id = dm.playerId " +
-                "LEFT JOIN players p2 ON p2.id = dm.defaultMemberPlayerId")
+                "DELETE FROM mechanics_defaultMembers " +
+                "WHERE playerUUID = ? AND defaultMemberPlayerUUID = ?")
                 .add(uuid.toString())
                 .add(member.toString());
 
-        query.execute(this.connection);
+        return query.execute(this.connection);
     }
 
     public void deleteAt(Location location) throws SQLException {

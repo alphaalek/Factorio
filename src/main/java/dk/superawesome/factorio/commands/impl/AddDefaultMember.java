@@ -25,6 +25,11 @@ public class AddDefaultMember extends AbstractCommand {
         }
 
         try {
+            if (Factorio.get().getMechanicController().getDefaultMembersFor(player.getUniqueId()).contains(target.get().getUniqueId())) {
+                player.sendMessage("§cSpilleren " + target.get().getName() + " er allerede iblandt dine standard medlemmer.");
+                return;
+            }
+
             Factorio.get().getMechanicController().addDefaultMemberFor(player.getUniqueId(), target.get().getUniqueId());
             player.sendMessage("§eDu tilføjede " + target.get().getName() + " som standard medlem for dine nybyggede maskiner.");
         } catch (SQLException ex) {

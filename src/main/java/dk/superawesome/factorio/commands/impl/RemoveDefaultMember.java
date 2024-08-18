@@ -25,6 +25,11 @@ public class RemoveDefaultMember extends AbstractCommand {
         }
 
         try {
+            if (!Factorio.get().getMechanicController().getDefaultMembersFor(player.getUniqueId()).contains(target.get().getUniqueId())) {
+                player.sendMessage("§cSpilleren " + target.get().getName() + " er ikke iblandt dine standard medlemmer.");
+                return;
+            }
+
             Factorio.get().getMechanicController().removeDefaultMemberFor(player.getUniqueId(), target.get().getUniqueId());
             player.sendMessage("§eDu fjernede " + target.get().getName() + " som standard medlem for dine nybyggede maskiner.");
         } catch (SQLException ex) {
