@@ -232,7 +232,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         COOKIE(Material.COOKIE, 32, 2),
         DAYLIGHT(Material.DAYLIGHT_DETECTOR, 9, 9),
         HOPPER(Material.HOPPER, 4, 9),
-        FISH(Material.COOKED_SALMON, 5, 7.15),
+        FISH(Material.COOKED_SALMON, 5, 6.65),
         BOOKSHELF(Material.BOOKSHELF, 9, 9),
         BEETROOT_SOUP(Material.BEETROOT_SOUP, 8, 5.25),
         TNT(Material.TNT, 9, 9),
