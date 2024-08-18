@@ -1,5 +1,19 @@
 name: Factorio
 version: 1.0
-author: Alek05
+authors: [Alek05, MartinErSej]
 api-version: 1.13
 main: dk.superawesome.factorio.Factorio
+
+commands:
+  addmembertoall:
+    usage: /addmembertoall <spiller>
+    description: Tilføj en spiller som medlem til alle dine maskiner.
+  listdefaultmembers:
+    usage: /listdefaultmembers
+    description: Se en liste af alle standard medlemmer af dine nybyggede maskiner.
+  adddefaultmember:
+    usage: /adddefaultmember <spiller>
+    description: Tilføj en spiller som standard medlem af dine nybyggede maskiner.
+  removedefaultmember:
+    usage: /removedefaultmember <spiller>
+    description: Fjern en spiller som standard medlem af dine nybyggede maskiner.

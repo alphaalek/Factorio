@@ -13,6 +13,8 @@ import org.bukkit.block.BlockFace;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -28,7 +30,7 @@ public class MechanicController {
         this.mechanicSerializer = mechanicSerializer;
         this.managementSerializer = managementSerializer;
 
-        Query query = new Query(
+        Query createMechanics = new Query(
                 "CREATE TABLE IF NOT EXISTS mechanics (" +
                 "id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, " +
                 "type VARCHAR(16) NOT NULL, " +
@@ -36,13 +38,19 @@ public class MechanicController {
                 "rotation ENUM('NORTH', 'EAST', 'SOUTH', 'WEST') NOT NULL, " +
                 "level INT DEFAULT 1, " +
                 "management TEXT, " +
-                "data TEXT)"
-        );
+                "data TEXT);");
+
+        Query createDefualtMembers = new Query(
+                "CREATE TABLE IF NOT EXISTS mechanics_defaultMembers (" +
+                "id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, " +
+                "playerId INT NOT NULL, " +
+                "defaultMemberPlayerId INT NOT NULL);");
 
         try {
-            query.execute(this.connection);
+            createMechanics.execute(this.connection);
+            createDefualtMembers.execute(this.connection);
         } catch (SQLException ex) {
-            Factorio.get().getLogger().log(Level.SEVERE, "Failed to create table!", ex);
+            Factorio.get().getLogger().log(Level.SEVERE, "Failed to create tables!", ex);
         }
     }
 
@@ -52,6 +60,49 @@ public class MechanicController {
 
     public MechanicSerializer getMechanicSerializer() {
         return this.mechanicSerializer;
+    }
+
+    public List<UUID> getDefaultMembersFor(UUID uuid) throws SQLException {
+        Query query = new Query(
+                "SELECT p.uuid AS member " +
+                "FROM mechanics_defaultMembers dm " +
+                "LEFT JOIN players p ON p.id = dm.playerId " +
+                "WHERE p.uuid = ?")
+                .add(uuid.toString());
+
+        List<UUID> members = new ArrayList<>();
+        return Optional.ofNullable(
+                query.executeQuery(this.connection, rs -> {
+                    do {
+                        members.add(UUID.fromString(rs.getString("member")));
+                    } while (rs.next());
+                    return members;
+                }))
+                .orElse(members);
+    }
+
+    public void addDefaultMemberFor(UUID uuid, UUID member) throws SQLException {
+        Query query = new Query(
+                "INSERT INTO mechanics_defaultMembers dm (playerId, defaultMemberPlayerId) " +
+                "SELECT p1.id, p2.id " +
+                "FROM players p1, players p2 " +
+                "WHERE p1.uuid = ? AND p2.uuid = ?")
+                .add(uuid.toString())
+                .add(member.toString());
+
+        query.execute(this.connection);
+    }
+
+    public void removeDefaultMemberFor(UUID uuid, UUID member) throws SQLException {
+        Query query = new Query(
+                "DELETE FROM mechanics_defaultMembers dm " +
+                "WHERE p1.uuid = ? AND p2.uuid = ? " +
+                "LEFT JOIN players p1 ON p1.id = dm.playerId " +
+                "LEFT JOIN players p2 ON p2.id = dm.defaultMemberPlayerId")
+                .add(uuid.toString())
+                .add(member.toString());
+
+        query.execute(this.connection);
     }
 
     public void deleteAt(Location location) throws SQLException {

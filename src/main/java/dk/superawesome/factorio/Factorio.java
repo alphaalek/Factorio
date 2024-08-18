@@ -1,5 +1,9 @@
 package dk.superawesome.factorio;
 
+import dk.superawesome.factorio.commands.impl.AddDefaultMember;
+import dk.superawesome.factorio.commands.impl.AddMemberToAll;
+import dk.superawesome.factorio.commands.impl.ListDefaultMembers;
+import dk.superawesome.factorio.commands.impl.RemoveDefaultMember;
 import dk.superawesome.factorio.listeners.*;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.db.DatabaseConnection;
@@ -26,8 +30,10 @@ public final class Factorio extends JavaPlugin implements Listener {
     private final Map<String, MechanicManager> mechanicManagers = new HashMap<>();
     private final MechanicSerializer mechanicSerializer = new MechanicSerializer();
     private MechanicStorageContext.Provider contextProvider;
+    private MechanicController mechanicController;
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onEnable() {
         instance = this;
 
@@ -39,6 +45,7 @@ public final class Factorio extends JavaPlugin implements Listener {
         DatabaseConnection connection = new DatabaseConnection(sec);
         Management.Serializer managementSerializer = new Management.Serializer(this.mechanicSerializer);
         MechanicController controller = new MechanicController(connection, this.mechanicSerializer, managementSerializer);
+        this.mechanicController = controller;
         this.contextProvider = new MechanicStorageContext.Provider(controller);
 
         for (World world : Bukkit.getServer().getWorlds()) {
@@ -52,6 +59,11 @@ public final class Factorio extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new SignChangeListener(), this);
         Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
         Bukkit.getPluginManager().registerEvents(new ShopManager(), this);
+
+        getCommand("addmembertoall").setExecutor(new AddMemberToAll());
+        getCommand("listdefaultmembers").setExecutor(new ListDefaultMembers());
+        getCommand("adddefaultmember").setExecutor(new AddDefaultMember());
+        getCommand("removedefaultmember").setExecutor(new RemoveDefaultMember());
 
         Tick.start();
 
@@ -91,6 +103,10 @@ public final class Factorio extends JavaPlugin implements Listener {
 
     public MechanicStorageContext.Provider getContextProvider() {
         return contextProvider;
+    }
+
+    public MechanicController getMechanicController() {
+        return mechanicController;
     }
 
     public <E extends Event> void registerEvent(Class<? extends E> clazz, EventPriority priority, Consumer<E> listener) {

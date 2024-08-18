@@ -42,6 +42,14 @@ public class InteractListener implements Listener {
         Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
         if (mechanic != null) {
             if (mechanic.getProfile().getBuilding() instanceof Matcher) {
+                // check access
+                if (!mechanic.getManagement().hasAccess(event.getPlayer(), Management.DELETE)) {
+                    event.getPlayer().sendMessage("§cDu har ikke adgang til at fjerne maskinen!");
+                    event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+                    event.setCancelled(true);
+                    return;
+                }
+
                 Factorio.get().getMechanicManager(event.getBlock().getWorld()).removeMechanic(event.getPlayer(), mechanic);
             } else {
                 event.setCancelled(true);

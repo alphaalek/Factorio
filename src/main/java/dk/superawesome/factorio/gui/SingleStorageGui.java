@@ -320,6 +320,8 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY
                     && event.getClickedInventory() != getInventory()
                     && registerInteractionAndCheckFailed(event.getCurrentItem())) {
+
+                // todo: fix put to other slots than for this storage
                 return true;
             }
             else if ((event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD || event.getAction() == InventoryAction.HOTBAR_SWAP)

@@ -152,7 +152,7 @@ public class Elements {
 
                                         // finally, add this player as a member of the mechanic
                                         mechanic.getManagement().getMembers().add(target.getUniqueId());
-                                        player.sendMessage("§eDu tilføjede spilleren " + name + " som medlem af maskinen.");
+                                        player.sendMessage("§eDu tilføjede spilleren " + target.getName() + " som medlem af maskinen.");
                                         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35f, 0.5f);
                                     }
 
