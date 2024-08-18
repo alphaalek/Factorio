@@ -5,6 +5,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -41,11 +43,11 @@ public class MechanicSerializer {
         writeInt(stream, stack.getAmount());
 
         if (stack.hasItemMeta()) {
-            writeInt(stream, 1);
-            ObjectOutputStream output = new ObjectOutputStream(stream);
+            stream.write(1);
+            ObjectOutputStream output = new BukkitObjectOutputStream(stream);
             output.writeObject(stack.getItemMeta());
         } else {
-            writeInt(stream, 0);
+            stream.write(0);
         }
     }
 
@@ -62,8 +64,9 @@ public class MechanicSerializer {
                 ItemStack stack = new ItemStack(Material.valueOf(mat), a);
 
                 if (hasMeta) {
-                    ObjectInputStream input = new ObjectInputStream(stream);
-                    stack.setItemMeta((ItemMeta) input.readObject());
+                    ObjectInputStream input = new BukkitObjectInputStream(stream);
+                    ItemMeta meta = (ItemMeta) input.readObject();
+                    stack.setItemMeta(meta);
                 }
 
                 return stack;

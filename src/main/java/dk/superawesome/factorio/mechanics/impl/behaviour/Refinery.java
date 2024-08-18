@@ -150,10 +150,10 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         ItemStack filledStack = context.getSerializer().readItemStack(str);
         if (filledStack != null && this.filledAmount > 0) {
             this.filled = Filled.getFilledStateByStack(filledStack).orElse(null);
-            if (this.filled == null) {
-                // invalid filled state
-                this.filledAmount = 0;
-            }
+        }
+        if (this.filled == null) {
+            // invalid filled state
+            this.filledAmount = 0;
         }
     }
 
