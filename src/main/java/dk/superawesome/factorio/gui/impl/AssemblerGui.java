@@ -151,7 +151,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
                         // get the chosen assembler type and set the assembler to use it
                         Assembler.Types type = typeOptional.get();
-                        if (getMechanic().getType() != null && getMechanic().getType().equals(type)) {
+                        if (getMechanic().getType() != null && getMechanic().getType().isTypesEqual(type)) {
                             player.sendMessage("§cMaskinen bruger allerede denne sammensætning.");
                             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1);
                             return true;
