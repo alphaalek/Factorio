@@ -48,4 +48,9 @@ public class CauldronProfile implements MechanicProfile<Cauldron> {
             return new Cauldron(loc, rotation, context);
         }
     }
+
+    @Override
+    public boolean isInteractable() {
+        return true;
+    }
 }

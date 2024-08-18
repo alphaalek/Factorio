@@ -27,7 +27,7 @@ public class InteractListener implements Listener {
             MechanicManager manager = Factorio.get().getMechanicManager(event.getClickedBlock().getWorld());
             Mechanic<?> mechanic = manager.getMechanicPartially(event.getClickedBlock().getLocation());
             if (mechanic != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && (!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR)) {
-                event.setCancelled(true);
+                event.setCancelled(!mechanic.getProfile().isInteractable());
 
                 if (mechanic.getProfile() instanceof GuiMechanicProfile<?>) {
                     interactMechanic(event.getPlayer(), mechanic);

@@ -14,4 +14,8 @@ public interface MechanicProfile<M extends Mechanic<M>> extends Identifiable {
     StorageProvider<M> getStorageProvider();
 
     MechanicLevel.Registry getLevelRegistry();
+
+    default boolean isInteractable() {
+        return false;
+    }
 }
