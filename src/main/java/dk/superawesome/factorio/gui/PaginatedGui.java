@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.gui;
 
 import dk.superawesome.factorio.util.Callback;
+import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -69,10 +70,10 @@ public abstract class PaginatedGui<G extends BaseGui<G>, T> extends BaseGuiAdapt
         getInventory().setItem(pageRows + 8, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
 
         if (values.size() > i) {
-            getInventory().setItem(pageRows + 8, new ItemStack(Material.ARROW));
+            getInventory().setItem(pageRows + 8, new ItemBuilder(Material.ARROW).setName("§eNæste side").build());
         }
         if (currentPage > 1) {
-            getInventory().setItem(pageRows, new ItemStack(Material.ARROW));
+            getInventory().setItem(pageRows, new ItemBuilder(Material.ARROW).setName("§eForrige side").build());
         }
     }
 
