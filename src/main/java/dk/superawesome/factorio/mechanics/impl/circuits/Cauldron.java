@@ -7,15 +7,10 @@ import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
-
-import java.util.Arrays;
-
-import static org.bukkit.event.block.CauldronLevelChangeEvent.ChangeReason.UNKNOWN;
 
 public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollection {
 
@@ -35,16 +30,15 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
         if (loc.getBlock().getType() == Material.CAULDRON) {
             this.fluid = null;
             this.amount = 0;
-        } else {
+        } else if (loc.getBlock().getType() == Material.WATER_CAULDRON) {
             Levelled cauldron = (Levelled) loc.getBlock().getBlockData();
             amount = cauldron.getLevel();
-
-            if (fluid == null) {
-                switch (loc.getBlock().getType()) {
-                    case WATER_CAULDRON -> fluid = Fluid.WATER;
-                    case LAVA_CAULDRON -> fluid = Fluid.LAVA;
-                    case POWDER_SNOW_CAULDRON -> fluid = Fluid.SNOW;
-                }
+            fluid = Fluid.WATER;
+        } else {
+            amount = 3;
+            switch (loc.getBlock().getType()) {
+                case LAVA_CAULDRON -> fluid = Fluid.LAVA;
+                case POWDER_SNOW_CAULDRON -> fluid = Fluid.SNOW;
             }
         }
     }
