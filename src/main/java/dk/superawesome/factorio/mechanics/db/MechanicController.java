@@ -80,24 +80,24 @@ public class MechanicController {
                 .orElse(members);
     }
 
-    public boolean addDefaultMemberFor(UUID uuid, UUID member) throws SQLException {
+    public void addDefaultMemberFor(UUID uuid, UUID member) throws SQLException {
         Query query = new Query(
                 "INSERT INTO mechanics_defaultMembers (playerUUID, defaultMemberPlayerUUID) " +
                 "VALUES (?, ?)")
                 .add(uuid.toString())
                 .add(member.toString());
 
-        return query.execute(this.connection);
+        query.execute(this.connection);
     }
 
-    public boolean removeDefaultMemberFor(UUID uuid, UUID member) throws SQLException {
+    public void removeDefaultMemberFor(UUID uuid, UUID member) throws SQLException {
         Query query = new Query(
                 "DELETE FROM mechanics_defaultMembers " +
                 "WHERE playerUUID = ? AND defaultMemberPlayerUUID = ?")
                 .add(uuid.toString())
                 .add(member.toString());
 
-        return query.execute(this.connection);
+        query.execute(this.connection);
     }
 
     public void deleteAt(Location location) throws SQLException {
