@@ -8,6 +8,7 @@ import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
+import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -215,6 +216,10 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         public Material getMat() {
             return type.getMat();
         }
+
+        public boolean isTypesEqual(Types type) {
+            return this.type == type;
+        }
     }
 
     public enum Types {
@@ -307,6 +312,11 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
         public static Optional<Types> getTypeFromMaterial(Material mat) {
             return Arrays.stream(values()).filter(t -> t.getMat().equals(mat)).findFirst();
+        }
+
+        @Override
+        public String toString() {
+            return StringUtil.capitalize(this.getMat());
         }
     }
 }
