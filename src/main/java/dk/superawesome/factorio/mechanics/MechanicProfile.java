@@ -7,6 +7,10 @@ public interface MechanicProfile<M extends Mechanic<M>> extends Identifiable {
 
     String getName();
 
+    default String getSignName() {
+        return getName();
+    }
+
     Building getBuilding();
 
     MechanicFactory<M> getFactory();
