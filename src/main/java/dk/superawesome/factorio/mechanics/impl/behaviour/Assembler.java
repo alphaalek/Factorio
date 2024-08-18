@@ -245,7 +245,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         SEA_LANTERN(Material.SEA_LANTERN, 4, 6.85),
         JUKEBOX(Material.JUKEBOX, 9, 18),
         GOLDEN_HOE(Material.GOLDEN_HOE, 4, 7.05),
-        SUSPICIOUS_STEW(Material.SUSPICIOUS_STEW, 8, 32),
+        SUSPICIOUS_STEW(Material.SUSPICIOUS_STEW, 8, 22.5),
         FLINT_AND_STEAL(Material.FLINT_AND_STEEL, 5, 2.65),
         BOOK_AND_QUILL(Material.WRITABLE_BOOK, 9, 9.55),
         CROSSBOW(Material.CROSSBOW, 9, 9),
