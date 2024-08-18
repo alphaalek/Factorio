@@ -51,12 +51,12 @@ public class MechanicSerializer {
 
     public ItemStack readItemStack(ByteArrayInputStream stream) throws IOException, ClassNotFoundException {
         int l = stream.read();
-        boolean hasMeta = stream.read() == 1;
         if (l > 0) {
             byte[] buf = new byte[l];
             int len = stream.read(buf, 0, l);
 
             int a = readInt(stream);
+            boolean hasMeta = stream.read() == 1;
             if (len == l && a > 0) {
                 String mat = new String(buf);
                 ItemStack stack = new ItemStack(Material.valueOf(mat), a);
