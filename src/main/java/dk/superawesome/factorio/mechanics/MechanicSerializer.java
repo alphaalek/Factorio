@@ -82,7 +82,7 @@ public class MechanicSerializer {
         return or;
     }
 
-    public void writeData(ByteArrayOutputStream stream, Query.CheckedConsumer<DataOutputStream> function) throws IOException {
+    public void writeData(ByteArrayOutputStream stream, Query.CheckedConsumer<DataOutputStream> function) {
         DataOutputStream dataStream = new DataOutputStream(stream);
         function.sneaky(dataStream);
     }

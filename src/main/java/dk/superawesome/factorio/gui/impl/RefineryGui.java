@@ -3,6 +3,7 @@ package dk.superawesome.factorio.gui.impl;
 import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Refinery;
 import dk.superawesome.factorio.mechanics.stackregistry.Volume;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -40,6 +41,7 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
     public void loadInputOutputItems() {
         super.loadInputOutputItems();
 
+        Bukkit.broadcastMessage(getMechanic().getFilled() + " " + getMechanic().getFilledAmount());
         if (getMechanic().getFilled() != null) {
             loadStorageTypes(getMechanic().getFilled().getOutputItemStack(), getMechanic().getFilledAmount(), FILLED_SLOTS);
         }

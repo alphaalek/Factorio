@@ -101,12 +101,14 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
             if ((filled == null || collection.hasFluid(filled.getFluid())) && filledAmount < Refinery.this.getCapacity()) {
                 filledAmount++;
                 setVolumeAmount(volumeAmount - 1); // can potentially be zero
-                collection.take(volume.getFluidRequires());
 
                 if (filled == null) {
                     // update filled type if not set
                     filled = Filled.getFilledState(volume, collection.getFluid()).orElseThrow(IllegalStateException::new);
                 }
+
+                // take fluid after updating filled state if not set
+                collection.take(volume.getFluidRequires());
 
                 // update items in gui if in use
                 RefineryGui gui = Refinery.this.<RefineryGui>getGuiInUse().get();
