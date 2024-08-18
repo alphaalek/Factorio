@@ -10,6 +10,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
@@ -111,6 +113,10 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
                 if (gui != null) {
                     gui.updateRemovedVolume(1);
                     gui.updateAddedFilled(1);
+
+                    for (HumanEntity viewer : gui.getInventory().getViewers()) {
+                        ((Player)viewer).playSound(viewer.getLocation(), filled.getFillSound(), 0.5f, 0.5f);
+                    }
                 }
 
                 event.setTransferred(true);
