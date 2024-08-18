@@ -169,7 +169,7 @@ public class MechanicManager implements Listener {
 
         Optional<MechanicProfile<?>> profile = Profiles.getProfiles()
                 .stream()
-                .filter(b -> b.getName().equalsIgnoreCase(type))
+                .filter(b -> b.getSignName().equalsIgnoreCase(type))
                 .findFirst();
         if (profile.isPresent()) {
             // fix lowercase/uppercase and my headache
