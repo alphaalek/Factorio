@@ -64,21 +64,21 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     public void load(MechanicStorageContext context) throws Exception {
         ByteArrayInputStream str = context.getData();
         this.ingredient = context.getSerializer().readItemStack(str);
-        this.ingredientAmount = context.getSerializer().readInt(str);
         this.smeltResult = context.getSerializer().readItemStack(str);
+        setIngredientAmount(context.getSerializer().readInt(str)); // ensure no zero if ingredient set
 
         loadFuel(context, str);
 
         this.storageType = context.getSerializer().readItemStack(str);
-        this.storageAmount = context.getSerializer().readInt(str);
+        setStorageAmount(context.getSerializer().readInt(str)); // ensure no zero if storage set
     }
 
     @Override
     public void save(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
         context.getSerializer().writeItemStack(str, this.ingredient);
-        context.getSerializer().writeInt(str, this.ingredientAmount);
         context.getSerializer().writeItemStack(str, this.smeltResult);
+        context.getSerializer().writeInt(str, this.ingredientAmount);
 
         saveFuel(context, str);
 

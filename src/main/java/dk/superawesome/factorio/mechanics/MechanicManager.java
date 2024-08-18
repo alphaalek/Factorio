@@ -229,7 +229,7 @@ public class MechanicManager implements Listener {
         return MechanicBuildResponse.SUCCESS;
     }
 
-    public void loadMechanic(Sign sign) {
+    public boolean loadMechanic(Sign sign) {
         try {
             Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
             if (profile.isPresent()) {
@@ -238,9 +238,12 @@ public class MechanicManager implements Listener {
                     mechanic.onBlocksLoaded();
                 }
             }
+            return true;
         } catch (SQLException | IOException ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to load mechanic at location " + sign.getLocation(), ex);
         }
+
+        return false;
     }
 
     private Mechanic<?> loadMechanicFromSign(MechanicProfile<?> profile, Sign sign, Query.CheckedBiFunction<String, Block, MechanicStorageContext> context) throws IOException, SQLException {

@@ -40,8 +40,9 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
     public void loadInputOutputItems() {
         super.loadInputOutputItems();
 
-        if (getMechanic().getFilled() != null)
+        if (getMechanic().getFilled() != null) {
             loadStorageTypes(getMechanic().getFilled().getOutputItemStack(), getMechanic().getFilledAmount(), FILLED_SLOTS);
+        }
     }
 
     @Override

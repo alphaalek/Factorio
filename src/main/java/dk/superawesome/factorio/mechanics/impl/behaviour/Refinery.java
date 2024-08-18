@@ -6,6 +6,7 @@ import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.stackregistry.Filled;
 import dk.superawesome.factorio.mechanics.stackregistry.Volume;
 import dk.superawesome.factorio.mechanics.transfer.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -44,8 +45,9 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
                     .map(Volume::getMat)
                     .map(ItemStack::new)
                     .orElse(null);
-            if ((item == null || collection.has(item)) && volumeAmount < getVolumeCapacity()) {
-                int add = this.<RefineryGui>put(collection, getVolumeCapacity() - volumeAmount, getGuiInUse(), RefineryGui::updateAddedVolume, new HeapToStackAccess<ItemStack>() {
+            if ((item == null && collection.has(i -> Volume.getTypeFromMaterial(i.getType()).isPresent()) || item != null && collection.has(item))
+                    && volumeAmount < getVolumeCapacity()) {
+                int add = this.<RefineryGui>put(collection, getVolumeCapacity() - volumeAmount, getGuiInUse(), RefineryGui::updateAddedVolume, new HeapToStackAccess<>() {
                     @Override
                     public ItemStack get() {
                         return Optional.ofNullable(volume).map(Volume::getMat).map(ItemStack::new).orElse(null);
@@ -96,11 +98,19 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
             if ((filled == null || collection.hasFluid(filled.getFluid())) && filledAmount < Refinery.this.getCapacity()) {
                 filledAmount++;
-                setVolumeAmount(volumeAmount - 1);
+                setVolumeAmount(volumeAmount - 1); // can potentially be zero
                 collection.take(volume.getFluidRequires());
 
                 if (filled == null) {
+                    // update filled type if not set
                     filled = Filled.getFilledState(volume, collection.getFluid()).orElseThrow(IllegalStateException::new);
+                }
+
+                // update items in gui if in use
+                RefineryGui gui = Refinery.this.<RefineryGui>getGuiInUse().get();
+                if (gui != null) {
+                    gui.updateRemovedVolume(1);
+                    gui.updateAddedFilled(1);
                 }
 
                 event.setTransferred(true);
@@ -124,13 +134,13 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
         this.volumeAmount = context.getSerializer().readInt(str);
         ItemStack volume = context.getSerializer().readItemStack(str);
-        if (volume != null) {
+        if (volume != null && this.volumeAmount > 0) {
             this.volume = Volume.getTypeFromMaterial(volume.getType()).orElse(null);
         }
 
         this.filledAmount = context.getSerializer().readInt(str);
         ItemStack filledStack = context.getSerializer().readItemStack(str);
-        if (filledStack != null) {
+        if (filledStack != null && this.filledAmount > 0) {
             this.filled = Filled.getFilledStateByStack(filledStack).orElse(null);
             if (this.filled == null) {
                 // invalid filled state
@@ -176,9 +186,8 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     public int getCapacity() {
         return level.getInt(ItemCollection.CAPACITY_MARK) *
                 Optional.ofNullable(filled)
-                        .map(Filled::getVolume)
-                        .map(Volume::getMat)
-                        .map(Material::getMaxStackSize)
+                        .map(Filled::getOutputItemStack)
+                        .map(ItemStack::getMaxStackSize)
                         .orElse(64);
     }
 
@@ -207,7 +216,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public int getMaxTransfer() {
-        return filled.getVolume().getMat().getMaxStackSize();
+        return filled.getOutputItemStack().getMaxStackSize();
     }
 
     @Override

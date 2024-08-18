@@ -6,7 +6,9 @@ public enum Fluid {
 
     WATER(3),
 
-    LAVA(3)
+    LAVA(3),
+
+    SNOW(3),
     ;
 
     private final int maxTransfer;

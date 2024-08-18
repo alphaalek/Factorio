@@ -6,10 +6,7 @@ import dk.superawesome.factorio.mechanics.db.DatabaseConnection;
 import dk.superawesome.factorio.mechanics.db.MechanicController;
 import dk.superawesome.factorio.util.Tick;
 import dk.superawesome.factorio.util.statics.BlockUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Tag;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
@@ -67,7 +64,10 @@ public final class Factorio extends JavaPlugin implements Listener {
                         if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())
                                 && manager.getMechanicAt(BlockUtil.getPointingBlock(state.getBlock(), false).getLocation()) == null) {
                             // load this mechanic
-                            manager.loadMechanic((Sign) state);
+                            if (!manager.loadMechanic((Sign) state)) {
+                                // unable to load mechanic properly due to corrupt data
+                                state.getBlock().setType(Material.AIR);
+                            }
                         }
                     }
                 }

@@ -14,6 +14,7 @@ public enum Filled {
 
     WATER_BUCKET(Volume.BUCKET, Fluid.WATER, () -> new ItemStack(Material.WATER_BUCKET)),
     LAVA_BUCKET(Volume.BUCKET, Fluid.LAVA, () -> new ItemStack(Material.LAVA_BUCKET)),
+    SNOW_BUCKET(Volume.BUCKET, Fluid.SNOW, () -> new ItemStack(Material.POWDER_SNOW_BUCKET)),
     WATER_BOTTLE(Volume.BOTTLE, Fluid.WATER, () -> {
         ItemStack bottle = new ItemStack(Material.POTION);
         ItemMeta meta = bottle.getItemMeta();

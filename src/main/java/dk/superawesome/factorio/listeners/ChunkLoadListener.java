@@ -4,6 +4,7 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.MechanicManager;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
@@ -23,7 +24,10 @@ public class ChunkLoadListener implements Listener {
                 if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())
                         && manager.getMechanicAt(BlockUtil.getPointingBlock(state.getBlock(), false).getLocation()) == null) {
                     // load this mechanic
-                    manager.loadMechanic((Sign) state);
+                    if (!manager.loadMechanic((Sign) state)) {
+                        // unable to load mechanic properly due to corrupt data
+                        state.getBlock().setType(Material.AIR);
+                    }
                 }
             }
         });
