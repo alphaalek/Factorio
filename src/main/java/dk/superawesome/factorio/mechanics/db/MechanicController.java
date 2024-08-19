@@ -33,7 +33,7 @@ public class MechanicController {
         Query createMechanics = new Query(
                 "CREATE TABLE IF NOT EXISTS mechanics (" +
                 "id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, " +
-                "type VARCHAR(16) NOT NULL, " +
+                "type VARCHAR(18) NOT NULL, " +
                 "location VARCHAR(64) NOT NULL, " +
                 "rotation ENUM('NORTH', 'EAST', 'SOUTH', 'WEST') NOT NULL, " +
                 "level INT DEFAULT 1, " +
@@ -42,9 +42,10 @@ public class MechanicController {
 
         Query createDefualtMembers = new Query(
                 "CREATE TABLE IF NOT EXISTS mechanics_defaultMembers (" +
-                "id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, " +
                 "playerUUID VARCHAR(36) NOT NULL, " +
-                "defaultMemberPlayerUUID VARCHAR(36) NOT NULL)");
+                "defaultMemberPlayerUUID VARCHAR(36) NOT NULL, " +
+                "PRIMARY KEY (playerUUID, defaultMemberPlayerUUID)" +
+                ");");
 
         try {
             createMechanics.execute(this.connection);
@@ -82,8 +83,7 @@ public class MechanicController {
 
     public void addDefaultMemberFor(UUID uuid, UUID member) throws SQLException {
         Query query = new Query(
-                "INSERT INTO mechanics_defaultMembers (playerUUID, defaultMemberPlayerUUID) " +
-                "VALUES (?, ?)")
+                "INSERT INTO mechanics_defaultMembers VALUES (?, ?)")
                 .add(uuid.toString())
                 .add(member.toString());
 
