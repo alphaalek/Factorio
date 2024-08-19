@@ -169,14 +169,16 @@ public class MechanicManager implements Listener {
 
         List<MechanicProfile<?>> match = Profiles.getProfiles()
                 .stream()
-                .filter(b -> b.getSignName().startsWith(type))
+                .filter(b -> b.getSignName().toLowerCase().startsWith(type.toLowerCase()))
                 .toList();
-        if (match.size() == 1) {
+        if (match.size() == 1) { // ensure only one possible mechanic
             MechanicProfile<?> profile = match.get(0);
 
             // fix lowercase/uppercase and my headache
             sign.getSide(Side.FRONT).setLine(0, "[" + profile.getSignName() + "]");
             sign.update();
+
+            return Optional.of(profile);
         }
 
         return Optional.empty();

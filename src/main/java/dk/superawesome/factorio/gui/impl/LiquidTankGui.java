@@ -2,6 +2,8 @@ package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.impl.behaviour.LiquidTank;
+import dk.superawesome.factorio.util.helper.ItemBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -25,7 +27,7 @@ public class LiquidTankGui extends MechanicGui<LiquidTankGui, LiquidTank>{
 
     static {
         int[] i = {0}; // force counter to heap for lambda access
-        STORAGE_SLOTS = Arrays.stream(STORAGE_SLOTS_STATES).mapToInt(o -> i[0]++).boxed().toList();
+        STORAGE_SLOTS = Arrays.stream(STORAGE_SLOTS_STATES).flatMapToInt(Arrays::stream).boxed().toList();
     }
 
     public LiquidTankGui(LiquidTank mechanic, AtomicReference<LiquidTankGui> inUseReference) {
@@ -35,7 +37,7 @@ public class LiquidTankGui extends MechanicGui<LiquidTankGui, LiquidTank>{
 
     @Override
     public void loadItems() {
-        for (int i : Arrays.asList(0, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 50, 53)) {
+        for (int i : Arrays.asList(0, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 53)) {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
 
@@ -56,20 +58,25 @@ public class LiquidTankGui extends MechanicGui<LiquidTankGui, LiquidTank>{
             case SNOW -> Material.WHITE_STAINED_GLASS_PANE;
         };
         // calculate amount for each slot
-        int each = getMechanic().getCapacity() / (STORAGE_SLOTS_STATES.length * 64);
-        int left = getMechanic().getFluidAmount();
-        for (int i = 5; i >= 0; i--) {
+        double each = ((double)getMechanic().getCapacity()) / (STORAGE_SLOTS_STATES.length * 64);
+        double left = getMechanic().getFluidAmount();
+
+        for (int i = 4; i >= 0; i--) {
             int amount = 0;
             for (int j = 0; j < 64; j++) {
                 if (left > each) {
                     left -= each;
                     amount++;
-                }
+                } else break;
             }
 
             if (amount > 0) {
                 for (int j : STORAGE_SLOTS_STATES[i]) {
-                    ItemStack stack = new ItemStack(fluidMaterial, amount);
+                    ItemStack stack = new ItemBuilder(fluidMaterial)
+                            .setAmount(amount)
+                            .setName("§eBeholder: " + getMechanic().getFluid())
+                            .addLore("§e" + getMechanic().getFluidAmount() + "§8/§e" + getMechanic().getCapacity())
+                            .build();
                     getInventory().setItem(j, stack);
                 }
             }

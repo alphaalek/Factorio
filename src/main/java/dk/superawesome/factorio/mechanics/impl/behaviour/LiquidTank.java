@@ -9,7 +9,13 @@ import dk.superawesome.factorio.mechanics.transfer.FluidContainer;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
-public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCollection, FluidContainer {
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Optional;
+
+public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCollection, FluidContainer, AccessibleMechanic {
 
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
@@ -18,6 +24,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
 
     public LiquidTank(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
+        loadFromStorage();
     }
 
     @Override
@@ -26,12 +33,35 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     }
 
     @Override
+    public void load(MechanicStorageContext context) throws IOException, SQLException {
+        ByteArrayInputStream str = context.getData();
+        int fluidOrdinal = str.read();
+        if (fluidOrdinal != -1) {
+            this.fluid = Fluid.values()[str.read()];
+        }
+        this.fluidAmount = context.getSerializer().readInt(str);
+    }
+
+    @Override
+    public void save(MechanicStorageContext context) throws IOException, SQLException {
+        ByteArrayOutputStream str = new ByteArrayOutputStream();
+        str.write(fluid.ordinal());
+        context.getSerializer().writeInt(str, fluidAmount);
+
+        context.uploadData(str);
+    }
+
+    @Override
     public void pipePut(FluidCollection collection, PipePutEvent event) {
         if ((fluid == null || collection.hasFluid(fluid)) && fluidAmount < getCapacity()) {
+            Fluid takeFluid = collection.getFluid();
             int take = collection.take(getMaxTransfer());
 
             if (take > 0) {
                 fluidAmount += take;
+                if (fluid == null) {
+                    fluid = takeFluid;
+                }
                 event.setTransferred(true);
 
                 LiquidTankGui gui = this.<LiquidTankGui>getGuiInUse().get();
@@ -45,14 +75,14 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     @Override
     public int take(int amount) {
         int take = Math.min(this.fluidAmount, amount);
-        this.fluidAmount -= take;
+        setFluidAmount(this.fluidAmount - take); // can potentially be zero
 
         LiquidTankGui gui = this.<LiquidTankGui>getGuiInUse().get();
         if (gui != null) {
             gui.loadInputOutputItems();
         }
 
-        return 0;
+        return take;
     }
 
     @Override
@@ -77,7 +107,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
 
     @Override
     public int getMaxTransfer() {
-        return fluid.getMaxTransfer();
+        return Optional.ofNullable(fluid).map(Fluid::getMaxTransfer).orElse(3);
     }
 
     @Override

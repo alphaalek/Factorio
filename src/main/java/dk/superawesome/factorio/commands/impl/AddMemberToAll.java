@@ -15,16 +15,6 @@ public class AddMemberToAll extends AbstractCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        MechanicManager manager = Factorio.get().getMechanicManager(player.getWorld());
-        List<Mechanic<?>> owned = manager.getAllMechanics().stream()
-                .filter(m -> m.getManagement().hasAccess(player, Management.MODIFY_MEMBERS))
-                .filter(m -> !player.isOp() || m.getManagement().getOwner().equals(player.getUniqueId()))
-                .toList();
-        if (owned.isEmpty()) {
-            player.sendMessage("§cDu har ingen maskiner i verdenen " + player.getWorld().getName() + ".");
-            return;
-        }
-
         if (args.length == 0) {
             player.sendMessage("§cVælg en spiller!");
             return;
@@ -32,6 +22,17 @@ public class AddMemberToAll extends AbstractCommand {
         Optional<OfflinePlayer> target = getTarget(args[0]);
         if (target.isEmpty()) {
             player.sendMessage("§cKunne ikke finde spilleren " + args[0]);
+            return;
+        }
+
+        MechanicManager manager = Factorio.get().getMechanicManager(player.getWorld());
+        List<Mechanic<?>> owned = manager.getAllMechanics().stream()
+                .filter(m -> m.getManagement().hasAccess(player, Management.MODIFY_MEMBERS))
+                .filter(m -> !m.getManagement().getMembers().contains(target.get().getUniqueId()))
+                .filter(m -> !player.isOp() || m.getManagement().getOwner().equals(player.getUniqueId()))
+                .toList();
+        if (owned.isEmpty()) {
+            player.sendMessage("§cKunne ikke finde nogen maskiner at tilføje " + target.get().getName() + " som medlem til i verdenen " + player.getWorld().getName() + ".");
             return;
         }
 
