@@ -42,16 +42,16 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
             return;
         }
 
-        // all assembler prices is over the minPrice or minPercentage then the power is off
+        // all assembler prices are over the minPrice or minPercentage then the power is off
         powered = true;
         for (Assembler assembler : assemblers) {
             if (assembler.getType() != null) {
                 Assembler.Type type = assembler.getType();
-                if (minPrice >= 0) {
+                if (!Double.isNaN(minPrice)) {
                     if (type.getPricePerItem() >= minPrice) {
                         powered = false;
                     }
-                } else if (minPercentage >= 0) {
+                } else {
                     double percentage = minPercentage;
                     if (type.produces() > type.type().getProduces()) {
                         percentage = (type.produces() / type.type().getProduces() - 1) * 100;
@@ -115,7 +115,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
             }
         });
 
-        think();
+        Bukkit.getScheduler().runTask(Factorio.get(), this::think);
     }
 
 
@@ -131,7 +131,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
         super.handleBlockBreak(event);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void onSignChange(SignChangeEvent event) {
         if (event.getBlock().equals(loc.getBlock())) {
             Bukkit.getScheduler().runTask(Factorio.get(), () -> loadPrice((Sign) event.getBlock().getState()));
@@ -141,8 +141,8 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     private void loadPrice(Sign sign) {
         String line = sign.getSide(Side.FRONT).getLine(2).trim();
-        minPrice = -1;
-        minPercentage = -1;
+        minPrice = Double.NaN;
+        minPercentage = Double.NaN;
         try {
             minPrice = Double.parseDouble(line);
         } catch (NumberFormatException e) {
@@ -152,7 +152,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
             }
         }
 
-        if (minPrice < 0 && minPercentage < 0) {
+        if (Double.isNaN(minPrice) && Double.isNaN(minPercentage)) {
             Factorio.get().getMechanicManager(loc.getWorld()).unload(this);
             Buildings.remove(loc.getWorld(), this);
 

@@ -46,10 +46,10 @@ public class AssemblerTriggerProfile implements MechanicProfile<AssemblerTrigger
         return 15;
     }
 
-//    @Override
-//    public boolean isInteractable() {
-//        return true;
-//    }
+    @Override
+    public boolean isInteractable() {
+        return true;
+    }
 
     private static class AssemblerTriggerMechanicFactory implements MechanicFactory<AssemblerTrigger> {
 
