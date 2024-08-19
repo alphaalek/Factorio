@@ -29,6 +29,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     private final DelayHandler thinkDelayHandler = new DelayHandler(20*60);
 
+    private boolean usePercentage;
     private double minPrice, minPercentage;
     private final List<Assembler> assemblers = new ArrayList<>();
 
