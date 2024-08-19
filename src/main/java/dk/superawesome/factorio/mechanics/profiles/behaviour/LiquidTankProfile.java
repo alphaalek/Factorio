@@ -6,6 +6,9 @@ import dk.superawesome.factorio.gui.GuiFactory;
 import dk.superawesome.factorio.gui.impl.LiquidTankGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.LiquidTank;
+import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
+import dk.superawesome.factorio.mechanics.transfer.FluidContainer;
+import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
@@ -43,7 +46,10 @@ public class LiquidTankProfile implements GuiMechanicProfile<LiquidTank> {
 
     @Override
     public MechanicLevel.Registry getLevelRegistry() {
-        return null;
+        return MechanicLevel.Registry.Builder
+                .make(1)
+                .mark(FluidCollection.CAPACITY_MARK, Array.fromData(100))
+                .build();
     }
 
     @Override

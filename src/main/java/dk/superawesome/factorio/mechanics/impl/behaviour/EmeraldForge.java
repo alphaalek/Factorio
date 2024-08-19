@@ -50,12 +50,14 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
     public void pipePut(MoneyCollection collection, PipePutEvent event) {
         double take = Math.min(64, getCapacity() - moneyAmount);
         double amount = collection.take(take);
-        moneyAmount += amount;
-        event.setTransferred(true);
+        if (amount > 0) {
+            moneyAmount += amount;
+            event.setTransferred(true);
 
-        EmeraldForgeGui gui = this.<EmeraldForgeGui>getGuiInUse().get();
-        if (gui != null) {
-            gui.loadInputOutputItems();
+            EmeraldForgeGui gui = this.<EmeraldForgeGui>getGuiInUse().get();
+            if (gui != null) {
+                gui.loadInputOutputItems();
+            }
         }
     }
 

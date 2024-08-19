@@ -47,7 +47,6 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
     @Override
     public void loadInputOutputItems() {
         int amount = (int) Math.ceil(getMechanic().getMoneyAmount());
-        clearSlots(STORAGE_SLOTS);
 
         // first load normal emeralds
         int left = loadStorageTypes(new ItemStack(Material.EMERALD), amount, STORAGE_SLOTS);
