@@ -32,6 +32,6 @@ public class RefineryBuilding implements Building, Buildable {
 
     @Override
     public int getID() {
-        return Profiles.STORAGE_BOX.getID();
+        return Profiles.REFINERY.getID();
     }
 }
