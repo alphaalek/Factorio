@@ -50,7 +50,6 @@ public class SignChangeListener implements Listener {
                 return;
             }
 
-            Bukkit.broadcastMessage("Building mechanic");
             ItemStack drop = new ItemStack(on.getType());
             // try to build the mechanic in the next tick
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {

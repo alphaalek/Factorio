@@ -171,7 +171,7 @@ public class MechanicManager implements Listener {
                 .stream()
                 .filter(b -> b.getSignName().toLowerCase().startsWith(type.toLowerCase()))
                 .toList();
-        if (match.size() == 1) {
+        if (match.size() == 1) { // ensure only one possible mechanic
             MechanicProfile<?> profile = match.get(0);
 
             // fix lowercase/uppercase and my headache
