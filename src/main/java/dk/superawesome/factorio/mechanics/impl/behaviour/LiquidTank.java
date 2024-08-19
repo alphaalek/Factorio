@@ -37,7 +37,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
         ByteArrayInputStream str = context.getData();
         int fluidOrdinal = str.read();
         if (fluidOrdinal != -1) {
-            this.fluid = Fluid.values()[str.read()];
+            this.fluid = Fluid.values()[fluidOrdinal];
         }
         this.fluidAmount = context.getSerializer().readInt(str);
 

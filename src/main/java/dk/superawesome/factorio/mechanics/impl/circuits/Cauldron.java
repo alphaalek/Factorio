@@ -15,6 +15,8 @@ import org.bukkit.event.block.CauldronLevelChangeEvent;
 
 public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollection {
 
+    private final DelayHandler transferDelayHandler = new DelayHandler(20 * 2);
+
     private Fluid fluid;
     private int amount;
 
@@ -63,7 +65,7 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
 
     @Override
     public DelayHandler getTransferDelayHandler() {
-        return DelayHandler.NO_DELAY;
+        return transferDelayHandler;
     }
 
     @Override

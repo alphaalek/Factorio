@@ -29,7 +29,7 @@ import java.util.*;
 
 public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements ThinkingMechanic {
 
-    private final DelayHandler thinkDelayHandler = new DelayHandler(20);
+    private final DelayHandler thinkDelayHandler = new DelayHandler(20 * 10);
 
     private boolean usePrice, usePercentage;
     private double minPrice, minPercentage;
@@ -105,7 +105,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     @Override
     public void onLeverPull(PlayerInteractEvent event) {
         super.handleLeverPull(event);
-        think();
+        Bukkit.getScheduler().runTask(Factorio.get(), this::think);
     }
 
     @Override
