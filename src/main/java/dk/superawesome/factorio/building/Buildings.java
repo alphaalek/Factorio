@@ -17,35 +17,37 @@ import java.util.List;
 public class Buildings {
 
     public static final Building ASSEMBLER;
+    public static final Building ASSEMBLER_TRIGGER;
+    public static final Building CAULDRON;
     public static final Building COLLECTOR;
     public static final Building COMPARATOR;
     public static final Building CONSTRUCTOR;
     public static final Building EMERALD_FORGE;
     public static final Building GATE;
-    public static final Building CAULDRON;
     public static final Building GENERATOR;
+    public static final Building LIQUID_TANK;
     public static final Building SMELTER;
     public static final Building STORAGE_BOX;
     public static final Building POWER_CENTRAL;
     public static final Building REFINERY;
-    public static final Building ASSEMBLER_TRIGGER;
 
     static {
         buildings = new Array<>();
 
         ASSEMBLER         = loadBuilding(new AssemblerBuilding());
+        ASSEMBLER_TRIGGER = loadBuilding(new AssemblerTriggerBuilding());
+        CAULDRON          = loadBuilding(new CauldronBuilding());
         COLLECTOR         = loadBuilding(new CollectorBuilding());
         COMPARATOR        = loadBuilding(new ComparatorBuilding());
         CONSTRUCTOR       = loadBuilding(new ConstructorBuilding());
         EMERALD_FORGE     = loadBuilding(new EmeraldForgeBuilding());
         GATE              = loadBuilding(new GateBuilding());
-        CAULDRON          = loadBuilding(new CauldronBuilding());
         GENERATOR         = loadBuilding(new GeneratorBuilding());
+        LIQUID_TANK = loadBuilding(new LiquidTankBuilding());
         SMELTER           = loadBuilding(new SmelterBuilding());
         STORAGE_BOX       = loadBuilding(new StorageBoxBuilding());
         POWER_CENTRAL     = loadBuilding(new PowerCentralBuilding());
         REFINERY          = loadBuilding(new RefineryBuilding());
-        ASSEMBLER_TRIGGER = loadBuilding(new AssemblerTriggerBuilding());
     }
 
     private static final Array<Building> buildings;
