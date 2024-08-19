@@ -18,7 +18,7 @@ public class AssemblerTriggerProfile implements MechanicProfile<AssemblerTrigger
 
     @Override
     public String getSignName() {
-        return "Assembl Trigger";
+        return "Assemb. Trigger";
     }
 
     @Override
