@@ -24,6 +24,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
 
     public LiquidTank(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
+        loadFromStorage();
     }
 
     @Override
