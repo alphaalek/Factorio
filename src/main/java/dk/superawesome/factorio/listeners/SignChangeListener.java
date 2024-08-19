@@ -14,6 +14,7 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.block.TileState;
+import org.bukkit.block.sign.Side;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -26,8 +27,10 @@ public class SignChangeListener implements Listener {
     public void onSignUpdate(SignChangeEvent event) {
         MechanicManager manager = Factorio.get().getMechanicManager(event.getBlock().getWorld());
 
-        if (manager.getMechanicPartially(event.getBlock().getLocation()) != null) {
-            event.setCancelled(true);
+        Mechanic<?> partiallyAt = manager.getMechanicPartially(event.getBlock().getLocation());
+        if (partiallyAt != null) {
+            // ensure first line persists to be identifiable for the mechanic at this sign block
+            event.setLine(0, partiallyAt.getProfile().getSignName());
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
             Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
             if (on == null
