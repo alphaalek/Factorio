@@ -16,17 +16,21 @@ public abstract class AbstractCommand implements CommandExecutor {
     private static final Pattern UUID_REGEX = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
 
     protected Optional<OfflinePlayer> getTarget(String argument) {
-        return Optional.ofNullable(
+        return Optional.of(
                 // check for username
                 Optional.of(Bukkit.getOfflinePlayer(argument))
-                        .filter(OfflinePlayer::hasPlayedBefore)
                         // if not present, check for uuid
-                        .orElse(Optional.of(argument)
-                                .filter(s -> UUID_REGEX.matcher(s).matches())
-                                .map(s -> Bukkit.getOfflinePlayer(UUID.fromString(s)))
-                                .filter(OfflinePlayer::hasPlayedBefore)
+                        .orElse(
+                            Optional.of(argument)
+                                .flatMap(s ->
+                                    UUID_REGEX.matcher(s).matches() ?
+                                        Optional.of(Bukkit.getOfflinePlayer(UUID.fromString(s))) :
+                                        Optional.empty()
+                                )
                                 // still not present, no valid target found
-                                .orElse(null)));
+                                .orElse(null)
+                        )
+        );
     }
 
     @Override
