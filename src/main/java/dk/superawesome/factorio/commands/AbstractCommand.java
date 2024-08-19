@@ -16,9 +16,10 @@ public abstract class AbstractCommand implements CommandExecutor {
     private static final Pattern UUID_REGEX = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
 
     protected Optional<OfflinePlayer> getTarget(String argument) {
-        return Optional.of(
+        return Optional.ofNullable(
                 // check for username
                 Optional.of(Bukkit.getOfflinePlayer(argument))
+                    .filter(oPlayer -> oPlayer.hasPlayedBefore() || oPlayer.isOnline())
                         // if not present, check for uuid
                         .orElse(
                             Optional.of(argument)
@@ -27,6 +28,7 @@ public abstract class AbstractCommand implements CommandExecutor {
                                         Optional.of(Bukkit.getOfflinePlayer(UUID.fromString(s))) :
                                         Optional.empty()
                                 )
+                                .filter(oPlayer -> oPlayer.hasPlayedBefore() || oPlayer.isOnline())
                                 // still not present, no valid target found
                                 .orElse(null)
                         )
