@@ -1,5 +1,7 @@
 package dk.superawesome.factorio.mechanics.stackregistry;
 
+import dk.superawesome.factorio.util.statics.StringUtil;
+
 public enum Fluid {
 
     WATER(3),
@@ -17,5 +19,10 @@ public enum Fluid {
 
     public int getMaxTransfer() {
         return maxTransfer;
+    }
+
+    @Override
+    public String toString() {
+        return StringUtil.capitalize(this);
     }
 }
