@@ -9,6 +9,7 @@ import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
 import dk.superawesome.factorio.mechanics.routes.Routes;
+import dk.superawesome.factorio.util.statics.BlockUtil;
 import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -193,11 +194,11 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     @EventHandler
     public void onMechanicBuild(MechanicBuildEvent event) {
         if (event.getMechanic() instanceof Assembler assembler) {
-            int xDiff = Math.abs(assembler.getLocation().getBlockX() - loc.getBlockX());
-            int zDiff = Math.abs(assembler.getLocation().getBlockZ() - loc.getBlockZ());
-            int yDiff = Math.abs(assembler.getLocation().getBlockY() - loc.getBlockY());
-            if (xDiff <= 1 && zDiff <= 1 && yDiff == 0) {
-                assemblers.add(assembler);
+            MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
+            for (BlockFace face : Routes.RELATIVES) {
+                if (manager.getMechanicPartially(BlockUtil.getRel(loc, face.getDirection())) == assembler) {
+                    assemblers.add(assembler);
+                }
             }
         }
     }
@@ -205,12 +206,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     @EventHandler
     public void onMechanicRemove(MechanicRemoveEvent event) {
         if (event.getMechanic() instanceof Assembler assembler) {
-            int xDiff = Math.abs(assembler.getLocation().getBlockX() - loc.getBlockX());
-            int zDiff = Math.abs(assembler.getLocation().getBlockZ() - loc.getBlockZ());
-            int yDiff = Math.abs(assembler.getLocation().getBlockY() - loc.getBlockY());
-            if (xDiff <= 1 && zDiff <= 1 && yDiff == 0) {
-                assemblers.remove(assembler);
-            }
+            assemblers.remove(assembler);
         }
     }
 }
