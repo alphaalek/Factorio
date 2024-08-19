@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Levelled;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
 
@@ -51,7 +52,7 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
     }
 
     @Override
-    public void onBlocksLoaded() {
+    public void onBlocksLoaded(Player by) {
         checkCauldron();
     }
 

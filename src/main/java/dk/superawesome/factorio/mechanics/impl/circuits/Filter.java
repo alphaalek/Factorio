@@ -33,19 +33,18 @@ public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
     }
 
     @Override
-    public void onBlocksLoaded() {
-        Block block = loc.getBlock().getRelative(getRotation());
-        loadItems((Sign) block.getState());
+    public void onBlocksLoaded(Player by) {
+        loadItems((Sign) loc.getBlock().getRelative(rot).getState(), by);
     }
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
         if (event.getBlock().equals(loc.getBlock())) {
-            Bukkit.getScheduler().runTask(Factorio.get(), () -> loadItems((Sign) event.getBlock().getState()));
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> loadItems((Sign) event.getBlock().getState(), event.getPlayer()));
         }
     }
 
-    private void loadItems(Sign sign) {
+    private void loadItems(Sign sign, Player by) {
         // get all lines except the first
         for (String line : Arrays.copyOfRange(sign.getSide(Side.FRONT).getLines(), 1, 4)) {
             Arrays.stream(line.split(","))
@@ -59,9 +58,8 @@ public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
             Factorio.get().getMechanicManager(loc.getWorld()).unload(this);
             Buildings.remove(loc.getWorld(), this);
 
-            Player owner = Bukkit.getPlayer(management.getOwner());
-            if (owner != null) {
-                owner.sendMessage("§cUgyldig item valgt!");
+            if (by != null) {
+                by.sendMessage("§cUgyldig item valgt!");
             }
         } else {
             // get all lines except the first

@@ -16,6 +16,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Campfire;
 import org.bukkit.block.data.type.Switch;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockVector;
 
@@ -72,8 +73,8 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public void onBlocksLoaded() {
-        lever = getLocation().getBlock().getRelative(getRotation().getOppositeFace());
+    public void onBlocksLoaded(Player by) {
+        lever = getLocation().getBlock().getRelative(rot.getOppositeFace());
         campfire = getLocation().getBlock().getRelative(0, 2, 0);
         if (lever.getType() != Material.LEVER || campfire.getType() != Material.CAMPFIRE) {
             // invalid generator

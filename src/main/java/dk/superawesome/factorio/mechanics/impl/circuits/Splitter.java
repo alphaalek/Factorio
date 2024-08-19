@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
@@ -40,7 +41,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
     }
 
     @Override
-    public void onBlocksLoaded() {
+    public void onBlocksLoaded(Player by) {
         for (BlockFace face : Routes.RELATIVES) {
             Block block = BlockUtil.getRel(loc, face.getDirection()).getBlock();
             if (block.getType() == Material.PISTON) {

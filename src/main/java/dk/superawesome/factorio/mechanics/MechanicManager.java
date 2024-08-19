@@ -167,17 +167,19 @@ public class MechanicManager implements Listener {
         }
         String type = sign.getSide(Side.FRONT).getLine(0).trim().substring(1, sign.getSide(Side.FRONT).getLine(0).trim().length() - 1);
 
-        Optional<MechanicProfile<?>> profile = Profiles.getProfiles()
+        List<MechanicProfile<?>> match = Profiles.getProfiles()
                 .stream()
-                .filter(b -> b.getSignName().equalsIgnoreCase(type))
-                .findFirst();
-        if (profile.isPresent()) {
+                .filter(b -> b.getSignName().startsWith(type))
+                .toList();
+        if (match.size() == 1) {
+            MechanicProfile<?> profile = match.get(0);
+
             // fix lowercase/uppercase and my headache
-            sign.getSide(Side.FRONT).setLine(0, "[" + profile.get().getSignName() + "]");
+            sign.getSide(Side.FRONT).setLine(0, "[" + profile.getSignName() + "]");
             sign.update();
         }
 
-        return profile;
+        return Optional.empty();
     }
 
     public MechanicBuildResponse buildMechanic(Sign sign, Player owner) {

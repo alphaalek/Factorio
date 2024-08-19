@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Switch;
+import org.bukkit.entity.Player;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -54,8 +55,8 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     @Override
-    public void onBlocksLoaded() {
-        lever = getLocation().getBlock().getRelative(getRotation().getOppositeFace());
+    public void onBlocksLoaded(Player by) {
+        lever = getLocation().getBlock().getRelative(rot.getOppositeFace());
         if (lever.getType() != Material.LEVER) {
             // invalid power central
             Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);

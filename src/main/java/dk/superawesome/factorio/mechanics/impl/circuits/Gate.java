@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Repeater;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
@@ -46,7 +47,7 @@ public class Gate extends AbstractMechanic<Gate> implements Container<TransferCo
     }
 
     @Override
-    public void onBlocksLoaded() {
+    public void onBlocksLoaded(Player by) {
         checkSignal();
     }
 

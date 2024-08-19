@@ -28,7 +28,7 @@ import java.util.*;
 
 public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements ThinkingMechanic {
 
-    private final DelayHandler thinkDelayHandler = new DelayHandler(20*60);
+    private final DelayHandler thinkDelayHandler = new DelayHandler(20);
 
     private boolean usePrice, usePercentage;
     private double minPrice, minPercentage;
@@ -40,31 +40,31 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     @Override
     public void think() {
-        if (assemblers.isEmpty()) {
-            return;
-        }
-
         // all assembler prices are over the minPrice or minPercentage then the power is off
         powered = false;
+
         for (Assembler assembler : assemblers) {
             if (assembler.getType() != null) {
                 Assembler.Type type = assembler.getType();
                 if (usePrice && type.getPricePerItem() < minPrice) {
                     powered = true;
+                    break;
                 } else if (usePercentage) {
                     double percentage = 0;
                     if (type.produces() > type.type().getProduces()) {
                         percentage = (type.produces() / type.type().getProduces() - 1) * 100;
                     } else if (type.produces() < type.type().getProduces()) {
-                        percentage = (type.type().getProduces() / type.produces() - 1) * 100;
+                        percentage = (type.type().getProduces() / type.produces() - 1) * 100 * -1;
                     }
 
                     if (percentage < minPercentage) {
                         powered = true;
+                        break;
                     }
                 }
             }
         }
+
         triggerLevers();
     }
 
@@ -73,6 +73,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
         for (Assembler assembler : assemblers) {
             if (assembler.getType() != null && assembler.getType().isTypesEquals(event.getType())) {
                 think();
+                break;
             }
         }
     }
@@ -82,6 +83,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
         for (Assembler assembler : assemblers) {
             if (assembler.getType() != null && assembler.getType().isTypesEquals(event.getNewType())) {
                 think();
+                break;
             }
         }
     }
@@ -102,11 +104,12 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     @Override
     public void onLeverPull(PlayerInteractEvent event) {
         super.handleLeverPull(event);
+        think();
     }
 
     @Override
     public void onBlocksLoaded(Player by) {
-        loadPrice((Sign) loc.getBlock().getRelative(getRotation()).getState(), by);
+        loadPrice((Sign) loc.getBlock().getRelative(rot).getState(), by);
 
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
             setupRelativeBlocks(at -> {
@@ -121,7 +124,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        if (event.getBlock().equals(loc.getBlock())) {
+        if (event.getBlock().equals(loc.getBlock().getRelative(rot))) {
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                 loadPrice((Sign) event.getBlock().getState(), event.getPlayer());
                 think();
@@ -149,6 +152,8 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
                 }
             }
 
+            i++;
+
             if (usePrice || usePercentage) {
                 // clear all other lines
                 for (int j = 1; j < 4; j++) {
@@ -161,8 +166,6 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
                 // we found a match, so just break
                 break;
             }
-
-            i++;
         }
 
 

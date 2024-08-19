@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
 public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic {
@@ -26,7 +27,7 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
     }
 
     @Override
-    public void onBlocksLoaded() {
+    public void onBlocksLoaded(Player by) {
         // check IO after all other mechanics has been loaded
         Bukkit.getScheduler().runTask(Factorio.get(), this::checkIO);
     }

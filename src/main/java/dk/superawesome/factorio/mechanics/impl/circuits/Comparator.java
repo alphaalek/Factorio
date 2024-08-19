@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Switch;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -50,20 +51,10 @@ public class Comparator extends SignalTrigger<Comparator> implements ThinkingMec
     }
 
     @Override
-    public void onBlocksLoaded() {
-        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-            MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
-            for (BlockFace face : Routes.RELATIVES) {
-                Block block = loc.getBlock().getRelative(face);
-                if (block.getType() == Material.LEVER) {
-                    levers.add(block);
-                    triggerLever(block, false);
-                }
-
-                Mechanic<?> at = manager.getMechanicPartially(block.getLocation());
-                if (at instanceof TransferCollection collection) {
-                    this.collectionTrigger = collection;
-                }
+    public void onBlocksLoaded(Player by) {
+        setupRelativeBlocks(at -> {
+            if (at instanceof TransferCollection collection) {
+                this.collectionTrigger = collection;
             }
         });
     }

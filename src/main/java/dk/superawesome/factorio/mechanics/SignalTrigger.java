@@ -49,13 +49,14 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     }
 
     protected void handleLeverPull(PlayerInteractEvent event) {
-        if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.LEVER) {
-            for (BlockFace face : Routes.RELATIVES) {
-                if (loc.getBlock().getRelative(face).equals(event.getClickedBlock())) {
-                    powered = !((Switch)loc.getBlock().getRelative(face).getBlockData()).isPowered();
-                    break;
-                }
-            }
+        if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.LEVER && levers.contains(event.getClickedBlock())) {
+            powered = !((Switch)event.getClickedBlock().getBlockData()).isPowered();
+        }
+    }
+
+    protected void handleBlockBreak(BlockBreakEvent event) {
+        if (event.getBlock().getType() == Material.LEVER) {
+            levers.remove(event.getBlock());
         }
     }
 
@@ -68,17 +69,6 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
                     if (powered) {
                         triggerLever(event.getBlock(), true);
                     }
-                    break;
-                }
-            }
-        }
-    }
-
-    protected void handleBlockBreak(BlockBreakEvent event) {
-        if (event.getBlock().getType() == Material.LEVER) {
-            for (BlockFace face : Routes.RELATIVES) {
-                if (loc.getBlock().getRelative(face).equals(event.getBlock())) {
-                    levers.remove(event.getBlock());
                     break;
                 }
             }

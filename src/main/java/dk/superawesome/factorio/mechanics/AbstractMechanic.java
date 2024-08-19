@@ -6,6 +6,7 @@ import dk.superawesome.factorio.util.TickThrottle;
 import dk.superawesome.factorio.util.db.Types;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -85,7 +86,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     }
 
     @Override
-    public void onBlocksLoaded() {
+    public void onBlocksLoaded(Player by) {
 
     }
 
