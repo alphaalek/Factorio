@@ -1,18 +1,19 @@
 package dk.superawesome.factorio.mechanics;
 
+import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Switch;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMechanic<M> implements ThinkingMechanic {
 
@@ -30,8 +31,24 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
         block.setBlockData(lever);
     }
 
-    @EventHandler
-    public void onLeverPull(PlayerInteractEvent event) {
+    protected void setupRelativeBlocks(Consumer<Mechanic<?>> find) {
+        MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
+
+        for (BlockFace face : Routes.RELATIVES) {
+            Block block = loc.getBlock().getRelative(face);
+            if (block.getType() == Material.LEVER) {
+                levers.add(block);
+                triggerLever(block, true); // locked so assembler types can be updated before triggering
+            }
+
+            Mechanic<?> at = manager.getMechanicPartially(block.getLocation());
+            if (at != null) {
+                find.accept(at);
+            }
+        }
+    }
+
+    protected void handleLeverPull(PlayerInteractEvent event) {
         if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.LEVER) {
             for (BlockFace face : Routes.RELATIVES) {
                 if (loc.getBlock().getRelative(face).equals(event.getClickedBlock())) {
@@ -71,6 +88,8 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     public abstract void onBlockPlace(BlockPlaceEvent event);
 
     public abstract void onBlockBreak(BlockBreakEvent event);
+
+    public abstract void onLeverPull(PlayerInteractEvent event);
 
     protected void triggerLevers() {
         for (Block lever : levers) {

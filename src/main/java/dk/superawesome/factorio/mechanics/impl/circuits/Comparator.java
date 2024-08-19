@@ -69,15 +69,9 @@ public class Comparator extends SignalTrigger<Comparator> implements ThinkingMec
     }
 
     @EventHandler
+    @Override
     public void onLeverPull(PlayerInteractEvent event) {
-        if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.LEVER) {
-            for (BlockFace face : Routes.RELATIVES) {
-                if (loc.getBlock().getRelative(face).equals(event.getClickedBlock())) {
-                    powered = !((Switch)loc.getBlock().getRelative(face).getBlockData()).isPowered();
-                    break;
-                }
-            }
-        }
+        super.handleLeverPull(event);
     }
 
     @EventHandler

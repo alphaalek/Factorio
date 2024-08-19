@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.*;
 
@@ -29,7 +30,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     private final DelayHandler thinkDelayHandler = new DelayHandler(20*60);
 
-    private boolean usePercentage;
+    private boolean usePrice, usePercentage;
     private double minPrice, minPercentage;
     private final List<Assembler> assemblers = new ArrayList<>();
 
@@ -44,28 +45,25 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
         }
 
         // all assembler prices are over the minPrice or minPercentage then the power is off
-        powered = true;
+        powered = false;
         for (Assembler assembler : assemblers) {
             if (assembler.getType() != null) {
                 Assembler.Type type = assembler.getType();
-                if (!Double.isNaN(minPrice)) {
-                    if (type.getPricePerItem() >= minPrice) {
-                        powered = false;
-                    }
-                } else {
-                    double percentage = minPercentage;
+                if (usePrice && type.getPricePerItem() < minPrice) {
+                    powered = true;
+                } else if (usePercentage) {
+                    double percentage = 0;
                     if (type.produces() > type.type().getProduces()) {
                         percentage = (type.produces() / type.type().getProduces() - 1) * 100;
                     } else if (type.produces() < type.type().getProduces()) {
                         percentage = (type.type().getProduces() / type.produces() - 1) * 100;
                     }
-                    if (percentage >= minPercentage) {
-                        powered = false;
+
+                    if (percentage < minPercentage) {
+                        powered = true;
                     }
                 }
             }
-            if (!powered)
-                break;
         }
         triggerLevers();
     }
@@ -75,50 +73,18 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
         for (Assembler assembler : assemblers) {
             if (assembler.getType() != null && assembler.getType().isTypesEquals(event.getType())) {
                 think();
-                break;
             }
         }
     }
 
     @EventHandler
     public void onAssemblerTypeChange(AssemblerTypeChangeEvent event) {
-        if (!assemblers.contains(event.getAssembler())) {
-            return;
-        }
-
         for (Assembler assembler : assemblers) {
             if (assembler.getType() != null && assembler.getType().isTypesEquals(event.getNewType())) {
                 think();
-                break;
             }
         }
     }
-
-    @Override
-    public void onBlocksLoaded() {
-        // get price from sign or %
-        loadPrice((Sign) loc.getBlock().getRelative(getRotation()).getState());
-
-        // check IO after all other mechanics has been loaded & lever has been placed
-        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-            MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
-            for (BlockFace face : Routes.RELATIVES) {
-                Block block = loc.getBlock().getRelative(face);
-                if (block.getType() == Material.LEVER) {
-                    levers.add(block);
-                    triggerLever(block, true); // locked so assembler types can be updated before triggering
-                }
-
-                Mechanic<?> at = manager.getMechanicPartially(block.getLocation());
-                if (at instanceof Assembler assembler) {
-                    assemblers.add(assembler);
-                }
-            }
-        });
-
-        Bukkit.getScheduler().runTask(Factorio.get(), this::think);
-    }
-
 
     @EventHandler
     @Override
@@ -133,42 +99,81 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     }
 
     @EventHandler
+    @Override
+    public void onLeverPull(PlayerInteractEvent event) {
+        super.handleLeverPull(event);
+    }
+
+    @Override
+    public void onBlocksLoaded(Player by) {
+        loadPrice((Sign) loc.getBlock().getRelative(getRotation()).getState(), by);
+
+        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+            setupRelativeBlocks(at -> {
+                if (at instanceof Assembler assembler) {
+                    assemblers.add(assembler);
+                }
+            });
+
+            think();
+        });
+    }
+
+    @EventHandler
     public void onSignChange(SignChangeEvent event) {
         if (event.getBlock().equals(loc.getBlock())) {
-            Bukkit.getScheduler().runTask(Factorio.get(), () -> loadPrice((Sign) event.getBlock().getState()));
-            think();
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+                loadPrice((Sign) event.getBlock().getState(), event.getPlayer());
+                think();
+            });
         }
     }
 
-    private void loadPrice(Sign sign) {
-        String line = sign.getSide(Side.FRONT).getLine(2).trim();
-        minPrice = Double.NaN;
-        minPercentage = Double.NaN;
-        try {
-            minPrice = Double.parseDouble(line);
-        } catch (NumberFormatException e) {
+    private void loadPrice(Sign sign, Player by) {
+        usePercentage = false;
+        usePrice = false;
+        int i = 0;
+        for (String line : Arrays.copyOfRange(sign.getSide(Side.FRONT).getLines(), 1, 4)) {
             try {
-                minPercentage = Double.parseDouble(line.replace("%", ""));
-            } catch (NumberFormatException ignored) {
+                // check for absolute price
+                minPrice = Double.parseDouble(line);
+                usePrice = true;
+            } catch (NumberFormatException e) {
+                if (line.endsWith("%")) {
+                    try {
+                        // check for percentage
+                        minPercentage = Double.parseDouble(line.substring(0, line.length() - 1));
+                        usePercentage = true;
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
             }
+
+            if (usePrice || usePercentage) {
+                // clear all other lines
+                for (int j = 1; j < 4; j++) {
+                    if (j != i) {
+                        sign.getSide(Side.FRONT).setLine(j, "");
+                    }
+                }
+                sign.update();
+
+                // we found a match, so just break
+                break;
+            }
+
+            i++;
         }
 
-        if (Double.isNaN(minPrice) && Double.isNaN(minPercentage)) {
+
+        // check if no valid filter found for this line
+        if (!usePrice && !usePercentage) {
             Factorio.get().getMechanicManager(loc.getWorld()).unload(this);
             Buildings.remove(loc.getWorld(), this);
 
-            Player owner = Bukkit.getPlayer(management.getOwner());
-            if (owner != null) {
-                owner.sendMessage("§cUgyldig pris eller procent!");
+            if (by != null) {
+                by.sendMessage("§cUgyldig pris eller procent!");
             }
-        } else {
-            sign.getSide(Side.FRONT).setLine(2, line);
-            // get all lines except 1 and 2 lines
-            for (int i = 3; i < 4; i++) {
-                sign.getSide(Side.FRONT).setLine(i, "");
-            }
-
-            sign.update();
         }
     }
 

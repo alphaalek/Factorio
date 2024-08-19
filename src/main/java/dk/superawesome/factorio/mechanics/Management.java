@@ -13,8 +13,9 @@ public class Management {
     public static int LEVEL_UP = 2;
     public static int DELETE = 4;
     public static int MODIFY_MEMBERS = 8;
+    public static int MODIFY_SIGN = 16;
 
-    public static int MEMBER_ACCESS = OPEN | LEVEL_UP;
+    public static int MEMBER_ACCESS = OPEN | LEVEL_UP | MODIFY_SIGN;
     public static int OWNER_ACCESS = MEMBER_ACCESS | DELETE | MODIFY_MEMBERS;
 
     public static class Serializer implements dk.superawesome.factorio.util.Serializer<Management> {

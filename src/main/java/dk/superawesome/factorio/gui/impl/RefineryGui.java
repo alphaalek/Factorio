@@ -16,7 +16,6 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
     public static final int VOLUME_CONTEXT = 0;
     public static final int FILLED_CONTEXT = 1;
 
-
     public static final List<Integer> VOLUME_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
     public static final List<Integer> FILLED_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40, 46, 47, 48, 49);
 

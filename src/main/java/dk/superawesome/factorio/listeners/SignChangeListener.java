@@ -2,6 +2,7 @@ package dk.superawesome.factorio.listeners;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Matcher;
+import dk.superawesome.factorio.mechanics.Management;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.MechanicBuildResponse;
 import dk.superawesome.factorio.mechanics.MechanicManager;
@@ -29,6 +30,13 @@ public class SignChangeListener implements Listener {
 
         Mechanic<?> partiallyAt = manager.getMechanicPartially(event.getBlock().getLocation());
         if (partiallyAt != null) {
+            // check access
+            if (!partiallyAt.getManagement().hasAccess(event.getPlayer(), Management.MODIFY_SIGN)) {
+                event.getPlayer().sendMessage("§cDu har ikke adgang til at ændre på dette skilt!");
+                event.setCancelled(true);
+                return;
+            }
+
             // ensure first line persists to be identifiable for the mechanic at this sign block
             event.setLine(0, partiallyAt.getProfile().getSignName());
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
@@ -43,11 +51,13 @@ public class SignChangeListener implements Listener {
             }
 
             ItemStack drop = new ItemStack(on.getType());
+            // try to build the mechanic in the next tick
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                 MechanicBuildResponse response = manager.buildMechanic((Sign) event.getBlock().getState(), event.getPlayer());
                 build: {
                     switch (response) {
                         case SUCCESS -> {
+                            // Success!
                             Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
                             event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
                             if (!(mechanic.getProfile().getBuilding() instanceof Matcher)) {

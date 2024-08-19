@@ -225,7 +225,7 @@ public class MechanicManager implements Listener {
 
         // place the blocks for this mechanic
         Buildings.build(sign.getWorld(), mechanic);
-        mechanic.onBlocksLoaded();
+        mechanic.onBlocksLoaded(owner);
 
         try {
             for (UUID defaultMember : Factorio.get().getMechanicController().getDefaultMembersFor(owner.getUniqueId())) {
@@ -247,7 +247,7 @@ public class MechanicManager implements Listener {
             if (profile.isPresent()) {
                 Mechanic<?> mechanic = loadMechanicFromSign(profile.get(), sign, (__, on) -> contextProvider.findAt(on.getLocation()));
                 if (mechanic != null) {
-                    mechanic.onBlocksLoaded();
+                    mechanic.onBlocksLoaded(null);
                 }
             }
             return true;
