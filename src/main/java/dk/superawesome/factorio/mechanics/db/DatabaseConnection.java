@@ -6,6 +6,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.logging.Level;
 
 public class DatabaseConnection {
@@ -53,7 +54,11 @@ public class DatabaseConnection {
             return;
         }
 
-        this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, this.username, this.password);
+        Properties properties = new Properties();
+        properties.setProperty("user", this.username);
+        properties.setProperty("password", this.password);
+        properties.setProperty("autoReconnect", "true");
+        this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, properties);
         Factorio.get().getLogger().info("Successfully connected to database!");
     }
 
