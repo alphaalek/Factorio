@@ -40,6 +40,12 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
             this.fluid = Fluid.values()[str.read()];
         }
         this.fluidAmount = context.getSerializer().readInt(str);
+
+        if (this.fluidAmount > 0 && fluid == null) {
+            this.fluidAmount = 0;
+        } else if (this.fluidAmount == 0 && fluid != null) {
+            this.fluid = null;
+        }
     }
 
     @Override
@@ -49,6 +55,11 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
         context.getSerializer().writeInt(str, fluidAmount);
 
         context.uploadData(str);
+    }
+
+    @Override
+    public boolean canBeDeleted() {
+        return true;
     }
 
     @Override

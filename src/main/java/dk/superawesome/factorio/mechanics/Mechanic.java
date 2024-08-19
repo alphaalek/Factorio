@@ -19,6 +19,8 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener {
 
     boolean exists();
 
+    boolean canBeDeleted();
+
     TickThrottle getTickThrottle();
 
     Location getLocation();

@@ -46,6 +46,12 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         this.recipeResult = context.getSerializer().readItemStack(str);
         this.storageType = context.getSerializer().readItemStack(str);
         this.storageAmount = context.getSerializer().readInt(str);
+
+        if (this.storageAmount > 0 && this.storageType == null) {
+            this.storageAmount = 0;
+        } else if (this.storageAmount == 0 && this.storageType != null) {
+            this.storageType = null;
+        }
     }
 
     @Override

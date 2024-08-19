@@ -60,6 +60,12 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
         loadFuel(context, str);
         this.availableEnergy = context.getSerializer().readDouble(str);
+
+        if (this.fuelAmount > 0 && this.fuel == null) {
+            this.fuelAmount = 0;
+        } else if (this.fuelAmount == 0 && this.fuel != null) {
+            this.fuel = null;
+        }
     }
 
     @Override

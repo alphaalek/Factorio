@@ -151,9 +151,16 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         if (filledStack != null && this.filledAmount > 0) {
             this.filled = Filled.getFilledStateByStack(filledStack).orElse(null);
         }
-        if (this.filled == null) {
-            // invalid filled state
+
+        if (this.filledAmount > 0 && this.filled == null) {
             this.filledAmount = 0;
+        } else if (this.filledAmount == 0 && this.filled != null) {
+            this.filled = null;
+        }
+        if (this.volumeAmount  > 0 && this.volume == null) {
+            this.volumeAmount = 0;
+        } else if (this.volumeAmount == 0 && this.volume != null) {
+            this.volume = null;
         }
     }
 

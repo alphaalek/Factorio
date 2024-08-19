@@ -71,6 +71,24 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
         this.storageType = context.getSerializer().readItemStack(str);
         setStorageAmount(context.getSerializer().readInt(str)); // ensure no zero if storage set
+
+        if (this.ingredientAmount > 0 && this.ingredient == null) {
+            this.ingredientAmount = 0;
+        } else if (this.ingredientAmount == 0 && this.ingredient != null) {
+            this.ingredient = null;
+            this.smeltResult = null;
+            this.cachedSmeltResult = null;
+        }
+        if (this.fuelAmount > 0 && this.fuel == null) {
+            this.fuelAmount = 0;
+        } else if (this.fuelAmount == 0 && this.fuel != null) {
+            this.fuel = null;
+        }
+        if (this.storageAmount > 0 && this.storageType == null) {
+            this.storageAmount = 0;
+        } else if (this.storageAmount == 0 && this.storageType != null) {
+            this.storageType = null;
+        }
     }
 
     @Override

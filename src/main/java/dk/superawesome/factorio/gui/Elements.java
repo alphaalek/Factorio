@@ -210,8 +210,7 @@ public class Elements {
             }
 
             // check if this mechanic has any items in its inventory
-            if (mechanic instanceof ItemCollection && !((ItemCollection) mechanic).isTransferEmpty()
-                    || mechanic instanceof Container && !((Container<?>) mechanic).isContainerEmpty()) {
+            if (!mechanic.canBeDeleted()) {
                 player.sendMessage("§cRyd maskinens inventar før du sletter den!");
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                 return;

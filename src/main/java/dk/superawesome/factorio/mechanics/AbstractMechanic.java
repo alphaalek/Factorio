@@ -2,6 +2,8 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
+import dk.superawesome.factorio.mechanics.transfer.Container;
+import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.TickThrottle;
 import dk.superawesome.factorio.util.db.Types;
 import org.bukkit.Location;
@@ -103,6 +105,17 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     @Override
     public Location getLocation() {
         return loc.clone();
+    }
+
+    @Override
+    public boolean canBeDeleted() {
+        if (this instanceof Container<?> container && !container.isContainerEmpty()) {
+            return false;
+        } else if (this instanceof TransferCollection collection && !collection.isTransferEmpty()) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
