@@ -28,22 +28,24 @@ public class Buildings {
     public static final Building STORAGE_BOX;
     public static final Building POWER_CENTRAL;
     public static final Building REFINERY;
+    public static final Building ASSEMBLER_TRIGGER;
 
     static {
         buildings = new Array<>();
 
-        ASSEMBLER     = loadBuilding(new AssemblerBuilding());
-        COLLECTOR     = loadBuilding(new CollectorBuilding());
-        COMPARATOR    = loadBuilding(new ComparatorBuilding());
-        CONSTRUCTOR   = loadBuilding(new ConstructorBuilding());
-        EMERALD_FORGE = loadBuilding(new EmeraldForgeBuilding());
-        GATE          = loadBuilding(new GateBuilding());
-        CAULDRON      = loadBuilding(new CauldronBuilding());
-        GENERATOR     = loadBuilding(new GeneratorBuilding());
-        SMELTER       = loadBuilding(new SmelterBuilding());
-        STORAGE_BOX   = loadBuilding(new StorageBoxBuilding());
-        POWER_CENTRAL = loadBuilding(new PowerCentralBuilding());
-        REFINERY      = loadBuilding(new RefineryBuilding());
+        ASSEMBLER         = loadBuilding(new AssemblerBuilding());
+        COLLECTOR         = loadBuilding(new CollectorBuilding());
+        COMPARATOR        = loadBuilding(new ComparatorBuilding());
+        CONSTRUCTOR       = loadBuilding(new ConstructorBuilding());
+        EMERALD_FORGE     = loadBuilding(new EmeraldForgeBuilding());
+        GATE              = loadBuilding(new GateBuilding());
+        CAULDRON          = loadBuilding(new CauldronBuilding());
+        GENERATOR         = loadBuilding(new GeneratorBuilding());
+        SMELTER           = loadBuilding(new SmelterBuilding());
+        STORAGE_BOX       = loadBuilding(new StorageBoxBuilding());
+        POWER_CENTRAL     = loadBuilding(new PowerCentralBuilding());
+        REFINERY          = loadBuilding(new RefineryBuilding());
+        ASSEMBLER_TRIGGER = loadBuilding(new AssemblerTriggerBuilding());
     }
 
     private static final Array<Building> buildings;

@@ -173,7 +173,7 @@ public class MechanicManager implements Listener {
                 .findFirst();
         if (profile.isPresent()) {
             // fix lowercase/uppercase and my headache
-            sign.getSide(Side.FRONT).setLine(0, "[" + profile.get().getName() + "]");
+            sign.getSide(Side.FRONT).setLine(0, "[" + profile.get().getSignName() + "]");
             sign.update();
         }
 

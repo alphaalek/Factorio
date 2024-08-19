@@ -61,7 +61,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
     private ItemStack getAssemblerTypeItem(Assembler.Type type) {
         return new ItemBuilder(type.type().getMat())
-                .addLore("").addLore("§eSammensætter §fx" + type.requires() + " §etil §f$" + StringUtil.formatDecimals(type.produces(), 2) + " §8(§f$" + (StringUtil.formatDecimals(type.produces() / type.requires(), 2)) + " §epr. item§8)")
+                .addLore("").addLore("§eSammensætter §fx" + type.requires() + " §etil §f$" + StringUtil.formatDecimals(type.produces(), 2) + " §8(§f$" + (StringUtil.formatDecimals(type.getPricePerItem(), 2)) + " §epr. item§8)")
                 .addLore(format(type) + " §8Sidst opdateret " + DurationFormatter.toDuration(System.currentTimeMillis() - Assembler.Types.LAST_UPDATE) + " siden")
                 .addFlags(ItemFlag.HIDE_ATTRIBUTES)
                 .build();
@@ -151,7 +151,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
                         // get the chosen assembler type and set the assembler to use it
                         Assembler.Types type = typeOptional.get();
-                        if (getMechanic().getType() != null && getMechanic().getType().isTypesEqual(type)) {
+                        if (getMechanic().getType() != null && getMechanic().getType().isTypesEquals(type)) {
                             player.sendMessage("§cMaskinen bruger allerede denne sammensætning.");
                             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1);
                             return true;

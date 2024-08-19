@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.api.events.AssemblerTypeChangeEvent;
 import dk.superawesome.factorio.api.events.AssemblerTypeRequestEvent;
 import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.mechanics.*;
@@ -120,7 +121,11 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
                 @Override
                 public void set(ItemStack val) {
-                    type = Types.getLoadedType(Types.getTypeFromMaterial(val.getType()).orElseThrow(IllegalArgumentException::new));
+                    Types oldTypes = type != null ? type.type() : null;
+                    Types newTypes = Types.getTypeFromMaterial(val.getType()).orElseThrow(IllegalArgumentException::new);
+                    type = Types.getLoadedType(newTypes);
+                    AssemblerTypeChangeEvent assemblerTypeChangeEvent = new AssemblerTypeChangeEvent(Assembler.this, oldTypes, newTypes);
+                    Bukkit.getPluginManager().callEvent(assemblerTypeChangeEvent);
                 }
             });
 
@@ -149,7 +154,10 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     }
 
     public void setType(Types type) {
+        Types oldTypes = this.type != null ? this.type.type() : null;
         this.type = Types.getLoadedType(type);
+        AssemblerTypeChangeEvent event = new AssemblerTypeChangeEvent(this, oldTypes, type);
+        Bukkit.getPluginManager().callEvent(event);
 
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
@@ -217,8 +225,12 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
             return type.getMat();
         }
 
-        public boolean isTypesEqual(Types type) {
+        public boolean isTypesEquals(Types type) {
             return this.type == type;
+        }
+
+        public double getPricePerItem() {
+            return produces / requires;
         }
     }
 
