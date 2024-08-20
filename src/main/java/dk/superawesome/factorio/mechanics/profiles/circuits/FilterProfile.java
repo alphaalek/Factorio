@@ -37,6 +37,11 @@ public class FilterProfile implements MechanicProfile<Filter> {
     }
 
     @Override
+    public boolean isInteractable() {
+        return true;
+    }
+
+    @Override
     public int getID() {
         return 11;
     }
