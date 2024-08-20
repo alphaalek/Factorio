@@ -66,7 +66,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     public void pipePut(FluidCollection collection, PipePutEvent event) {
         if ((fluid == null || collection.hasFluid(fluid)) && fluidAmount < getCapacity()) {
             Fluid takeFluid = collection.getFluid();
-            int take = collection.take(getMaxTransfer());
+            int take = collection.take(Math.min(getMaxTransfer(), getCapacity() - fluidAmount));
 
             if (take > 0) {
                 fluidAmount += take;
