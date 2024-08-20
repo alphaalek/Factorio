@@ -27,10 +27,12 @@ public class ListDefaultMembers extends AbstractCommand {
 
             player.sendMessage("§eDu har følgende standard medlemmer for dine nybyggede maskiner (" + members.size() + "):");
             for (UUID member : members) {
-                TextComponent text = new TextComponent(" §e" + Bukkit.getOfflinePlayer(member).getName() + " (" + member + ")  ");
+                TextComponent text = new TextComponent(" §e" + Bukkit.getOfflinePlayer(member).getName() + " (" + member + ") ");
+
                 TextComponent delete = new TextComponent("§c[✗]");
                 delete.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/removedefaultmember " + member));
-                delete.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("\"§cKlik for at fjerne dette medlem fra dine standard medlemmer.\"")));
+                delete.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("§cKlik for at fjerne dette medlem fra dine standard medlemmer")));
+
                 player.spigot().sendMessage(text, delete);
             }
         } catch (SQLException ex) {

@@ -20,8 +20,8 @@ public class AddMemberToAll extends AbstractCommand {
             return;
         }
         Optional<OfflinePlayer> target = getTarget(args[0]);
-        if (target.isEmpty()) {
-            player.sendMessage("§cKunne ikke finde spilleren " + args[0]);
+        if (target.isEmpty() || target.get().getUniqueId().equals(player.getUniqueId())) {
+            player.sendMessage("§cKunne ikke finde spilleren " + args[0] + ".");
             return;
         }
 

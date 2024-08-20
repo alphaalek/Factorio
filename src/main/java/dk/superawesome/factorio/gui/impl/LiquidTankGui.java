@@ -59,7 +59,7 @@ public class LiquidTankGui extends MechanicGui<LiquidTankGui, LiquidTank>{
         };
         // calculate amount for each slot
         double each = ((double)getMechanic().getCapacity()) / (STORAGE_SLOTS_STATES.length * 64);
-        double left = getMechanic().getFluidAmount();
+        double left = getMechanic().getFluidAmount() + .1;
 
         for (int i = 4; i >= 0; i--) {
             int amount = 0;

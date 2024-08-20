@@ -133,7 +133,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
 
     @Override
     public boolean hasFluid(Fluid fluid) {
-        return false;
+        return this.fluid == fluid;
     }
 
     @Override

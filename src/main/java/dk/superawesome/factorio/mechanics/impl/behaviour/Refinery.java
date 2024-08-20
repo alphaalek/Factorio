@@ -87,13 +87,9 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
                 return;
             }
 
-            // empty bottle and filled bottle type is not matching, can't fill up
-            if (filled != null && !filled.getVolume().equals(volume)) {
-                return;
-            }
-
             // check for valid combination
-            if (Filled.getFilledState(volume, collection.getFluid()).isEmpty()) {
+            Optional<Filled> gives = Filled.getFilledState(volume, collection.getFluid());
+            if (gives.isEmpty() || (filled != null && !gives.get().equals(filled))) {
                 return;
             }
 
