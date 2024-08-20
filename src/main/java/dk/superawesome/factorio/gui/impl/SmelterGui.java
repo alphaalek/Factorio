@@ -29,7 +29,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
     public static final List<Integer> INGREDIENT_SLOTS = Arrays.asList(9, 10, 18, 19, 27, 28, 36, 37, 45, 46);
     public static final List<Integer> FUEL_SLOTS = Arrays.asList(12, 13, 21, 22, 30, 31, 39, 40, 48, 49);
-    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(6, 7, 8, 15, 16, 17, 24, 25, 26, 33, 34);
+    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(6, 7, 8, 15, 16, 17, 24, 25, 26, 33, 34, 35);
 
     public SmelterGui(Smelter mechanic, AtomicReference<SmelterGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder());
@@ -44,8 +44,6 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
         for (int i = 3; i < 5; i++) {
             getInventory().setItem(i, new ItemStack(Material.FURNACE));
         }
-        getInventory().setItem(35, new ItemBuilder(Material.FEATHER).setName("§eOpdatér Inventar").build());
-        registerEvent(35, __ -> loadInputOutputItems());
 
         updateFuelState();
         if (getMechanic().isDeclined()) {

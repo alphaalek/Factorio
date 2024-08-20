@@ -15,7 +15,7 @@ public class StorageBoxGui extends SingleStorageGui<StorageBoxGui, StorageBox> {
 
     public static final int STORAGE_CONTEXT = 0;
 
-    public static final int STORED_SIZE = 35;
+    public static final int STORED_SIZE = 36;
 
     public StorageBoxGui(StorageBox mechanic, AtomicReference<StorageBoxGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder(), IntStream.range(0, STORED_SIZE).boxed().collect(Collectors.toList()));
@@ -27,7 +27,6 @@ public class StorageBoxGui extends SingleStorageGui<StorageBoxGui, StorageBox> {
         for (int i : Arrays.asList(36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 50)) {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
-        getInventory().setItem(35, new ItemBuilder(Material.FEATHER).setName("§eOpdatér Inventar").build());
         getInventory().setItem(49, new ItemBuilder(Material.MINECART)
                 .setName("§eIndsæt/Tage imellem inventar")
                 .addLore("")
@@ -35,7 +34,6 @@ public class StorageBoxGui extends SingleStorageGui<StorageBoxGui, StorageBox> {
                 .addLore("§eVenstreklik for at putte ind. §8(§e§oShift for alt§8)")
                 .build());
 
-        registerEvent(35, __ -> loadInputOutputItems());
         registerEvent(49, this::handlePutOrTakeAll);
 
         super.loadItems();

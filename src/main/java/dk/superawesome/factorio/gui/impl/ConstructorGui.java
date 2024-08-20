@@ -25,7 +25,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     private static final int GRID_WIDTH = 3;
     private static final int GRID_HEIGHT = 3;
     private static final List<Integer> CRAFTING_SLOTS = Arrays.asList(10, 11, 12, 19, 20, 21, 28, 29, 30);
-    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34);
+    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35);
 
     private static final List<Recipe> commonRecipes = new ArrayList<>();
 
@@ -69,7 +69,6 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         for (int i = 37; i <= 39; i++) {
             getInventory().setItem(i, new ItemStack(Material.CRAFTING_TABLE));
         }
-        getInventory().setItem(35, new ItemBuilder(Material.FEATHER).setName("§eOpdatér Inventar").build());
 
         getInventory().setItem(47, this.craft = getMechanic().getRecipeResult());
         for (int i = 0; i < CRAFTING_SLOTS.size(); i++) {
@@ -87,8 +86,6 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             updateDeclinedState(true);
         }
         updateCrafting();
-
-        registerEvent(35, __ -> loadInputOutputItems());
 
         super.loadItems();
     }
