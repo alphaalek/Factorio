@@ -60,7 +60,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         ((R) route).getFactory().callRemoveEvent((R) route);
     }
 
-    public static class TransferOutputEntry implements OutputEntry {
+    public static class TransferOutputEntry implements OutputEntry<TransferCollection> {
 
         protected final Block block;
 
@@ -81,7 +81,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
     }
 
-    public static class SignalOutputEntry implements OutputEntry {
+    public static class SignalOutputEntry implements OutputEntry<SignalSource> {
 
         protected final Block block;
 
