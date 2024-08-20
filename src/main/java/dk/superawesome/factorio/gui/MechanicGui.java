@@ -17,10 +17,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -193,6 +190,38 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
             int diff = after - before;
 
             updateAmount(storage, source, diff, leftover);
+        });
+    }
+
+    private Map<Integer, ItemStack> getMatchingSlots(ItemStack stack, boolean onlyPuttable) {
+        int[] j = {0}; // force to heap for lambda access
+
+        Map<Integer, ItemStack> slots = new HashMap<>();
+        IntStream.range(0, getInventory().getSize())
+                .mapToObj(i -> getInventory().getItem(j[0] = i))
+                .filter(i -> i == null || (stack.isSimilar(i) && (!onlyPuttable || i.getAmount() < 64)))
+                .forEach(i -> slots.put(j[0], i));
+        return slots;
+    }
+
+    protected void fixSlotsPut(ItemStack item, Inventory source, List<Integer> ignoreSlots) {
+        getMechanic().getTickThrottle().throttle();
+
+        ItemStack stack = item.clone();
+        Map<Integer, ItemStack> prev = getMatchingSlots(stack, true);
+        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+            Map<Integer, ItemStack> after = getMatchingSlots(stack, false);
+
+            for (Map.Entry<Integer, ItemStack> entry : after.entrySet()) {
+                if (!ignoreSlots.contains(entry.getKey())) {
+                    int diff = Optional.ofNullable(entry.getValue()).map(ItemStack::getAmount).orElse(0)
+                             - Optional.ofNullable(prev.get(entry.getKey())).map(ItemStack::getAmount).orElse(0);
+                    if (diff > 0) { // diff can only be above zero if the Map$Entry#getValue is not null
+                        getInventory().setItem(entry.getKey(), prev.get(entry.getKey()));
+                        source.addItem(new ItemStack(entry.getValue().getType(), diff));
+                    }
+                }
+            }
         });
     }
 

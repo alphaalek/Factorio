@@ -41,12 +41,13 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     @Override
     public void think() {
-        // all assembler prices are over the minPrice or minPercentage then the power is off
+        // if all assembler prices are above the minPrice or minPercentage, power is off
         powered = false;
 
         for (Assembler assembler : assemblers) {
             if (assembler.getType() != null) {
                 Assembler.Type type = assembler.getType();
+
                 if (usePrice && type.getPricePerItem() < minPrice) {
                     powered = true;
                     break;

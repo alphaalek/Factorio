@@ -319,12 +319,10 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         if (movedFromOtherInventory(event)) {
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY
                     && event.getClickedInventory() != getInventory()
-                    && registerInteractionAndCheckFailed(event.getCurrentItem())) {
-
-                // todo: fix put to other slots than for this storage
-                return true;
-            }
-            else if ((event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD || event.getAction() == InventoryAction.HOTBAR_SWAP)
+                    && event.getCurrentItem() != null) {
+                fixPutSlots = true;
+                return registerInteractionAndCheckFailed(event.getCurrentItem());
+            } else if ((event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD || event.getAction() == InventoryAction.HOTBAR_SWAP)
                     && (event.getCurrentItem() == null || findItems(slots).size() > 1)
                     && registerInteractionAndCheckFailed(event.getWhoClicked().getInventory().getItem(event.getHotbarButton()))) {
                 return true;
@@ -334,6 +332,8 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
         return false;
     }
 
+    private boolean fixPutSlots;
+
     @Override
     public void onClickPost(InventoryClickEvent event) {
         if (getMechanic().getTickThrottle().isThrottled()) {
@@ -342,6 +342,13 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
 
         if (!event.isCancelled()) {
             updateAmount(storage, event.getWhoClicked().getInventory(), slots, this::updateRemovedItems);
+
+            if (fixPutSlots) {
+                // InventoryClickEvent#getCurrentItem can't be null in this case
+                fixSlotsPut(event.getCurrentItem(), event.getClickedInventory(), slots);
+            }
         }
+
+        fixPutSlots = false;
     }
 }
