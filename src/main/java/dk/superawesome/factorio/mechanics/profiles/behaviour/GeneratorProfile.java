@@ -50,7 +50,7 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(1)
-                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(12))
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(24))
                 .build();
     }
 
