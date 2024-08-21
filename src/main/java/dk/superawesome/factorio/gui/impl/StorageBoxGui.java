@@ -18,7 +18,7 @@ public class StorageBoxGui extends SingleStorageGui<StorageBoxGui, StorageBox> {
     public static final int STORED_SIZE = 36;
 
     public StorageBoxGui(StorageBox mechanic, AtomicReference<StorageBoxGui> inUseReference) {
-        super(mechanic, inUseReference, new InitCallbackHolder(), IntStream.range(0, STORED_SIZE).boxed().collect(Collectors.toList()));
+        super(mechanic, inUseReference, new InitCallbackHolder());
         initCallback.call();
     }
 

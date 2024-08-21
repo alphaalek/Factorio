@@ -28,9 +28,9 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
     private final List<Integer> slots;
     private final Storage storage;
     
-    public SingleStorageGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback, List<Integer> slots) {
+    public SingleStorageGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback) {
         super(mechanic, inUseReference, initCallback);
-        this.slots = slots;
+        this.slots = mechanic.getProfile().getStorageProvider().getSlots(getContext());
         storage = mechanic.getProfile().getStorageProvider().createStorage(mechanic, getContext());
     }
     

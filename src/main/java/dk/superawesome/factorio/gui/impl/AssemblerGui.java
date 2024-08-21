@@ -27,7 +27,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
     private static final List<Integer> MONEY_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40, 46, 47, 48, 49);
 
     public AssemblerGui(Assembler mechanic, AtomicReference<AssemblerGui> inUseReference) {
-        super(mechanic, inUseReference, new InitCallbackHolder(), STORAGE_SLOTS);
+        super(mechanic, inUseReference, new InitCallbackHolder());
         initCallback.call();
     }
 

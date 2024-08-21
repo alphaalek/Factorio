@@ -20,7 +20,7 @@ public class RefineryGui extends SingleStorageGui<RefineryGui, Refinery> {
     public static final List<Integer> FILLED_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40, 46, 47, 48, 49);
 
     public RefineryGui(Refinery mechanic, AtomicReference<RefineryGui> inUseReference) {
-        super(mechanic, inUseReference, new InitCallbackHolder(), VOLUME_SLOTS);
+        super(mechanic, inUseReference, new InitCallbackHolder());
         initCallback.call();
     }
 
