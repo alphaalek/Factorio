@@ -6,6 +6,7 @@ import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
@@ -16,14 +17,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class Constructor extends AbstractMechanic<Constructor> implements AccessibleMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
     private final DelayHandler thinkDelayHandler = new DelayHandler(20);
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
+
     private final ItemStack[] craftingGridItems = new ItemStack[9];
     private ItemStack recipeResult;
     private ItemStack storageType;
