@@ -108,6 +108,8 @@ public class Routes {
             if (!route.getLocations().contains(fromVec) && onlyExpandIfOriginValid) {
                 return;
             }
+
+            route.add(fromVec);
         }
 
         expandRoute(route, from);
