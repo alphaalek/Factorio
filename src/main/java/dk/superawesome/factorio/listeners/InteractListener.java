@@ -4,6 +4,7 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Matcher;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.util.TickValue;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -44,7 +45,7 @@ public class InteractListener implements Listener {
             if (mechanic.getProfile().getBuilding() instanceof Matcher) {
                 // check access
                 if (!mechanic.getManagement().hasAccess(event.getPlayer(), Management.DELETE)) {
-                    event.getPlayer().sendMessage("§cDu har ikke adgang til at fjerne maskinen!");
+                    event.getPlayer().sendMessage("§cDu har ikke adgang til at fjerne maskinen (" + Bukkit.getOfflinePlayer(mechanic.getManagement().getOwner()).getName() + ")!");
                     event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                     event.setCancelled(true);
                     return;
@@ -69,7 +70,7 @@ public class InteractListener implements Listener {
             // check if the player has access to open this mechanic
             if (!mechanic.getManagement().hasAccess(player, Management.OPEN)) {
                 // no access
-                player.sendMessage("§cDu har ikke adgang til at åbne denne maskine!");
+                player.sendMessage("§cDu har ikke adgang til at åbne denne maskine (" + Bukkit.getOfflinePlayer(mechanic.getManagement().getOwner()).getName() + ")!");
                 player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 0.5f);
                 return;
             }
