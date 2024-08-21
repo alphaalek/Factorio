@@ -51,7 +51,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     @Override
     public void save(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
-        str.write(fluid.ordinal());
+        str.write(Optional.ofNullable(fluid).map(Enum::ordinal).orElse(-1));
         context.getSerializer().writeInt(str, fluidAmount);
 
         context.uploadData(str);

@@ -28,7 +28,7 @@ public class StorageBoxGui extends SingleStorageGui<StorageBoxGui, StorageBox> {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
         getInventory().setItem(49, new ItemBuilder(Material.MINECART)
-                .setName("§eIndsæt/Tage imellem inventar")
+                .setName("§eIndsæt/Tage imellem inventar §8(§e" + getMechanic().getAmount() + " items i alt§8)")
                 .addLore("")
                 .addLore("§eHøjreklik for at tage ud. §8(§e§oShift for alt§8)")
                 .addLore("§eVenstreklik for at putte ind. §8(§e§oShift for alt§8)")
