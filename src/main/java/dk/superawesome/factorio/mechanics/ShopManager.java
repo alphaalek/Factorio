@@ -60,6 +60,7 @@ public class ShopManager implements Listener {
                     return;
                 }
 
+                // TODO: fix virtual one way container thinking all slots which the storage is applied to, can be added and will therefore not take account for going above capacity (edge case)
                 event.setOwnerInventory(recentContainer = (VirtualOneWayContainer) container.createVirtualOneWayInventory(mechanic, storageGui, isInput));
             }
             gui.handleClose(event.getClient());
