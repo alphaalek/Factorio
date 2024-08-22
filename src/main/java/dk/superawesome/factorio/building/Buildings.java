@@ -43,7 +43,7 @@ public class Buildings {
         EMERALD_FORGE     = loadBuilding(new EmeraldForgeBuilding());
         GATE              = loadBuilding(new GateBuilding());
         GENERATOR         = loadBuilding(new GeneratorBuilding());
-        LIQUID_TANK = loadBuilding(new LiquidTankBuilding());
+        LIQUID_TANK       = loadBuilding(new LiquidTankBuilding());
         SMELTER           = loadBuilding(new SmelterBuilding());
         STORAGE_BOX       = loadBuilding(new StorageBoxBuilding());
         POWER_CENTRAL     = loadBuilding(new PowerCentralBuilding());

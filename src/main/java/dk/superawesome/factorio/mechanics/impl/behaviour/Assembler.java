@@ -112,7 +112,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
                 .map(Type::getMat)
                 .map(ItemStack::new)
                 .orElse(null);
-        if ((item == null || collection.has(item)) && ingredientAmount < getCapacity()) {
+        if ((item == null && collection.has(i -> Types.getTypeFromMaterial(i.getType()).isPresent()) || item != null && collection.has(item)) && ingredientAmount < getCapacity()) {
             int add = this.<AssemblerGui>put(collection, getCapacity() - ingredientAmount, getGuiInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
                 @Override
                 public ItemStack get() {
