@@ -249,8 +249,12 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 if (!facing.equals(from)) {
                     add(relVec);
                     addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
-                }
 
+                    if (facing.getType() == Material.REDSTONE_WIRE
+                            || facing.getType() == Material.REPEATER && BlockUtil.getPointingBlock(facing, false).equals(rel)) {
+                        addWire(facing, BlockUtil.getVec(facing), 16);
+                    }
+                }
             // check for expand signal route
             } else if (signal > 1) {
                 if (mat == Material.REDSTONE_WIRE) {
@@ -279,7 +283,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
                 if (up.getType() == Material.REDSTONE_WIRE
                         && (from.getType() == Material.REDSTONE_WIRE && !(insulatorUp.getType().isSolid() && insulatorUp.getType().isOccluding())
-                        || from.getType() == Material.REPEATER && BlockUtil.getPointingBlock(from, true).equals(rel) // TODO: check?
+                        || from.getType() == Material.REPEATER && BlockUtil.getPointingBlock(from, false).equals(rel)
                         )
                 ) {
                     addWire(up, BlockUtil.getVec(up), signal - 1);

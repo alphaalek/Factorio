@@ -87,6 +87,11 @@ public class ShopManager implements Listener {
                 storage.setStored(stack);
             }
             recentContainer.getStorageGui().updateAmount(recentContext, recentOffer, event.getClientInventory(), diff, recentContainer.getSlots());
+
+            // if we were not able to add anything, clear the stored
+            if (storage.getAmount() == 0) {
+                storage.setStored(null);
+            }
         }
     }
 }

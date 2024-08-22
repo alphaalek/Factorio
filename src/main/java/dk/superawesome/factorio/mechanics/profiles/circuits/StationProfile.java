@@ -38,7 +38,7 @@ public class StationProfile implements MechanicProfile<Station> {
 
     @Override
     public int getID() {
-        return 16;
+        return 17;
     }
 
     private static class OneWayMechanicFactory implements MechanicFactory<Station> {

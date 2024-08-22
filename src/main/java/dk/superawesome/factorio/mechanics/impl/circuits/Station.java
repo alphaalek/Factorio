@@ -19,7 +19,7 @@ public class Station extends AbstractMechanic<Station> implements Container<Tran
 
     @Override
     public MechanicProfile<Station> getProfile() {
-        return Profiles.Station;
+        return Profiles.STATION;
     }
 
     @Override

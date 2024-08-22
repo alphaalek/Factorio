@@ -279,6 +279,10 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             searchRecipe();
         }
 
+        if (this.craft != null && this.craft.getType() == Material.AIR) {
+            this.craft = null;
+        }
+
         // set the crafting slot to the recipe result
         getInventory().setItem(47, this.craft);
         getMechanic().setRecipeResult(this.craft);

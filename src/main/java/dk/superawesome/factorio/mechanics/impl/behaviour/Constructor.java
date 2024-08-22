@@ -213,7 +213,6 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     @Override
     public List<ItemStack> take(int amount) {
-
         return this.<ConstructorGui>take(Math.min(getMaxTransfer(), amount), storageType, storageAmount, getGuiInUse(), ConstructorGui::updateRemovedItems, new HeapToStackAccess<>() {
             @Override
             public Integer get() {
@@ -249,7 +248,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     @Override
     public boolean isContainerEmpty() {
-        return recipeResult == null;
+        return Arrays.stream(craftingGridItems).filter(Objects::nonNull).anyMatch(i -> i.getType() != Material.AIR);
     }
 
     @Override

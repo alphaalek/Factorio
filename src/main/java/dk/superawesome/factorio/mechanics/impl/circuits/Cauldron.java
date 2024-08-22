@@ -74,11 +74,6 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
     }
 
     @Override
-    public int getMinTransfer() {
-        return 1;
-    }
-
-    @Override
     public int getTransferAmount() {
         return this.amount;
     }
