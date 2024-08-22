@@ -243,7 +243,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     addWire(facing, BlockUtil.getVec(facing), 16);
                 }
             // comparator - signal output (for generator to power-central)
-            } else if (mat == Material.COMPARATOR) {
+            } else if (mat == Material.COMPARATOR && BlockUtil.getPointingBlock(rel, false).equals(from)) {
                 Block facing = BlockUtil.getPointingBlock(rel, true);
                 // check if the comparator is facing outwards
                 if (!facing.equals(from)) {
@@ -257,6 +257,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     addWire(rel, relVec, signal - 1);
                     return;
                 }
+
+                // TODO: some signal problem, check Ludomanens plot
 
                 if (mat.isSolid() && mat.isOccluding()) {
                     add(relVec);
@@ -277,7 +279,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
                 if (up.getType() == Material.REDSTONE_WIRE
                         && (from.getType() == Material.REDSTONE_WIRE && !(insulatorUp.getType().isSolid() && insulatorUp.getType().isOccluding())
-                        || from.getType() == Material.REPEATER && BlockUtil.getPointingBlock(from, true).equals(rel)
+                        || from.getType() == Material.REPEATER && BlockUtil.getPointingBlock(from, true).equals(rel) // TODO: check?
                         )
                 ) {
                     addWire(up, BlockUtil.getVec(up), signal - 1);

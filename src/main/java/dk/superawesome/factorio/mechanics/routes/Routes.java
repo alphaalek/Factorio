@@ -123,7 +123,7 @@ public class Routes {
         for (BlockFace face : route instanceof AbstractRoute.Signal ? SIGNAL_EXPAND_DIRECTIONS : RELATIVES) {
             BlockVector relVec = BlockUtil.getVec(BlockUtil.getRel(from.getLocation(), face.getDirection()));
             // search relative vector
-            if (!route.hasVisited(fromVec, relVec) && !route.getLocations().contains(relVec)) {
+            if (!route.hasVisited(fromVec, relVec)) {
                 Block rel = BlockUtil.getBlock(from.getWorld(), relVec);
                 route.visit(fromVec, relVec);
                 route.search(from, fromMat, relVec, rel);

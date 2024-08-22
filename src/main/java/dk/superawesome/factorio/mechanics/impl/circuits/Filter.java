@@ -39,7 +39,7 @@ public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        if (event.getBlock().equals(loc.getBlock())) {
+        if (event.getBlock().equals(loc.getBlock().getRelative(rot))) {
             Bukkit.getScheduler().runTask(Factorio.get(), () -> loadItems((Sign) event.getBlock().getState(), event.getPlayer()));
         }
     }

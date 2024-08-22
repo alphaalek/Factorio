@@ -23,14 +23,22 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
     private static Graph getConsumptionGraph(Inventory inventory, PowerCentral mechanic) {
         return new Graph(inventory,
                 () -> mechanic.pollRecentConsumption() * 2,
-                e -> new ItemBuilder(Material.LIGHT_GRAY_WOOL).setName("§eForbrug: " + StringUtil.formatDecimals(e, 2) + "W").addLore("§eEnergi: " + StringUtil.formatDecimals(mechanic.getEnergy(), 2) + "J").build()
+                e -> new ItemBuilder(Material.LIGHT_GRAY_WOOL)
+                        .setName("§eForbrug: " + StringUtil.formatDecimals(e, 2) + "W")
+                        .addLore("§eEnergi: " + StringUtil.formatDecimals(mechanic.getEnergy(), 2) + "J")
+                        .addLore("§eKapacitet: " + StringUtil.formatDecimals(mechanic.getCapacity(), 2) + "J")
+                        .build()
         );
     }
 
     private static Graph getProductionGraph(Inventory inventory, PowerCentral mechanic) {
         return new Graph(inventory,
                 () -> mechanic.pollRecentProduction() * 2,
-                e -> new ItemBuilder(Material.GRAY_WOOL).setName("§eProduktion: " + StringUtil.formatDecimals(e, 2) + "W").addLore("§eEnergi: " + StringUtil.formatDecimals(mechanic.getEnergy(), 2) + "J").build()
+                e -> new ItemBuilder(Material.GRAY_WOOL)
+                        .setName("§eProduktion: " + StringUtil.formatDecimals(e, 2) + "W")
+                        .addLore("§eEnergi: " + StringUtil.formatDecimals(mechanic.getEnergy(), 2) + "J")
+                        .addLore("§eKapacitet: " + StringUtil.formatDecimals(mechanic.getCapacity(), 2) + "J")
+                        .build()
         );
     }
 

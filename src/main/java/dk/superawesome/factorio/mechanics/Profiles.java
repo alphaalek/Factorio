@@ -10,6 +10,8 @@ import dk.superawesome.factorio.util.Array;
 public class Profiles {
 
     public static final MechanicProfile<Assembler> ASSEMBLER;
+    public static final MechanicProfile<AssemblerTrigger> ASSEMBLER_TRIGGER;
+    public static final MechanicProfile<Cauldron> CAULDRON;
     public static final MechanicProfile<Collector> COLLECTOR;
     public static final MechanicProfile<Comparator> COMPARATOR;
     public static final MechanicProfile<Constructor> CONSTRUCTOR;
@@ -19,18 +21,19 @@ public class Profiles {
     public static final MechanicProfile<Generator> GENERATOR;
     public static final MechanicProfile<Hopper> HOPPER;
     public static final MechanicProfile<LiquidTank> LIQUID_TANK;
+    public static final MechanicProfile<Station> Station;
+    public static final MechanicProfile<PowerCentral> POWER_CENTRAL;
+    public static final MechanicProfile<Refinery> REFINERY;
     public static final MechanicProfile<Smelter> SMELTER;
     public static final MechanicProfile<Splitter> SPLITTER;
     public static final MechanicProfile<StorageBox> STORAGE_BOX;
-    public static final MechanicProfile<PowerCentral> POWER_CENTRAL;
-    public static final MechanicProfile<Refinery> REFINERY;
-    public static final MechanicProfile<Cauldron> CAULDRON;
-    public static final MechanicProfile<AssemblerTrigger> ASSEMBLER_TRIGGER;
 
     static {
         profiles = new Array<>();
 
         ASSEMBLER         = loadProfile(new AssemblerProfile());
+        ASSEMBLER_TRIGGER = loadProfile(new AssemblerTriggerProfile());
+        CAULDRON          = loadProfile(new CauldronProfile());
         COLLECTOR         = loadProfile(new CollectorProfile());
         COMPARATOR        = loadProfile(new ComparatorProfile());
         CONSTRUCTOR       = loadProfile(new ConstructorProfile());
@@ -39,14 +42,13 @@ public class Profiles {
         GATE              = loadProfile(new GateProfile());
         GENERATOR         = loadProfile(new GeneratorProfile());
         HOPPER            = loadProfile(new HopperProfile());
-        LIQUID_TANK = loadProfile(new LiquidTankProfile());
+        LIQUID_TANK       = loadProfile(new LiquidTankProfile());
+        POWER_CENTRAL     = loadProfile(new PowerCentralProfile());
+        REFINERY          = loadProfile(new RefineryProfile());
+        Station = loadProfile(new StationProfile());
         SMELTER           = loadProfile(new SmelterProfile());
         SPLITTER          = loadProfile(new SplitterProfile());
         STORAGE_BOX       = loadProfile(new StorageBoxProfile());
-        POWER_CENTRAL     = loadProfile(new PowerCentralProfile());
-        REFINERY          = loadProfile(new RefineryProfile());
-        CAULDRON          = loadProfile(new CauldronProfile());
-        ASSEMBLER_TRIGGER = loadProfile(new AssemblerTriggerProfile());
     }
 
     private static final Array<MechanicProfile<?>> profiles;
