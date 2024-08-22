@@ -98,9 +98,13 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
         int take = Math.min(this.amount, amount);
         this.amount -= take;
         if (this.amount == 0) {
+            this.fluid = null;
             loc.getBlock().setType(Material.CAULDRON);
+        } else {
+            Levelled cauldron = (Levelled) loc.getBlock().getBlockData();
+            cauldron.setLevel(this.amount);
+            loc.getBlock().setBlockData(cauldron);
         }
-        checkCauldron();
 
         return take;
     }
