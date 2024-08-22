@@ -17,6 +17,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
@@ -97,6 +98,17 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
             for (HumanEntity player : gui.getInventory().getViewers()) {
                 ((Player)player).playSound(getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.25f, 1f);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPriceUpdate(AssemblerTypeRequestEvent event) {
+        if (event.getType().equals(type.type)) {
+            type = Types.getLoadedType(event.getType());
+            AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
+            if (gui != null) {
+                gui.loadAssemblerType();
             }
         }
     }
