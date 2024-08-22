@@ -238,7 +238,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     return;
                 }
 
-                if (!expandWire(facing, rel, 16)
+                if (!expandWire(facing, rel, rel, 16)
                         && facing.getType().isSolid() && facing.getType().isOccluding()) {
                     signals.put(relVec, 16);
                     Routes.expandRoute(this, rel, relVec, ((Directional)rel.getBlockData()).getFacing().getOppositeFace());
@@ -253,7 +253,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     add(relVec);
                     addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
 
-                    expandWire(facing, rel, 16);
+                    expandWire(facing, rel, rel, 16);
                 }
 
             // check for expand signal route
@@ -268,27 +268,29 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     for (BlockFace face : Routes.SIGNAL_EXPAND_DIRECTIONS) {
                         Block sourceRel = rel.getRelative(face);
                         if (!sourceRel.equals(from)) {
-                            expandWire(sourceRel, rel, 16);
+                            expandWire(sourceRel, rel, rel, 16);
                         }
                     }
                 }
 
                 Block up = rel.getRelative(BlockFace.UP);
                 Block down = rel.getRelative(BlockFace.DOWN);
+
                 Block insulatorUp = from.getRelative(BlockFace.UP);
+                Block insulatorDown = from.getRelative(BlockFace.DOWN);
 
                 if (up.getType() == Material.REDSTONE_WIRE
                         && (from.getType() == Material.REDSTONE_WIRE && !insulatorUp.getType().isSolid() && !insulatorUp.getType().isOccluding()
                         || from.getType() == Material.REPEATER && BlockUtil.getPointingBlock(from, true).equals(rel)
                         )
                 ) {
-                    expandWire(up, from, from.getType() == Material.REPEATER ? 16 : signal - 1);
+                    expandWire(up, from, from, from.getType() == Material.REPEATER ? 16 : signal - 1);
                 }
 
-                if (from.getType() == Material.REDSTONE_WIRE
+                if (from.getType() == Material.REDSTONE_WIRE && insulatorDown.getType().isSolid() && insulatorDown.getType().isOccluding()
                         && (down.getType() == Material.REDSTONE_WIRE && !mat.isSolid() && !mat.isOccluding()
-                        || down.getType() == Material.REPEATER && BlockUtil.getPointingBlock(down, false).equals(from.getRelative(BlockFace.DOWN)))) {
-                    expandWire(down, from, signal - 1);
+                        || down.getType() == Material.REPEATER && BlockUtil.getPointingBlock(down, false).equals(insulatorDown))) {
+                    expandWire(down, from, insulatorDown, signal - 1);
                 } else if (from.getType() == Material.REPEATER
                         && mat.isSolid() && mat.isOccluding()
                         && down.getType() == Material.REDSTONE_WIRE) {
@@ -297,12 +299,12 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             }
         }
 
-        private boolean expandWire(Block block, Block from, int signal) {
+        private boolean expandWire(Block block, Block from, Block point, int signal) {
             add(BlockUtil.getVec(block));
             if (block.getType() == Material.REDSTONE_WIRE) {
                 expandWire(from, block, BlockUtil.getVec(block), signal);
                 return true;
-            } else if (block.getType() == Material.REPEATER && BlockUtil.getPointingBlock(block, false).equals(from)) {
+            } else if (block.getType() == Material.REPEATER && BlockUtil.getPointingBlock(block, false).equals(point)) {
                 signals.put(BlockUtil.getVec(block), 16);
                 Routes.expandRoute(this, block, BlockUtil.getVec(block), ((Directional)block.getBlockData()).getFacing().getOppositeFace());
                 return true;
