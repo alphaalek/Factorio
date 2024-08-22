@@ -69,7 +69,9 @@ public class MechanicSerializer {
                     stack.setItemMeta(meta);
                 }
 
-                return stack;
+                if (stack.getType() != Material.AIR) {
+                    return stack;
+                }
             }
         }
 

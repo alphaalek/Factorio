@@ -27,9 +27,13 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     }
 
     protected void triggerLever(Block block, boolean powered) {
-        Switch lever = (Switch) block.getBlockData();
-        lever.setPowered(powered);
-        block.setBlockData(lever);
+        if (block.getType() == Material.LEVER) {
+            Switch lever = (Switch) block.getBlockData();
+            lever.setPowered(powered);
+            block.setBlockData(lever);
+        } else {
+            levers.remove(block);
+        }
     }
 
     protected void setupRelativeBlocks(Consumer<Mechanic<?>> find) {
@@ -56,9 +60,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     }
 
     protected void handleBlockBreak(BlockBreakEvent event) {
-        if (event.getBlock().getType() == Material.LEVER) {
-            levers.remove(event.getBlock());
-        }
+        levers.remove(event.getBlock());
     }
 
     protected void handleBlockPlace(BlockPlaceEvent event) {
