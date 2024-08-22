@@ -46,7 +46,7 @@ public class InteractListener implements Listener {
                 // check access
                 if (!mechanic.getManagement().hasAccess(event.getPlayer(), Management.DELETE)) {
                     event.getPlayer().sendMessage("§cDu har ikke adgang til at fjerne maskinen (" + Bukkit.getOfflinePlayer(mechanic.getManagement().getOwner()).getName() + ")!");
-                    event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+                    event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.4f, 0.4f);
                     event.setCancelled(true);
                     return;
                 }
@@ -71,7 +71,7 @@ public class InteractListener implements Listener {
             if (!mechanic.getManagement().hasAccess(player, Management.OPEN)) {
                 // no access
                 player.sendMessage("§cDu har ikke adgang til at åbne denne maskine (" + Bukkit.getOfflinePlayer(mechanic.getManagement().getOwner()).getName() + ")!");
-                player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 0.5f);
+                player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.4f, 0.4f);
                 return;
             }
 

@@ -59,9 +59,13 @@ public class SignChangeListener implements Listener {
                         case SUCCESS -> {
                             // Success!
                             Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
-                            event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
-                            if (!(mechanic.getProfile().getBuilding() instanceof Matcher)) {
-                                event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), drop);
+                            if (mechanic != null) {
+                                event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
+                                if (!(mechanic.getProfile().getBuilding() instanceof Matcher)) {
+                                    event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), drop);
+                                }
+                            } else {
+                                event.getPlayer().sendMessage("§cNoget gik galt! Kontakt en udvikler.");
                             }
                             break build;
                         }

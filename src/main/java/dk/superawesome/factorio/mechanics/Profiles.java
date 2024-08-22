@@ -21,15 +21,41 @@ public class Profiles {
     public static final MechanicProfile<Generator> GENERATOR;
     public static final MechanicProfile<Hopper> HOPPER;
     public static final MechanicProfile<LiquidTank> LIQUID_TANK;
+    public static final MechanicProfile<Station> Station;
+    public static final MechanicProfile<PowerCentral> POWER_CENTRAL;
+    public static final MechanicProfile<Refinery> REFINERY;
     public static final MechanicProfile<Smelter> SMELTER;
     public static final MechanicProfile<Splitter> SPLITTER;
     public static final MechanicProfile<StorageBox> STORAGE_BOX;
+<<<<<<< HEAD
+=======
     public static final MechanicProfile<PowerCentral> POWER_CENTRAL;
     public static final MechanicProfile<Refinery> REFINERY;
+>>>>>>> c34a86259f42ff9e2ae31dc89a4a1f06b9844e1b
 
     static {
         profiles = new Array<>();
 
+<<<<<<< HEAD
+        ASSEMBLER         = loadProfile(new AssemblerProfile());
+        ASSEMBLER_TRIGGER = loadProfile(new AssemblerTriggerProfile());
+        CAULDRON          = loadProfile(new CauldronProfile());
+        COLLECTOR         = loadProfile(new CollectorProfile());
+        COMPARATOR        = loadProfile(new ComparatorProfile());
+        CONSTRUCTOR       = loadProfile(new ConstructorProfile());
+        EMERALD_FORGE     = loadProfile(new EmeraldForgeProfile());
+        FILTER            = loadProfile(new FilterProfile());
+        GATE              = loadProfile(new GateProfile());
+        GENERATOR         = loadProfile(new GeneratorProfile());
+        HOPPER            = loadProfile(new HopperProfile());
+        LIQUID_TANK       = loadProfile(new LiquidTankProfile());
+        POWER_CENTRAL     = loadProfile(new PowerCentralProfile());
+        REFINERY          = loadProfile(new RefineryProfile());
+        Station = loadProfile(new StationProfile());
+        SMELTER           = loadProfile(new SmelterProfile());
+        SPLITTER          = loadProfile(new SplitterProfile());
+        STORAGE_BOX       = loadProfile(new StorageBoxProfile());
+=======
         ASSEMBLER         = loadProfile(new AssemblerProfile());            /* ID: 4 */
         ASSEMBLER_TRIGGER = loadProfile(new AssemblerTriggerProfile());     /* ID: 15 */
         CAULDRON          = loadProfile(new CauldronProfile());             /* ID: 14 */
@@ -47,6 +73,7 @@ public class Profiles {
         STORAGE_BOX       = loadProfile(new StorageBoxProfile());           /* ID: 2 */
         POWER_CENTRAL     = loadProfile(new PowerCentralProfile());         /* ID: 3 */
         REFINERY          = loadProfile(new RefineryProfile());             /* ID: 13 */
+>>>>>>> c34a86259f42ff9e2ae31dc89a4a1f06b9844e1b
     }
 
     private static final Array<MechanicProfile<?>> profiles;
