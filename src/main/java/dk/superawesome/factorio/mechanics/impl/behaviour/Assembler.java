@@ -105,7 +105,11 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     @EventHandler
     public void onPriceUpdate(AssemblerTypeRequestEvent event) {
         if (event.getType().equals(type.type)) {
-            setType(event.getType());
+            type = Types.getLoadedType(event.getType());
+            AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
+            if (gui != null) {
+                gui.loadAssemblerType();
+            }
         }
     }
 
