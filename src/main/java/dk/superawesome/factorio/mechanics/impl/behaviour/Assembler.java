@@ -18,6 +18,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
@@ -102,9 +103,9 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         }
     }
 
-    @EventHandler
+    @EventHandler//TODO check for if we need that (priority = EventPriority.HIGH)
     public void onPriceUpdate(AssemblerTypeRequestEvent event) {
-        if (event.getType().equals(type.type)) {
+        if (type != null && type.isTypesEquals(event.getType())) {
             type = Types.getLoadedType(event.getType());
             AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
             if (gui != null) {
@@ -299,8 +300,9 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
             types.clear();
             for (Types type : Types.values()) {
                 AssemblerTypeRequestEvent requestEvent = new AssemblerTypeRequestEvent(type);
-                Bukkit.getPluginManager().callEvent(requestEvent);
                 types.add(new Type(type, requestEvent.getRequires(), requestEvent.getProduces()));
+                Bukkit.getPluginManager().callEvent(requestEvent);
+                types.set(types.size() - 1, new Type(type, requestEvent.getRequires(), requestEvent.getProduces()));
             }
         }
 
