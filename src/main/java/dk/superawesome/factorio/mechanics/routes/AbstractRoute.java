@@ -238,10 +238,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     return;
                 }
 
-                if (facing.getType() == Material.REDSTONE_WIRE) {
-                    expandWire(rel, facing, BlockUtil.getVec(facing), 16);
-                } else if (facing.getType() == Material.REPEATER && BlockUtil.getPointingBlock(facing, false).equals(rel) ||
-                        facing.getType().isSolid() && facing.getType().isOccluding()) {
+                if (!expandWire(facing, rel, 16)
+                        && facing.getType().isSolid() && facing.getType().isOccluding()) {
                     signals.put(relVec, 16);
                     Routes.expandRoute(this, rel, relVec, ((Directional)rel.getBlockData()).getFacing().getOppositeFace());
                 }
@@ -255,13 +253,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     add(relVec);
                     addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
 
-                    if (facing.getType() == Material.REDSTONE_WIRE) {
-                        expandWire(rel, facing, BlockUtil.getVec(facing), 16);
-                    } else if (facing.getType() == Material.REPEATER && BlockUtil.getPointingBlock(facing, false).equals(rel)) {
-                        BlockVector facingVec = BlockUtil.getVec(facing);
-                        signals.put(facingVec, 16);
-                        Routes.expandRoute(this, facing, facingVec, ((Directional)rel.getBlockData()).getFacing().getOppositeFace());
-                    }
+                    expandWire(facing, rel, 16);
                 }
 
             // check for expand signal route
@@ -275,11 +267,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     add(relVec);
                     for (BlockFace face : Routes.SIGNAL_EXPAND_DIRECTIONS) {
                         Block sourceRel = rel.getRelative(face);
-                        if (!sourceRel.equals(from)
-                                && (sourceRel.getType() == Material.REDSTONE_WIRE
-                                    || sourceRel.getType() == Material.REPEATER && BlockUtil.getPointingBlock(sourceRel, false).equals(rel))
-                        ) {
-                            expandWire(from, sourceRel, BlockUtil.getVec(sourceRel), signal - 1);
+                        if (!sourceRel.equals(from)) {
+                            expandWire(sourceRel, rel, 16);
                         }
                     }
                 }
@@ -293,19 +282,33 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                         || from.getType() == Material.REPEATER && BlockUtil.getPointingBlock(from, true).equals(rel)
                         )
                 ) {
-                    expandWire(from, up, BlockUtil.getVec(up), signal - 1);
+                    expandWire(up, from, from.getType() == Material.REPEATER ? 16 : signal - 1);
                 }
 
                 if (from.getType() == Material.REDSTONE_WIRE
                         && (down.getType() == Material.REDSTONE_WIRE && !mat.isSolid() && !mat.isOccluding()
                         || down.getType() == Material.REPEATER && BlockUtil.getPointingBlock(down, false).equals(from.getRelative(BlockFace.DOWN)))) {
-                    expandWire(from, down, BlockUtil.getVec(down), signal - 1);
+                    expandWire(down, from, signal - 1);
                 } else if (from.getType() == Material.REPEATER
                         && mat.isSolid() && mat.isOccluding()
                         && down.getType() == Material.REDSTONE_WIRE) {
                     expandWire(from, down, BlockUtil.getVec(down), signal - 1);
                 }
             }
+        }
+
+        private boolean expandWire(Block block, Block from, int signal) {
+            add(BlockUtil.getVec(block));
+            if (block.getType() == Material.REDSTONE_WIRE) {
+                expandWire(from, block, BlockUtil.getVec(block), signal);
+                return true;
+            } else if (block.getType() == Material.REPEATER && BlockUtil.getPointingBlock(block, false).equals(from)) {
+                signals.put(BlockUtil.getVec(block), 16);
+                Routes.expandRoute(this, block, BlockUtil.getVec(block), ((Directional)block.getBlockData()).getFacing().getOppositeFace());
+                return true;
+            }
+
+            return false;
         }
 
         private void expandWire(Block from, Block rel, BlockVector relVec, int signal) {
