@@ -55,6 +55,6 @@ public class GeneratorBuilding implements Building, Buildable {
 
     @Override
     public int getID() {
-        return Profiles.POWER_CENTRAL.getID();
+        return Profiles.GENERATOR.getID();
     }
 }
