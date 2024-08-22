@@ -10,6 +10,8 @@ import dk.superawesome.factorio.util.Array;
 public class Profiles {
 
     public static final MechanicProfile<Assembler> ASSEMBLER;
+    public static final MechanicProfile<AssemblerTrigger> ASSEMBLER_TRIGGER;
+    public static final MechanicProfile<Cauldron> CAULDRON;
     public static final MechanicProfile<Collector> COLLECTOR;
     public static final MechanicProfile<Comparator> COMPARATOR;
     public static final MechanicProfile<Constructor> CONSTRUCTOR;
@@ -24,29 +26,27 @@ public class Profiles {
     public static final MechanicProfile<StorageBox> STORAGE_BOX;
     public static final MechanicProfile<PowerCentral> POWER_CENTRAL;
     public static final MechanicProfile<Refinery> REFINERY;
-    public static final MechanicProfile<Cauldron> CAULDRON;
-    public static final MechanicProfile<AssemblerTrigger> ASSEMBLER_TRIGGER;
 
     static {
         profiles = new Array<>();
 
-        ASSEMBLER         = loadProfile(new AssemblerProfile());
-        COLLECTOR         = loadProfile(new CollectorProfile());
-        COMPARATOR        = loadProfile(new ComparatorProfile());
-        CONSTRUCTOR       = loadProfile(new ConstructorProfile());
-        EMERALD_FORGE     = loadProfile(new EmeraldForgeProfile());
-        FILTER            = loadProfile(new FilterProfile());
-        GATE              = loadProfile(new GateProfile());
-        GENERATOR         = loadProfile(new GeneratorProfile());
-        HOPPER            = loadProfile(new HopperProfile());
-        LIQUID_TANK = loadProfile(new LiquidTankProfile());
-        SMELTER           = loadProfile(new SmelterProfile());
-        SPLITTER          = loadProfile(new SplitterProfile());
-        STORAGE_BOX       = loadProfile(new StorageBoxProfile());
-        POWER_CENTRAL     = loadProfile(new PowerCentralProfile());
-        REFINERY          = loadProfile(new RefineryProfile());
-        CAULDRON          = loadProfile(new CauldronProfile());
-        ASSEMBLER_TRIGGER = loadProfile(new AssemblerTriggerProfile());
+        ASSEMBLER         = loadProfile(new AssemblerProfile());            /* ID: 4 */
+        ASSEMBLER_TRIGGER = loadProfile(new AssemblerTriggerProfile());     /* ID: 15 */
+        CAULDRON          = loadProfile(new CauldronProfile());             /* ID: 14 */
+        COLLECTOR         = loadProfile(new CollectorProfile());            /* ID: 7 */
+        COMPARATOR        = loadProfile(new ComparatorProfile());           /* ID: 12 */
+        CONSTRUCTOR       = loadProfile(new ConstructorProfile());          /* ID: 0 */
+        EMERALD_FORGE     = loadProfile(new EmeraldForgeProfile());         /* ID: 5 */
+        FILTER            = loadProfile(new FilterProfile());               /* ID: 11 */
+        GATE              = loadProfile(new GateProfile());                 /* ID: 9 */
+        GENERATOR         = loadProfile(new GeneratorProfile());            /* ID: 6 */
+        HOPPER            = loadProfile(new HopperProfile());               /* ID: 8 */
+        LIQUID_TANK       = loadProfile(new LiquidTankProfile());           /* ID: 16 */
+        SMELTER           = loadProfile(new SmelterProfile());              /* ID: 1 */
+        SPLITTER          = loadProfile(new SplitterProfile());             /* ID: 10 */
+        STORAGE_BOX       = loadProfile(new StorageBoxProfile());           /* ID: 2 */
+        POWER_CENTRAL     = loadProfile(new PowerCentralProfile());         /* ID: 3 */
+        REFINERY          = loadProfile(new RefineryProfile());             /* ID: 13 */
     }
 
     private static final Array<MechanicProfile<?>> profiles;
