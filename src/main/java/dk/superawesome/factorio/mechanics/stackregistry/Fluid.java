@@ -4,17 +4,23 @@ import dk.superawesome.factorio.util.statics.StringUtil;
 
 public enum Fluid {
 
-    WATER(3),
+    WATER(1,3),
 
-    LAVA(3),
+    LAVA(3, 3),
 
-    SNOW(3),
+    SNOW(3,3),
     ;
 
+    private final int minTransfer;
     private final int maxTransfer;
 
-    Fluid(int maxTransfer) {
+    Fluid(int minTransfer, int maxTransfer) {
+        this.minTransfer = minTransfer;
         this.maxTransfer = maxTransfer;
+    }
+
+    public int getMinTransfer() {
+        return 1;
     }
 
     public int getMaxTransfer() {
