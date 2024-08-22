@@ -102,10 +102,6 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
                 // take fluid after updating filled state if not set
                 collection.take(volume.getFluidRequires());
 
-                // update filled amount
-                filledAmount++;
-                setVolumeAmount(volumeAmount - 1);
-
                 // update items in gui if in use
                 RefineryGui gui = Refinery.this.<RefineryGui>getGuiInUse().get();
                 if (gui != null) {
@@ -116,6 +112,10 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
                         ((Player)viewer).playSound(viewer.getLocation(), filled.getFillSound(), 0.5f, 0.5f);
                     }
                 }
+
+                // update filled amount
+                filledAmount++;
+                setVolumeAmount(volumeAmount - 1);
 
                 event.setTransferred(true);
             }
