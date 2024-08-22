@@ -20,7 +20,7 @@ public enum Fluid {
     }
 
     public int getMinTransfer() {
-        return 1;
+        return minTransfer;
     }
 
     public int getMaxTransfer() {
