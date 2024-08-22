@@ -284,7 +284,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
                 int boxAmount = (int) Math.min(a, storage.getAmount());
                 // put all items we can in the player's inventory from the storage box
                 int left = updateAddedItems(playerInv, boxAmount, storage.getStored(),
-                        IntStream.range(0, playerInv.getSize())
+                        IntStream.range(0, 36)
                                 .boxed()
                                 .collect(Collectors.toList()));
                 int amount = boxAmount - left;

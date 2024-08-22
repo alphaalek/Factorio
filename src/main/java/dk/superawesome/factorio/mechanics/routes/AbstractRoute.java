@@ -262,8 +262,6 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     return;
                 }
 
-                // TODO: some signal problem, check Ludomanens plot
-
                 if (mat.isSolid() && mat.isOccluding()) {
                     add(relVec);
                     for (BlockFace face : Routes.SIGNAL_EXPAND_DIRECTIONS) {
@@ -282,7 +280,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 Block insulatorUp = from.getRelative(BlockFace.UP);
 
                 if (up.getType() == Material.REDSTONE_WIRE
-                        && (from.getType() == Material.REDSTONE_WIRE && !(insulatorUp.getType().isSolid() && insulatorUp.getType().isOccluding())
+                        && (from.getType() == Material.REDSTONE_WIRE && !insulatorUp.getType().isSolid() && !insulatorUp.getType().isOccluding()
                         || from.getType() == Material.REPEATER && BlockUtil.getPointingBlock(from, false).equals(rel)
                         )
                 ) {
