@@ -68,7 +68,7 @@ public class Routes {
         return true;
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry<?>> R setupRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = AbstractRoute.getCachedOriginRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
             route = createNewRoute(start, factory, onlyExpandIfOriginValid);
@@ -88,7 +88,7 @@ public class Routes {
                 .start(source);
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry<?>> R createNewRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = factory.create(BlockUtil.getVec(start));
         startRoute(route, start, onlyExpandIfOriginValid);
 
@@ -112,10 +112,10 @@ public class Routes {
             route.add(fromVec);
         }
 
-        expandRoute(route, from);
+        expandRoute(route, from, from);
     }
 
-    public static void expandRoute(AbstractRoute<?, ?> route, Block from) {
+    public static void expandRoute(AbstractRoute<?, ?> route, Block from, Block ignore) {
         BlockVector fromVec = BlockUtil.getVec(from);
         Material fromMat = from.getType();
 
@@ -125,13 +125,28 @@ public class Routes {
             // search relative vector
             if (!route.hasVisited(fromVec, relVec)) {
                 Block rel = BlockUtil.getBlock(from.getWorld(), relVec);
+                if (rel.equals(ignore)) {
+                    continue;
+                }
+
                 route.visit(fromVec, relVec);
                 route.search(from, fromMat, relVec, rel);
             }
         }
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> void setupForcibly(Block block, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+    public static void expandRoute(AbstractRoute<?, ?> route, Block from, BlockVector fromVec, BlockFace face) {
+        BlockVector relVec = BlockUtil.getVec(BlockUtil.getRel(from.getLocation(), face.getDirection()));
+
+        if (!route.hasVisited(fromVec, relVec)) {
+            Block rel = BlockUtil.getBlock(from.getWorld(), relVec);
+
+            route.visit(fromVec, relVec);
+            route.search(from, from.getType(), relVec, rel);
+        }
+    }
+
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry<?>> void setupForcibly(Block block, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         updateNearbyRoutes(block, modified -> {
             if (modified.isEmpty()) {
                 setupRoute(block, factory, onlyExpandIfOriginValid);
