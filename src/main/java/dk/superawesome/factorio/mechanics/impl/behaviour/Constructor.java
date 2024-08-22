@@ -248,7 +248,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     @Override
     public boolean isContainerEmpty() {
-        return Arrays.stream(craftingGridItems).filter(Objects::nonNull).anyMatch(i -> i.getType() != Material.AIR);
+        return Arrays.stream(craftingGridItems).filter(Objects::nonNull).allMatch(i -> i.getType() == Material.AIR);
     }
 
     @Override
