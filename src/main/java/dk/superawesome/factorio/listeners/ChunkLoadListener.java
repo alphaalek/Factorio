@@ -20,16 +20,7 @@ public class ChunkLoadListener implements Listener {
     public void onChunkLoad(ChunkLoadEvent event) {
         MechanicManager manager = Factorio.get().getMechanicManager(event.getWorld());
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-            for (BlockState state : event.getChunk().getTileEntities()) {
-                if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())
-                        && manager.getMechanicAt(BlockUtil.getPointingBlock(state.getBlock(), false).getLocation()) == null) {
-                    // load this mechanic
-                    if (!manager.loadMechanic((Sign) state)) {
-                        // unable to load mechanic properly due to corrupt data
-                        state.getBlock().setType(Material.AIR);
-                    }
-                }
-            }
+            manager.loadMechanics(event.getChunk());
         });
     }
 

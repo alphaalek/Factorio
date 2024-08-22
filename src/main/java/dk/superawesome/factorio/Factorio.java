@@ -71,18 +71,7 @@ public final class Factorio extends JavaPlugin implements Listener {
             // load all mechanics
             for (World world : Bukkit.getWorlds()) {
                 MechanicManager manager = getMechanicManager(world);
-                for (Chunk chunk : world.getLoadedChunks()) {
-                    for (BlockState state : chunk.getTileEntities()) {
-                        if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())
-                                && manager.getMechanicAt(BlockUtil.getPointingBlock(state.getBlock(), false).getLocation()) == null) {
-                            // load this mechanic
-                            if (!manager.loadMechanic((Sign) state)) {
-                                // unable to load mechanic properly due to corrupt data
-                                state.getBlock().setType(Material.AIR);
-                            }
-                        }
-                    }
-                }
+                manager.loadMechanics();
             }
         });
     }

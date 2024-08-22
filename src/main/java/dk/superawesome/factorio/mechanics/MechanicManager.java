@@ -15,6 +15,7 @@ import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
@@ -46,6 +47,26 @@ public class MechanicManager implements Listener {
 
     private final Map<BlockVector, Mechanic<?>> mechanics = new HashMap<>();
     private final Queue<ThinkingMechanic> thinkingMechanics = new LinkedList<>();
+
+    public void loadMechanics() {
+        for (Chunk chunk : world.getLoadedChunks()) {
+            loadMechanics(chunk);
+        }
+    }
+
+    public void loadMechanics(Chunk chunk) {
+        for (BlockState state : chunk.getTileEntities()) {
+            if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())
+                    && getProfileFrom((Sign) state).isPresent()
+                    && getMechanicAt(BlockUtil.getPointingBlock(state.getBlock(), false).getLocation()) == null) {
+                // load this mechanic
+                if (!loadMechanic((Sign) state)) {
+                    // unable to load mechanic properly due to corrupt data
+                    state.getBlock().setType(Material.AIR);
+                }
+            }
+        }
+    }
 
     public void handleThinking() {
         for (ThinkingMechanic thinking : thinkingMechanics) {
