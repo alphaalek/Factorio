@@ -82,34 +82,23 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         // check if an assembler type is chosen, if not, don't continue
         if (type == null
                 // check if the assembler has enough ingredients to assemble, if not, don't continue
-                || ingredientAmount < type.requires()
+                || ingredientAmount < type.getRequires()
                 // check if the assembler has enough space for money, if not, don't continue
-                || moneyAmount + type.produces() > getMoneyCapacity()) {
+                || moneyAmount + type.getProduces() > getMoneyCapacity()) {
             return;
         }
 
         // do the assembling
-        ingredientAmount -= type.requires();
-        moneyAmount += type.produces();
+        ingredientAmount -= type.getRequires();
+        moneyAmount += type.getProduces();
 
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
-            gui.updateRemovedIngredients(type.requires());
-            gui.updateAddedMoney(type.produces());
+            gui.updateRemovedIngredients(type.getRequires());
+            gui.updateAddedMoney(type.getProduces());
 
             for (HumanEntity player : gui.getInventory().getViewers()) {
                 ((Player)player).playSound(getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.25f, 1f);
-            }
-        }
-    }
-
-    @EventHandler//TODO check for if we need that (priority = EventPriority.HIGH)
-    public void onPriceUpdate(AssemblerTypeRequestEvent event) {
-        if (type != null && type.isTypesEquals(event.getType())) {
-            type = Types.getLoadedType(event.getType());
-            AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
-            if (gui != null) {
-                gui.loadAssemblerType();
             }
         }
     }
@@ -134,7 +123,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
                 @Override
                 public void set(ItemStack val) {
-                    Types oldTypes = type != null ? type.type() : null;
+                    Types oldTypes = type != null ? type.getType() : null;
                     Types newTypes = Types.getTypeFromMaterial(val.getType()).orElseThrow(IllegalArgumentException::new);
                     type = Types.getLoadedType(newTypes);
                     AssemblerTypeChangeEvent assemblerTypeChangeEvent = new AssemblerTypeChangeEvent(Assembler.this, oldTypes, newTypes);
@@ -167,7 +156,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     }
 
     public void setType(Types type) {
-        Types oldTypes = this.type != null ? this.type.type() : null;
+        Types oldTypes = this.type != null ? this.type.getType() : null;
         this.type = Types.getLoadedType(type);
         AssemblerTypeChangeEvent event = new AssemblerTypeChangeEvent(this, oldTypes, type);
         Bukkit.getPluginManager().callEvent(event);
@@ -206,7 +195,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public int getMaxTransfer() {
-        return type.type().getMat().getMaxStackSize();
+        return type.getType().getMat().getMaxStackSize();
     }
 
     @Override
@@ -232,7 +221,29 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         return take;
     }
 
-    public record Type(Types type, int requires, double produces) {
+    public static class Type {
+
+        private final Types type;
+        private double produces;
+        private int requires;
+
+        public Type(Types type, int requires, double produces) {
+            this.type = type;
+            this.requires = requires;
+            this.produces = produces;
+        }
+
+        public double getProduces() {
+            return produces;
+        }
+
+        public int getRequires() {
+            return requires;
+        }
+
+        public Types getType() {
+            return type;
+        }
 
         public Material getMat() {
             return type.getMat();
@@ -244,6 +255,14 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
         public double getPricePerItem() {
             return produces / requires;
+        }
+
+        public void setProduces(double produces) {
+            this.produces = produces;
+        }
+
+        public void setRequires(int requires) {
+            this.requires = requires;
         }
     }
 
@@ -291,18 +310,26 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         private static final List<Type> types = new ArrayList<>();
 
         static {
+            addDefaultTypes();
             requestTypes();
             Bukkit.getScheduler().runTaskTimer(Factorio.get(), Assembler.Types::requestTypes, ONE_HOUR_DELAY_TICKS, ONE_HOUR_DELAY_TICKS);
         }
 
+        private static void addDefaultTypes() {
+            for (Types type : Types.values()) {
+                types.add(new Type(type, type.getRequires(), type.getProduces()));
+            }
+        }
+
         private static void requestTypes() {
             LAST_UPDATE = System.currentTimeMillis();
-            types.clear();
             for (Types type : Types.values()) {
                 AssemblerTypeRequestEvent requestEvent = new AssemblerTypeRequestEvent(type);
-                types.add(new Type(type, requestEvent.getRequires(), requestEvent.getProduces()));
                 Bukkit.getPluginManager().callEvent(requestEvent);
-                types.set(types.size() - 1, new Type(type, requestEvent.getRequires(), requestEvent.getProduces()));
+
+                Type loadedType = getLoadedType(type);
+                loadedType.setRequires(requestEvent.getRequires());
+                loadedType.setProduces(requestEvent.getProduces());
             }
         }
 
@@ -311,7 +338,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         }
 
         public static Type getLoadedType(Types type) {
-            return types.stream().filter(t -> t.type() == type).findFirst().orElseThrow(IllegalArgumentException::new);
+            return types.stream().filter(t -> t.getType() == type).findFirst().orElseThrow(IllegalArgumentException::new);
         }
 
         private final Material mat;
