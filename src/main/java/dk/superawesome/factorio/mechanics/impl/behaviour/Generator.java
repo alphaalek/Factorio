@@ -34,7 +34,12 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
             new BlockVector(0, 1, 1),
             new BlockVector(0, 1, -1),
             new BlockVector(1, 1, 0),
-            new BlockVector(-1, 1, 0)
+            new BlockVector(-1, 1, 0),
+
+            new BlockVector(0, 0, 1),
+            new BlockVector(0, 0, -1),
+            new BlockVector(1, 0, 0),
+            new BlockVector(-1, 0, 0)
     );
 
     private final DelayHandler thinkDelayHandler = new DelayHandler(20);

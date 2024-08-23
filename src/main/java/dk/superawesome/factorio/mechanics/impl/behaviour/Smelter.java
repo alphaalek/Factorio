@@ -32,10 +32,16 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     private static final List<BlockVector> WASTE_OUTPUT_RELATIVES = Arrays.asList(
             new BlockVector(0, 2, 0),
+
             new BlockVector(0, 1, 1),
             new BlockVector(0, 1, -1),
             new BlockVector(1, 1, 0),
-            new BlockVector(-1, 1, 0)
+            new BlockVector(-1, 1, 0),
+
+            new BlockVector(0, 0, 1),
+            new BlockVector(0, 0, -1),
+            new BlockVector(1, 0, 0),
+            new BlockVector(-1, 0, 0)
     );
 
     private final DelayHandler thinkDelayHandler = new DelayHandler(20);
