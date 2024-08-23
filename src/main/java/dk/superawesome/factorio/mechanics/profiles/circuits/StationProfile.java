@@ -9,7 +9,7 @@ import org.bukkit.block.BlockFace;
 
 public class StationProfile implements MechanicProfile<Station> {
 
-    private static final MechanicFactory<Station> factory = new OneWayMechanicFactory();
+    private static final MechanicFactory<Station> factory = new StationMechanicFactory();
 
     @Override
     public String getName() {
@@ -41,7 +41,7 @@ public class StationProfile implements MechanicProfile<Station> {
         return 17;
     }
 
-    private static class OneWayMechanicFactory implements MechanicFactory<Station> {
+    private static class StationMechanicFactory implements MechanicFactory<Station> {
 
         @Override
         public Station create(Location loc, BlockFace rotation, MechanicStorageContext context) {
