@@ -60,18 +60,18 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
     }
 
     private ItemStack getAssemblerTypeItem(Assembler.Type type) {
-        return new ItemBuilder(type.type().getMat())
-                .addLore("").addLore("§eSammensætter §fx" + type.requires() + " §etil §f$" + StringUtil.formatDecimals(type.produces(), 2) + " §8(§f$" + (StringUtil.formatDecimals(type.getPricePerItem(), 2)) + " §epr. item§8)")
+        return new ItemBuilder(type.getType().getMat())
+                .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + StringUtil.formatDecimals(type.getProduces(), 2) + " §8(§f$" + (StringUtil.formatDecimals(type.getPricePerItem(), 2)) + " §epr. item§8)")
                 .addLore(format(type) + " §8Sidst opdateret " + DurationFormatter.toDuration(System.currentTimeMillis() - Assembler.Types.LAST_UPDATE) + " siden")
                 .addFlags(ItemFlag.HIDE_ATTRIBUTES)
                 .build();
     }
 
     public static String format(Assembler.Type type) {
-        if (type.produces() > type.type().getProduces()) {
-            return "§a+" + (StringUtil.formatDecimals((type.produces() / type.type().getProduces() - 1) * 100, 2)) + "%";
-        } else if (type.produces() < type.type().getProduces()) {
-            return "§c-" + (StringUtil.formatDecimals((type.type().getProduces() / type.produces() - 1) * 100, 2)) + "%";
+        if (type.getProduces() > type.getType().getProduces()) {
+            return "§a+" + (StringUtil.formatDecimals((type.getProduces() / type.getType().getProduces() - 1) * 100, 2)) + "%";
+        } else if (type.getProduces() < type.getType().getProduces()) {
+            return "§c-" + (StringUtil.formatDecimals((type.getType().getProduces() / type.getProduces() - 1) * 100, 2)) + "%";
         } else {
             return "§e~0%";
         }

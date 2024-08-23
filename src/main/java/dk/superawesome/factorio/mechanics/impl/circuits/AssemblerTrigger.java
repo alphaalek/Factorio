@@ -53,10 +53,10 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
                     break;
                 } else if (usePercentage) {
                     double percentage = 0;
-                    if (type.produces() > type.type().getProduces()) {
-                        percentage = (type.produces() / type.type().getProduces() - 1) * 100;
-                    } else if (type.produces() < type.type().getProduces()) {
-                        percentage = (type.type().getProduces() / type.produces() - 1) * 100 * -1;
+                    if (type.getProduces() > type.getType().getProduces()) {
+                        percentage = (type.getProduces() / type.getType().getProduces() - 1) * 100;
+                    } else if (type.getProduces() < type.getType().getProduces()) {
+                        percentage = (type.getType().getProduces() / type.getProduces() - 1) * 100 * -1;
                     }
 
                     if (percentage < minPercentage) {
