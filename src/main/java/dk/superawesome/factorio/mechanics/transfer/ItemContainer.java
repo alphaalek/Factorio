@@ -13,7 +13,7 @@ import java.util.function.BiConsumer;
 public interface ItemContainer extends Container<ItemCollection> {
 
     default boolean accepts(TransferCollection collection) {
-        return collection instanceof ItemCollection;
+        return collection instanceof ItemCollection && collection != this;
     }
 
     default Inventory createVirtualOneWayInventory(Mechanic<?> mechanic, MechanicStorageGui gui, boolean inputAsIteratorSlots) {

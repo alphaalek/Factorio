@@ -40,7 +40,7 @@ public class MechanicController {
                 "management TEXT, " +
                 "data TEXT);");
 
-        Query createDefualtMembers = new Query(
+        Query createDefaultMembers = new Query(
                 "CREATE TABLE IF NOT EXISTS mechanics_defaultMembers (" +
                 "playerUUID VARCHAR(36) NOT NULL, " +
                 "defaultMemberPlayerUUID VARCHAR(36) NOT NULL, " +
@@ -49,7 +49,7 @@ public class MechanicController {
 
         try {
             createMechanics.execute(this.connection);
-            createDefualtMembers.execute(this.connection);
+            createDefaultMembers.execute(this.connection);
         } catch (SQLException ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to create tables!", ex);
         }

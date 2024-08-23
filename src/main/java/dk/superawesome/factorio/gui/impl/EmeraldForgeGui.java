@@ -75,8 +75,8 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
             }
 
             loadStorageTypesWithoutClear(new ItemStack(Material.EMERALD_BLOCK), blocks, STORAGE_SLOTS);
-            updateMoneyAmount();
         }
+        updateMoneyAmount();
     }
 
     private void handleTakeMoney(InventoryClickEvent event) {
