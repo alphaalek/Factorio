@@ -27,6 +27,7 @@ public class Buildings {
     public static final Building GENERATOR;
     public static final Building LIQUID_TANK;
     public static final Building SMELTER;
+    public static final Building SOLAR_CELL;
     public static final Building STORAGE_BOX;
     public static final Building POWER_CENTRAL;
     public static final Building REFINERY;
@@ -45,6 +46,7 @@ public class Buildings {
         GENERATOR         = loadBuilding(new GeneratorBuilding());
         LIQUID_TANK       = loadBuilding(new LiquidTankBuilding());
         SMELTER           = loadBuilding(new SmelterBuilding());
+        SOLAR_CELL        = loadBuilding(new SolarCellBuilding());
         STORAGE_BOX       = loadBuilding(new StorageBoxBuilding());
         POWER_CENTRAL     = loadBuilding(new PowerCentralBuilding());
         REFINERY          = loadBuilding(new RefineryBuilding());

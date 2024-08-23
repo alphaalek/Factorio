@@ -7,6 +7,7 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.stackregistry.Fuel;
+import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Location;
@@ -28,7 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class Generator extends AbstractMechanic<Generator> implements FuelMechanic, AccessibleMechanic, ThinkingMechanic, ItemContainer, SignalSource, Lightable, Storage {
+public class Generator extends AbstractMechanic<Generator> implements FuelMechanic, AccessibleMechanic, ThinkingMechanic, ItemContainer, SignalSource, Lightable, Storage, EnergyCollection {
 
     private static final List<BlockVector> WASTE_OUTPUT_RELATIVES = Arrays.asList(
             new BlockVector(0, 1, 1),
@@ -168,7 +169,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
         this.<GeneratorGui>putFuel(collection, this, event, getGuiInUse(), GeneratorGui::updateAddedItems);
     }
 
-    public double takeEnergy(double energy) {
+    private double takeEnergy(double energy) {
         double take = Math.min(availableEnergy, energy);
         availableEnergy -= take;
         return take;
@@ -286,5 +287,40 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     @Override
     public List<BlockVector> getWasteOutputs() {
         return WASTE_OUTPUT_RELATIVES;
+    }
+
+    @Override
+    public boolean hasEnergy() {
+        return availableEnergy > 0;
+    }
+
+    @Override
+    public double take(double amount) {
+        return takeEnergy(amount);
+    }
+
+    @Override
+    public boolean isTransferEmpty() {
+        return availableEnergy == 0;
+    }
+
+    @Override
+    public DelayHandler getTransferDelayHandler() {
+        return thinkDelayHandler;
+    }
+
+    @Override
+    public int getMaxTransfer() {
+        return (int) availableEnergy;
+    }
+
+    @Override
+    public int getTransferAmount() {
+        return (int) availableEnergy;
+    }
+
+    @Override
+    public double getTransferEnergyCost() {
+        return 1d / 20d;
     }
 }

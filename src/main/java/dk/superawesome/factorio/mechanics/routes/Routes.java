@@ -6,6 +6,7 @@ import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Generator;
 import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
+import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
@@ -49,7 +50,7 @@ public class Routes {
         return false;
     }
 
-    public static boolean transferEnergyToPowerCentral(Block start, Generator source) {
+    public static boolean transferEnergyToPowerCentral(Block start, EnergyCollection source) {
         Mechanic<?> mechanic = Factorio.get().getMechanicManager(start.getWorld()).getMechanicPartially(start.getLocation());
         if (!(mechanic instanceof PowerCentral powerCentral)) {
             return false;
@@ -62,7 +63,7 @@ public class Routes {
 
         // transfer energy
         double take = powerCentral.getCapacity() - powerCentral.getEnergy();
-        double amount = source.takeEnergy(take);
+        double amount = source.take(take);
         powerCentral.setEnergy(powerCentral.getEnergy() + amount);
 
         return true;
