@@ -41,7 +41,7 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
 
     private void updateMoneyAmount() {
         getInventory().setItem(49, new ItemBuilder(Material.MINECART)
-                .setName("§eFå emeralder §8(§e$" + StringUtil.formatDecimals(getMechanic().getMoneyAmount(), 2) + " i alt§8)")
+                .setName("§eFå emeralder §8(§e" + StringUtil.formatDecimals(getMechanic().getMoneyAmount(), 2) + " i alt§8)")
                 .addLore("")
                 .addLore("§eKlik for at tage ud. §8(§e§oShift for alt§8)")
                 .build());
@@ -101,7 +101,7 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
             getMechanic().setMoneyAmount(getMechanic().getMoneyAmount() - moneyAmount);
             loadInputOutputItems();
 
-            player.sendMessage("§eDu tog §f$" + StringUtil.formatDecimals(moneyAmount, 2) + "§e fra maskinens inventar.");
+            player.sendMessage("§eDu tog §f" + StringUtil.formatDecimals(moneyAmount, 2) + "§e emeralder fra maskinens inventar.");
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1f);
         };
 
