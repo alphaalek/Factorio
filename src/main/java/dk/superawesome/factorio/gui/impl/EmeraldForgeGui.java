@@ -35,13 +35,17 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
         for (int i : Arrays.asList(0, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 50, 53)) {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
+        updateMoneyAmount();
+
+        registerEvent(49, this::handleTakeMoney);
+    }
+
+    private void updateMoneyAmount() {
         getInventory().setItem(49, new ItemBuilder(Material.MINECART)
                 .setName("§eFå emeralder §8(§e$" + StringUtil.formatDecimals(getMechanic().getMoneyAmount(), 2) + " i alt§8)")
                 .addLore("")
                 .addLore("§eKlik for at tage ud. §8(§e§oShift for alt§8)")
                 .build());
-
-        registerEvent(49, this::handleTakeMoney);
     }
 
     @Override
@@ -72,6 +76,7 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
             }
 
             loadStorageTypesWithoutClear(new ItemStack(Material.EMERALD_BLOCK), blocks, STORAGE_SLOTS);
+            updateMoneyAmount();
         }
     }
 
