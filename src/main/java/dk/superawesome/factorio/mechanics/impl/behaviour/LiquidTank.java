@@ -36,7 +36,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     public void load(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayInputStream str = context.getData();
         int fluidOrdinal = str.read();
-        if (fluidOrdinal != -1) {
+        if (fluidOrdinal <= Fluid.values().length && fluidOrdinal >= 0) {
             this.fluid = Fluid.values()[fluidOrdinal];
         }
         this.fluidAmount = context.getSerializer().readInt(str);
