@@ -274,6 +274,8 @@ public class MechanicManager implements Listener {
                 Mechanic<?> mechanic = loadMechanicFromSign(profile.get(), sign, (__, on) -> contextProvider.findAt(on.getLocation()));
                 if (mechanic != null) {
                     mechanic.onBlocksLoaded(null);
+                } else {
+                    Factorio.get().getLogger().warning("Failed to load but found mechanic at location " + sign.getLocation());
                 }
             }
             return true;
