@@ -97,12 +97,11 @@ public class Routes {
 
     public static void startRoute(AbstractRoute<?, ?> route, Block from, boolean onlyExpandIfOriginValid) {
         BlockVector fromVec = BlockUtil.getVec(from);
-        Material fromMat = from.getType();
 
         // search origin vector
         if (!route.hasVisited(fromVec, fromVec) && !route.getLocations().contains(fromVec)) {
             route.visit(fromVec, fromVec);
-            route.search(from, fromMat, fromVec, from, true);
+            route.search(from, fromVec, from, true);
 
             // the origin vector was not added to the route, stop expanding
             if (!route.getLocations().contains(fromVec) && onlyExpandIfOriginValid) {
@@ -121,7 +120,6 @@ public class Routes {
 
     public static void expandRoute(AbstractRoute<?, ?> route, Block from, Block ignore, boolean isFromOrigin) {
         BlockVector fromVec = BlockUtil.getVec(from);
-        Material fromMat = from.getType();
 
         // iterate over all blocks around this block
         for (BlockFace face : route instanceof AbstractRoute.Signal ? SIGNAL_EXPAND_DIRECTIONS : RELATIVES) {
@@ -134,7 +132,7 @@ public class Routes {
                 }
 
                 route.visit(fromVec, relVec);
-                route.search(from, fromMat, relVec, rel, isFromOrigin);
+                route.search(from, relVec, rel, isFromOrigin);
             }
         }
     }
@@ -146,7 +144,7 @@ public class Routes {
             Block rel = BlockUtil.getBlock(from.getWorld(), relVec);
 
             route.visit(fromVec, relVec);
-            route.search(from, from.getType(), relVec, rel, false);
+            route.search(from, relVec, rel, false);
         }
     }
 

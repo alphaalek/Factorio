@@ -79,6 +79,7 @@ public class MechanicManager implements Listener {
     public Collection<Mechanic<?>> getAllMechanics() {
         return mechanics.values();
     }
+
     public Mechanic<?> load(MechanicProfile<?> profile, MechanicStorageContext context, Location loc, BlockFace rotation) {
         Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, context);
         if (mechanic instanceof ThinkingMechanic) {

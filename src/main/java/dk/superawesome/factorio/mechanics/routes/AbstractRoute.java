@@ -144,7 +144,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
     public abstract RouteFactory<R> getFactory();
 
-    public abstract void search(Block from, Material fromMat, BlockVector relVec, Block rel, boolean isFromOrigin);
+    public abstract void search(Block from, BlockVector relVec, Block rel, boolean isFromOrigin);
 
     protected abstract P createOutputEntry(World world, BlockVector vec);
 
@@ -160,7 +160,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
 
         @Override
-        public void search(Block from, Material fromMat, BlockVector relVec, Block rel, boolean isFromOrigin) {
+        public void search(Block from, BlockVector relVec, Block rel, boolean isFromOrigin) {
             Material mat = rel.getType();
 
             // piston = pipe output
@@ -175,8 +175,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     mat == Material.GLASS
                     || BlockUtil.anyStainedGlass.test(mat)
                         && (isFromOrigin
-                            || fromMat == mat
-                            || fromMat == Material.GLASS
+                            || from.getType() == mat
+                            || from.getType() == Material.GLASS
                         )
             ) {
                 add(relVec);
@@ -219,7 +219,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
 
         @Override
-        public void search(Block from, Material fromMat, BlockVector relVec, Block rel, boolean isFromOrigin) {
+        public void search(Block from, BlockVector relVec, Block rel, boolean isFromOrigin) {
             int signal = signals.getOrDefault(BlockUtil.getVec(from), 16);
             Material mat = rel.getType();
             if (mat == Material.REPEATER) {
@@ -258,7 +258,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             // check for expand signal route
             } else if (signal > 1) {
                 if (mat == Material.REDSTONE_WIRE) {
-                    expandWire(from, rel, relVec, signal - 1);
+                    expandWire(rel, relVec, from, signal - 1);
                     return;
                 }
 
@@ -283,25 +283,25 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                         || from.getType() == Material.REPEATER && BlockUtil.getPointingBlock(from, true).equals(rel)
                         )
                 ) {
-                    expandWire(up, from, from, from.getType() == Material.REPEATER ? 16 : signal - 1);
+                    expandWire(up, insulatorUp, rel, signal - 1);
                 }
 
                 if (from.getType() == Material.REDSTONE_WIRE && insulatorDown.getType().isSolid() && insulatorDown.getType().isOccluding()
                         && (down.getType() == Material.REDSTONE_WIRE && !mat.isSolid() && !mat.isOccluding()
                         || down.getType() == Material.REPEATER && BlockUtil.getPointingBlock(down, false).equals(insulatorDown))) {
-                    expandWire(down, from, insulatorDown, signal - 1);
+                    expandWire(down, insulatorDown, insulatorDown, signal - 1);
                 } else if (from.getType() == Material.REPEATER
                         && mat.isSolid() && mat.isOccluding()
                         && down.getType() == Material.REDSTONE_WIRE) {
-                    expandWire(from, down, BlockUtil.getVec(down), signal - 1);
+                    expandWire(down, BlockUtil.getVec(down), insulatorDown, signal - 1);
                 }
             }
         }
 
-        private boolean expandWire(Block block, Block from, Block point, int signal) {
+        private boolean expandWire(Block block, Block ignore, Block point, int signal) {
             add(BlockUtil.getVec(block));
             if (block.getType() == Material.REDSTONE_WIRE) {
-                expandWire(from, block, BlockUtil.getVec(block), signal);
+                expandWire(block, BlockUtil.getVec(block), ignore, signal);
                 return true;
             } else if (block.getType() == Material.REPEATER && BlockUtil.getPointingBlock(block, false).equals(point)) {
                 signals.put(BlockUtil.getVec(block), 16);
@@ -312,10 +312,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return false;
         }
 
-        private void expandWire(Block from, Block rel, BlockVector relVec, int signal) {
+        private void expandWire(Block rel, BlockVector relVec, Block ignore, int signal) {
             add(relVec);
             signals.put(relVec, signal);
-            Routes.expandRoute(this, rel, from);
+            Routes.expandRoute(this, rel, ignore);
         }
 
         @Override
