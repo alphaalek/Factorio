@@ -54,6 +54,8 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         } else if (this.storageAmount == 0 && this.storageType != null) {
             this.storageType = null;
             this.recipeResult = null;
+        } else if (this.recipeResult != null && this.recipeResult.getType() == Material.AIR) {
+            this.recipeResult = null;
         }
     }
 
