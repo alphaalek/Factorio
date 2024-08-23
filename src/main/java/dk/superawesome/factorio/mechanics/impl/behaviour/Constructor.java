@@ -50,8 +50,10 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
         if (this.storageAmount > 0 && this.storageType == null) {
             this.storageAmount = 0;
+            this.recipeResult = null;
         } else if (this.storageAmount == 0 && this.storageType != null) {
             this.storageType = null;
+            this.recipeResult = null;
         }
     }
 
