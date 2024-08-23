@@ -18,7 +18,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
@@ -95,7 +94,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
             gui.updateRemovedIngredients(type.requires());
-            gui.updateAddedMoney(type.produces());
+            gui.setDisplayedMoney(moneyAmount);
 
             for (HumanEntity player : gui.getInventory().getViewers()) {
                 ((Player)player).playSound(getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.25f, 1f);
@@ -226,7 +225,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
-            gui.updateRemovedMoney(take);
+            gui.setDisplayedMoney(moneyAmount);
         }
 
         return take;

@@ -85,12 +85,9 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
         updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getType().getMat()), reverseSlots(STORAGE_SLOTS));
     }
 
-    public void updateAddedMoney(double amount) {
+    public void setDisplayedMoney(double amount) {
+        clearSlots(MONEY_SLOTS);
         updateAddedItems(getInventory(), (int) amount, new ItemStack(Material.EMERALD), MONEY_SLOTS);
-    }
-
-    public void updateRemovedMoney(double amount) {
-        updateRemovedItems(getInventory(), (int) amount, new ItemStack(Material.EMERALD), reverseSlots(MONEY_SLOTS));
     }
 
     private void openChooseAssemblerGui(Player player) {
