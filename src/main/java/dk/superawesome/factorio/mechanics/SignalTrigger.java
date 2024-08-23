@@ -85,7 +85,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     public abstract void onLeverPull(PlayerInteractEvent event);
 
     protected void triggerLevers() {
-        for (Block lever : levers) {
+        for (Block lever : new ArrayList<>(levers)) {
             triggerLever(lever, powered);
         }
     }
