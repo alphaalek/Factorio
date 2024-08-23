@@ -48,7 +48,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
     }
 
-    public static <R extends AbstractRoute<R, ? extends OutputEntry>> void removeRouteFromCache(World world, AbstractRoute<?, ?> route) {
+    public static <R extends AbstractRoute<R, ? extends OutputEntry<?>>> void removeRouteFromCache(World world, AbstractRoute<?, ?> route) {
         if (cachedRoutes.isEmpty()) {
             return;
         }
@@ -144,7 +144,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
     public abstract RouteFactory<R> getFactory();
 
-    public abstract void search(Block from, Material fromMat, BlockVector relVec, Block rel);
+    public abstract void search(Block from, Material fromMat, BlockVector relVec, Block rel, boolean isFromOrigin);
 
     protected abstract P createOutputEntry(World world, BlockVector vec);
 
@@ -160,7 +160,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
 
         @Override
-        public void search(Block from, Material fromMat, BlockVector relVec, Block rel) {
+        public void search(Block from, Material fromMat, BlockVector relVec, Block rel, boolean isFromOrigin) {
             Material mat = rel.getType();
 
             // piston = pipe output
@@ -174,10 +174,9 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             } else if (
                     mat == Material.GLASS
                     || BlockUtil.anyStainedGlass.test(mat)
-                        && (fromMat == mat
+                        && (isFromOrigin
+                            || fromMat == mat
                             || fromMat == Material.GLASS
-                            // if this route is allowing to expand if the origin route is invalid, check for a sticky piston
-                            || fromMat == Material.STICKY_PISTON
                         )
             ) {
                 add(relVec);
@@ -220,7 +219,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
 
         @Override
-        public void search(Block from, Material fromMat, BlockVector relVec, Block rel) {
+        public void search(Block from, Material fromMat, BlockVector relVec, Block rel, boolean isFromOrigin) {
             int signal = signals.getOrDefault(BlockUtil.getVec(from), 16);
             Material mat = rel.getType();
             if (mat == Material.REPEATER) {

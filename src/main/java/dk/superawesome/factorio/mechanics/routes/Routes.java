@@ -102,7 +102,7 @@ public class Routes {
         // search origin vector
         if (!route.hasVisited(fromVec, fromVec) && !route.getLocations().contains(fromVec)) {
             route.visit(fromVec, fromVec);
-            route.search(from, fromMat, fromVec, from);
+            route.search(from, fromMat, fromVec, from, true);
 
             // the origin vector was not added to the route, stop expanding
             if (!route.getLocations().contains(fromVec) && onlyExpandIfOriginValid) {
@@ -112,10 +112,14 @@ public class Routes {
             route.add(fromVec);
         }
 
-        expandRoute(route, from, from);
+        expandRoute(route, from, from, true);
     }
 
     public static void expandRoute(AbstractRoute<?, ?> route, Block from, Block ignore) {
+        expandRoute(route, from, ignore, false);
+    }
+
+    public static void expandRoute(AbstractRoute<?, ?> route, Block from, Block ignore, boolean isFromOrigin) {
         BlockVector fromVec = BlockUtil.getVec(from);
         Material fromMat = from.getType();
 
@@ -130,7 +134,7 @@ public class Routes {
                 }
 
                 route.visit(fromVec, relVec);
-                route.search(from, fromMat, relVec, rel);
+                route.search(from, fromMat, relVec, rel, isFromOrigin);
             }
         }
     }
@@ -142,7 +146,7 @@ public class Routes {
             Block rel = BlockUtil.getBlock(from.getWorld(), relVec);
 
             route.visit(fromVec, relVec);
-            route.search(from, from.getType(), relVec, rel);
+            route.search(from, from.getType(), relVec, rel, false);
         }
     }
 
