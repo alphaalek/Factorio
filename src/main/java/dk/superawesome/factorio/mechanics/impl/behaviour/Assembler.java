@@ -93,13 +93,8 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
-<<<<<<< HEAD
-            gui.updateRemovedIngredients(type.requires());
-            gui.setDisplayedMoney(moneyAmount);
-=======
             gui.updateRemovedIngredients(type.getRequires());
-            gui.updateAddedMoney(type.getProduces());
->>>>>>> a33bff929ac05e476b800608e6f4c5b0d2640e04
+            gui.setDisplayedMoney(moneyAmount);
 
             for (HumanEntity player : gui.getInventory().getViewers()) {
                 ((Player)player).playSound(getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.25f, 1f);
