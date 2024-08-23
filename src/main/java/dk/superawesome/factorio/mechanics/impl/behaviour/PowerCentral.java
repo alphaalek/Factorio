@@ -34,6 +34,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     private Block lever;
     private double energy;
     private boolean turnedOn;
+    private double recentMax = 0;
 
     public PowerCentral(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -136,7 +137,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
         }
 
         double production = this.recentProduction;
-        this.recentConsumption = 0;
+        this.recentProduction = 0;
         return production;
     }
 
@@ -167,6 +168,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     @Override
     public boolean preSignal(AbstractRoute.Signal signal) {
         double signalCost = signal.getLocations().size() * SIGNAL_COST;
+        setRecentMax(signalCost);
         if (this.energy < signalCost) {
             return false;
         }
@@ -194,5 +196,13 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     @Override
     public boolean handleOutput(Block block) {
         return Routes.suckItems(block, this);
+    }
+
+    public double getRecentMax() {
+        return recentMax;
+    }
+
+    public void setRecentMax(double recentMax) {
+        this.recentMax = recentMax;
     }
 }

@@ -34,6 +34,10 @@ public class Routes {
 
         PipeSuckEvent event = new PipeSuckEvent(from);
         Bukkit.getPluginManager().callEvent(event);
+
+        if (event.getTransfer() != null)
+            source.setRecentMax(source.getRecentMax() + event.getTransfer().getTransferEnergyCost());
+
         if (event.getTransfer() == null
                 || !event.getTransfer().getTransferDelayHandler().ready()
                 || event.getTransfer().isTransferEmpty()

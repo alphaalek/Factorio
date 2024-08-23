@@ -25,6 +25,8 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                 () -> mechanic.pollRecentConsumption() * 2,
                 e -> new ItemBuilder(Material.LIGHT_GRAY_WOOL)
                         .setName("§eForbrug: " + StringUtil.formatDecimals(e, 2) + "W")
+                        .addLore("§eMaksimalt forbrug: " + StringUtil.formatDecimals(mechanic.getRecentMax(), 2) + "W")
+                        .addLore("§eProduktion: " + StringUtil.formatDecimals(e, 2) + "W")
                         .addLore("§eEnergi: " + StringUtil.formatDecimals(mechanic.getEnergy(), 2) + "J")
                         .addLore("§eKapacitet: " + StringUtil.formatDecimals(mechanic.getCapacity(), 2) + "J")
                         .build()
