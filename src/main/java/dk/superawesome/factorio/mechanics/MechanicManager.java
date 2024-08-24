@@ -55,21 +55,12 @@ public class MechanicManager implements Listener {
     }
 
     public void loadMechanics(Chunk chunk) {
-        Factorio.get().getLogger().info("Loading mechanics in chunk " + chunk);
-
         for (BlockState state : chunk.getTileEntities()) {
-            if (!(state instanceof Sign)) {
-                continue;
-            }
-            Factorio.get().getLogger().info("Loading mechanic at " + state.getLocation() + " state: " + state);
-            Factorio.get().getLogger().info(Tag.WALL_SIGNS.isTagged(state.getType()) + " " + getProfileFrom((Sign) state).isPresent() + " " + BlockUtil.getPointingBlock(state.getBlock(), false));
             if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())
                     && getProfileFrom((Sign) state).isPresent()
                     && getMechanicAt(BlockUtil.getPointingBlock(state.getBlock(), true).getLocation()) == null) {
                 // load this mechanic
-                Factorio.get().getLogger().info("Loading mechanic at " + state.getLocation());
                 if (!loadMechanic((Sign) state)) {
-                    Factorio.get().getLogger().warning("Failed to load mechanic at " + state.getLocation());
                     // unable to load mechanic properly due to corrupt data
                     state.getBlock().setType(Material.AIR);
                 }
@@ -91,9 +82,7 @@ public class MechanicManager implements Listener {
 
     public Mechanic<?> load(MechanicProfile<?> profile, MechanicStorageContext context, Location loc, BlockFace rotation) {
         Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, context);
-        Factorio.get().getLogger().info("Loaded mechanic at location " + loc + " mechanic: " + mechanic);
         if (mechanic instanceof ThinkingMechanic) {
-            Factorio.get().getLogger().info("Loaded mechanic at location " + loc + " adding to thinking mechanics");
             thinkingMechanics.add((ThinkingMechanic) mechanic);
         }
 
@@ -283,17 +272,12 @@ public class MechanicManager implements Listener {
     public boolean loadMechanic(Sign sign) {
         try {
             Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
-            Factorio.get().getLogger().info("Loading mechanic at location " + sign.getLocation() + " profile is present: " + profile.isPresent());
-            Factorio.get().getLogger().info("Loading mechanic at location " + sign.getLocation() + " profile: " + (profile.orElse(null)));
             if (profile.isPresent()) {
                 Mechanic<?> mechanic = loadMechanicFromSign(profile.get(), sign, (__, on) -> contextProvider.findAt(on.getLocation()));
-                Factorio.get().getLogger().info("Loaded mechanic at location " + sign.getLocation() + " mechanic is present: " + (mechanic != null));
                 if (mechanic != null) {
-                    Factorio.get().getLogger().info("Loaded mechanic at location " + sign.getLocation() + " calling onBlocksLoaded");
                     mechanic.onBlocksLoaded(null);
                 }
             }
-            Factorio.get().getLogger().info("Loaded mechanic at location " + sign.getLocation());
             return true;
         } catch (SQLException | IOException ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to load mechanic at location " + sign.getLocation(), ex);
@@ -305,14 +289,12 @@ public class MechanicManager implements Listener {
     private Mechanic<?> loadMechanicFromSign(MechanicProfile<?> profile, Sign sign, Query.CheckedBiFunction<String, Block, MechanicStorageContext> context) throws IOException, SQLException {
         // get the block which the sign is hanging on, because this block is the root of the mechanic
         Block on = BlockUtil.getPointingBlock(sign.getBlock(), true);
-        Factorio.get().getLogger().info("Loading mechanic at location " + sign.getLocation() + " on: " + on);
         if (on == null) {
             return null;
         }
 
         // load this mechanic
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
-        Factorio.get().getLogger().info("Loading mechanic at location " + sign.getLocation() + " rotation: " + rotation);
         return load(profile, context.<SQLException>sneaky(profile.getName(), on), on.getLocation(), rotation);
     }
 
