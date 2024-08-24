@@ -213,7 +213,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
                     };
                 } else continue;
 
-                boolean transferred = Routes.startTransferRoute(block, wrappedCollection, true);
+                boolean transferred = Routes.startTransferRoute(block, wrappedCollection, this, true);
                 if (!event.transferred()) {
                     event.setTransferred(transferred);
                 }

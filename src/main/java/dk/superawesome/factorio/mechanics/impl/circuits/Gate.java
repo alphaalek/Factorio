@@ -82,7 +82,7 @@ public class Gate extends AbstractMechanic<Gate> implements Container<TransferCo
     @Override
     public void pipePut(TransferCollection collection, PipePutEvent event) {
         // only continue pipe route if the gate is open
-        if (open && Routes.startTransferRoute(loc.getBlock(), collection, false)) {
+        if (open && Routes.startTransferRoute(loc.getBlock(), collection, this, false)) {
             event.setTransferred(true);
         }
     }

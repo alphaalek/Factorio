@@ -3,9 +3,11 @@ package dk.superawesome.factorio.mechanics.routes;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.SignalSource;
+import dk.superawesome.factorio.mechanics.Source;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Generator;
 import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
+import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
@@ -46,7 +48,7 @@ public class Routes {
         }
 
         // start the pipe route
-        if (startTransferRoute(start, event.getTransfer(), false)) {
+        if (startTransferRoute(start, event.getTransfer(), source, false)) {
             source.setEnergy(source.getEnergy() - event.getTransfer().getTransferEnergyCost());
             return true;
         }
@@ -73,7 +75,7 @@ public class Routes {
         return true;
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry<?>> R setupRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = AbstractRoute.getCachedOriginRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
             route = createNewRoute(start, factory, onlyExpandIfOriginValid);
@@ -83,9 +85,9 @@ public class Routes {
         return route;
     }
 
-    public static boolean startTransferRoute(Block start, TransferCollection collection, boolean onlyExpandIfOriginValid) {
+    public static boolean startTransferRoute(Block start, TransferCollection collection, Source from, boolean onlyExpandIfOriginValid) {
         return setupRoute(start, transferRouteFactory, onlyExpandIfOriginValid)
-                .start(collection);
+                .start(collection, from);
     }
 
     public static boolean startSignalRoute(Block start, SignalSource source, boolean onlyExpandIfOriginValid) {
@@ -93,7 +95,7 @@ public class Routes {
                 .start(source);
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry<?>> R createNewRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = factory.create(BlockUtil.getVec(start));
         startRoute(route, start, onlyExpandIfOriginValid);
 
@@ -153,7 +155,7 @@ public class Routes {
         }
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry<?>> void setupForcibly(Block block, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> void setupForcibly(Block block, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         updateNearbyRoutes(block, modified -> {
             if (modified.isEmpty()) {
                 setupRoute(block, factory, onlyExpandIfOriginValid);

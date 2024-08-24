@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public interface Mechanic<M extends Mechanic<M>> extends Listener {
+public interface Mechanic<M extends Mechanic<M>> extends Listener, Source {
 
     void unload();
 

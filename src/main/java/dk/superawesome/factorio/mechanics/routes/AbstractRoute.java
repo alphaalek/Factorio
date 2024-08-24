@@ -1,7 +1,9 @@
 package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.mechanics.SignalSource;
+import dk.superawesome.factorio.mechanics.Source;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
+import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
@@ -48,7 +50,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
     }
 
-    public static <R extends AbstractRoute<R, ? extends OutputEntry<?>>> void removeRouteFromCache(World world, AbstractRoute<?, ?> route) {
+    public static <R extends AbstractRoute<R, ? extends OutputEntry>> void removeRouteFromCache(World world, AbstractRoute<?, ?> route) {
         if (cachedRoutes.isEmpty()) {
             return;
         }
@@ -61,7 +63,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         ((R) route).getFactory().callRemoveEvent((R) route);
     }
 
-    public static class TransferOutputEntry implements OutputEntry<TransferCollection> {
+    public static class TransferOutputEntry implements OutputEntry {
 
         protected final Block block;
 
@@ -69,20 +71,15 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             this.block = BlockUtil.getPointingBlock(BlockUtil.getBlock(world, vec), false);
         }
 
-        public boolean handle(TransferCollection collection) {
-            PipePutEvent event = new PipePutEvent(block, collection);
+        public boolean handle(TransferCollection collection, Source from) {
+            PipePutEvent event = new PipePutEvent(block, collection, from);
             Bukkit.getPluginManager().callEvent(event);
 
             return event.transferred();
         }
-
-        @Override
-        public BlockVector getVec() {
-            return BlockUtil.getVec(block);
-        }
     }
 
-    public static class SignalOutputEntry implements OutputEntry<SignalSource> {
+    public static class SignalOutputEntry implements OutputEntry {
 
         protected final Block block;
 
@@ -92,11 +89,6 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
         public boolean handle(SignalSource source) {
             return source.handleOutput(block);
-        }
-
-        @Override
-        public BlockVector getVec() {
-            return BlockUtil.getVec(block);
         }
     }
 
@@ -189,10 +181,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return new TransferOutputEntry(world, vec);
         }
 
-        public boolean start(TransferCollection collection) {
+        public boolean start(TransferCollection collection, Source from) {
             boolean transferred = false;
             for (TransferOutputEntry entry : outputs.get(Routes.DEFAULT_CONTEXT, LinkedList::new)) {
-                if (entry.handle(collection)) {
+                if (entry.handle(collection, from)) {
                     transferred = true;
                 }
 

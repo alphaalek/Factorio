@@ -107,7 +107,7 @@ public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
     public void pipePut(ItemCollection collection, PipePutEvent event) {
         for (ItemStack filter : this.filter) {
             if (collection.has(filter)) {
-                if (Routes.startTransferRoute(loc.getBlock(), collection, false)) {
+                if (Routes.startTransferRoute(loc.getBlock(), collection, this, false)) {
                     event.setTransferred(true);
                 }
                 return;

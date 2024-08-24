@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.mechanics.routes.events.pipe;
 
+import dk.superawesome.factorio.mechanics.Source;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import org.bukkit.block.Block;
 import org.bukkit.event.HandlerList;
@@ -10,15 +11,21 @@ public class PipePutEvent extends BlockEvent {
     private static final HandlerList handlers = new HandlerList();
 
     private final TransferCollection collection;
+    private final Source from;
     private boolean transferred;
 
-    public PipePutEvent(Block theBlock, TransferCollection collection) {
+    public PipePutEvent(Block theBlock, TransferCollection collection, Source from) {
         super(theBlock);
         this.collection = collection;
+        this.from = from;
     }
 
     public TransferCollection getTransfer() {
         return collection;
+    }
+
+    public Source getFrom() {
+        return from;
     }
 
     public boolean transferred() {

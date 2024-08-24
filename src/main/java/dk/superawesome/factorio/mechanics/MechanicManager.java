@@ -171,7 +171,7 @@ public class MechanicManager implements Listener {
     public void onPipePut(PipePutEvent event) {
         if (event.getBlock().getWorld().equals(this.world)) {
             Mechanic<?> mechanic = getMechanicAt(event.getBlock().getLocation());
-            if (mechanic instanceof Container && ((Container<?>)mechanic).accepts(event.getTransfer())) {
+            if (mechanic instanceof Container && ((Container<?>)mechanic).accepts(event.getTransfer()) && mechanic != event.getFrom()) {
                 doTransfer((Container<?>) mechanic, event.getTransfer(), event);
             }
         }
@@ -180,9 +180,11 @@ public class MechanicManager implements Listener {
     @EventHandler
     public void onWorldSave(WorldSaveEvent event) {
         if (event.getWorld().equals(this.world)) {
-            for (Mechanic<?> mechanic : mechanics.values()) {
-                mechanic.save();
-            }
+            Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), () -> {
+                for (Mechanic<?> mechanic : mechanics.values()) {
+                    mechanic.save();
+                }
+            });
         }
     }
 

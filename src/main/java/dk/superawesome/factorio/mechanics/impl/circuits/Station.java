@@ -34,7 +34,7 @@ public class Station extends AbstractMechanic<Station> implements Container<Tran
 
     @Override
     public void pipePut(TransferCollection collection, PipePutEvent event) {
-        if (Routes.startTransferRoute(loc.getBlock(), collection, false)) {
+        if (Routes.startTransferRoute(loc.getBlock(), collection, this, false)) {
             event.setTransferred(true);
         }
     }
