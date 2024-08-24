@@ -55,12 +55,14 @@ public class MechanicManager implements Listener {
     }
 
     public void loadMechanics(Chunk chunk) {
+        Factorio.get().getLogger().info("Loading mechanics in chunk " + chunk);
+
         for (BlockState state : chunk.getTileEntities()) {
             if (!(state instanceof Sign)) {
                 continue;
             }
             Factorio.get().getLogger().info("Loading mechanic at " + state.getLocation() + " state: " + state);
-            Factorio.get().getLogger().info(Tag.WALL_SIGNS.isTagged(state.getType()) + " " + getProfileFrom((Sign) state).isPresent() + " " + getMechanicAt(BlockUtil.getPointingBlock(state.getBlock(), false).getLocation()));
+            Factorio.get().getLogger().info(Tag.WALL_SIGNS.isTagged(state.getType()) + " " + getProfileFrom((Sign) state).isPresent() + " " + BlockUtil.getPointingBlock(state.getBlock(), false));
             if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())
                     && getProfileFrom((Sign) state).isPresent()
                     && getMechanicAt(BlockUtil.getPointingBlock(state.getBlock(), false).getLocation()) == null) {
