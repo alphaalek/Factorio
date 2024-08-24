@@ -19,10 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, AccessibleMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
@@ -43,6 +40,19 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
             new BlockVector(1, 0, 0),
             new BlockVector(-1, 0, 0)
     );
+
+    private static final List<FurnaceRecipe> FURNACE_RECIPES = new ArrayList<>();
+
+    static {
+        Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
+        while (recipeIterator.hasNext()) {
+            Recipe recipe = recipeIterator.next();
+
+            if (recipe instanceof FurnaceRecipe furnaceRecipe) {
+                FURNACE_RECIPES.add(furnaceRecipe);
+            }
+        }
+    }
 
     private final DelayHandler thinkDelayHandler = new DelayHandler(20);
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
@@ -178,19 +188,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     public boolean canSmelt(ItemStack item) {
-        Iterator<Recipe> recipeIterator = Bukkit.recipeIterator();
-        while (recipeIterator.hasNext()) {
-            Recipe recipe = recipeIterator.next();
-
-            if (recipe instanceof FurnaceRecipe furnaceRecipe) {
-                if (furnaceRecipe.getInputChoice().test(item)) {
-                    cachedSmeltResult = furnaceRecipe.getResult();
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return FURNACE_RECIPES.stream().anyMatch(r -> r.getInputChoice().test(item));
     }
 
     @Override
