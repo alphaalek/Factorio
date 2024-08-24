@@ -1,7 +1,10 @@
 package dk.superawesome.factorio.mechanics.routes;
 
+import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.Source;
+import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
@@ -214,12 +217,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         public void search(Block from, BlockVector relVec, Block rel, boolean isFromOrigin) {
             int signal = signals.getOrDefault(BlockUtil.getVec(from), 16);
             Material mat = rel.getType();
-            if (mat == Material.REPEATER) {
-                // check if this repeater continues the signal route or triggers an output
-                if (!BlockUtil.getPointingBlock(rel, false).equals(from)) {
-                    // this repeater does not connect with the input
-                    return;
-                }
+            if (mat == Material.REPEATER && BlockUtil.getPointingBlock(rel, false).equals(from)) {
                 add(relVec);
 
                 Block facing = BlockUtil.getPointingBlock(rel, true);
@@ -237,16 +235,16 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
             // comparator - signal output (for generator to power-central)
             } else if (mat == Material.COMPARATOR && BlockUtil.getPointingBlock(rel, false).equals(from)) {
+                add(relVec);
+
                 Block facing = BlockUtil.getPointingBlock(rel, true);
 
-                // check if the comparator is facing outwards
-                if (!facing.equals(from)) {
-                    add(relVec);
+                Mechanic<?> at = Factorio.get().getMechanicManager(from.getWorld()).getMechanicPartially(facing.getLocation());
+                if (!(at instanceof PowerCentral)) {
                     addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
-
-                    expandWire(facing, rel, rel, 16);
                 }
 
+                expandWire(facing, rel, rel, 16);
             // check for expand signal route
             } else if (signal > 1) {
                 if (mat == Material.REDSTONE_WIRE) {
@@ -295,7 +293,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             if (block.getType() == Material.REDSTONE_WIRE) {
                 expandWire(block, BlockUtil.getVec(block), ignore, signal);
                 return true;
-            } else if (block.getType() == Material.REPEATER && BlockUtil.getPointingBlock(block, false).equals(point)) {
+            } else if ((block.getType() == Material.REPEATER || block.getType() == Material.COMPARATOR) && BlockUtil.getPointingBlock(block, false).equals(point)) {
                 signals.put(BlockUtil.getVec(block), 16);
                 Routes.expandRoute(this, block, BlockUtil.getVec(block), ((Directional)block.getBlockData()).getFacing().getOppositeFace());
                 return true;
