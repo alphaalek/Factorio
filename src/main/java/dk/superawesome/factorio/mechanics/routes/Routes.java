@@ -4,15 +4,12 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.Source;
-import dk.superawesome.factorio.mechanics.impl.behaviour.Generator;
 import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
-import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
@@ -30,18 +27,20 @@ public class Routes {
     public static final BlockFace[] SIGNAL_EXPAND_DIRECTIONS = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
     public static final BlockFace[] RELATIVES = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
-    public static boolean suckItems(Block start, PowerCentral source) {
+    public static boolean suckToPipe(Block start, PowerCentral source) {
         // we will suck items out of the mechanic that the sticky piston is pointing towards
         Block from = BlockUtil.getPointingBlock(start, false);
 
         PipeSuckEvent event = new PipeSuckEvent(from);
         Bukkit.getPluginManager().callEvent(event);
 
-        if (event.getTransfer() != null)
-            source.setRecentMax(source.getRecentMax() + event.getTransfer().getTransferEnergyCost());
+        if (event.getTransfer() == null) {
+            return false;
+        }
 
-        if (event.getTransfer() == null
-                || !event.getTransfer().getTransferDelayHandler().ready()
+        source.setRecentMax(source.getRecentMax() + event.getTransfer().getTransferEnergyCost());
+
+        if (!event.getTransfer().getTransferDelayHandler().ready()
                 || event.getTransfer().isTransferEmpty()
                 || source.getEnergy() < event.getTransfer().getTransferEnergyCost()) {
             return false;

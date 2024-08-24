@@ -8,6 +8,9 @@ commands:
   addmembertoall:
     usage: /addmembertoall <spiller>
     description: Tilføj en spiller som medlem til alle dine maskiner.
+  removememberfromall:
+    usage: /removememberfromall <spiller>
+    description: Fjern en spiller som medlem fra alle dine maskiner.
   listdefaultmembers:
     usage: /listdefaultmembers
     description: Se en liste af alle standard medlemmer af dine nybyggede maskiner.

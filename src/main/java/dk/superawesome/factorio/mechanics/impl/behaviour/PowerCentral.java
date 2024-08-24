@@ -195,7 +195,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     @Override
     public boolean handleOutput(Block block) {
-        return Routes.suckItems(block, this);
+        return Routes.suckToPipe(block, this);
     }
 
     public double getRecentMax() {

@@ -22,22 +22,11 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
     private static Graph getConsumptionGraph(Inventory inventory, PowerCentral mechanic) {
         return new Graph(inventory,
-                () -> mechanic.pollRecentConsumption() * 2,
+                mechanic::pollRecentConsumption,
                 e -> new ItemBuilder(Material.LIGHT_GRAY_WOOL)
                         .setName("§eForbrug: " + StringUtil.formatDecimals(e, 2) + "W")
-                        .addLore("§eMaksimalt forbrug: " + StringUtil.formatDecimals(mechanic.getRecentMax(), 2) + "W")
+                        .addLore("§ePotentiel forbrug: " + StringUtil.formatDecimals(mechanic.getRecentMax(), 2) + "W")
                         .addLore("§eProduktion: " + StringUtil.formatDecimals(e, 2) + "W")
-                        .addLore("§eEnergi: " + StringUtil.formatDecimals(mechanic.getEnergy(), 2) + "J")
-                        .addLore("§eKapacitet: " + StringUtil.formatDecimals(mechanic.getCapacity(), 2) + "J")
-                        .build()
-        );
-    }
-
-    private static Graph getProductionGraph(Inventory inventory, PowerCentral mechanic) {
-        return new Graph(inventory,
-                () -> mechanic.pollRecentProduction() * 2,
-                e -> new ItemBuilder(Material.GRAY_WOOL)
-                        .setName("§eProduktion: " + StringUtil.formatDecimals(e, 2) + "W")
                         .addLore("§eEnergi: " + StringUtil.formatDecimals(mechanic.getEnergy(), 2) + "J")
                         .addLore("§eKapacitet: " + StringUtil.formatDecimals(mechanic.getCapacity(), 2) + "J")
                         .build()
@@ -50,10 +39,6 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
         super(mechanic, inUseReference, new InitCallbackHolder());
         initCallback.call();
 
-        /*
-        this.tasks.add(
-                Bukkit.getScheduler().runTaskTimer(Factorio.get(), getProductionGraph(getInventory(), getMechanic()), 0L, 10L));
-        */
         this.tasks.add(
                 Bukkit.getScheduler().runTaskTimer(Factorio.get(), getConsumptionGraph(getInventory(), getMechanic()), 0L, 10L));
 
