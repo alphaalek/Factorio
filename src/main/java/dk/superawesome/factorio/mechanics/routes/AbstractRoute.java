@@ -240,7 +240,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 Block facing = BlockUtil.getPointingBlock(rel, true);
 
                 Mechanic<?> at = Factorio.get().getMechanicManager(from.getWorld()).getMechanicPartially(facing.getLocation());
-                if (!(at instanceof PowerCentral)) {
+                if (at instanceof PowerCentral) {
                     addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
                 }
 
@@ -293,7 +293,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             if (block.getType() == Material.REDSTONE_WIRE) {
                 expandWire(block, BlockUtil.getVec(block), ignore, signal);
                 return true;
-            } else if ((block.getType() == Material.REPEATER || block.getType() == Material.COMPARATOR) && BlockUtil.getPointingBlock(block, false).equals(point)) {
+            } else if ((block.getType() == Material.REPEATER || block.getType() == Material.COMPARATOR)
+                    && BlockUtil.getPointingBlock(block, false).equals(point)) {
                 signals.put(BlockUtil.getVec(block), 16);
                 Routes.expandRoute(this, block, BlockUtil.getVec(block), ((Directional)block.getBlockData()).getFacing().getOppositeFace());
                 return true;

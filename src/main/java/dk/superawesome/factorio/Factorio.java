@@ -1,9 +1,6 @@
 package dk.superawesome.factorio;
 
-import dk.superawesome.factorio.commands.impl.AddDefaultMember;
-import dk.superawesome.factorio.commands.impl.AddMemberToAll;
-import dk.superawesome.factorio.commands.impl.ListDefaultMembers;
-import dk.superawesome.factorio.commands.impl.RemoveDefaultMember;
+import dk.superawesome.factorio.commands.impl.*;
 import dk.superawesome.factorio.listeners.*;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.db.DatabaseConnection;
@@ -64,7 +61,7 @@ public final class Factorio extends JavaPlugin implements Listener {
         getCommand("listdefaultmembers").setExecutor(new ListDefaultMembers());
         getCommand("adddefaultmember").setExecutor(new AddDefaultMember());
         getCommand("removedefaultmember").setExecutor(new RemoveDefaultMember());
-        getCommand("removememberfromall").setExecutor(new RemoveDefaultMember());
+        getCommand("removememberfromall").setExecutor(new RemoveMemberFromAll());
 
         Tick.start();
 

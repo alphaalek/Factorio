@@ -168,11 +168,15 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     @Override
     public boolean preSignal(AbstractRoute.Signal signal) {
         double signalCost = signal.getLocations().size() * SIGNAL_COST;
-        setRecentMax(signalCost);
         if (this.energy < signalCost) {
+            if (recentMax == 0) {
+                recentMax = signalCost;
+            }
+
             return false;
         }
 
+        recentMax = signalCost;
         setEnergy(getEnergy() - signalCost);
         return true;
     }
