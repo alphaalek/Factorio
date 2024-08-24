@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMechanic<M> implements ThinkingMechanic {
+public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMechanic<M> {
 
     protected final List<Block> levers = new ArrayList<>();
 
@@ -27,6 +27,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     }
 
     protected void triggerLever(Block block, boolean powered) {
+        this.powered = powered;
         if (block.getType() == Material.LEVER) {
             Switch lever = (Switch) block.getBlockData();
             lever.setPowered(powered);
@@ -36,19 +37,19 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
         }
     }
 
-    protected void setupRelativeBlocks(Consumer<Mechanic<?>> find) {
+    protected void setupRelativeBlocks(Consumer<Block> findBlock, Consumer<Mechanic<?>> findMechanic) {
         MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
 
         for (BlockFace face : Routes.RELATIVES) {
             Block block = loc.getBlock().getRelative(face);
             if (block.getType() == Material.LEVER) {
                 levers.add(block);
-                triggerLever(block, true); // locked so assembler types can be updated before triggering
+                findBlock.accept(block);
             }
 
             Mechanic<?> at = manager.getMechanicPartially(block.getLocation());
             if (at != null) {
-                find.accept(at);
+                findMechanic.accept(at);
             }
         }
     }
@@ -78,15 +79,27 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
         }
     }
 
+    public boolean isPowered() {
+        return powered;
+    }
+
+    public void setPowered(boolean powered) {
+        this.powered = powered;
+    }
+
     public abstract void onBlockPlace(BlockPlaceEvent event);
 
     public abstract void onBlockBreak(BlockBreakEvent event);
 
     public abstract void onLeverPull(PlayerInteractEvent event);
 
-    protected void triggerLevers() {
+    protected void triggerLevers(boolean powered) {
         for (Block lever : new ArrayList<>(levers)) {
             triggerLever(lever, powered);
         }
+    }
+
+    protected void triggerLevers() {
+        triggerLevers(powered);
     }
 }

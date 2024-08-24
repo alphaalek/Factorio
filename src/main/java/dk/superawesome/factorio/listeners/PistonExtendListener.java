@@ -11,6 +11,7 @@ import org.bukkit.event.block.BlockPistonEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 
+import java.util.Collections;
 import java.util.List;
 
 public class PistonExtendListener implements Listener {
@@ -37,14 +38,16 @@ public class PistonExtendListener implements Listener {
 
     @EventHandler
     public void onPistonExtend(BlockPistonExtendEvent event) {
-        if (disallowPiston(event, event.getBlocks())) {
+        if (disallowPiston(event, event.getBlocks())
+                || disallowPiston(event, Collections.singletonList(event.getBlock()))) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onPistonRetract(BlockPistonRetractEvent event) {
-        if (disallowPiston(event, event.getBlocks())) {
+        if (disallowPiston(event, event.getBlocks())
+                || disallowPiston(event, Collections.singletonList(event.getBlock()))) {
             event.setCancelled(true);
         }
     }

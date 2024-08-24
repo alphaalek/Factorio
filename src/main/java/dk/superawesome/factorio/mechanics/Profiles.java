@@ -22,8 +22,9 @@ public class Profiles {
     public static final MechanicProfile<Hopper> HOPPER;
     public static final MechanicProfile<LiquidTank> LIQUID_TANK;
     public static final MechanicProfile<Station> STATION;
-    public static final MechanicProfile<SolarCell> SOLAR_CELL;
+    // public static final MechanicProfile<SolarCell> SOLAR_CELL;
     public static final MechanicProfile<PowerCentral> POWER_CENTRAL;
+    public static final MechanicProfile<PowerLifter> POWER_LIFTER;
     public static final MechanicProfile<Refinery> REFINERY;
     public static final MechanicProfile<Smelter> SMELTER;
     public static final MechanicProfile<Splitter> SPLITTER;
@@ -45,9 +46,10 @@ public class Profiles {
         HOPPER            = loadProfile(new HopperProfile());
         LIQUID_TANK       = loadProfile(new LiquidTankProfile());
         POWER_CENTRAL     = loadProfile(new PowerCentralProfile());
+        POWER_LIFTER      = loadProfile(new PowerLifterProfile());
         REFINERY          = loadProfile(new RefineryProfile());
         STATION           = loadProfile(new StationProfile());
-        SOLAR_CELL        = null;//loadProfile(new SolarCellProfile());
+        // SOLAR_CELL     = loadProfile(new SolarCellProfile());
         SMELTER           = loadProfile(new SmelterProfile());
         SPLITTER          = loadProfile(new SplitterProfile());
         STORAGE_BOX       = loadProfile(new StorageBoxProfile());

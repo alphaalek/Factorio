@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.Mechanic;
+import dk.superawesome.factorio.mechanics.SignalInvoker;
 import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.Source;
 import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
@@ -27,11 +28,19 @@ public class Routes {
     public static final BlockFace[] SIGNAL_EXPAND_DIRECTIONS = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
     public static final BlockFace[] RELATIVES = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
-    public static boolean suckToPipe(Block start, PowerCentral source) {
+    public static boolean invokeSignalOutput(Block start, PowerCentral source) {
         // we will suck items out of the mechanic that the sticky piston is pointing towards
-        Block from = BlockUtil.getPointingBlock(start, false);
+        Block points = BlockUtil.getPointingBlock(start, false);
+        if (points == null) {
+            return false;
+        }
 
-        PipeSuckEvent event = new PipeSuckEvent(from);
+        Mechanic<?> at = Factorio.get().getMechanicManager(start.getWorld()).getMechanicAt(points.getLocation());
+        if (at instanceof SignalInvoker invoker) {
+            return invoker.invoke(source);
+        }
+
+        PipeSuckEvent event = new PipeSuckEvent(points);
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.getTransfer() == null) {

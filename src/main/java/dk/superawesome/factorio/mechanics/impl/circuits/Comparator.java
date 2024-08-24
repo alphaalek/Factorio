@@ -52,10 +52,14 @@ public class Comparator extends SignalTrigger<Comparator> implements ThinkingMec
 
     @Override
     public void onBlocksLoaded(Player by) {
-        setupRelativeBlocks(at -> {
-            if (at instanceof TransferCollection collection) {
-                this.collectionTrigger = collection;
-            }
+        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+            setupRelativeBlocks(at -> triggerLever(at, true), at -> {
+                if (at instanceof TransferCollection collection) {
+                    this.collectionTrigger = collection;
+                }
+            });
+
+            think();
         });
     }
 

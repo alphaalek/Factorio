@@ -114,7 +114,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
         loadPrice((Sign) loc.getBlock().getRelative(rot).getState(), by);
 
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-            setupRelativeBlocks(at -> {
+            setupRelativeBlocks(at -> triggerLever(at, true), at -> {
                 if (at instanceof Assembler assembler) {
                     assemblers.add(assembler);
                 }

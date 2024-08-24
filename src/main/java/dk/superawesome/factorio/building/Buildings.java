@@ -30,6 +30,7 @@ public class Buildings {
     public static final Building SOLAR_CELL;
     public static final Building STORAGE_BOX;
     public static final Building POWER_CENTRAL;
+    public static final Building POWER_LIFTER;
     public static final Building REFINERY;
 
     static {
@@ -49,6 +50,7 @@ public class Buildings {
         SOLAR_CELL        = loadBuilding(new SolarCellBuilding());
         STORAGE_BOX       = loadBuilding(new StorageBoxBuilding());
         POWER_CENTRAL     = loadBuilding(new PowerCentralBuilding());
+        POWER_LIFTER      = loadBuilding(new PowerLifterBuilding());
         REFINERY          = loadBuilding(new RefineryBuilding());
     }
 

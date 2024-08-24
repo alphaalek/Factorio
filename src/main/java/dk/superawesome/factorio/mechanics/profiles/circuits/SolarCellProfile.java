@@ -39,7 +39,7 @@ public class SolarCellProfile implements MechanicProfile<SolarCell> {
 
     @Override
     public int getID() {
-        return 17;
+        return 19;
     }
 
     private static class SolarCellMechanicFactory implements MechanicFactory<SolarCell> {

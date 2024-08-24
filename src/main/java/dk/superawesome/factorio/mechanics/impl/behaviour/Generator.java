@@ -300,6 +300,11 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
+    public boolean canBeDeleted() {
+        return isContainerEmpty();
+    }
+
+    @Override
     public boolean isTransferEmpty() {
         return availableEnergy == 0;
     }

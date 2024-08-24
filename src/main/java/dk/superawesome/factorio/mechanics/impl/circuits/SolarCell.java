@@ -35,7 +35,7 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements SignalSour
 
     @Override
     public MechanicProfile<SolarCell> getProfile() {
-        return Profiles.SOLAR_CELL;
+        return null; // Profiles.SOLAR_CELL;
     }
 
     @Override

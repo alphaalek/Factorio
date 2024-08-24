@@ -88,10 +88,13 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         this.storageType = context.getSerializer().readItemStack(str);
         setStorageAmount(context.getSerializer().readInt(str)); // ensure no zero if storage set
 
-        if (this.ingredientAmount > 0 && this.ingredient == null) {
-            this.ingredientAmount = 0;
-        } else if (this.ingredientAmount == 0 && this.ingredient != null) {
-            this.ingredient = null;
+        clearSmeltResult: {
+            if (this.ingredientAmount > 0 && this.ingredient == null) {
+                this.ingredientAmount = 0;
+            } else if (this.ingredientAmount == 0 && this.ingredient != null) {
+                this.ingredient = null;
+            } else break clearSmeltResult;
+
             this.smeltResult = null;
             this.cachedSmeltResult = null;
         }
@@ -188,7 +191,13 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     public boolean canSmelt(ItemStack item) {
-        return FURNACE_RECIPES.stream().anyMatch(r -> r.getInputChoice().test(item));
+        boolean can = FURNACE_RECIPES.stream().peek(r -> cachedSmeltResult = r.getResult()).anyMatch(r -> r.getInputChoice().test(item));
+
+        if (!can) {
+            cachedSmeltResult = null;
+        }
+
+        return can;
     }
 
     @Override
