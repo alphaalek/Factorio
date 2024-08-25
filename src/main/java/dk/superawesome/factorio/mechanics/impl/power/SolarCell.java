@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMechanic, SignalSource, EnergyCollection {
 
-    private final DelayHandler thinkHandler = new DelayHandler(20 * 60); // 1 minute
+    private final DelayHandler thinkHandler = new DelayHandler(20);
 
     private Block daylightSensor;
     private double energy;
@@ -44,7 +44,7 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
     @Override
     public void think() {
         if (daylightSensor.getLightFromSky() == 15 && !isAtMaxEnergy()) {
-            energy += Math.random() * 55 + 20; // 20-75
+            energy += (Math.random() * 55 + 20) / 60; // 0.5 to 0.75 per second
             Routes.startSignalRoute(getLocation().getBlock(), this, true, false);
         } else if (hasEnergy()) {
             Routes.startSignalRoute(getLocation().getBlock(), this, true, false);
