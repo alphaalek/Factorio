@@ -19,7 +19,7 @@ public class CauldronBuilding implements Building, Matcher {
     );
 
     private final List<Predicate<Material>> materials = Arrays.asList(
-            matchAny(Material.CAULDRON, Material.WATER_CAULDRON, Material.LAVA_CAULDRON),
+            matchAny(Material.CAULDRON, Material.WATER_CAULDRON, Material.LAVA_CAULDRON, Material.POWDER_SNOW_CAULDRON),
             Tag.WALL_SIGNS::isTagged
     );
 
