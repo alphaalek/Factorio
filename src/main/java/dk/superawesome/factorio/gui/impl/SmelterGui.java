@@ -2,9 +2,8 @@ package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.MechanicGui;
-import dk.superawesome.factorio.mechanics.impl.behaviour.Smelter;
+import dk.superawesome.factorio.mechanics.impl.accessible.Smelter;
 import dk.superawesome.factorio.mechanics.stackregistry.Fuel;
-import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;

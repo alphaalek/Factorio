@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.profiles.behaviour;
+package dk.superawesome.factorio.mechanics.profiles.accesible;
 
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
@@ -6,7 +6,7 @@ import dk.superawesome.factorio.gui.GuiFactory;
 import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
+import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.util.Array;

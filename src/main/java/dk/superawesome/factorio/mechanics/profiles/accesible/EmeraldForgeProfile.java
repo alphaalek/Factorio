@@ -1,11 +1,11 @@
-package dk.superawesome.factorio.mechanics.profiles.behaviour;
+package dk.superawesome.factorio.mechanics.profiles.accesible;
 
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
 import dk.superawesome.factorio.gui.impl.EmeraldForgeGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.impl.behaviour.EmeraldForge;
+import dk.superawesome.factorio.mechanics.impl.accessible.EmeraldForge;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;

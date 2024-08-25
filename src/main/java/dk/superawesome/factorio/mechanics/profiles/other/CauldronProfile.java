@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.profiles.circuits;
+package dk.superawesome.factorio.mechanics.profiles.other;
 
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;

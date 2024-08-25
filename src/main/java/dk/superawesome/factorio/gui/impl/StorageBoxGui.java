@@ -1,15 +1,13 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.gui.SingleStorageGui;
-import dk.superawesome.factorio.mechanics.impl.behaviour.StorageBox;
+import dk.superawesome.factorio.mechanics.impl.accessible.StorageBox;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class StorageBoxGui extends SingleStorageGui<StorageBoxGui, StorageBox> {
 

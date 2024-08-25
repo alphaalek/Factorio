@@ -1,6 +1,6 @@
 package dk.superawesome.factorio.mechanics;
 
-import dk.superawesome.factorio.mechanics.impl.behaviour.*;
+import dk.superawesome.factorio.mechanics.impl.accessible.*;
 import dk.superawesome.factorio.mechanics.impl.circuits.*;
 import dk.superawesome.factorio.mechanics.impl.other.Cauldron;
 import dk.superawesome.factorio.mechanics.impl.power.Generator;
@@ -8,9 +8,18 @@ import dk.superawesome.factorio.mechanics.impl.power.PowerCentral;
 import dk.superawesome.factorio.mechanics.impl.power.PowerLifter;
 import dk.superawesome.factorio.mechanics.impl.power.SolarCell;
 import dk.superawesome.factorio.mechanics.impl.relative.*;
-import dk.superawesome.factorio.mechanics.profiles.behaviour.*;
-import dk.superawesome.factorio.mechanics.profiles.behaviour.LiquidTankProfile;
+import dk.superawesome.factorio.mechanics.profiles.accesible.*;
+import dk.superawesome.factorio.mechanics.profiles.accesible.LiquidTankProfile;
 import dk.superawesome.factorio.mechanics.profiles.circuits.*;
+import dk.superawesome.factorio.mechanics.profiles.other.CauldronProfile;
+import dk.superawesome.factorio.mechanics.profiles.power.GeneratorProfile;
+import dk.superawesome.factorio.mechanics.profiles.power.PowerCentralProfile;
+import dk.superawesome.factorio.mechanics.profiles.power.PowerLifterProfile;
+import dk.superawesome.factorio.mechanics.profiles.power.SolarCellProfile;
+import dk.superawesome.factorio.mechanics.profiles.relative.AssemblerTriggerProfile;
+import dk.superawesome.factorio.mechanics.profiles.relative.CollectorProfile;
+import dk.superawesome.factorio.mechanics.profiles.relative.ComparatorProfile;
+import dk.superawesome.factorio.mechanics.profiles.relative.HopperProfile;
 import dk.superawesome.factorio.util.Array;
 
 public class Profiles {
@@ -22,6 +31,7 @@ public class Profiles {
     public static final MechanicProfile<Comparator> COMPARATOR;
     public static final MechanicProfile<Constructor> CONSTRUCTOR;
     public static final MechanicProfile<EmeraldForge> EMERALD_FORGE;
+    public static final MechanicProfile<Excluder> EXCLUDER;
     public static final MechanicProfile<Filter> FILTER;
     public static final MechanicProfile<Gate> GATE;
     public static final MechanicProfile<Generator> GENERATOR;
@@ -46,6 +56,7 @@ public class Profiles {
         COMPARATOR        = loadProfile(new ComparatorProfile());
         CONSTRUCTOR       = loadProfile(new ConstructorProfile());
         EMERALD_FORGE     = loadProfile(new EmeraldForgeProfile());
+        EXCLUDER          = loadProfile(new ExcluderProfile());
         FILTER            = loadProfile(new FilterProfile());
         GATE              = loadProfile(new GateProfile());
         GENERATOR         = loadProfile(new GeneratorProfile());

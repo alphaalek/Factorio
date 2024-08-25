@@ -2,10 +2,7 @@ package dk.superawesome.factorio.mechanics.impl.circuits;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Buildings;
-import dk.superawesome.factorio.mechanics.Circuit;
-import dk.superawesome.factorio.mechanics.MechanicProfile;
-import dk.superawesome.factorio.mechanics.MechanicStorageContext;
-import dk.superawesome.factorio.mechanics.Profiles;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
@@ -32,29 +29,29 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
 
     @Override
     public void onBlocksLoaded(Player by) {
-        loadItems((Sign) loc.getBlock().getRelative(rot).getState(), by);
+        loadItems(filter, (Sign) loc.getBlock().getRelative(rot).getState(), by, loc, this);
     }
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
         if (event.getBlock().equals(loc.getBlock().getRelative(rot))) {
-            Bukkit.getScheduler().runTask(Factorio.get(), () -> loadItems((Sign) event.getBlock().getState(), event.getPlayer()));
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> loadItems(filter, (Sign) event.getBlock().getState(), event.getPlayer(), loc, this));
         }
     }
 
-    private void loadItems(Sign sign, Player by) {
+    public static void loadItems(List<ItemStack> filter, Sign sign, Player by, Location loc, Mechanic<?> mechanic) {
         // get all lines except the first
         for (String line : Arrays.copyOfRange(sign.getSide(Side.FRONT).getLines(), 1, 4)) {
             Arrays.stream(line.split(","))
                     .map(String::trim)
-                    .map(this::findItem)
+                    .map(Filter::findItem)
                     .forEach(filter::add);
         }
         filter.removeAll(Collections.singletonList(null));
 
         if (filter.isEmpty()) {
-            Factorio.get().getMechanicManager(loc.getWorld()).unload(this);
-            Buildings.remove(loc.getWorld(), this);
+            Factorio.get().getMechanicManager(loc.getWorld()).unload(mechanic);
+            Buildings.remove(loc.getWorld(), mechanic);
 
             if (by != null) {
                 by.sendMessage("§cUgyldig item valgt!");
@@ -66,7 +63,7 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
                 StringBuilder builder = new StringBuilder();
                 Arrays.stream(line.split(","))
                         .map(String::trim)
-                        .map(this::findItem)
+                        .map(Filter::findItem)
                         .filter(Objects::nonNull)
                         .peek(__ -> builder.append(","))
                         .forEach(item -> builder.append(item.getType().name().toLowerCase()));
@@ -82,8 +79,7 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
         }
     }
 
-
-    private ItemStack findItem(String name) {
+    public static ItemStack findItem(String name) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equalsIgnoreCase(name))
                 .findFirst()
