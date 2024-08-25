@@ -15,14 +15,12 @@ public class PipePutEvent extends BlockEvent {
 
     private final TransferCollection collection;
     private final Source from;
-    private final Set<AbstractRoute.Pipe> route;
     private boolean transferred;
 
-    public PipePutEvent(Block theBlock, TransferCollection collection, Source from, Set<AbstractRoute.Pipe> route) {
+    public PipePutEvent(Block theBlock, TransferCollection collection, Source from) {
         super(theBlock);
         this.collection = collection;
         this.from = from;
-        this.route = route;
     }
 
     public TransferCollection getTransfer() {
@@ -31,10 +29,6 @@ public class PipePutEvent extends BlockEvent {
 
     public Source getFrom() {
         return from;
-    }
-
-    public Set<AbstractRoute.Pipe> getRoute() {
-        return route;
     }
 
     public boolean transferred() {

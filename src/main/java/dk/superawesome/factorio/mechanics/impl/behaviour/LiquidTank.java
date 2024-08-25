@@ -65,7 +65,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     }
 
     @Override
-    public void pipePut(FluidCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
+    public void pipePut(FluidCollection collection, PipePutEvent event) {
         if ((fluid == null || collection.hasFluid(fluid)) && fluidAmount < getCapacity()) {
             Fluid takeFluid = collection.getFluid();
             int take = collection.take(Math.min(getMaxTransfer(), getCapacity() - fluidAmount));

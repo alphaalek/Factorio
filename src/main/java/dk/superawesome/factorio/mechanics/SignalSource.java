@@ -20,5 +20,5 @@ public interface SignalSource {
 
     int getContext();
 
-    boolean handleOutput(Block block, Set<AbstractRoute.Signal> exclude);
+    boolean handleOutput(Block block);
 }

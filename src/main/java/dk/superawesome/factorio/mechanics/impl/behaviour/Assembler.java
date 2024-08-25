@@ -106,7 +106,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     }
 
     @Override
-    public void pipePut(ItemCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
+    public void pipePut(ItemCollection collection, PipePutEvent event) {
         ItemStack item = Optional.ofNullable(type)
                 .map(Type::getMat)
                 .map(ItemStack::new)

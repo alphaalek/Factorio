@@ -80,8 +80,8 @@ public class Gate extends Circuit<Gate, TransferCollection> implements Container
     }
 
     @Override
-    public boolean pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route) {
-        return open && Routes.startTransferRoute(loc.getBlock(), route, collection, this, false);
+    public boolean pipePut(TransferCollection collection) {
+        return open && Routes.startTransferRoute(loc.getBlock(), collection, this, false);
     }
 
     @Override

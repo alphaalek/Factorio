@@ -73,8 +73,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             this.block = BlockUtil.getPointingBlock(BlockUtil.getBlock(world, vec), false);
         }
 
-        public boolean handle(TransferCollection collection, Source from, Set<Pipe> route) {
-            PipePutEvent event = new PipePutEvent(block, collection, from, route);
+        public boolean handle(TransferCollection collection, Source from) {
+            PipePutEvent event = new PipePutEvent(block, collection, from);
             Bukkit.getPluginManager().callEvent(event);
 
             return event.transferred();
@@ -94,8 +94,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             this.block = BlockUtil.getBlock(world, vec);
         }
 
-        public boolean handle(SignalSource source, Set<Signal> exclude) {
-            return source.handleOutput(block, exclude);
+        public boolean handle(SignalSource source) {
+            return source.handleOutput(block);
         }
 
         @Override
@@ -218,10 +218,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return new TransferOutputEntry(world, vec);
         }
 
-        public boolean start(TransferCollection collection, Source from, Set<Pipe> exclude) {
+        public boolean start(TransferCollection collection, Source from) {
             boolean transferred = false;
             for (TransferOutputEntry entry : outputs.get(Routes.DEFAULT_CONTEXT, LinkedList::new)) {
-                if (entry.handle(collection, from, exclude)) {
+                if (entry.handle(collection, from)) {
                     transferred = true;
                 }
 
@@ -348,7 +348,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return new SignalOutputEntry(world, vec);
         }
 
-        public boolean start(SignalSource source, Set<Signal> exclude) {
+        public boolean start(SignalSource source) {
             if (!source.preSignal(this)) {
                 return false;
             }
@@ -356,7 +356,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             // handle signal outputs
             int mechanics = 0;
             for (SignalOutputEntry entry : outputs.get(source.getContext(), LinkedList::new)) {
-                if (entry.handle(source, exclude)) {
+                if (entry.handle(source)) {
                     mechanics++;
                 }
             }

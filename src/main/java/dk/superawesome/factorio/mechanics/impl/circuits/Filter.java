@@ -2,16 +2,17 @@ package dk.superawesome.factorio.mechanics.impl.circuits;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Buildings;
-import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.Circuit;
+import dk.superawesome.factorio.mechanics.MechanicProfile;
+import dk.superawesome.factorio.mechanics.MechanicStorageContext;
+import dk.superawesome.factorio.mechanics.Profiles;
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
-import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
@@ -102,10 +103,10 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
     }
 
     @Override
-    public boolean pipePut(ItemCollection collection, Set<AbstractRoute.Pipe> route) {
+    public boolean pipePut(ItemCollection collection) {
         for (ItemStack filter : this.filter) {
             if (collection.has(filter)) {
-                return Routes.startTransferRoute(loc.getBlock(), route, collection, this, false);
+                return Routes.startTransferRoute(loc.getBlock(), collection, this, false);
             }
         }
 

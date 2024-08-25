@@ -163,7 +163,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public void pipePut(ItemCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
+    public void pipePut(ItemCollection collection, PipePutEvent event) {
         if (tickThrottle.isThrottled()) {
             return;
         }
@@ -183,7 +183,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public boolean handleOutput(Block block, Set<AbstractRoute.Signal> route) {
+    public boolean handleOutput(Block block) {
         boolean transferred = Routes.transferEnergyToPowerCentral(block, this);
         if (transferred && !turnedOn) {
             // update light state if the generator was able to transfer energy, and it's currently not turned on

@@ -2,11 +2,15 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.routes.Routes;
+import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Powerable;
+import org.bukkit.block.data.type.RedstoneWire;
+import org.bukkit.block.data.type.Repeater;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -45,6 +49,10 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
             if (block.getType() == Material.LEVER) {
                 levers.add(block);
                 findBlock.accept(block);
+
+                if (((Switch)block.getBlockData()).isPowered()) {
+                    powered = true;
+                }
             }
 
             Mechanic<?> at = manager.getMechanicPartially(block.getLocation());
@@ -59,6 +67,8 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     protected void handleLeverPull(PlayerInteractEvent event) {
         if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.LEVER && levers.contains(event.getClickedBlock())) {
             powered = !((Switch)event.getClickedBlock().getBlockData()).isPowered();
+
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> triggerLevers());
         }
     }
 

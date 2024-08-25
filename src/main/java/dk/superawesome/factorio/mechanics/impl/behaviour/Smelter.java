@@ -132,7 +132,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     @Override
-    public void pipePut(ItemCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
+    public void pipePut(ItemCollection collection, PipePutEvent event) {
         if (tickThrottle.isThrottled()) {
             return;
         }

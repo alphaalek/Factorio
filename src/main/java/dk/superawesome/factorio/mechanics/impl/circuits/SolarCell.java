@@ -1,7 +1,6 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
 import org.bukkit.Location;
@@ -9,8 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-
-import java.util.Set;
 
 public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMechanic, SignalSource, EnergyCollection {
 
@@ -58,7 +55,7 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
     }
 
     @Override
-    public boolean handleOutput(Block block, Set<AbstractRoute.Signal> route) {
+    public boolean handleOutput(Block block) {
         return Routes.transferEnergyToPowerCentral(block, this);
     }
 

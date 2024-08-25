@@ -27,7 +27,7 @@ public class Routes {
     public static final BlockFace[] SIGNAL_EXPAND_DIRECTIONS = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
     public static final BlockFace[] RELATIVES = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
-    public static boolean invokeSignalOutput(Block start, PowerCentral source, Set<AbstractRoute.Signal> exclude) {
+    public static boolean invokeSignalOutput(Block start, PowerCentral source) {
         // we will suck items out of the mechanic that the sticky piston is pointing towards
         Block points = BlockUtil.getPointingBlock(start, false);
         if (points == null) {
@@ -36,7 +36,7 @@ public class Routes {
 
         Mechanic<?> at = Factorio.get().getMechanicManager(start.getWorld()).getMechanicAt(points.getLocation());
         if (at instanceof SignalInvoker invoker) {
-            return invoker.invoke(source, exclude);
+            return invoker.invoke(source);
         }
 
         PipeSuckEvent event = new PipeSuckEvent(points);
@@ -83,52 +83,28 @@ public class Routes {
     }
 
     public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
-        return setupRoute(start, new HashSet<>(), factory, onlyExpandIfOriginValid);
-    }
-
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, Set<R> exclude, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = AbstractRoute.getCachedOriginRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
-            route = createNewRoute(start, exclude, factory, onlyExpandIfOriginValid);
+            route = createNewRoute(start, factory, onlyExpandIfOriginValid);
             AbstractRoute.addRouteToCache(route);
         }
-
-        exclude.add(route);
 
         return route;
     }
 
     public static boolean startTransferRoute(Block start, TransferCollection collection, Source from, boolean onlyExpandIfOriginValid) {
-        return startTransferRoute(start, new HashSet<>(), collection, from, onlyExpandIfOriginValid);
-    }
-
-    public static boolean startTransferRoute(Block start, Set<AbstractRoute.Pipe> exclude, TransferCollection collection, Source from, boolean onlyExpandIfOriginValid) {
-        return setupRoute(start, exclude, transferRouteFactory, onlyExpandIfOriginValid)
-                .start(collection, from, exclude);
+        return setupRoute(start, transferRouteFactory, onlyExpandIfOriginValid)
+                .start(collection, from);
     }
 
     public static boolean startSignalRoute(Block start, SignalSource source, boolean onlyExpandIfOriginValid) {
-        return startSignalRoute(start, new HashSet<>(), source, onlyExpandIfOriginValid);
+        return setupRoute(start, signalRouteFactory, onlyExpandIfOriginValid)
+                .start(source);
     }
 
-    public static boolean startSignalRoute(Block start, Set<AbstractRoute.Signal> exclude, SignalSource source, boolean onlyExpandIfOriginValid) {
-        return setupRoute(start, exclude, signalRouteFactory, onlyExpandIfOriginValid)
-                .start(source, exclude);
-    }
-
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, Set<R> excludes, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = factory.create(BlockUtil.getVec(start), start.getWorld());
         startRoute(route, start, onlyExpandIfOriginValid);
-
-        if (excludes != null) {
-            for (R exclude : excludes) {
-                for (int context : exclude.getContexts()) {
-                    for (P output : exclude.getOutputs(context)) {
-                        route.removeOutputEntry(context, output.getVec());
-                    }
-                }
-            }
-        }
 
         return route;
     }

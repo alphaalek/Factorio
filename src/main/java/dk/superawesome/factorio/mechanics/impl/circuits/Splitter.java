@@ -138,7 +138,7 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
     }
 
     @Override
-    public boolean pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route) {
+    public boolean pipePut(TransferCollection collection) {
         if (outputBlocks.isEmpty()) {
             return false;
         }
@@ -230,7 +230,7 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
                     };
                 } else continue;
 
-                if (Routes.startTransferRoute(block, route, wrappedCollection, this, true)) {
+                if (Routes.startTransferRoute(block, wrappedCollection, this, true)) {
                     transferred = true;
                 }
             }

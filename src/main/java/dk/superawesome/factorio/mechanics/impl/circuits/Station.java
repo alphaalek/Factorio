@@ -33,8 +33,8 @@ public class Station extends Circuit<Station, TransferCollection> implements Con
     }
 
     @Override
-    public boolean pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route) {
-        return Routes.startTransferRoute(loc.getBlock(), route, collection, this, false);
+    public boolean pipePut(TransferCollection collection) {
+        return Routes.startTransferRoute(loc.getBlock(), collection, this, false);
     }
 
     @Override

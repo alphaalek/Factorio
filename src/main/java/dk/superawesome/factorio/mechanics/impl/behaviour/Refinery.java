@@ -43,7 +43,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         }
 
         @Override
-        public void pipePut(ItemCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
+        public void pipePut(ItemCollection collection, PipePutEvent event) {
             ItemStack item = Optional.ofNullable(volume)
                     .map(Volume::getMat)
                     .map(ItemStack::new)
@@ -83,7 +83,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         }
 
         @Override
-        public void pipePut(FluidCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
+        public void pipePut(FluidCollection collection, PipePutEvent event) {
             // no empty bottle or not enough fluid to fill a bottle
             if (volume == null || collection.getTransferAmount() < volume.getFluidRequires()) {
                 return;
@@ -205,15 +205,15 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     }
 
     @Override
-    public void pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
+    public void pipePut(TransferCollection collection, PipePutEvent event) {
         if (tickThrottle.isThrottled()) {
             return;
         }
 
         if (collection instanceof ItemCollection itemCollection) {
-            delegatedItemContainer.pipePut(itemCollection, route, event);
+            delegatedItemContainer.pipePut(itemCollection, event);
         } else if (collection instanceof FluidCollection fluidCollection) {
-            delegatedFluidContainer.pipePut(fluidCollection, route, event);
+            delegatedFluidContainer.pipePut(fluidCollection, event);
         }
     }
 

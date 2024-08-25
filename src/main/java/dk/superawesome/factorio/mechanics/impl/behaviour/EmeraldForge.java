@@ -49,7 +49,7 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
     }
 
     @Override
-    public void pipePut(MoneyCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
+    public void pipePut(MoneyCollection collection, PipePutEvent event) {
         double take = Math.min(64, getCapacity() - moneyAmount);
         double amount = collection.take(take);
         if (amount > 0) {

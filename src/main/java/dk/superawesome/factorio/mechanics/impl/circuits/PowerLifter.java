@@ -3,14 +3,14 @@ package dk.superawesome.factorio.mechanics.impl.circuits;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
-import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.statics.BlockUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.Repeater;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -25,6 +25,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInvoker {
+
+    private boolean invoked;
 
     public PowerLifter(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -41,22 +43,26 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     }
 
     @Override
-    public boolean invoke(PowerCentral source, Set<AbstractRoute.Signal> route) {
-        AtomicBoolean transferred = new AtomicBoolean();
+    public boolean invoke(PowerCentral source) {
+        if (invoked) {
+            return false;
+        }
 
+        AtomicBoolean transferred = new AtomicBoolean();
+        invoked = true;
         for (Block lever : levers) {
-            boolean did = Routes.startSignalRoute(lever, route, source, false);
+            boolean did = Routes.startSignalRoute(lever, source, false);
             if (did) {
                 transferred.set(true);
             }
         }
-
         startLift(l -> {
-            boolean did = l.invoke(source, route);
+            boolean did = l.invoke(source);
             if (did) {
                 transferred.set(true);
             }
         });
+        invoked = false;
 
         if (transferred.get()) {
             powered = true;

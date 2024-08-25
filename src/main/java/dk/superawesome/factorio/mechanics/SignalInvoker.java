@@ -7,5 +7,5 @@ import java.util.Set;
 
 public interface SignalInvoker {
 
-    boolean invoke(PowerCentral source, Set<AbstractRoute.Signal> route);
+    boolean invoke(PowerCentral source);
 }
