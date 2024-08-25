@@ -117,7 +117,7 @@ public class Routes {
     }
 
     public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, Set<R> excludes, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
-        R route = factory.create(BlockUtil.getVec(start));
+        R route = factory.create(BlockUtil.getVec(start), start.getWorld());
         startRoute(route, start, onlyExpandIfOriginValid);
 
         if (excludes != null) {
@@ -198,59 +198,67 @@ public class Routes {
         updateNearbyRoutes(block, false, null);
     }
 
-    public static void updateNearbyRoutes(Block block, boolean addAgain, Consumer<List<AbstractRoute<?, ?>>> modifiedRoutesFunction) {
+    public static void removeNearbyRoutesSync(Block block) {
+        updateNearbyRoutesSync(block, false, null);
+    }
+
+    public static void updateNearbyRoutesSync(Block block, boolean addAgain, Consumer<List<AbstractRoute<?, ?>>> modifiedRoutesFunction) {
         // check blocks in next tick, because we are calling this in a break/place event
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-            List<AbstractRoute<?, ?>> routes = new ArrayList<>(AbstractRoute.getCachedRoutes(block.getWorld(), BlockUtil.getVec(block)));
-            for (AbstractRoute<?, ?> route : routes) {
-                AbstractRoute.removeRouteFromCache(block.getWorld(), route);
-            }
+            updateNearbyRoutes(block, addAgain, modifiedRoutesFunction);
+        });
+    }
 
-            List<AbstractRoute<?, ?>> modifiedRoutes = new ArrayList<>();
-            modifiedRoutes.addAll(routes);
-            // iterate over all blocks around this block
-            for (int x = -1; x <= 1; x++) {
-                for (int y = -1; y <= 1; y++) {
-                    for (int z = -1; z <= 1; z++) {
-                        if (Math.abs(x) == 1 && Math.abs(z) == 1) {
-                            // ignore corner blocks
-                            continue;
-                        }
+    public static void updateNearbyRoutes(Block block, boolean addAgain, Consumer<List<AbstractRoute<?, ?>>> modifiedRoutesFunction) {
+        List<AbstractRoute<?, ?>> routes = new ArrayList<>(AbstractRoute.getCachedRoutes(block.getWorld(), BlockUtil.getVec(block)));
+        for (AbstractRoute<?, ?> route : routes) {
+            AbstractRoute.removeRouteFromCache(block.getWorld(), route);
+        }
 
-                        BlockVector rel = BlockUtil.getVec(BlockUtil.getRel(block.getLocation(), new BlockVector(x, y, z)));
-                        List<AbstractRoute<?, ?>> relRoutes = new ArrayList<>(AbstractRoute.getCachedRoutes(block.getWorld(), rel));
+        List<AbstractRoute<?, ?>> modifiedRoutes = new ArrayList<>();
+        modifiedRoutes.addAll(routes);
+        // iterate over all blocks around this block
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    if (Math.abs(x) == 1 && Math.abs(z) == 1) {
+                        // ignore corner blocks
+                        continue;
+                    }
 
-                        if (!relRoutes.isEmpty()) {
-                            for (AbstractRoute<?, ?> relRoute : relRoutes) {
-                                if (relRoute instanceof AbstractRoute.Pipe) {
-                                    // ignore edge blocks for pipes
-                                    if ((Math.abs(x) == 1 || Math.abs(z) == 1) && Math.abs(y) == 1) {
-                                        continue;
-                                    }
-                                } else if (relRoute instanceof AbstractRoute.Signal) {
-                                    // ignore up/down blocks for signal
-                                    if (x == 0 && z == 0 && Math.abs(y) == 1) {
-                                        continue;
-                                    }
+                    BlockVector rel = BlockUtil.getVec(BlockUtil.getRel(block.getLocation(), new BlockVector(x, y, z)));
+                    List<AbstractRoute<?, ?>> relRoutes = new ArrayList<>(AbstractRoute.getCachedRoutes(block.getWorld(), rel));
+
+                    if (!relRoutes.isEmpty()) {
+                        for (AbstractRoute<?, ?> relRoute : relRoutes) {
+                            if (relRoute instanceof AbstractRoute.Pipe) {
+                                // ignore edge blocks for pipes
+                                if ((Math.abs(x) == 1 || Math.abs(z) == 1) && Math.abs(y) == 1) {
+                                    continue;
                                 }
-
-                                AbstractRoute.removeRouteFromCache(block.getWorld(), relRoute);
-                                modifiedRoutes.add(relRoute);
+                            } else if (relRoute instanceof AbstractRoute.Signal) {
+                                // ignore up/down blocks for signal
+                                if (x == 0 && z == 0 && Math.abs(y) == 1) {
+                                    continue;
+                                }
                             }
+
+                            AbstractRoute.removeRouteFromCache(block.getWorld(), relRoute);
+                            modifiedRoutes.add(relRoute);
                         }
                     }
                 }
             }
+        }
 
-            if (addAgain) {
-                // setup again and connect routes
-                for (AbstractRoute<?, ?> modifiedRoute : modifiedRoutes) {
-                    setupRoute(BlockUtil.getBlock(block.getWorld(), modifiedRoute.getStart()), modifiedRoute.getFactory(), true);
-                }
+        if (addAgain) {
+            // setup again and connect routes
+            for (AbstractRoute<?, ?> modifiedRoute : modifiedRoutes) {
+                setupRoute(BlockUtil.getBlock(block.getWorld(), modifiedRoute.getStart()), modifiedRoute.getFactory(), true);
             }
-            if (modifiedRoutesFunction != null) {
-                modifiedRoutesFunction.accept(modifiedRoutes);
-            }
-        });
+        }
+        if (modifiedRoutesFunction != null) {
+            modifiedRoutesFunction.accept(modifiedRoutes);
+        }
     }
 }

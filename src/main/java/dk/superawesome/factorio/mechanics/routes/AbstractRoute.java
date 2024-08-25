@@ -108,10 +108,16 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
     protected final Set<BlockVector> locations = new HashSet<>();
     protected final Map<BlockVector, List<BlockVector>> visited = new HashMap<>();
 
+    private final World world;
     private final BlockVector start;
 
-    public AbstractRoute(BlockVector start) {
+    public AbstractRoute(World world, BlockVector start) {
         this.start = start;
+        this.world = world;
+    }
+
+    public World getWorld() {
+        return world;
     }
 
     public BlockVector getStart() {
@@ -173,8 +179,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
     public static class Pipe extends AbstractRoute<Pipe, TransferOutputEntry> {
 
-        public Pipe(BlockVector start) {
-            super(start);
+        public Pipe(BlockVector start, World world) {
+            super(world, start);
         }
 
         @Override
@@ -232,8 +238,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
         private final Map<BlockVector, Integer> signals = new HashMap<>();
 
-        public Signal(BlockVector start) {
-            super(start);
+        public Signal(BlockVector start, World world) {
+            super(world, start);
         }
 
         @Override

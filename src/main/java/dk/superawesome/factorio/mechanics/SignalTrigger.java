@@ -52,6 +52,8 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
                 findMechanic.accept(at);
             }
         }
+
+        triggerLevers();
     }
 
     protected void handleLeverPull(PlayerInteractEvent event) {

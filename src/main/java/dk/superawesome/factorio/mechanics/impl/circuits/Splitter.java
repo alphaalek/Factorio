@@ -39,16 +39,19 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
         super(loc, rotation, context);
     }
 
-    @Override
     public MechanicProfile<Splitter> getProfile() {
         return Profiles.SPLITTER;
     }
 
     @Override
     public void onBlocksLoaded(Player by) {
+        setupNearby();
+    }
+
+    private void setupNearby() {
         for (BlockFace face : Routes.RELATIVES) {
-            Block block = BlockUtil.getRel(loc, face.getDirection()).getBlock();
-            if (block.getType() == Material.PISTON && BlockUtil.getPointingBlock(block, true).equals(loc.getBlock())) {
+            Block block = loc.getBlock().getRelative(face);
+            if (block.getType() == Material.PISTON && BlockUtil.getPointingBlock(block, false).equals(loc.getBlock())) {
                 // ignore input block
                 continue;
             }
@@ -66,6 +69,11 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
+        if (event.getBlock().getType() == Material.PISTON && BlockUtil.getPointingBlock(event.getBlock(), false).equals(loc.getBlock())) {
+            // ignore input block
+            return;
+        }
+
         for (BlockFace face : Routes.RELATIVES) {
             Block block = loc.getBlock().getRelative(face);
             if (block.equals(event.getBlock())) {
@@ -77,17 +85,11 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
 
     @EventHandler
     public void onPipeBuild(PipeBuildEvent event) {
-        Bukkit.broadcastMessage("pipe build " + event.getRoute().getStart());
-        if (!event.getRoute().getOutputs(Routes.DEFAULT_CONTEXT).isEmpty()) {
+        if (!outputBlocks.contains(BlockUtil.getBlock(event.getRoute().getWorld(), event.getRoute().getStart()))
+                && !event.getRoute().getOutputs(Routes.DEFAULT_CONTEXT).isEmpty()) {
             // iterate over blocks nearby and check if the route origin block is matching the block at the location of this splitter
             for (BlockFace face : Routes.RELATIVES) {
-                if (event.getRoute().getStart().equals(BlockUtil.getVec(BlockUtil.getRel(loc, face.getDirection())))
-                        // check if the output blocks already registered does not connect to same route as the one built
-                        && outputBlocks.stream()
-                                .map(BlockUtil::getVec)
-                                .flatMap(v -> AbstractRoute.getCachedRoutes(loc.getWorld(), v).stream())
-                                .flatMap(r -> r.getLocations().stream())
-                                .noneMatch(event.getRoute().getStart()::equals)) {
+                if (event.getRoute().getStart().equals(BlockUtil.getVec(BlockUtil.getRel(loc, face.getDirection())))) {
                     outputBlocks.add(BlockUtil.getBlock(loc.getWorld(), event.getRoute().getStart()));
                     break;
                 }
@@ -98,13 +100,14 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
     @EventHandler
     public void onPipeRemove(PipeRemoveEvent event) {
         if (!validating) {
-            outputBlocks.removeIf(b -> event.getRoute().getStart().equals(BlockUtil.getVec(b)));
+            outputBlocks.clear();
+            setupNearby();
         }
     }
 
     @Override
     public boolean accepts(TransferCollection collection) {
-        return false;
+        return collection instanceof ItemCollection || collection instanceof MoneyCollection;
     }
 
     @Override
@@ -136,8 +139,6 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
 
     @Override
     public void pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
-        Bukkit.broadcastMessage("Put " + outputBlocks);
-
         if (outputBlocks.isEmpty()) {
             return;
         }
@@ -146,7 +147,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
         int each = (int) Math.floor(((double) total) / outputBlocks.size());
         AtomicInteger remainder = new AtomicInteger(total - each * outputBlocks.size());
 
-        Iterator<Block> blockIterator = remainder.get() > 0 ? createEvenRemainderDistribution() : outputBlocks.iterator();
+        Iterator<Block> blockIterator = remainder.get() > 0 ? createEvenRemainderDistribution() : new ArrayList<>(outputBlocks).iterator();
         while (blockIterator.hasNext()) {
             Block block = blockIterator.next();
 
