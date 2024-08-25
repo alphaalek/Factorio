@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.mechanics.impl.accessible;
 
+import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.impl.LiquidTankGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -41,6 +42,10 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
         }
         this.fluidAmount = context.getSerializer().readInt(str);
 
+        if (this.fluidAmount < 0) {
+            Factorio.get().getLogger().warning("Storage amount for "+getProfile().getName()+" at " + getLocation() + " was negative, setting to 0");
+            this.fluidAmount = 0;
+        }
         if (this.fluidAmount > 0 && fluid == null) {
             this.fluidAmount = 0;
         } else if (this.fluidAmount == 0 && fluid != null) {

@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.mechanics.impl.accessible;
 
+import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.impl.ConstructorGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -49,6 +50,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         this.storageAmount = context.getSerializer().readInt(str);
 
         if (this.storageAmount < 0) {
+            Factorio.get().getLogger().warning("Storage amount for "+getProfile().getName()+" at " + getLocation() + " was negative, setting to 0");
             this.storageAmount = 0;
         }
         if (this.storageAmount > 0 && this.storageType == null) {

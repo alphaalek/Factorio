@@ -46,6 +46,10 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
             this.type = Types.getLoadedType(Types.getTypeFromMaterial(item.getType()).orElseThrow(IllegalArgumentException::new));
         }
         this.ingredientAmount = context.getSerializer().readInt(data);
+        if (this.ingredientAmount < 0) {
+            Factorio.get().getLogger().warning("Storage amount for "+getProfile().getName()+" at " + getLocation() + " was negative, setting to 0");
+            this.ingredientAmount = 0;
+        }
         this.moneyAmount = context.getSerializer().readDouble(data);
     }
 
