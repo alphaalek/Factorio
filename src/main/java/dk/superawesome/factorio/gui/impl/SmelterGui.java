@@ -72,7 +72,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             }
         } else {
             for (int i : Arrays.asList(14, 23, 32)) {
-                getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS));
+                getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
             }
         }
     }
@@ -296,19 +296,26 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
             // ensure correct amount when collecting items from the different kind of stored slots
             if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR && event.getCursor() != null) {
-                if (getMechanic().getIngredient() != null
-                        && event.getCursor().isSimilar(getMechanic().getIngredient())) {
-                    updateIngredientsPost = true;
-                }
+                match: {
+                    if (getMechanic().getIngredient() != null
+                            && event.getCursor().isSimilar(getMechanic().getIngredient())) {
+                        updateIngredientsPost = true;
+                        break match;
+                    }
 
-                if (getMechanic().getFuel() != null
-                        && event.getCursor().getType() == getMechanic().getFuel().getMaterial()) {
-                    updateFuelPost = true;
-                }
+                    if (getMechanic().getFuel() != null
+                            && event.getCursor().getType() == getMechanic().getFuel().getMaterial()) {
+                        updateFuelPost = true;
+                        break match;
+                    }
 
-                if (getMechanic().getStorageType() != null
-                        && event.getCursor().isSimilar(getMechanic().getStorageType())) {
-                    updateAmount(STORAGE_SLOTS, diff -> getMechanic().setStorageAmount(getMechanic().getStorageAmount() - diff));
+                    if (getMechanic().getStorageType() != null
+                            && event.getCursor().isSimilar(getMechanic().getStorageType())) {
+                        updateAmount(STORAGE_SLOTS, diff -> getMechanic().setStorageAmount(getMechanic().getStorageAmount() - diff));
+                        break match;
+                    }
+
+                    return true;
                 }
             }
 

@@ -326,6 +326,10 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
                     && (event.getCurrentItem() == null || findItems(slots).size() > 1)
                     && registerInteractionAndCheckFailed(event.getWhoClicked().getInventory().getItem(event.getHotbarButton()))) {
                 return true;
+            } else if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR
+                    && event.getClickedInventory() != getInventory()
+                    && !event.getCursor().isSimilar(storage.getStored())) {
+                return true;
             }
         }
 

@@ -103,7 +103,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             }
         } else {
             for (int i : Arrays.asList(13, 22, 31)) {
-                getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS));
+                getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
             }
         }
     }
@@ -192,7 +192,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         }
 
         // cancel dragging in constructor gui if it's not in the crafting slots
-        return event.getRawSlots().stream().anyMatch(i -> event.getView().getInventory(i).getType() == InventoryType.CHEST);
+        return event.getRawSlots().stream().anyMatch(i -> event.getView().getInventory(i) == getInventory());
     }
 
     private int getUpperCorner() {
