@@ -104,7 +104,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             }
         } else {
             for (int i : Arrays.asList(13, 22, 31)) {
-                getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
+                getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS));
             }
         }
     }

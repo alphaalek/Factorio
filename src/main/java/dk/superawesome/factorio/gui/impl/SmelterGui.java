@@ -73,7 +73,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             }
         } else {
             for (int i : Arrays.asList(14, 23, 32)) {
-                getInventory().setItem(i, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
+                getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS));
             }
         }
     }

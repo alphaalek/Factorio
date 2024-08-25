@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.mechanics.impl.behaviour.*;
 import dk.superawesome.factorio.mechanics.impl.circuits.*;
+import dk.superawesome.factorio.mechanics.impl.other.Cauldron;
 import dk.superawesome.factorio.mechanics.impl.power.Generator;
 import dk.superawesome.factorio.mechanics.impl.power.PowerCentral;
 import dk.superawesome.factorio.mechanics.impl.power.PowerLifter;
