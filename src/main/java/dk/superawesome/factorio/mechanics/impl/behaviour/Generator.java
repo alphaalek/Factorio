@@ -183,7 +183,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public boolean handleOutput(Block block) {
+    public boolean handleOutput(Block block, Set<AbstractRoute.Signal> route) {
         boolean transferred = Routes.transferEnergyToPowerCentral(block, this);
         if (transferred && !turnedOn) {
             // update light state if the generator was able to transfer energy, and it's currently not turned on

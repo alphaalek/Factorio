@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.impl.circuits;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
 import org.bukkit.Location;
@@ -11,6 +12,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.weather.WeatherEvent;
+
+import java.util.Set;
 
 public class SolarCell extends AbstractMechanic<SolarCell> implements SignalSource, EnergyCollection {
 
@@ -65,7 +68,7 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements SignalSour
     }
 
     @Override
-    public boolean handleOutput(Block block) {
+    public boolean handleOutput(Block block, Set<AbstractRoute.Signal> route) {
         return Routes.transferEnergyToPowerCentral(block, this);
     }
 

@@ -6,7 +6,6 @@ import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.Source;
 import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
-import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
@@ -95,8 +94,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             this.block = BlockUtil.getBlock(world, vec);
         }
 
-        public boolean handle(SignalSource source) {
-            return source.handleOutput(block);
+        public boolean handle(SignalSource source, Set<Signal> exclude) {
+            return source.handleOutput(block, exclude);
         }
 
         @Override
@@ -343,7 +342,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return new SignalOutputEntry(world, vec);
         }
 
-        public boolean start(SignalSource source) {
+        public boolean start(SignalSource source, Set<Signal> exclude) {
             if (!source.preSignal(this)) {
                 return false;
             }
@@ -351,7 +350,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             // handle signal outputs
             int mechanics = 0;
             for (SignalOutputEntry entry : outputs.get(source.getContext(), LinkedList::new)) {
-                if (entry.handle(source)) {
+                if (entry.handle(source, exclude)) {
                     mechanics++;
                 }
             }

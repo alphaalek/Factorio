@@ -18,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Set;
 
 public class PowerCentral extends AbstractMechanic<PowerCentral> implements AccessibleMechanic, ThinkingMechanic, SignalSource, Lightable {
 
@@ -198,8 +199,8 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     @Override
-    public boolean handleOutput(Block block) {
-        return Routes.invokeSignalOutput(block, this);
+    public boolean handleOutput(Block block, Set<AbstractRoute.Signal> exclude) {
+        return Routes.invokeSignalOutput(block, this, exclude);
     }
 
     public double getRecentMax() {

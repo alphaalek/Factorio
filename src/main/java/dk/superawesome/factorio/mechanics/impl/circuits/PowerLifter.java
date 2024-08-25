@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.impl.circuits;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
@@ -40,18 +41,18 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     }
 
     @Override
-    public boolean invoke(PowerCentral source) {
+    public boolean invoke(PowerCentral source, Set<AbstractRoute.Signal> route) {
         AtomicBoolean transferred = new AtomicBoolean();
 
         for (Block lever : levers) {
-            boolean did = Routes.startSignalRoute(lever, source, false);
+            boolean did = Routes.startSignalRoute(lever, route, source, false);
             if (did) {
                 transferred.set(true);
             }
         }
 
         startLift(l -> {
-            boolean did = l.invoke(source);
+            boolean did = l.invoke(source, route);
             if (did) {
                 transferred.set(true);
             }

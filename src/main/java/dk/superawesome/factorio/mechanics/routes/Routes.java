@@ -27,7 +27,7 @@ public class Routes {
     public static final BlockFace[] SIGNAL_EXPAND_DIRECTIONS = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
     public static final BlockFace[] RELATIVES = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
-    public static boolean invokeSignalOutput(Block start, PowerCentral source) {
+    public static boolean invokeSignalOutput(Block start, PowerCentral source, Set<AbstractRoute.Signal> exclude) {
         // we will suck items out of the mechanic that the sticky piston is pointing towards
         Block points = BlockUtil.getPointingBlock(start, false);
         if (points == null) {
@@ -36,7 +36,7 @@ public class Routes {
 
         Mechanic<?> at = Factorio.get().getMechanicManager(start.getWorld()).getMechanicAt(points.getLocation());
         if (at instanceof SignalInvoker invoker) {
-            return invoker.invoke(source);
+            return invoker.invoke(source, exclude);
         }
 
         PipeSuckEvent event = new PipeSuckEvent(points);
@@ -113,7 +113,7 @@ public class Routes {
 
     public static boolean startSignalRoute(Block start, Set<AbstractRoute.Signal> exclude, SignalSource source, boolean onlyExpandIfOriginValid) {
         return setupRoute(start, exclude, signalRouteFactory, onlyExpandIfOriginValid)
-                .start(source);
+                .start(source, exclude);
     }
 
     public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, Set<R> excludes, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {

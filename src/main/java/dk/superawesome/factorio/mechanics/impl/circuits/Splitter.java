@@ -11,7 +11,9 @@ import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -46,7 +48,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
     public void onBlocksLoaded(Player by) {
         for (BlockFace face : Routes.RELATIVES) {
             Block block = BlockUtil.getRel(loc, face.getDirection()).getBlock();
-            if (BlockUtil.getPointingBlock(block, true).equals(loc.getBlock())) {
+            if (block.getType() == Material.PISTON && BlockUtil.getPointingBlock(block, true).equals(loc.getBlock())) {
                 // ignore input block
                 continue;
             }
@@ -75,6 +77,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
 
     @EventHandler
     public void onPipeBuild(PipeBuildEvent event) {
+        Bukkit.broadcastMessage("pipe build " + event.getRoute().getStart());
         if (!event.getRoute().getOutputs(Routes.DEFAULT_CONTEXT).isEmpty()) {
             // iterate over blocks nearby and check if the route origin block is matching the block at the location of this splitter
             for (BlockFace face : Routes.RELATIVES) {
@@ -133,6 +136,8 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
 
     @Override
     public void pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
+        Bukkit.broadcastMessage("Put " + outputBlocks);
+
         if (outputBlocks.isEmpty()) {
             return;
         }
