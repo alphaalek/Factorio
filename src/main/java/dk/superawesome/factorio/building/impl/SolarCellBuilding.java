@@ -1,40 +1,40 @@
 package dk.superawesome.factorio.building.impl;
 
-import dk.superawesome.factorio.building.Buildable;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Matcher;
 import dk.superawesome.factorio.mechanics.Profiles;
 import org.bukkit.Material;
 import org.bukkit.Tag;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
-public class SolarCellBuilding implements Building, Buildable {
+public class SolarCellBuilding implements Building, Matcher {
 
-    private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
-        (b, r) -> b.setType(Material.LIGHTNING_ROD),
-        (b, r) -> b.setType(Material.DAYLIGHT_DETECTOR),
-        (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */
+    private final List<Predicate<Material>> materials = Arrays.asList(
+        match(Material.DAYLIGHT_DETECTOR),
+        Tag.WALL_SIGNS::isTagged
+    );
+
+    private final List<BlockVector> relatives = Arrays.asList(
+        new BlockVector(),
+        new BlockVector(-1, 0, 0)
     );
 
     @Override
-    public List<BiConsumer<Block, BlockFace>> getBlocks() {
-        return blocks;
-    }
-
-    @Override
     public List<BlockVector> getRelatives() {
-        return DEFAULT_RELATIVES;
+        return relatives;
     }
 
     @Override
     public int getID() {
-        return Profiles.GATE.getID();
+        return Profiles.SOLAR_CELL.getID();
+    }
+
+    @Override
+    public List<Predicate<Material>> getMaterials() {
+        return materials;
     }
 }

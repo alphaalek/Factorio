@@ -1,44 +1,37 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
-import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.weather.WeatherEvent;
 
 import java.util.Set;
 
-public class SolarCell extends AbstractMechanic<SolarCell> implements SignalSource, EnergyCollection {
+public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMechanic, SignalSource, EnergyCollection {
+
+    private final DelayHandler thinkHandler = new DelayHandler(20 * 60); // 1 minute
 
     private Block daylightSensor;
-    private long lastEnergyCharge;
     private double energy;
 
     public SolarCell(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
-
-        lastEnergyCharge = System.currentTimeMillis();
     }
 
     @Override
     public void onBlocksLoaded(Player by) {
-        daylightSensor = getLocation().getBlock().getRelative(BlockFace.UP);
-        if (daylightSensor.getType() != org.bukkit.Material.DAYLIGHT_DETECTOR) {
-            Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
-            Buildings.remove(loc.getWorld(), this);
-        }
+        daylightSensor = getLocation().getBlock();
+        daylightSensor.setType(Material.DAYLIGHT_DETECTOR); //using day sensor, not night
     }
 
     @Override
     public MechanicProfile<SolarCell> getProfile() {
-        return null; // Profiles.SOLAR_CELL;
+        return Profiles.SOLAR_CELL;
     }
 
     @Override
@@ -46,25 +39,22 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements SignalSour
         return SignalSource.TO_POWER_CENTRAL;
     }
 
-    @EventHandler
-    public void insteadOfRunnable(WeatherEvent event) {
-        if (daylightSensor.getLightLevel() > 13 && canCharge() && !isAtMaxEnergy()) {
-            double randomNum = Math.random() * 55 + 10; // 10-65
-            lastEnergyCharge = System.currentTimeMillis();
-            energy += (randomNum / 50) * daylightSensor.getLightLevel(); // 0.2-1.3 * lightLevel
-            Routes.startSignalRoute(getLocation().getBlock(), this, false);
-        } else if (canCharge()) {
-            Routes.startSignalRoute(getLocation().getBlock(), this, false);
-        }
+    @Override
+    public DelayHandler getThinkDelayHandler() {
+        return thinkHandler;
     }
 
-    private boolean canCharge() {
-        long TIME_BETWEEN_CHARGES = 1000 * 60 * 5; // 5 minutes
-        return System.currentTimeMillis() - lastEnergyCharge > TIME_BETWEEN_CHARGES;
+    @Override
+    public void think() {
+        if (daylightSensor.getLightFromSky() == 15 && !isAtMaxEnergy()) {
+            energy += Math.random() * 55 + 20; // 20-75
+            Routes.startSignalRoute(getLocation().getBlock(), this, false);
+        } else if (hasEnergy())
+            Routes.startSignalRoute(getLocation().getBlock(), this, false);
     }
 
     private boolean isAtMaxEnergy() {
-        return energy >= 100;
+        return energy >= 200;
     }
 
     @Override
@@ -108,5 +98,4 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements SignalSour
     public double getTransferEnergyCost() {
         return 1d / 30d;
     }
-
 }
