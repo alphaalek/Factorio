@@ -1,9 +1,6 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
-import dk.superawesome.factorio.mechanics.AbstractMechanic;
-import dk.superawesome.factorio.mechanics.MechanicProfile;
-import dk.superawesome.factorio.mechanics.MechanicStorageContext;
-import dk.superawesome.factorio.mechanics.Profiles;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -14,7 +11,7 @@ import org.bukkit.block.BlockFace;
 
 import java.util.Set;
 
-public class Station extends AbstractMechanic<Station> implements Container<TransferCollection> {
+public class Station extends Circuit<Station, TransferCollection> implements Container<TransferCollection> {
 
     public Station(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -36,10 +33,8 @@ public class Station extends AbstractMechanic<Station> implements Container<Tran
     }
 
     @Override
-    public void pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
-        if (Routes.startTransferRoute(loc.getBlock(), route, collection, this, false)) {
-            event.setTransferred(true);
-        }
+    public boolean pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route) {
+        return Routes.startTransferRoute(loc.getBlock(), route, collection, this, false);
     }
 
     @Override

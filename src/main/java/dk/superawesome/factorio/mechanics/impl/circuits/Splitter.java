@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
-public class Splitter extends AbstractMechanic<Splitter> implements Container<TransferCollection> {
+public class Splitter extends Circuit<Splitter, TransferCollection> implements Container<TransferCollection> {
 
     private final List<Block> outputBlocks = new ArrayList<>();
     private int currentStartIndex;
@@ -138,9 +138,9 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
     }
 
     @Override
-    public void pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
+    public boolean pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route) {
         if (outputBlocks.isEmpty()) {
-            return;
+            return false;
         }
 
         int total = Math.min(collection.getMaxTransfer() * outputBlocks.size(), collection.getTransferAmount());
@@ -148,9 +148,10 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
         AtomicInteger remainder = new AtomicInteger(total - each * outputBlocks.size());
 
         Iterator<Block> blockIterator = remainder.get() > 0 ? createEvenRemainderDistribution() : new ArrayList<>(outputBlocks).iterator();
+
+        boolean transferred = false;
         while (blockIterator.hasNext()) {
             Block block = blockIterator.next();
-
             if (!collection.isTransferEmpty()) {
                 TransferCollection wrappedCollection;
                 if (collection instanceof ItemCollection itemCollection) {
@@ -229,12 +230,13 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
                     };
                 } else continue;
 
-                boolean transferred = Routes.startTransferRoute(block, route, wrappedCollection, this, true);
-                if (!event.transferred()) {
-                    event.setTransferred(transferred);
+                if (Routes.startTransferRoute(block, route, wrappedCollection, this, true)) {
+                    transferred = true;
                 }
             }
         }
+
+        return transferred;
     }
 
     @Override

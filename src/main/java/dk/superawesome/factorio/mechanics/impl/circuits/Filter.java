@@ -2,10 +2,7 @@ package dk.superawesome.factorio.mechanics.impl.circuits;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Buildings;
-import dk.superawesome.factorio.mechanics.AbstractMechanic;
-import dk.superawesome.factorio.mechanics.MechanicProfile;
-import dk.superawesome.factorio.mechanics.MechanicStorageContext;
-import dk.superawesome.factorio.mechanics.Profiles;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -25,7 +22,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
+public class Filter extends Circuit<Filter, ItemCollection> implements ItemContainer {
 
     private final List<ItemStack> filter = new ArrayList<>();
 
@@ -105,15 +102,14 @@ public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
     }
 
     @Override
-    public void pipePut(ItemCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
+    public boolean pipePut(ItemCollection collection, Set<AbstractRoute.Pipe> route) {
         for (ItemStack filter : this.filter) {
             if (collection.has(filter)) {
-                if (Routes.startTransferRoute(loc.getBlock(), route, collection, this, false)) {
-                    event.setTransferred(true);
-                }
-                return;
+                return Routes.startTransferRoute(loc.getBlock(), route, collection, this, false);
             }
         }
+
+        return false;
     }
 
     @Override

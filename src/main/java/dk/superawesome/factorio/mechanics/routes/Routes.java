@@ -90,7 +90,7 @@ public class Routes {
         R route = AbstractRoute.getCachedOriginRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
             route = createNewRoute(start, exclude, factory, onlyExpandIfOriginValid);
-            AbstractRoute.addRouteToCache(start.getWorld(), route);
+            AbstractRoute.addRouteToCache(route);
         }
 
         exclude.add(route);
@@ -212,7 +212,7 @@ public class Routes {
     public static void updateNearbyRoutes(Block block, boolean addAgain, Consumer<List<AbstractRoute<?, ?>>> modifiedRoutesFunction) {
         List<AbstractRoute<?, ?>> routes = new ArrayList<>(AbstractRoute.getCachedRoutes(block.getWorld(), BlockUtil.getVec(block)));
         for (AbstractRoute<?, ?> route : routes) {
-            AbstractRoute.removeRouteFromCache(block.getWorld(), route);
+            AbstractRoute.removeRouteFromCache(route);
         }
 
         List<AbstractRoute<?, ?>> modifiedRoutes = new ArrayList<>();
@@ -243,7 +243,7 @@ public class Routes {
                                 }
                             }
 
-                            AbstractRoute.removeRouteFromCache(block.getWorld(), relRoute);
+                            AbstractRoute.removeRouteFromCache(relRoute);
                             modifiedRoutes.add(relRoute);
                         }
                     }

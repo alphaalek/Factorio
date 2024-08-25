@@ -35,15 +35,15 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 .getOrDefault(new BlockVector(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ()), new ArrayList<>());
     }
 
-    public static <R extends AbstractRoute<R, ? extends OutputEntry>> void addRouteToCache(World world, AbstractRoute<?, ?> route) {
+    public static <R extends AbstractRoute<R, ? extends OutputEntry>> void addRouteToCache(AbstractRoute<?, ?> route) {
         if (cachedRoutes.isEmpty()) {
-            cachedRoutes.put(world, new HashMap<>());
+            cachedRoutes.put(route.getWorld(), new HashMap<>());
         }
 
         if (!route.getLocations().isEmpty()) {
-            cachedOriginRoutes.get(world).put(route.getStart(), route);
+            cachedOriginRoutes.get(route.getWorld()).put(route.getStart(), route);
             for (BlockVector loc : route.getLocations()) {
-                cachedRoutes.get(world)
+                cachedRoutes.get(route.getWorld())
                         .computeIfAbsent(loc, __ -> new ArrayList<>())
                         .add(route);
             }
@@ -52,14 +52,14 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
     }
 
-    public static <R extends AbstractRoute<R, ? extends OutputEntry>> void removeRouteFromCache(World world, AbstractRoute<?, ?> route) {
+    public static <R extends AbstractRoute<R, ? extends OutputEntry>> void removeRouteFromCache(AbstractRoute<?, ?> route) {
         if (cachedRoutes.isEmpty()) {
             return;
         }
 
-        cachedOriginRoutes.get(world).remove(route.getStart());
+        cachedOriginRoutes.get(route.getWorld()).remove(route.getStart());
         for (BlockVector loc : route.getLocations()) {
-            cachedRoutes.get(world).getOrDefault(loc, new ArrayList<>()).remove(route);
+            cachedRoutes.get(route.getWorld()).getOrDefault(loc, new ArrayList<>()).remove(route);
         }
 
         ((R) route).getFactory().callRemoveEvent((R) route);
