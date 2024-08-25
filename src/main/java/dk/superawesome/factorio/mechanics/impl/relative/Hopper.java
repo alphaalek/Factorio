@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.impl.circuits;
+package dk.superawesome.factorio.mechanics.impl.relative;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicBuildEvent;

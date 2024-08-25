@@ -4,7 +4,7 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.Source;
-import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
+import dk.superawesome.factorio.mechanics.impl.power.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.Array;
@@ -91,14 +91,16 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
         protected final Block block;
         protected final Location loc;
+        protected final Block from;
 
-        private SignalOutputEntry(World world, BlockVector vec) {
+        private SignalOutputEntry(World world, BlockVector vec, BlockVector from) {
             this.block = BlockUtil.getBlock(world, vec);
             this.loc = block.getLocation();
+            this.from = BlockUtil.getBlock(world, from);
         }
 
         public boolean handle(SignalSource source) {
-            return source.handleOutput(block, loc);
+            return source.handleOutput(block, loc, from);
         }
 
         @Override
@@ -143,42 +145,23 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         return locations;
     }
 
-    public List<Integer> getContexts() {
-        List<Integer> contexts = new ArrayList<>();
-
-        for (int i = 0; i < outputs.size(); i++) {
-            Queue<?> outputs = this.outputs.get(i);
-            if (outputs != null) {
-                contexts.add(i);
-            }
-        }
-
-        return contexts;
-    }
-
     public Queue<P> getOutputs(int context) {
         return outputs.get(context, LinkedList::new);
     }
 
-    public void addOutput(World world, BlockVector vec, int context) {
-        outputs.get(context, LinkedList::new).add(createOutputEntry(world, vec));
+    public void addOutput(World world, BlockVector vec, BlockVector from, int context) {
+        outputs.get(context, LinkedList::new).add(createOutputEntry(world, vec, from));
     }
 
-    public void addOutput(World world, BlockVector vec) {
-        addOutput(world, vec, Routes.DEFAULT_CONTEXT);
+    public void addOutput(World world, BlockVector vec, BlockVector from) {
+        addOutput(world, vec, from, Routes.DEFAULT_CONTEXT);
     }
 
     public abstract RouteFactory<R> getFactory();
 
     public abstract void search(Block from, BlockVector relVec, Block rel, boolean isFromOrigin);
 
-    protected abstract P createOutputEntry(World world, BlockVector vec);
-
-    public void removeOutputEntry(int context, BlockVector vec) {
-        if (outputs.has(context)) {
-            outputs.get(context).removeIf(e -> e.getVec().equals(vec));
-        }
-    }
+    protected abstract P createOutputEntry(World world, BlockVector vec, BlockVector from);
 
     public static class Pipe extends AbstractRoute<Pipe, TransferOutputEntry> {
 
@@ -201,7 +184,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 // ... however only if the piston is not pointing towards the block where the pipe search came from
                 if (!point.equals(from)) {
                     add(relVec);
-                    addOutput(from.getWorld(), BlockUtil.getVec(point));
+                    addOutput(from.getWorld(), BlockUtil.getVec(point), BlockUtil.getVec(rel));
                 }
             // glass = pipe expand
             } else if (
@@ -218,7 +201,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
 
         @Override
-        protected TransferOutputEntry createOutputEntry(World world, BlockVector vec) {
+        protected TransferOutputEntry createOutputEntry(World world, BlockVector vec, BlockVector from) {
             return new TransferOutputEntry(world, vec);
         }
 
@@ -262,7 +245,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 // facing sticky piston - signal output (for power-central to mechanics)
                 if (facing.getType() == Material.STICKY_PISTON) {
                     add(BlockUtil.getVec(facing));
-                    addOutput(from.getWorld(), BlockUtil.getVec(BlockUtil.getPointingBlock(facing, false)), SignalSource.FROM_POWER_CENTRAL);
+                    addOutput(from.getWorld(), BlockUtil.getVec(BlockUtil.getPointingBlock(facing, false)), BlockUtil.getVec(facing), SignalSource.FROM_POWER_CENTRAL);
                     return;
                 }
 
@@ -280,7 +263,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
                 Mechanic<?> at = Factorio.get().getMechanicManager(from.getWorld()).getMechanicPartially(facing.getLocation());
                 if (at instanceof PowerCentral) {
-                    addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
+                    addOutput(from.getWorld(), BlockUtil.getVec(facing), BlockUtil.getVec(rel), SignalSource.TO_POWER_CENTRAL);
                 }
 
                 expandWire(facing, rel, rel, 16);
@@ -349,8 +332,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
 
         @Override
-        protected SignalOutputEntry createOutputEntry(World world, BlockVector vec) {
-            return new SignalOutputEntry(world, vec);
+        protected SignalOutputEntry createOutputEntry(World world, BlockVector vec, BlockVector from) {
+            return new SignalOutputEntry(world, vec, from);
         }
 
         public boolean start(SignalSource source) {

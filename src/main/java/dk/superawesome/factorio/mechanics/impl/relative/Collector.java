@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.impl.circuits;
+package dk.superawesome.factorio.mechanics.impl.relative;
 
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;

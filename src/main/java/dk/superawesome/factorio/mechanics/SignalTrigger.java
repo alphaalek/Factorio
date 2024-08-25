@@ -49,10 +49,6 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
             if (block.getType() == Material.LEVER) {
                 levers.add(block);
                 findBlock.accept(block);
-
-                if (((Switch)block.getBlockData()).isPowered()) {
-                    powered = true;
-                }
             }
 
             Mechanic<?> at = manager.getMechanicPartially(block.getLocation());

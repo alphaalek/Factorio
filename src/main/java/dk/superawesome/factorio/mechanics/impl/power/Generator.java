@@ -1,10 +1,9 @@
-package dk.superawesome.factorio.mechanics.impl.behaviour;
+package dk.superawesome.factorio.mechanics.impl.power;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.impl.GeneratorGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.stackregistry.Fuel;
@@ -29,7 +28,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public class Generator extends AbstractMechanic<Generator> implements FuelMechanic, AccessibleMechanic, ThinkingMechanic, ItemContainer, SignalSource, Lightable, Storage, EnergyCollection {
 
@@ -183,7 +181,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public boolean handleOutput(Block block, Location loc) {
+    public boolean handleOutput(Block block, Location loc, Block from) {
         boolean transferred = Routes.transferEnergyToPowerCentral(block, loc, this);
         if (transferred && !turnedOn) {
             // update light state if the generator was able to transfer energy, and it's currently not turned on

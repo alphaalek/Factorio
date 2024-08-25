@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.impl.behaviour;
+package dk.superawesome.factorio.mechanics.impl.power;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Buildings;
@@ -18,7 +18,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Set;
 
 public class PowerCentral extends AbstractMechanic<PowerCentral> implements AccessibleMechanic, ThinkingMechanic, SignalSource, Lightable {
 
@@ -199,8 +198,8 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     @Override
-    public boolean handleOutput(Block block, Location loc) {
-        return Routes.invokeSignalOutput(block, loc, this);
+    public boolean handleOutput(Block block, Location loc, Block from) {
+        return Routes.invokeSignalOutput(block, loc, from, this);
     }
 
     public double getRecentMax() {

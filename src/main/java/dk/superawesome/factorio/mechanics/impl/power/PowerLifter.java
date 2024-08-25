@@ -1,16 +1,14 @@
-package dk.superawesome.factorio.mechanics.impl.circuits;
+package dk.superawesome.factorio.mechanics.impl.power;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.statics.BlockUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
-import org.bukkit.block.data.type.Repeater;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -49,6 +47,22 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         }
 
         AtomicBoolean transferred = new AtomicBoolean();
+        startLift(l -> {
+            boolean did = l.invokeChild(source);
+            if (did) {
+                transferred.set(true);
+            }
+        });
+
+        return transferred.get();
+    }
+
+    public boolean invokeChild(PowerCentral source) {
+        if (invoked) {
+            return false;
+        }
+
+        AtomicBoolean transferred = new AtomicBoolean();
         invoked = true;
         for (Block lever : levers) {
             boolean did = Routes.startSignalRoute(lever, source, false);
@@ -56,12 +70,6 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
                 transferred.set(true);
             }
         }
-        startLift(l -> {
-            boolean did = l.invoke(source);
-            if (did) {
-                transferred.set(true);
-            }
-        });
         invoked = false;
 
         if (transferred.get()) {
@@ -78,19 +86,19 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
             Block point = BlockUtil.getPointingBlock(event.getBlock(), true);
             if (point != null && point.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(point, false).equals(loc.getBlock())) {
                 powered = event.getNewCurrent() > 0;
-                triggerLevers(powered);
                 startLift(l -> l.triggerLevers(powered));
             }
         }
     }
 
     private void startLift(Consumer<PowerLifter> andThen) {
-        doLift(new HashSet<>(), andThen);
+        andThen.accept(this);
+        doLift(null, new HashSet<>(), andThen);
     }
 
-    private void doLift(Set<BlockVector> route, Consumer<PowerLifter> andThen) {
+    private void doLift(Block from, Set<BlockVector> route, Consumer<PowerLifter> andThen) {
         Block point = BlockUtil.getPointingBlock(loc.getBlock(), true);
-        if (point != null) {
+        if (point != null && point.getType() == Material.OBSERVER && (from == null || !BlockUtil.getPointingBlock(point, true).equals(from))) {
             BlockVector vec = BlockUtil.getVec(point);
             if (route.contains(vec)) {
                 return;
@@ -100,7 +108,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
             Mechanic<?> at = Factorio.get().getMechanicManagerFor(this).getMechanicAt(point.getLocation());
             if (at instanceof PowerLifter lifter) {
                 andThen.accept(lifter);
-                lifter.doLift(route, andThen);
+                lifter.doLift(point, route, andThen);
             }
         }
     }

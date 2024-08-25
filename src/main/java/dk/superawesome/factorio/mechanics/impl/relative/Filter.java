@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.impl.circuits;
+package dk.superawesome.factorio.mechanics.impl.relative;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Buildings;
@@ -6,7 +6,6 @@ import dk.superawesome.factorio.mechanics.Circuit;
 import dk.superawesome.factorio.mechanics.MechanicProfile;
 import dk.superawesome.factorio.mechanics.MechanicStorageContext;
 import dk.superawesome.factorio.mechanics.Profiles;
-import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;

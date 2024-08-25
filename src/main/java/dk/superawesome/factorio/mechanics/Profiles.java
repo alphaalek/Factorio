@@ -2,6 +2,11 @@ package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.mechanics.impl.behaviour.*;
 import dk.superawesome.factorio.mechanics.impl.circuits.*;
+import dk.superawesome.factorio.mechanics.impl.power.Generator;
+import dk.superawesome.factorio.mechanics.impl.power.PowerCentral;
+import dk.superawesome.factorio.mechanics.impl.power.PowerLifter;
+import dk.superawesome.factorio.mechanics.impl.power.SolarCell;
+import dk.superawesome.factorio.mechanics.impl.relative.*;
 import dk.superawesome.factorio.mechanics.profiles.behaviour.*;
 import dk.superawesome.factorio.mechanics.profiles.behaviour.LiquidTankProfile;
 import dk.superawesome.factorio.mechanics.profiles.circuits.*;

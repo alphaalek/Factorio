@@ -21,5 +21,5 @@ public interface SignalSource {
 
     int getContext();
 
-    boolean handleOutput(Block block, Location loc);
+    boolean handleOutput(Block block, Location loc, Block from);
 }

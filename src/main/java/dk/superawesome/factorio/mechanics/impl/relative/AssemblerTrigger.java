@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.impl.circuits;
+package dk.superawesome.factorio.mechanics.impl.relative;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.AssemblerTypeChangeEvent;
@@ -10,11 +10,8 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.statics.BlockUtil;
-import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;

@@ -2,7 +2,7 @@ package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
+import dk.superawesome.factorio.mechanics.impl.power.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
 import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
@@ -14,9 +14,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class Routes {
@@ -28,13 +26,13 @@ public class Routes {
     public static final BlockFace[] SIGNAL_EXPAND_DIRECTIONS = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
     public static final BlockFace[] RELATIVES = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
-    public static boolean invokeSignalOutput(Block start, Location loc, PowerCentral source) {
-        Mechanic<?> at = Factorio.get().getMechanicManager(start.getWorld()).getMechanicAt(loc);
+    public static boolean invokeSignalOutput(Block block, Location loc, Block start, PowerCentral source) {
+        Mechanic<?> at = Factorio.get().getMechanicManager(block.getWorld()).getMechanicAt(loc);
         if (at instanceof SignalInvoker invoker) {
             return invoker.invoke(source);
         }
 
-        PipeSuckEvent event = new PipeSuckEvent(start);
+        PipeSuckEvent event = new PipeSuckEvent(block);
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.getTransfer() == null) {

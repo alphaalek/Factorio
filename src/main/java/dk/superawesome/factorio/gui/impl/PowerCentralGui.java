@@ -2,7 +2,7 @@ package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.MechanicGui;
-import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
+import dk.superawesome.factorio.mechanics.impl.power.PowerCentral;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;

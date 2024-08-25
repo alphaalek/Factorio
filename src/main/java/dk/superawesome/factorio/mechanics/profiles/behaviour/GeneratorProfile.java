@@ -6,7 +6,7 @@ import dk.superawesome.factorio.gui.GuiFactory;
 import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.gui.impl.GeneratorGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.impl.behaviour.Generator;
+import dk.superawesome.factorio.mechanics.impl.power.Generator;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;

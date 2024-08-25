@@ -1,4 +1,4 @@
-package dk.superawesome.factorio.mechanics.impl.circuits;
+package dk.superawesome.factorio.mechanics.impl.power;
 
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
@@ -55,7 +55,7 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
     }
 
     @Override
-    public boolean handleOutput(Block block, Location loc) {
+    public boolean handleOutput(Block block, Location loc, Block from) {
         return Routes.transferEnergyToPowerCentral(block, loc, this);
     }
 
