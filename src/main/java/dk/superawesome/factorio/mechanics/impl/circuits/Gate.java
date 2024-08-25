@@ -5,6 +5,7 @@ import dk.superawesome.factorio.mechanics.AbstractMechanic;
 import dk.superawesome.factorio.mechanics.MechanicProfile;
 import dk.superawesome.factorio.mechanics.MechanicStorageContext;
 import dk.superawesome.factorio.mechanics.Profiles;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.Container;
@@ -20,6 +21,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
+
+import java.util.Set;
 
 public class Gate extends AbstractMechanic<Gate> implements Container<TransferCollection> {
 
@@ -80,9 +83,9 @@ public class Gate extends AbstractMechanic<Gate> implements Container<TransferCo
     }
 
     @Override
-    public void pipePut(TransferCollection collection, PipePutEvent event) {
+    public void pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
         // only continue pipe route if the gate is open
-        if (open && Routes.startTransferRoute(loc.getBlock(), collection, this, false)) {
+        if (open && Routes.startTransferRoute(loc.getBlock(), route, collection, this, false)) {
             event.setTransferred(true);
         }
     }

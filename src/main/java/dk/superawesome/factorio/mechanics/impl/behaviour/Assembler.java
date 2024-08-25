@@ -5,6 +5,7 @@ import dk.superawesome.factorio.api.events.AssemblerTypeChangeEvent;
 import dk.superawesome.factorio.api.events.AssemblerTypeRequestEvent;
 import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
@@ -24,10 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class Assembler extends AbstractMechanic<Assembler> implements AccessibleMechanic, ThinkingMechanic, ItemContainer, MoneyCollection {
 
@@ -108,7 +106,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     }
 
     @Override
-    public void pipePut(ItemCollection collection, PipePutEvent event) {
+    public void pipePut(ItemCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
         ItemStack item = Optional.ofNullable(type)
                 .map(Type::getMat)
                 .map(ItemStack::new)

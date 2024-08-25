@@ -181,7 +181,7 @@ public class MechanicManager implements Listener {
 
     @SuppressWarnings("unchecked")
     private <C extends TransferCollection> void doTransfer(Container<? extends TransferCollection> container, TransferCollection collection, PipePutEvent event) {
-        ((Container<C>)container).pipePut((C) collection, event);
+        ((Container<C>)container).pipePut((C) collection, event.getRoute(), event);
     }
 
     public Optional<MechanicProfile<?>> getProfileFrom(Sign sign) {

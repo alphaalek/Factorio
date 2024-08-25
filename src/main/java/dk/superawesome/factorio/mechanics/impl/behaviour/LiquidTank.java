@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.gui.impl.LiquidTankGui;
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
 import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
@@ -14,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.Set;
 
 public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCollection, FluidContainer, AccessibleMechanic {
 
@@ -63,7 +65,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     }
 
     @Override
-    public void pipePut(FluidCollection collection, PipePutEvent event) {
+    public void pipePut(FluidCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
         if ((fluid == null || collection.hasFluid(fluid)) && fluidAmount < getCapacity()) {
             Fluid takeFluid = collection.getFluid();
             int take = collection.take(Math.min(getMaxTransfer(), getCapacity() - fluidAmount));

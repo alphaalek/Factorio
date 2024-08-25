@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.gui.impl.StorageBoxGui;
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
@@ -13,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class StorageBox extends AbstractMechanic<StorageBox> implements AccessibleMechanic, ItemCollection, ItemContainer, Storage {
@@ -55,7 +57,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
     }
 
     @Override
-    public void pipePut(ItemCollection collection, PipePutEvent event) {
+    public void pipePut(ItemCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
         if (tickThrottle.isThrottled()) {
             return;
         }

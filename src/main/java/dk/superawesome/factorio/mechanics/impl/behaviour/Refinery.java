@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.impl.behaviour;
 
 import dk.superawesome.factorio.gui.impl.RefineryGui;
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.stackregistry.Filled;
 import dk.superawesome.factorio.mechanics.stackregistry.Volume;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMechanic, Container<TransferCollection>, ItemCollection {
@@ -41,7 +43,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         }
 
         @Override
-        public void pipePut(ItemCollection collection, PipePutEvent event) {
+        public void pipePut(ItemCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
             ItemStack item = Optional.ofNullable(volume)
                     .map(Volume::getMat)
                     .map(ItemStack::new)
@@ -81,7 +83,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         }
 
         @Override
-        public void pipePut(FluidCollection collection, PipePutEvent event) {
+        public void pipePut(FluidCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
             // no empty bottle or not enough fluid to fill a bottle
             if (volume == null || collection.getTransferAmount() < volume.getFluidRequires()) {
                 return;
@@ -203,15 +205,15 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     }
 
     @Override
-    public void pipePut(TransferCollection collection, PipePutEvent event) {
+    public void pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
         if (tickThrottle.isThrottled()) {
             return;
         }
 
         if (collection instanceof ItemCollection itemCollection) {
-            delegatedItemContainer.pipePut(itemCollection, event);
+            delegatedItemContainer.pipePut(itemCollection, route, event);
         } else if (collection instanceof FluidCollection fluidCollection) {
-            delegatedFluidContainer.pipePut(fluidCollection, event);
+            delegatedFluidContainer.pipePut(fluidCollection, route, event);
         }
     }
 

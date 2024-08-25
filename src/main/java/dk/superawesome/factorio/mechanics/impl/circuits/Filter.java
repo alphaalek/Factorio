@@ -6,6 +6,7 @@ import dk.superawesome.factorio.mechanics.AbstractMechanic;
 import dk.superawesome.factorio.mechanics.MechanicProfile;
 import dk.superawesome.factorio.mechanics.MechanicStorageContext;
 import dk.superawesome.factorio.mechanics.Profiles;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
@@ -104,10 +105,10 @@ public class Filter extends AbstractMechanic<Filter> implements ItemContainer {
     }
 
     @Override
-    public void pipePut(ItemCollection collection, PipePutEvent event) {
+    public void pipePut(ItemCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
         for (ItemStack filter : this.filter) {
             if (collection.has(filter)) {
-                if (Routes.startTransferRoute(loc.getBlock(), collection, this, false)) {
+                if (Routes.startTransferRoute(loc.getBlock(), route, collection, this, false)) {
                     event.setTransferred(true);
                 }
                 return;

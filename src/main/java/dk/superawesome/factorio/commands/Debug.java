@@ -6,6 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class Debug extends AbstractCommand {
 
@@ -34,7 +35,8 @@ public class Debug extends AbstractCommand {
             while (clazz != Object.class) {
                 for (Field field : clazz.getDeclaredFields()) {
                     field.setAccessible(true);
-                    player.sendMessage(field.getName() + ": §e" + field.get(mechanic));
+                    Object val = field.get(mechanic);
+                    player.sendMessage(field.getName() + ": §e" + (val instanceof Object[] ? Arrays.toString((Object[]) val) : val));
                 }
 
                 clazz = clazz.getSuperclass();

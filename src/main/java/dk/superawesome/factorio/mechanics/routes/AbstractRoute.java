@@ -74,11 +74,16 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             this.block = BlockUtil.getPointingBlock(BlockUtil.getBlock(world, vec), false);
         }
 
-        public boolean handle(TransferCollection collection, Source from) {
-            PipePutEvent event = new PipePutEvent(block, collection, from);
+        public boolean handle(TransferCollection collection, Source from, Set<Pipe> route) {
+            PipePutEvent event = new PipePutEvent(block, collection, from, route);
             Bukkit.getPluginManager().callEvent(event);
 
             return event.transferred();
+        }
+
+        @Override
+        public BlockVector getVec() {
+            return BlockUtil.getVec(block);
         }
     }
 
@@ -92,6 +97,11 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
         public boolean handle(SignalSource source) {
             return source.handleOutput(block);
+        }
+
+        @Override
+        public BlockVector getVec() {
+            return BlockUtil.getVec(block);
         }
     }
 
@@ -125,6 +135,19 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         return locations;
     }
 
+    public List<Integer> getContexts() {
+        List<Integer> contexts = new ArrayList<>();
+
+        for (int i = 0; i < outputs.size(); i++) {
+            Queue<?> outputs = this.outputs.get(i);
+            if (outputs != null) {
+                contexts.add(i);
+            }
+        }
+
+        return contexts;
+    }
+
     public Queue<P> getOutputs(int context) {
         return outputs.get(context, LinkedList::new);
     }
@@ -142,6 +165,12 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
     public abstract void search(Block from, BlockVector relVec, Block rel, boolean isFromOrigin);
 
     protected abstract P createOutputEntry(World world, BlockVector vec);
+
+    public void removeOutputEntry(int context, BlockVector vec) {
+        if (outputs.has(context)) {
+            outputs.get(context).removeIf(e -> e.getVec().equals(vec));
+        }
+    }
 
     public static class Pipe extends AbstractRoute<Pipe, TransferOutputEntry> {
 
@@ -184,10 +213,10 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return new TransferOutputEntry(world, vec);
         }
 
-        public boolean start(TransferCollection collection, Source from) {
+        public boolean start(TransferCollection collection, Source from, Set<Pipe> exclude) {
             boolean transferred = false;
             for (TransferOutputEntry entry : outputs.get(Routes.DEFAULT_CONTEXT, LinkedList::new)) {
-                if (entry.handle(collection, from)) {
+                if (entry.handle(collection, from, exclude)) {
                     transferred = true;
                 }
 

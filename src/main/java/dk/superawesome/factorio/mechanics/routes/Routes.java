@@ -1,10 +1,7 @@
 package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.mechanics.Mechanic;
-import dk.superawesome.factorio.mechanics.SignalInvoker;
-import dk.superawesome.factorio.mechanics.SignalSource;
-import dk.superawesome.factorio.mechanics.Source;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.behaviour.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
 import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
@@ -16,7 +13,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class Routes {
@@ -84,28 +83,52 @@ public class Routes {
     }
 
     public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+        return setupRoute(start, new HashSet<>(), factory, onlyExpandIfOriginValid);
+    }
+
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, Set<R> exclude, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = AbstractRoute.getCachedOriginRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
-            route = createNewRoute(start, factory, onlyExpandIfOriginValid);
+            route = createNewRoute(start, exclude, factory, onlyExpandIfOriginValid);
             AbstractRoute.addRouteToCache(start.getWorld(), route);
         }
+
+        exclude.add(route);
 
         return route;
     }
 
     public static boolean startTransferRoute(Block start, TransferCollection collection, Source from, boolean onlyExpandIfOriginValid) {
-        return setupRoute(start, transferRouteFactory, onlyExpandIfOriginValid)
-                .start(collection, from);
+        return startTransferRoute(start, new HashSet<>(), collection, from, onlyExpandIfOriginValid);
+    }
+
+    public static boolean startTransferRoute(Block start, Set<AbstractRoute.Pipe> exclude, TransferCollection collection, Source from, boolean onlyExpandIfOriginValid) {
+        return setupRoute(start, exclude, transferRouteFactory, onlyExpandIfOriginValid)
+                .start(collection, from, exclude);
     }
 
     public static boolean startSignalRoute(Block start, SignalSource source, boolean onlyExpandIfOriginValid) {
-        return setupRoute(start, signalRouteFactory, onlyExpandIfOriginValid)
+        return startSignalRoute(start, new HashSet<>(), source, onlyExpandIfOriginValid);
+    }
+
+    public static boolean startSignalRoute(Block start, Set<AbstractRoute.Signal> exclude, SignalSource source, boolean onlyExpandIfOriginValid) {
+        return setupRoute(start, exclude, signalRouteFactory, onlyExpandIfOriginValid)
                 .start(source);
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, Set<R> excludes, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = factory.create(BlockUtil.getVec(start));
         startRoute(route, start, onlyExpandIfOriginValid);
+
+        if (excludes != null) {
+            for (R exclude : excludes) {
+                for (int context : exclude.getContexts()) {
+                    for (P output : exclude.getOutputs(context)) {
+                        route.removeOutputEntry(context, output.getVec());
+                    }
+                }
+            }
+        }
 
         return route;
     }
@@ -164,18 +187,18 @@ public class Routes {
     }
 
     public static <R extends AbstractRoute<R, P>, P extends OutputEntry> void setupForcibly(Block block, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
-        updateNearbyRoutes(block, modified -> {
+        updateNearbyRoutes(block, true, modified -> {
             if (modified.isEmpty()) {
                 setupRoute(block, factory, onlyExpandIfOriginValid);
             }
         });
     }
 
-    public static void updateNearbyRoutes(Block block) {
-        updateNearbyRoutes(block, null);
+    public static void removeNearbyRoutes(Block block) {
+        updateNearbyRoutes(block, false, null);
     }
 
-    public static void updateNearbyRoutes(Block block, Consumer<List<AbstractRoute<?, ?>>> modifiedRoutesFunction) {
+    public static void updateNearbyRoutes(Block block, boolean addAgain, Consumer<List<AbstractRoute<?, ?>>> modifiedRoutesFunction) {
         // check blocks in next tick, because we are calling this in a break/place event
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
             List<AbstractRoute<?, ?>> routes = new ArrayList<>(AbstractRoute.getCachedRoutes(block.getWorld(), BlockUtil.getVec(block)));
@@ -219,9 +242,11 @@ public class Routes {
                 }
             }
 
-            // setup again and connect routes
-            for (AbstractRoute<?, ?> modifiedRoute : modifiedRoutes) {
-                setupRoute(BlockUtil.getBlock(block.getWorld(), modifiedRoute.getStart()), modifiedRoute.getFactory(), true);
+            if (addAgain) {
+                // setup again and connect routes
+                for (AbstractRoute<?, ?> modifiedRoute : modifiedRoutes) {
+                    setupRoute(BlockUtil.getBlock(block.getWorld(), modifiedRoute.getStart()), modifiedRoute.getFactory(), true);
+                }
             }
             if (modifiedRoutesFunction != null) {
                 modifiedRoutesFunction.accept(modifiedRoutes);

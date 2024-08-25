@@ -10,11 +10,11 @@ public class BlockListener implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        Routes.updateNearbyRoutes(event.getBlock());
+        Routes.removeNearbyRoutes(event.getBlock());
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        Routes.updateNearbyRoutes(event.getBlock());
+        Routes.removeNearbyRoutes(event.getBlock());
     }
 }

@@ -1,6 +1,9 @@
 package dk.superawesome.factorio.mechanics.transfer;
 
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
+
+import java.util.Set;
 
 public interface Container<C extends TransferCollection> {
 
@@ -8,7 +11,7 @@ public interface Container<C extends TransferCollection> {
 
     boolean isContainerEmpty();
 
-    void pipePut(C collection, PipePutEvent event);
+    void pipePut(C collection, Set<AbstractRoute.Pipe> route, PipePutEvent event);
 
     int getCapacity();
 

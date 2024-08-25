@@ -81,7 +81,7 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
     @Override
     public void think() {
         if (takeMechanic != null && putMechanic != null && !takeMechanic.isTransferEmpty()) {
-            putMechanic.pipePut(takeMechanic, new PipePutEvent(null, takeMechanic, this));
+            putMechanic.pipePut(takeMechanic, null, new PipePutEvent(null, takeMechanic, this, null));
         }
     }
 }

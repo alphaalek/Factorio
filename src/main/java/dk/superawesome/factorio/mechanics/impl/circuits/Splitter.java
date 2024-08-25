@@ -12,7 +12,6 @@ import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -23,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
@@ -30,6 +30,8 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
 
     private final List<Block> outputBlocks = new ArrayList<>();
     private int currentStartIndex;
+
+    private boolean validating;
 
     public Splitter(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -44,13 +46,20 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
     public void onBlocksLoaded(Player by) {
         for (BlockFace face : Routes.RELATIVES) {
             Block block = BlockUtil.getRel(loc, face.getDirection()).getBlock();
-            if (block.getType() == Material.PISTON) {
+            if (BlockUtil.getPointingBlock(block, true).equals(loc.getBlock())) {
                 // ignore input block
                 continue;
             }
 
-            Routes.setupForcibly(block, Routes.transferRouteFactory, true);
+            setup(block);
         }
+    }
+
+    private void setup(Block block) {
+        Routes.setupForcibly(block, Routes.transferRouteFactory, true);
+        validating = true;
+        Routes.removeNearbyRoutes(block);
+        validating = false;
     }
 
     @EventHandler
@@ -58,8 +67,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
         for (BlockFace face : Routes.RELATIVES) {
             Block block = loc.getBlock().getRelative(face);
             if (block.equals(event.getBlock())) {
-                // try to setup a new pipe route
-                Routes.setupForcibly(block, Routes.transferRouteFactory, true);
+                setup(event.getBlock());
                 break;
             }
         }
@@ -86,7 +94,9 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
 
     @EventHandler
     public void onPipeRemove(PipeRemoveEvent event) {
-        outputBlocks.removeIf(b -> event.getRoute().getStart().equals(BlockUtil.getVec(b)));
+        if (!validating) {
+            outputBlocks.removeIf(b -> event.getRoute().getStart().equals(BlockUtil.getVec(b)));
+        }
     }
 
     @Override
@@ -122,7 +132,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
     }
 
     @Override
-    public void pipePut(TransferCollection collection, PipePutEvent event) {
+    public void pipePut(TransferCollection collection, Set<AbstractRoute.Pipe> route, PipePutEvent event) {
         if (outputBlocks.isEmpty()) {
             return;
         }
@@ -213,7 +223,7 @@ public class Splitter extends AbstractMechanic<Splitter> implements Container<Tr
                     };
                 } else continue;
 
-                boolean transferred = Routes.startTransferRoute(block, wrappedCollection, this, true);
+                boolean transferred = Routes.startTransferRoute(block, route, wrappedCollection, this, true);
                 if (!event.transferred()) {
                     event.setTransferred(transferred);
                 }
