@@ -22,11 +22,14 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
     private static Graph getConsumptionGraph(Inventory inventory, PowerCentral mechanic) {
         return new Graph(inventory,
-                mechanic::pollRecentConsumption,
+                new DoubleSupplier[] {
+                    mechanic::pollRecentConsumption,
+                    mechanic::pollRecentProduction
+                },
                 e -> new ItemBuilder(Material.LIGHT_GRAY_WOOL)
-                        .setName("§eForbrug: " + StringUtil.formatDecimals(e, 2) + "W")
+                        .setName("§eForbrug: " + StringUtil.formatDecimals(e[0], 2) + "W")
                         .addLore("§ePotentiel forbrug: " + StringUtil.formatDecimals(mechanic.getRecentMax(), 2) + "W")
-                        .addLore("§eProduktion: " + StringUtil.formatDecimals(e, 2) + "W")
+                        .addLore("§eProduktion: " + StringUtil.formatDecimals(e[1], 2) + "W")
                         .addLore("§eEnergi: " + StringUtil.formatDecimals(mechanic.getEnergy(), 2) + "J")
                         .addLore("§eKapacitet: " + StringUtil.formatDecimals(mechanic.getCapacity(), 2) + "J")
                         .build()
@@ -54,13 +57,13 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
         private final int[] columns = new int[WIDTH];
         private double[] states = new double[COLLECT_WIDTH];
 
-        private final DoubleSupplier currentState;
-        private final Function<Double, ItemStack> item;
+        private final DoubleSupplier[] currentStates;
+        private final Function<Double[], ItemStack> item;
         private final Inventory inventory;
 
-        public Graph(Inventory inventory, DoubleSupplier currentState, Function<Double, ItemStack> item) {
+        public Graph(Inventory inventory, DoubleSupplier[] currentStates, Function<Double[], ItemStack> item) {
             this.inventory = inventory;
-            this.currentState = currentState;
+            this.currentStates = currentStates;
             this.item = item;
 
             for (int i = 0; i < COLLECT_WIDTH; i++) {
@@ -72,15 +75,20 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
         public void run() {
             double[] states = new double[COLLECT_WIDTH];
             double min = -1, max = 0;
+
+            // get value from suppliers
+            double state1 = this.currentStates[0].getAsDouble();
+            double state2 = this.currentStates[1].getAsDouble();
+
             for (int i = 1; i < COLLECT_WIDTH + 1; i++) {
-                double state = i < this.states.length ? this.states[i] : this.currentState.getAsDouble();
-                if (state > max) {
-                    max = state;
+                state1 = i < this.states.length ? this.states[i] : state1;
+                if (state1 > max) {
+                    max = state1;
                 }
-                if (state < min || min == -1) {
-                    min = state;
+                if (state1 < min || min == -1) {
+                    min = state1;
                 }
-                states[i - 1] = state;
+                states[i - 1] = state1;
             }
 
             // evaluating the grade difference by the average between min and max values
@@ -102,7 +110,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                     setSlots(i, 3, null);
                 }
 
-                ItemStack item = this.item.apply(Math.max(0, state));
+                ItemStack item = this.item.apply(new Double[] { Math.max(0, state), Math.max(0, state2) });
                 boolean smoothed = false;
                 // smooth out graph
                 if (grade != -1 && i > 0 && columns[i - 1] != grade) {
@@ -183,7 +191,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                 ItemStack itemAt = inventory.getItem(slot);
                 if (item == null
                         && itemAt != null
-                        && itemAt.getType() != this.item.apply(0d).getType()) {
+                        && itemAt.getType() != this.item.apply(new Double[] {0d,0d}).getType()) {
                     continue;
                 }
 
