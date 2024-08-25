@@ -19,7 +19,7 @@ public class PowerLifterBuilding implements Building, Matcher {
     );
 
     private final List<Predicate<Material>> materials = Arrays.asList(
-            match(Material.STICKY_PISTON),
+            match(Material.OBSERVER),
             Tag.WALL_SIGNS::isTagged
     );
 
