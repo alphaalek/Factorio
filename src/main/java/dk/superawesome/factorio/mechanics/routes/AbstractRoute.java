@@ -10,6 +10,7 @@ import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -70,7 +71,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         protected final Block block;
 
         private TransferOutputEntry(World world, BlockVector vec) {
-            this.block = BlockUtil.getPointingBlock(BlockUtil.getBlock(world, vec), false);
+            this.block = BlockUtil.getBlock(world, vec);
         }
 
         public boolean handle(TransferCollection collection, Source from) {
@@ -89,13 +90,15 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
     public static class SignalOutputEntry implements OutputEntry {
 
         protected final Block block;
+        protected final Location loc;
 
         private SignalOutputEntry(World world, BlockVector vec) {
             this.block = BlockUtil.getBlock(world, vec);
+            this.loc = block.getLocation();
         }
 
         public boolean handle(SignalSource source) {
-            return source.handleOutput(block);
+            return source.handleOutput(block, loc);
         }
 
         @Override
@@ -194,10 +197,11 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
             // piston = pipe output
             if (mat == Material.PISTON) {
+                Block point = BlockUtil.getPointingBlock(rel, false);
                 // ... however only if the piston is not pointing towards the block where the pipe search came from
-                if (!BlockUtil.getPointingBlock(rel, false).equals(from)) {
+                if (!point.equals(from)) {
                     add(relVec);
-                    addOutput(from.getWorld(), relVec);
+                    addOutput(from.getWorld(), BlockUtil.getVec(point));
                 }
             // glass = pipe expand
             } else if (
@@ -257,7 +261,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 Block facing = BlockUtil.getPointingBlock(rel, true);
                 // facing sticky piston - signal output (for power-central to mechanics)
                 if (facing.getType() == Material.STICKY_PISTON) {
-                    addOutput(from.getWorld(), BlockUtil.getVec(facing), SignalSource.FROM_POWER_CENTRAL);
+                    add(BlockUtil.getVec(facing));
+                    addOutput(from.getWorld(), BlockUtil.getVec(BlockUtil.getPointingBlock(facing, false)), SignalSource.FROM_POWER_CENTRAL);
                     return;
                 }
 

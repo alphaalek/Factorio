@@ -8,6 +8,7 @@ import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
@@ -27,19 +28,13 @@ public class Routes {
     public static final BlockFace[] SIGNAL_EXPAND_DIRECTIONS = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
     public static final BlockFace[] RELATIVES = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
-    public static boolean invokeSignalOutput(Block start, PowerCentral source) {
-        // we will suck items out of the mechanic that the sticky piston is pointing towards
-        Block points = BlockUtil.getPointingBlock(start, false);
-        if (points == null) {
-            return false;
-        }
-
-        Mechanic<?> at = Factorio.get().getMechanicManager(start.getWorld()).getMechanicAt(points.getLocation());
+    public static boolean invokeSignalOutput(Block start, Location loc, PowerCentral source) {
+        Mechanic<?> at = Factorio.get().getMechanicManager(start.getWorld()).getMechanicAt(loc);
         if (at instanceof SignalInvoker invoker) {
             return invoker.invoke(source);
         }
 
-        PipeSuckEvent event = new PipeSuckEvent(points);
+        PipeSuckEvent event = new PipeSuckEvent(start);
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.getTransfer() == null) {
@@ -63,8 +58,8 @@ public class Routes {
         return false;
     }
 
-    public static boolean transferEnergyToPowerCentral(Block start, EnergyCollection source) {
-        Mechanic<?> mechanic = Factorio.get().getMechanicManager(start.getWorld()).getMechanicPartially(start.getLocation());
+    public static boolean transferEnergyToPowerCentral(Block start, Location loc, EnergyCollection source) {
+        Mechanic<?> mechanic = Factorio.get().getMechanicManager(start.getWorld()).getMechanicPartially(loc);
         if (!(mechanic instanceof PowerCentral powerCentral)) {
             return false;
         }

@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 
 import java.util.Set;
@@ -20,5 +21,5 @@ public interface SignalSource {
 
     int getContext();
 
-    boolean handleOutput(Block block);
+    boolean handleOutput(Block block, Location loc);
 }
