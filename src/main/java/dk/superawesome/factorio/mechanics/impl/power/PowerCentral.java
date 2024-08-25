@@ -77,7 +77,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     public void think() {
         double prev = energy;
         if (energy > 0) {
-            Routes.startSignalRoute(lever, this, false);
+            Routes.startSignalRoute(lever, this, true, false);
 
             if (!turnedOn && energy < prev) {
                 turnedOn = true;
@@ -166,7 +166,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     @Override
-    public boolean preSignal(AbstractRoute.Signal signal) {
+    public boolean preSignal(AbstractRoute.Signal signal, boolean firstCall) {
         double signalCost = signal.getLocations().size() * SIGNAL_COST;
         if (this.energy < signalCost) {
             if (recentMax == 0) {
@@ -176,7 +176,9 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
             return false;
         }
 
-        recentMax = signalCost;
+        if (firstCall) {
+            recentMax = signalCost;
+        }
         setEnergy(getEnergy() - signalCost);
         return true;
     }

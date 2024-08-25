@@ -90,9 +90,9 @@ public class Routes {
                 .start(collection, from);
     }
 
-    public static boolean startSignalRoute(Block start, SignalSource source, boolean onlyExpandIfOriginValid) {
+    public static boolean startSignalRoute(Block start, SignalSource source, boolean firstCall, boolean onlyExpandIfOriginValid) {
         return setupRoute(start, signalRouteFactory, onlyExpandIfOriginValid)
-                .start(source);
+                .start(source, firstCall);
     }
 
     public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {

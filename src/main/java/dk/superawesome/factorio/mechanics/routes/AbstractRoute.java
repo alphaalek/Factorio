@@ -336,8 +336,8 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
             return new SignalOutputEntry(world, vec, from);
         }
 
-        public boolean start(SignalSource source) {
-            if (!source.preSignal(this)) {
+        public boolean start(SignalSource source, boolean firstCall) {
+            if (!source.preSignal(this, firstCall)) {
                 return false;
             }
 

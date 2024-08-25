@@ -11,7 +11,7 @@ public interface SignalSource {
     int FROM_POWER_CENTRAL = 0;
     int TO_POWER_CENTRAL = 1;
 
-    default boolean preSignal(AbstractRoute.Signal signal) {
+    default boolean preSignal(AbstractRoute.Signal signal, boolean firstCall) {
         return true;
     }
 

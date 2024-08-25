@@ -66,7 +66,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         AtomicBoolean transferred = new AtomicBoolean();
         invoked = true;
         for (Block lever : levers) {
-            boolean did = Routes.startSignalRoute(lever, source, false);
+            boolean did = Routes.startSignalRoute(lever, source, false,false);
             if (did) {
                 transferred.set(true);
             }

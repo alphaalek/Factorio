@@ -131,7 +131,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
         // try to transfer energy if the generator has any energy available
         if (availableEnergy > 0) {
             double prevProvideEnergy = availableEnergy;
-            Routes.startSignalRoute(lever, this, false);
+            Routes.startSignalRoute(lever, this, true, false);
 
             if (availableEnergy == prevProvideEnergy && turnedOn) {
                 // the generator was not able to transfer any energy, although it has energy to provide, so turn off

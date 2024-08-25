@@ -45,9 +45,10 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
     public void think() {
         if (daylightSensor.getLightFromSky() == 15 && !isAtMaxEnergy()) {
             energy += Math.random() * 55 + 20; // 20-75
-            Routes.startSignalRoute(getLocation().getBlock(), this, false);
-        } else if (hasEnergy())
-            Routes.startSignalRoute(getLocation().getBlock(), this, false);
+            Routes.startSignalRoute(getLocation().getBlock(), this, true, false);
+        } else if (hasEnergy()) {
+            Routes.startSignalRoute(getLocation().getBlock(), this, true, false);
+        }
     }
 
     private boolean isAtMaxEnergy() {
