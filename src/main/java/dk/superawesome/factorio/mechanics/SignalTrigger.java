@@ -70,9 +70,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
                 if (loc.getBlock().getRelative(face).equals(event.getBlock())) {
                     levers.add(event.getBlock());
 
-                    if (powered) {
-                        triggerLever(event.getBlock(), true);
-                    }
+                    triggerLever(event.getBlock(), powered);
                     break;
                 }
             }
@@ -94,6 +92,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     public abstract void onLeverPull(PlayerInteractEvent event);
 
     protected void triggerLevers(boolean powered) {
+        this.powered = powered;
         for (Block lever : new ArrayList<>(levers)) {
             triggerLever(lever, powered);
         }

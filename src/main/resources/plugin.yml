@@ -20,3 +20,4 @@ commands:
   removedefaultmember:
     usage: /removedefaultmember <spiller>
     description: Fjern en spiller som standard medlem af dine nybyggede maskiner.
+  debug:

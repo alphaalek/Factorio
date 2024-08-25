@@ -293,7 +293,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         this.storageAmount = amount;
 
         if (this.storageAmount == 0) {
-            storageType = null;
+            this.storageType = null;
         }
     }
 }

@@ -1,15 +1,13 @@
 package dk.superawesome.factorio;
 
+import dk.superawesome.factorio.commands.Debug;
 import dk.superawesome.factorio.commands.impl.*;
 import dk.superawesome.factorio.listeners.*;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.db.DatabaseConnection;
 import dk.superawesome.factorio.mechanics.db.MechanicController;
 import dk.superawesome.factorio.util.Tick;
-import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.*;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -62,6 +60,7 @@ public final class Factorio extends JavaPlugin implements Listener {
         getCommand("adddefaultmember").setExecutor(new AddDefaultMember());
         getCommand("removedefaultmember").setExecutor(new RemoveDefaultMember());
         getCommand("removememberfromall").setExecutor(new RemoveMemberFromAll());
+        getCommand("debug").setExecutor(new Debug());
 
         Tick.start();
 

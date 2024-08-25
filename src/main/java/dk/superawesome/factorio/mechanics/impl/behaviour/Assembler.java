@@ -220,6 +220,11 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         return take;
     }
 
+    @Override
+    public boolean canBeDeleted() {
+        return isContainerEmpty();
+    }
+
     public static class Type {
 
         private final Types type;

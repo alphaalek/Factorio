@@ -16,7 +16,10 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.util.BlockVector;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -47,7 +50,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
             }
         }
 
-        doLift(l -> {
+        startLift(l -> {
             boolean did = l.invoke(source);
             if (did) {
                 transferred.set(true);
@@ -56,7 +59,6 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
 
         if (transferred.get()) {
             powered = true;
-            triggerLevers();
             return true;
         }
 
@@ -64,20 +66,35 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     }
 
     @EventHandler
-    public void onRedstonePowerOff(BlockRedstoneEvent event) {
-        if (event.getBlock().getType() == Material.REPEATER
-                && BlockUtil.getPointingBlock(event.getBlock(), true).equals(loc.getBlock().getRelative(BlockFace.DOWN))) {
-            powered = event.getNewCurrent() > 0;
-            triggerLevers();
-            doLift(l -> l.triggerLevers(powered));
+    public void onSignal(BlockRedstoneEvent event) {
+        if (event.getBlock().getType() == Material.REPEATER) {
+            Block point = BlockUtil.getPointingBlock(event.getBlock(), true);
+            if (point != null && point.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(point, false).equals(loc.getBlock())) {
+                powered = event.getNewCurrent() > 0;
+                triggerLevers(powered);
+                startLift(l -> l.triggerLevers(powered));
+            }
         }
     }
 
-    private void doLift(Consumer<PowerLifter> andThen) {
+    private void startLift(Consumer<PowerLifter> andThen) {
+        doLift(new HashSet<>(), andThen);
+    }
+
+    private void doLift(Set<BlockVector> route, Consumer<PowerLifter> andThen) {
         Block point = BlockUtil.getPointingBlock(loc.getBlock(), false);
-        Mechanic<?> at = Factorio.get().getMechanicManagerFor(this).getMechanicAt(point.getLocation());
-        if (at instanceof PowerLifter lifter) {
-            andThen.accept(lifter);
+        if (point != null) {
+            BlockVector vec = BlockUtil.getVec(point);
+            if (route.contains(vec)) {
+                return;
+            }
+
+            route.add(vec);
+            Mechanic<?> at = Factorio.get().getMechanicManagerFor(this).getMechanicAt(point.getLocation());
+            if (at instanceof PowerLifter lifter) {
+                andThen.accept(lifter);
+                lifter.doLift(route, andThen);
+            }
         }
     }
 
