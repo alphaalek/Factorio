@@ -1,6 +1,6 @@
 package dk.superawesome.factorio.api.events;
 
-import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
+import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 

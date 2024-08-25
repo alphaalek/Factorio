@@ -1,17 +1,14 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.gui.MechanicGui;
-import dk.superawesome.factorio.mechanics.impl.behaviour.LiquidTank;
+import dk.superawesome.factorio.mechanics.impl.accessible.LiquidTank;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class LiquidTankGui extends MechanicGui<LiquidTankGui, LiquidTank>{
 

@@ -1,11 +1,11 @@
-package dk.superawesome.factorio.mechanics.profiles.behaviour;
+package dk.superawesome.factorio.mechanics.profiles.accesible;
 
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
 import dk.superawesome.factorio.gui.impl.ConstructorGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.impl.behaviour.Constructor;
+import dk.superawesome.factorio.mechanics.impl.accessible.Constructor;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;

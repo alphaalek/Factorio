@@ -1,11 +1,10 @@
-package dk.superawesome.factorio.mechanics.impl.behaviour;
+package dk.superawesome.factorio.mechanics.impl.accessible;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.AssemblerTypeChangeEvent;
 import dk.superawesome.factorio.api.events.AssemblerTypeRequestEvent;
 import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
@@ -18,7 +17,6 @@ import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;

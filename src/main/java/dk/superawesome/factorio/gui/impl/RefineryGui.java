@@ -1,7 +1,7 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.gui.SingleStorageGui;
-import dk.superawesome.factorio.mechanics.impl.behaviour.Refinery;
+import dk.superawesome.factorio.mechanics.impl.accessible.Refinery;
 import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
 import dk.superawesome.factorio.mechanics.stackregistry.Volume;
 import org.bukkit.Material;

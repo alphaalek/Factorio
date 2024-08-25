@@ -1,8 +1,7 @@
-package dk.superawesome.factorio.mechanics.impl.behaviour;
+package dk.superawesome.factorio.mechanics.impl.accessible;
 
 import dk.superawesome.factorio.gui.impl.RefineryGui;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.stackregistry.Filled;
 import dk.superawesome.factorio.mechanics.stackregistry.Volume;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
 
 public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMechanic, Container<TransferCollection>, ItemCollection {

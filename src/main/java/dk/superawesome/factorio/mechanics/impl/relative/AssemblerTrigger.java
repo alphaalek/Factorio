@@ -7,7 +7,7 @@ import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
-import dk.superawesome.factorio.mechanics.impl.behaviour.Assembler;
+import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
