@@ -14,12 +14,12 @@ public class TickValue<T> implements Supplier<T> {
 
     public void set(T val) {
         this.val = val;
-        lastTick = Tick.get();
+        lastTick = Tick.currentTick;
     }
 
     @Override
     public T get() {
-        int tick = Tick.get();
+        int tick = Tick.currentTick;
         if (tick != lastTick) {
             lastTick = tick;
             val = def != null ? def.get() : null;

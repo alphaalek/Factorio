@@ -5,11 +5,7 @@ import org.bukkit.Bukkit;
 
 public class Tick {
 
-    private static int currentTick;
-
-    public static int get() {
-        return currentTick;
-    }
+    public static int currentTick;
 
     public static void start() {
         Bukkit.getScheduler().runTaskTimer(Factorio.get(), () -> {

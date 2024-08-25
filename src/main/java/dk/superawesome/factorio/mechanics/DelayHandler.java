@@ -18,7 +18,7 @@ public class DelayHandler {
     }
 
     public boolean ready() {
-        int current = Tick.get();
+        int current = Tick.currentTick;
         if (lastCheckTick == -1 || current - lastCheckTick >= delay) {
             lastCheckTick = current;
             return true;

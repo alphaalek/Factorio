@@ -5,10 +5,10 @@ public class TickThrottle {
     private int throttledTick;
 
     public void throttle() {
-        throttledTick = Tick.get();
+        throttledTick = Tick.currentTick;
     }
 
     public boolean isThrottled() {
-        return throttledTick == Tick.get();
+        return throttledTick == Tick.currentTick;
     }
 }
