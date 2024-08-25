@@ -83,7 +83,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     }
 
     private void doLift(Set<BlockVector> route, Consumer<PowerLifter> andThen) {
-        Block point = BlockUtil.getPointingBlock(loc.getBlock(), false);
+        Block point = BlockUtil.getPointingBlock(loc.getBlock(), true);
         if (point != null) {
             BlockVector vec = BlockUtil.getVec(point);
             if (route.contains(vec)) {
