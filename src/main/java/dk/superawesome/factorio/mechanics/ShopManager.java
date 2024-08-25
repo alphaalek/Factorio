@@ -37,18 +37,7 @@ public class ShopManager implements Listener {
             BaseGui<?> gui = accessible.getOrCreateInventory(mechanic);
             if (gui instanceof MechanicStorageGui storageGui) {
                 TransactionEvent.TransactionType type = event.getTransactionType();
-                boolean isInput;
-                switch (type) {
-                    case SELL -> {
-                        isInput = true;
-                        recentContext = storageGui.getInputContext();
-                    }
-                    case BUY -> {
-                        isInput = false;
-                        recentContext = storageGui.getOutputContext();
-                    }
-                    default -> { return; }
-                }
+                boolean isInput = checkInput(storageGui, type);
 
                 recentOffer = Arrays.stream(event.getStock()).filter(Objects::nonNull).findFirst().orElse(new ItemStack(Material.AIR));
 
@@ -65,6 +54,21 @@ public class ShopManager implements Listener {
             }
             gui.handleClose(event.getClient());
         }
+    }
+
+    private boolean checkInput(MechanicStorageGui storageGui, TransactionEvent.TransactionType type) {
+        switch (type) {
+            case SELL -> {
+                recentContext = storageGui.getInputContext();
+                return true;
+            }
+            case BUY -> {
+                recentContext = storageGui.getOutputContext();
+                return false;
+            }
+        }
+
+        return false;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
