@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
@@ -124,7 +125,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         }
 
         if (STORAGE_SLOTS.contains(event.getRawSlot())) {
-            return handleOnlyCollectInteraction(event, getStorage(0));
+            return handleOnlyCollectInteraction(event, getStorage(STORAGE_CONTEXT));
         }
 
         return true;
@@ -135,11 +136,11 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         if (movedFromOtherInventory(event)) {
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY && event.getCurrentItem() != null) {
                 if (STORAGE_SLOTS.contains(event.getRawSlot())) {
-                    // allow collecting items from storage slots
+                    // allow collecting items from storage slots, amount update is handled in onClickIn
                     return false;
                 } else if (event.getClickedInventory() != getInventory() && !getMechanic().getTickThrottle().isThrottled()) {
                     // ... otherwise put items into crafting slots
-                    ItemStack stack = event.getClickedInventory().getItem(event.getSlot());
+                    ItemStack stack = event.getClickedInventory().getItem(event.getSlot()); // get the literal item
                     if (stack != null) {
                         addItemsToSlots(stack, CRAFTING_SLOTS);
                     }
@@ -152,7 +153,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             if (CRAFTING_SLOTS.contains(event.getRawSlot()) && event.getClickedInventory() == getInventory()) {
                 if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
                     // update storage amount because this action can collect items from the storage slots
-                    updateAmount(getStorage(0), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
+                    updateAmount(getStorage(STORAGE_CONTEXT), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
                 }
 
                 getMechanic().getTickThrottle().throttle();
@@ -164,15 +165,18 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             // check hotbar swap interaction for storage slots
             if (STORAGE_SLOTS.contains(event.getRawSlot())
                     && (event.getAction() == InventoryAction.HOTBAR_SWAP || event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD)
-                    && handleOnlyHotbarCollectInteraction(event, getStorage(0))) {
+                    && handleOnlyHotbarCollectInteraction(event, getStorage(STORAGE_CONTEXT))) {
                 return true;
             }
 
-            // ensure correct storage amount when collecting items from the storage slots
-            if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR
-                    && event.getCursor() != null && getMechanic().getStorageType() != null && event.getCursor().isSimilar(getMechanic().getStorageType())) {
-                // update storage amount after this
-                updateAmount(getStorage(0), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
+            // check collect to cursor
+            if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
+                if (event.getClickedInventory() != getInventory()) {
+                    // ensure correct gui post action
+                    fixSlotsTake(event.getWhoClicked().getInventory(), event.getView(), Stream.concat(CRAFTING_SLOTS.stream(), STORAGE_SLOTS.stream()).toList());
+                }
+
+                updateAmount(getStorage(STORAGE_CONTEXT), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
             }
         }
 

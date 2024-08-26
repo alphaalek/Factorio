@@ -8,6 +8,7 @@ import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.Storage;
 import dk.superawesome.factorio.mechanics.StorageProvider;
 import dk.superawesome.factorio.util.Callback;
+import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -90,15 +92,6 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         gui.open(p);
     }
 
-    protected int getAffectedAmountForAction(InventoryAction action, ItemStack item) {
-        return switch (action) {
-            case DROP_ALL_CURSOR, DROP_ALL_SLOT, PICKUP_ALL, PICKUP_SOME, MOVE_TO_OTHER_INVENTORY -> item.getAmount();
-            case DROP_ONE_SLOT, DROP_ONE_CURSOR, PICKUP_ONE -> 1;
-            case PICKUP_HALF -> (int) Math.round(item.getAmount() / 2d);
-            default -> 0;
-        };
-    }
-
     public void updateFuelState(List<Integer> slots) {
         if (getMechanic() instanceof FuelMechanic fuelMechanic) {
             int blaze = Math.round(fuelMechanic.getCurrentFuelAmount() * slots.size());
@@ -135,7 +128,20 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         return null;
     }
 
+    protected int getAffectedAmountForAction(InventoryAction action, ItemStack item) {
+        return switch (action) {
+            case DROP_ALL_CURSOR, DROP_ALL_SLOT, PICKUP_ALL, PICKUP_SOME, MOVE_TO_OTHER_INVENTORY -> item.getAmount();
+            case DROP_ONE_SLOT, DROP_ONE_CURSOR, PICKUP_ONE -> 1;
+            case PICKUP_HALF -> (int) Math.round(item.getAmount() / 2d);
+            default -> 0;
+        };
+    }
+
     protected boolean handleOnlyCollectInteraction(InventoryClickEvent event, Storage storage) {
+        if (event.getClickedInventory() != getInventory()) {
+            return false;
+        }
+
         if (event.getAction() == InventoryAction.PLACE_ONE
                 || event.getAction() == InventoryAction.PLACE_ALL
                 || event.getAction() == InventoryAction.PLACE_SOME
@@ -143,11 +149,35 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
             return true;
         }
 
-        if (event.getCurrentItem() != null) {
-            storage.setAmount(storage.getAmount() - getAffectedAmountForAction(event.getAction(), event.getCurrentItem()));
+        if (event.getCurrentItem() != null
+                && event.getAction() != InventoryAction.COLLECT_TO_CURSOR
+                && event.getAction() != InventoryAction.HOTBAR_SWAP
+                && event.getAction() != InventoryAction.HOTBAR_MOVE_AND_READD) {
+            int affected = getAffectedAmountForAction(event.getAction(), event.getCurrentItem());
+            if (affected > 0) {
+                if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+                    affected = Math.min(affected, getSpaceFor(event.getWhoClicked().getInventory(), event.getCurrentItem()));
+                }
+
+                storage.setAmount(storage.getAmount() - affected);
+            }
         }
 
         return false;
+    }
+
+    private int getSpaceFor(Inventory inv, ItemStack item) {
+        int space = 0;
+        for (int i = 0; i < 36; i++) {
+            ItemStack at = inv.getItem(i);
+            if (at == null) {
+                space += 64;
+            } else if (at.isSimilar(item)) {
+                space += at.getMaxStackSize() - at.getAmount();
+            }
+        }
+
+        return space;
     }
 
     protected boolean handleOnlyHotbarCollectInteraction(InventoryClickEvent event, Storage storage) {
@@ -194,12 +224,18 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
     }
 
     private Map<Integer, ItemStack> getMatchingSlots(ItemStack stack, boolean onlyPuttable) {
+        return getSlots().entrySet().stream()
+                .filter(e -> e.getValue() == null || (stack.isSimilar(e.getValue()) && (!onlyPuttable || e.getValue().getAmount() < 64)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private Map<Integer, ItemStack> getSlots() {
         int[] j = {0}; // force to heap for lambda access
 
         Map<Integer, ItemStack> slots = new HashMap<>();
         IntStream.range(0, getInventory().getSize())
                 .mapToObj(i -> getInventory().getItem(j[0] = i))
-                .filter(i -> i == null || (stack.isSimilar(i) && (!onlyPuttable || i.getAmount() < 64)))
+                .map(i -> i != null ? i.clone() : null)
                 .forEach(i -> slots.put(j[0], i));
         return slots;
     }
@@ -216,9 +252,42 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
                 if (!ignoreSlots.contains(entry.getKey())) {
                     int diff = Optional.ofNullable(entry.getValue()).map(ItemStack::getAmount).orElse(0)
                              - Optional.ofNullable(prev.get(entry.getKey())).map(ItemStack::getAmount).orElse(0);
-                    if (diff > 0) { // diff can only be above zero if the Map$Entry#getValue is not null
+                    if (diff > 0) { // diff can only be above zero if the Map$Entry#getValue is not null, no NPE inspection
                         getInventory().setItem(entry.getKey(), prev.get(entry.getKey()));
-                        source.addItem(new ItemStack(entry.getValue().getType(), diff));
+                        source.addItem(new ItemBuilder(entry.getValue()).setAmount(diff).build());
+                    }
+                }
+            }
+        });
+    }
+
+    protected void fixSlotsTake(Inventory source, InventoryView view, List<Integer> ignoreSlots) {
+        getMechanic().getTickThrottle().throttle();
+
+        Map<Integer, ItemStack> prev = getSlots();
+        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+            Map<Integer, ItemStack> after = getSlots();
+
+            for (Map.Entry<Integer, ItemStack> entry : prev.entrySet()) {
+                if (!ignoreSlots.contains(entry.getKey())) {
+                    int diff = Optional.ofNullable(entry.getValue()).map(ItemStack::getAmount).orElse(0)
+                            - Optional.ofNullable(after.get(entry.getKey())).map(ItemStack::getAmount).orElse(0);
+                    if (diff > 0) { // diff can only be above zero if the Map$Entry#getValue is not null, no NPE inspection
+                        getInventory().setItem(entry.getKey(), prev.get(entry.getKey()));
+
+                        Map<Integer, ItemStack> left = source.removeItem(new ItemBuilder(entry.getValue()).setAmount(diff).build());
+                        ItemStack cursor = view.getCursor();
+                        if (!left.isEmpty() && cursor != null && cursor.isSimilar(entry.getValue())) {
+                            // not all items which the action removed was found in the inventory afterward, check for cursor item
+
+                            int leftLiteral = 0;
+                            for (ItemStack leftItem : left.values()) {
+                                leftLiteral += leftItem.getAmount();
+                            }
+
+                            // update cursor and remove the items left which couldn't be removed from the inventory
+                            cursor.setAmount(cursor.getAmount() - leftLiteral);
+                        }
                     }
                 }
             }
