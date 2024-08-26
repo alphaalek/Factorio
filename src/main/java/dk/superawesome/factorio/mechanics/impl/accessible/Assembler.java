@@ -92,7 +92,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         ingredientAmount -= type.getRequires();
         moneyAmount += type.getProduces();
 
-        type.getType().setSold(type.getType().getSold() + type.getProduces());
+        type.getType().getTransformed(type.getType().getTransformed() + type.getProduces());
 
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
@@ -332,8 +332,8 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
             LAST_UPDATE = System.currentTimeMillis();
             for (Types type : Types.values()) {
                 try {
-                    Factorio.get().getMechanicController().registerTransformed(type, type.getSold());
-                    type.setSold(0);
+                    Factorio.get().getMechanicController().registerTransformed(type, type.getTransformed());
+                    type.getTransformed(0);
                 } catch (SQLException ex) {
                     Bukkit.getLogger().log(Level.SEVERE, "Failed to register transformed amount for type " + type, ex);
                 }
@@ -359,7 +359,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         private final int requires;
         private final double produces;
 
-        private double sold;
+        private double transformed;
 
         Types (Material mat, int requires, double produces) {
             this.mat = mat;
@@ -379,12 +379,12 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
             return produces;
         }
 
-        public double getSold() {
-            return sold;
+        public double getTransformed() {
+            return transformed;
         }
 
-        public void setSold(double amount) {
-            this.sold = amount;
+        public void getTransformed(double amount) {
+            this.transformed = amount;
         }
 
         public static Optional<Types> getTypeFromMaterial(Material mat) {
