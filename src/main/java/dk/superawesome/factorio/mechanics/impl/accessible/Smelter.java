@@ -104,10 +104,6 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         } else if (this.fuelAmount == 0 && this.fuel != null) {
             this.fuel = null;
         }
-        if (this.storageAmount < 0) {
-            Factorio.get().getLogger().warning("Storage amount for "+getProfile().getName()+" at " + getLocation() + " was negative, setting to 0");
-            this.storageAmount = 0;
-        }
         if (this.storageAmount > 0 && this.storageType == null) {
             this.storageAmount = 0;
         } else if (this.storageAmount == 0 && this.storageType != null) {

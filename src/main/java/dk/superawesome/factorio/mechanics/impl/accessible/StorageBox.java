@@ -34,10 +34,6 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
         this.stored = context.getSerializer().readItemStack(str);
         this.amount = context.getSerializer().readInt(str);
 
-        if (this.amount < 0) {
-            Factorio.get().getLogger().warning("Storage amount for "+getProfile().getName()+" at " + getLocation() + " was negative, setting to 0");
-            this.amount = 0;
-        }
         if (this.stored == null && this.amount > 0) {
             this.amount = 0;
         } else if (this.stored != null && this.amount == 0) {

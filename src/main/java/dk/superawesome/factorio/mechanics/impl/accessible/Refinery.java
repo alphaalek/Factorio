@@ -149,10 +149,6 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
             this.filled = Filled.getFilledStateByStack(filledStack).orElse(null);
         }
 
-        if (this.filledAmount < 0) {
-            Factorio.get().getLogger().warning("Storage amount for "+getProfile().getName()+" at " + getLocation() + " was negative, setting to 0");
-            this.filledAmount = 0;
-        }
         if (this.filledAmount > 0 && this.filled == null) {
             this.filledAmount = 0;
         } else if (this.filledAmount == 0 && this.filled != null) {

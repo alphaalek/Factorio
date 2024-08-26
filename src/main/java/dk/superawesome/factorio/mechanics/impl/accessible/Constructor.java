@@ -49,10 +49,6 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         this.storageType = context.getSerializer().readItemStack(str);
         this.storageAmount = context.getSerializer().readInt(str);
 
-        if (this.storageAmount < 0) {
-            Factorio.get().getLogger().warning("Storage amount for "+getProfile().getName()+" at " + getLocation() + " was negative, setting to 0");
-            this.storageAmount = 0;
-        }
         if (this.storageAmount > 0 && this.storageType == null) {
             this.storageAmount = 0;
             this.recipeResult = null;
