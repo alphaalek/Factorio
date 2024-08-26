@@ -150,4 +150,41 @@ public class BlockUtil {
         );
         block.setBlockData(sign);
     }
+
+    public static boolean isRelativeFast(Block b1, Block b2) {
+        double dx = Math.abs(b1.getX() - b2.getX());
+        double dy = Math.abs(b1.getY() - b2.getY());
+        double dz = Math.abs(b1.getZ() - b2.getZ());
+
+        return (dx + dy + dz) == 1;
+    }
+
+    public static boolean isDiagonalXYZFast(Block b1, Block b2) {
+        return (Math.abs(b1.getX() - b2.getX()) == 1 && Math.abs(b1.getY() - b2.getY()) == 1 && Math.abs(b1.getZ() - b2.getZ()) == 1);
+    }
+
+    public static boolean isDiagonalXZFast(Block b1, Block b2) {
+        return (Math.abs(b1.getX() - b2.getX()) == 1 && Math.abs(b1.getZ() - b2.getZ()) == 1 && b1.getY() == b2.getY());
+    }
+
+    public static boolean isDiagonalYFast(Block b1, Block b2) {
+        double x1 = b1.getX();
+        double y1 = b1.getY();
+        double z1 = b1.getZ();
+
+        double x2 = b2.getX();
+        double y2 = b2.getY();
+        double z2 = b2.getZ();
+
+        return (Math.abs(x1 - x2) == 1 && Math.abs(y1 - y2) == 1 && z1 == z2)
+                || (Math.abs(y1 - y2) == 1 && Math.abs(z1 - z2) == 1 && x1 == x2);
+    }
+
+    public static boolean isDiagonal2DFast(Block b1, Block b2) {
+        return isDiagonalYFast(b1, b2) || isDiagonalXZFast(b1, b2);
+    }
+
+    public static boolean isDiagonal3DFast(Block b1, Block b2) {
+        return isDiagonal2DFast(b1, b2) || isDiagonalXYZFast(b1, b2);
+    }
 }

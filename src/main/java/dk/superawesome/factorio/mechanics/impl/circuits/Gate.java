@@ -61,11 +61,8 @@ public class Gate extends Circuit<Gate, TransferCollection> implements Container
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        for (BlockFace face : Routes.RELATIVES) {
-            if (loc.getBlock().getRelative(face).equals(event.getBlock())) {
-                Bukkit.getScheduler().runTask(Factorio.get(), this::checkSignal);
-                break;
-            }
+        if (BlockUtil.isRelativeFast(event.getBlock(), loc.getBlock())) {
+            Bukkit.getScheduler().runTask(Factorio.get(), this::checkSignal);
         }
     }
 

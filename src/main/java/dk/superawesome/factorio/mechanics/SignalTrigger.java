@@ -73,15 +73,9 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     }
 
     protected void handleBlockPlace(BlockPlaceEvent event) {
-        if (event.getBlock().getType() == Material.LEVER) {
-            for (BlockFace face : Routes.RELATIVES) {
-                if (loc.getBlock().getRelative(face).equals(event.getBlock())) {
-                    levers.add(event.getBlock());
-
-                    triggerLever(event.getBlock(), powered);
-                    break;
-                }
-            }
+        if (BlockUtil.isRelativeFast(event.getBlock(), loc.getBlock()) && event.getBlock().getType() == Material.LEVER) {
+            levers.add(event.getBlock());
+            triggerLever(event.getBlock(), powered);
         }
     }
 

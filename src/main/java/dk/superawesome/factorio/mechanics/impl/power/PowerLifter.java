@@ -83,7 +83,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
 
     @EventHandler
     public void onSignal(BlockRedstoneEvent event) {
-        if (event.getBlock().getType() == Material.REPEATER) {
+        if (BlockUtil.isDiagonalYFast(event.getBlock(), loc.getBlock()) && event.getBlock().getType() == Material.REPEATER) {
             Block point = BlockUtil.getPointingBlock(event.getBlock(), true);
             if (point != null && point.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(point, false).equals(loc.getBlock())) {
                 powered = event.getNewCurrent() > 0;

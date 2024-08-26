@@ -69,17 +69,13 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (event.getBlock().getType() == Material.PISTON && BlockUtil.getPointingBlock(event.getBlock(), false).equals(loc.getBlock())) {
-            // ignore input block
-            return;
-        }
-
-        for (BlockFace face : Routes.RELATIVES) {
-            Block block = loc.getBlock().getRelative(face);
-            if (block.equals(event.getBlock())) {
-                setup(event.getBlock());
-                break;
+        if (BlockUtil.isRelativeFast(event.getBlock(), loc.getBlock())) {
+            if (event.getBlock().getType() == Material.PISTON && BlockUtil.getPointingBlock(event.getBlock(), false).equals(loc.getBlock())) {
+                // ignore input block
+                return;
             }
+
+            setup(event.getBlock());
         }
     }
 
