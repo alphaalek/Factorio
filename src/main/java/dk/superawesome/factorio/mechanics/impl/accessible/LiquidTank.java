@@ -1,6 +1,5 @@
 package dk.superawesome.factorio.mechanics.impl.accessible;
 
-import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.impl.LiquidTankGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -78,7 +77,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
 
                 LiquidTankGui gui = this.<LiquidTankGui>getGuiInUse().get();
                 if (gui != null) {
-                    gui.loadInputOutputItems();
+                    gui.updateItems();
                 }
             }
         }
@@ -91,7 +90,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
 
         LiquidTankGui gui = this.<LiquidTankGui>getGuiInUse().get();
         if (gui != null) {
-            gui.loadInputOutputItems();
+            gui.updateItems();
         }
 
         return take;

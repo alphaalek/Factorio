@@ -21,6 +21,7 @@ import org.bukkit.inventory.CraftingRecipe;
 import org.bukkit.util.BlockVector;
 
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;

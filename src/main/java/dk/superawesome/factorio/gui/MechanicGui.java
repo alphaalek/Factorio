@@ -48,10 +48,10 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
             getInventory().setItem(slot, element.getItem());
         }
 
-        loadInputOutputItems();
+        updateItems();
     }
 
-    public abstract void loadInputOutputItems();
+    public abstract void updateItems();
 
     protected List<GuiElement> getGuiElements() {
         return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
@@ -86,7 +86,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
 
                     // return to the gui and reload view
                     return Arrays.asList(
-                            SignGUIAction.openInventory(Factorio.get(), getInventory()), SignGUIAction.runSync(Factorio.get(), this::loadInputOutputItems));
+                            SignGUIAction.openInventory(Factorio.get(), getInventory()), SignGUIAction.runSync(Factorio.get(), this::updateItems));
                 })
                 .build();
         gui.open(p);

@@ -207,7 +207,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
     }
 
     @Override
-    public void loadInputOutputItems() {
+    public void updateItems() {
 
     }
 

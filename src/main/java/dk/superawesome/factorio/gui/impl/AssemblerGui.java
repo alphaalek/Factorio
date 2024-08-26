@@ -182,7 +182,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
     }
 
     @Override
-    public void loadInputOutputItems() {
+    public void updateItems() {
         if (getMechanic().getType() != null) {
             loadStorageTypes(new ItemStack(getMechanic().getType().getMat()), getMechanic().getIngredientAmount(), STORAGE_SLOTS);
         }

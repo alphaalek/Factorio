@@ -4,6 +4,7 @@ import de.rapha149.signgui.SignGUI;
 import de.rapha149.signgui.SignGUIAction;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
+import dk.superawesome.factorio.gui.impl.UpgradeMechanicGui;
 import dk.superawesome.factorio.mechanics.AccessibleMechanic;
 import dk.superawesome.factorio.mechanics.Management;
 import dk.superawesome.factorio.mechanics.Mechanic;
@@ -16,6 +17,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -28,8 +30,11 @@ public class Elements {
         @Override
         public void handle(InventoryClickEvent event, Player player, MechanicGui<?, ?> gui) {
             event.setCancelled(true);
-            player.sendMessage("§cDet er ikke muligt at opgradere maskinen.");
-            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
+            player.openInventory(getInv(gui.getMechanic()));
+        }
+
+        private <M extends Mechanic<M>> Inventory getInv(Mechanic<?> mechanic) {
+            return new UpgradeMechanicGui<>((M) mechanic).getInventory();
         }
 
         @Override

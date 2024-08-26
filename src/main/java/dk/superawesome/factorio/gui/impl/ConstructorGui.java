@@ -91,7 +91,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     }
 
     @Override
-    public void loadInputOutputItems() {
+    public void updateItems() {
         if (getMechanic().getStorageType() != null) {
             loadStorageTypes(getMechanic().getStorageType(), getMechanic().getStorageAmount(), STORAGE_SLOTS);
         }

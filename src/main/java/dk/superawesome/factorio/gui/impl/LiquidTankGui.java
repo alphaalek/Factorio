@@ -42,7 +42,7 @@ public class LiquidTankGui extends MechanicGui<LiquidTankGui, LiquidTank>{
     }
 
     @Override
-    public void loadInputOutputItems() {
+    public void updateItems() {
         clearSlots(STORAGE_SLOTS);
 
         if (getMechanic().isContainerEmpty()) {

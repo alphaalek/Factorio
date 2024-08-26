@@ -53,7 +53,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     }
 
     @Override
-    public void loadInputOutputItems() {
+    public void updateItems() {
         if (getMechanic().getIngredient() != null) {
             loadStorageTypes(getMechanic().getIngredient(), getMechanic().getIngredientAmount(), INGREDIENT_SLOTS);
         }

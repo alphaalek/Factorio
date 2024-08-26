@@ -48,7 +48,7 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
     }
 
     @Override
-    public void loadInputOutputItems() {
+    public void updateItems() {
         int amount = (int) Math.ceil(getMechanic().getMoneyAmount());
 
         // first load normal emeralds
@@ -99,7 +99,7 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
             }
 
             getMechanic().setMoneyAmount(getMechanic().getMoneyAmount() - moneyAmount);
-            loadInputOutputItems();
+            updateItems();
 
             player.sendMessage("§eDu tog §f" + StringUtil.formatDecimals(moneyAmount, 2) + "§e emeralder fra maskinens inventar.");
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1f);

@@ -39,7 +39,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
     protected abstract boolean isItemAllowed(ItemStack item);
 
     @Override
-    public void loadInputOutputItems() {
+    public void updateItems() {
         if (storage.getStored() != null) {
             loadStorageTypes(storage.getStored(), storage.getAmount(), slots);
         }
