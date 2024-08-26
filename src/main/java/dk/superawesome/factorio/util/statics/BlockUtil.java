@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.util.statics;
 
+import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.BlockValidator;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -7,11 +8,13 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.Sign;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 @SuppressWarnings("deprecation")
 public class BlockUtil {
@@ -149,6 +152,12 @@ public class BlockUtil {
                 )
         );
         block.setBlockData(sign);
+    }
+
+    public static void forRelative(Block block, Consumer<Block> doFor) {
+        for (BlockFace face : Routes.RELATIVES) {
+            doFor.accept(block.getRelative(face));
+        }
     }
 
     public static boolean isRelativeFast(Block b1, Block b2) {

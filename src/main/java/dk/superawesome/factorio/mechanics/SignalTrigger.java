@@ -45,8 +45,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     protected void setupRelativeBlocks(Consumer<Block> findBlock, Consumer<Mechanic<?>> findMechanic) {
         MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
 
-        for (BlockFace face : Routes.RELATIVES) {
-            Block block = loc.getBlock().getRelative(face);
+        BlockUtil.forRelative(loc.getBlock(), block -> {
             if (block.getType() == Material.LEVER) {
                 levers.add(block);
                 findBlock.accept(block);
@@ -56,7 +55,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
             if (at != null) {
                 findMechanic.accept(at);
             }
-        }
+        });
 
         triggerLevers();
     }
@@ -72,6 +71,10 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
 
     protected void handleBlockBreak(BlockBreakEvent event) {
         levers.remove(event.getBlock());
+
+        if (BlockUtil.isDiagonalYFast(event.getBlock(), loc.getBlock())) {
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> levers.removeIf(lever -> lever.getType() != Material.LEVER));
+        }
     }
 
     protected void handleBlockPlace(BlockPlaceEvent event) {

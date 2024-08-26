@@ -92,7 +92,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         ingredientAmount -= type.getRequires();
         moneyAmount += type.getProduces();
 
-        type.getType().getTransformed(type.getType().getTransformed() + type.getProduces());
+        type.getType().setTransformed(type.getType().getTransformed() + type.getProduces());
 
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
@@ -333,7 +333,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
             for (Types type : Types.values()) {
                 try {
                     Factorio.get().getMechanicController().registerTransformed(type, type.getTransformed());
-                    type.getTransformed(0);
+                    type.setTransformed(0);
                 } catch (SQLException ex) {
                     Bukkit.getLogger().log(Level.SEVERE, "Failed to register transformed amount for type " + type, ex);
                 }
@@ -383,7 +383,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
             return transformed;
         }
 
-        public void getTransformed(double amount) {
+        public void setTransformed(double amount) {
             this.transformed = amount;
         }
 

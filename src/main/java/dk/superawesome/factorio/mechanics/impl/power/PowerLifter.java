@@ -9,6 +9,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Powerable;
+import org.bukkit.block.data.type.Repeater;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -125,6 +127,27 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     @Override
     public void onBlockBreak(BlockBreakEvent event) {
         super.handleBlockBreak(event);
+
+        if (BlockUtil.isDiagonal3DFast(event.getBlock(), loc.getBlock())) {
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+                boolean prevPowered = powered;
+
+                powered = false;
+                BlockUtil.forRelative(loc.getBlock(), b -> {
+                    if (b.getType() == Material.STICKY_PISTON) {
+                        BlockUtil.forRelative(b, b2 -> {
+                            if (b2.getType() == Material.REPEATER && ((Repeater)b2.getBlockData()).isPowered()) {
+                                powered = true;
+                            }
+                        });
+                    }
+                });
+
+                if (prevPowered != powered) {
+                    startLift(p -> p.triggerLevers(powered));
+                }
+            });
+        }
     }
 
     @EventHandler
