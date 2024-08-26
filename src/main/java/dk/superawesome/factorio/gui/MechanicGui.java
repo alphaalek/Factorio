@@ -225,7 +225,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
 
     private Map<Integer, ItemStack> getMatchingSlots(ItemStack stack, boolean onlyPuttable) {
         return getSlots().entrySet().stream()
-                .filter(e -> e.getValue() == null || (stack.isSimilar(e.getValue()) && (!onlyPuttable || e.getValue().getAmount() < 64)))
+                .filter(e -> e.getValue() != null && (stack.isSimilar(e.getValue()) && (!onlyPuttable || e.getValue().getAmount() < 64)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

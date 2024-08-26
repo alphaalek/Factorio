@@ -81,14 +81,18 @@ public class Management {
     }
 
     public boolean hasAccess(Player player, int access) {
+        // give operators access to all mechanics
+        if (player.isOp()) {
+            return true;
+        }
+
         UUID uuid = player.getUniqueId();
         if (this.owner.equals(uuid)) {
             return (OWNER_ACCESS & access) > 0;
         } else if (this.members.contains(uuid)) {
             return (MEMBER_ACCESS & access) > 0;
         } else {
-            // give operators access to all mechanics
-            return player.isOp();
+            return false;
         }
     }
 }

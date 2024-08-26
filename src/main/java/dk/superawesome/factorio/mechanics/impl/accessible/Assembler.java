@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.logging.Level;
 
 public class Assembler extends AbstractMechanic<Assembler> implements AccessibleMechanic, ThinkingMechanic, ItemContainer, MoneyCollection {
 
@@ -90,6 +91,8 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         // do the assembling
         ingredientAmount -= type.getRequires();
         moneyAmount += type.getProduces();
+
+        type.getType().setSold(type.getType().getSold() + type.getProduces());
 
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
@@ -328,6 +331,13 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         private static void requestTypes() {
             LAST_UPDATE = System.currentTimeMillis();
             for (Types type : Types.values()) {
+                try {
+                    Factorio.get().getMechanicController().registerTransformed(type, type.getSold());
+                    type.setSold(0);
+                } catch (SQLException ex) {
+                    Bukkit.getLogger().log(Level.SEVERE, "Failed to register transformed amount for type " + type, ex);
+                }
+
                 AssemblerTypeRequestEvent requestEvent = new AssemblerTypeRequestEvent(type);
                 Bukkit.getPluginManager().callEvent(requestEvent);
 
@@ -349,6 +359,8 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         private final int requires;
         private final double produces;
 
+        private double sold;
+
         Types (Material mat, int requires, double produces) {
             this.mat = mat;
             this.requires = requires;
@@ -365,6 +377,14 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
         public double getProduces() {
             return produces;
+        }
+
+        public double getSold() {
+            return sold;
+        }
+
+        public void setSold(double amount) {
+            this.sold = amount;
         }
 
         public static Optional<Types> getTypeFromMaterial(Material mat) {

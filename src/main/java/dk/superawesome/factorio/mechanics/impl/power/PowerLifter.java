@@ -87,7 +87,8 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
             Block point = BlockUtil.getPointingBlock(event.getBlock(), true);
             if (point != null && point.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(point, false).equals(loc.getBlock())) {
                 powered = event.getNewCurrent() > 0;
-                startLift(l -> l.triggerLevers(powered));
+
+                Bukkit.getScheduler().runTask(Factorio.get(), () -> startLift(l -> l.triggerLevers(powered)));
             }
         }
     }

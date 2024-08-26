@@ -12,6 +12,7 @@ import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.RedstoneWire;
 import org.bukkit.block.data.type.Repeater;
 import org.bukkit.block.data.type.Switch;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -61,10 +62,11 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     }
 
     protected void handleLeverPull(PlayerInteractEvent event) {
-        if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.LEVER && levers.contains(event.getClickedBlock())) {
-            powered = !((Switch)event.getClickedBlock().getBlockData()).isPowered();
-
-            Bukkit.getScheduler().runTask(Factorio.get(), () -> triggerLevers());
+        if (event.getClickedBlock() != null
+                && event.getClickedBlock().getType() == Material.LEVER
+                && event.getAction() == Action.RIGHT_CLICK_BLOCK
+                && levers.contains(event.getClickedBlock())) {
+            event.setCancelled(true);
         }
     }
 

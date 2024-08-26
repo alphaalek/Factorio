@@ -4,6 +4,7 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.Management;
 import dk.superawesome.factorio.mechanics.MechanicSerializer;
 import dk.superawesome.factorio.mechanics.MechanicStorageContext;
+import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
 import dk.superawesome.factorio.util.Serializer;
 import dk.superawesome.factorio.util.db.Query;
 import dk.superawesome.factorio.util.db.Types;
@@ -47,9 +48,17 @@ public class MechanicController {
                 "PRIMARY KEY (playerUUID, defaultMemberPlayerUUID)" +
                 ");");
 
+        Query createAssemblerTransformed = new Query(
+                "CREATE TABLE IF NOT EXISTS mechanics_assembler_transformed (" +
+                "type VARCHAR(32) PRIMARY KEY NOT NULL, " +
+                "transformed DOUBLE(32, 2)" +
+                ");"
+        );
+
         try {
             createMechanics.execute(this.connection);
             createDefaultMembers.execute(this.connection);
+            createAssemblerTransformed.execute(this.connection);
         } catch (SQLException ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to create tables!", ex);
         }
@@ -61,6 +70,17 @@ public class MechanicController {
 
     public MechanicSerializer getMechanicSerializer() {
         return this.mechanicSerializer;
+    }
+
+    public void registerTransformed(Assembler.Types type, double amount) throws SQLException {
+        Query query = new Query(
+                "UPDATE mechanics_assembler_transformed " +
+                "SET transformed = transformed + ? " +
+                "WHERE type = ?")
+                .add(amount)
+                .add(type.name());
+
+        query.execute(this.connection);
     }
 
     public List<UUID> getDefaultMembersFor(UUID uuid) throws SQLException {
