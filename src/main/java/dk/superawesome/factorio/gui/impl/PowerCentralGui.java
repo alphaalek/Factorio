@@ -76,25 +76,22 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
             double[] states = new double[COLLECT_WIDTH];
             double min = -1, max = 0;
 
-            // get value from suppliers
-            double state1 = this.currentStates[0].getAsDouble();
-            double state2 = this.currentStates[1].getAsDouble();
-
             for (int i = 1; i < COLLECT_WIDTH + 1; i++) {
-                state1 = i < this.states.length ? this.states[i] : state1;
-                if (state1 > max) {
-                    max = state1;
+                double state = i < this.states.length ? this.states[i] : this.currentStates[0].getAsDouble();
+                if (state > max) {
+                    max = state;
                 }
-                if (state1 < min || min == -1) {
-                    min = state1;
+                if (state < min || min == -1) {
+                    min = state;
                 }
-                states[i - 1] = state1;
+                states[i - 1] = state;
             }
 
             // evaluating the grade difference by the average between min and max values
             // adding 0.1, so we are bound to lower value when rounding to nearest grade
             double diff = (max - min) / 5 + .1;
 
+            double other = this.currentStates[1].getAsDouble();
             // start iterating over the columns and placing grades
             for (int i = 0; i < WIDTH; i++) {
                 double state = states[COLLECT_WIDTH - WIDTH + i];
@@ -110,7 +107,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                     setSlots(i, 3, null);
                 }
 
-                ItemStack item = this.item.apply(new Double[] { Math.max(0, state), Math.max(0, state2) });
+                ItemStack item = this.item.apply(new Double[] { Math.max(0, state), Math.max(0, other) });
                 boolean smoothed = false;
                 // smooth out graph
                 if (grade != -1 && i > 0 && columns[i - 1] != grade) {
