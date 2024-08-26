@@ -193,11 +193,11 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     public void onMechanicBuild(MechanicBuildEvent event) {
         if (event.getMechanic() instanceof Assembler assembler) {
             MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
-            for (BlockFace face : Routes.RELATIVES) {
-                if (manager.getMechanicPartially(BlockUtil.getRel(loc, face.getDirection())) == assembler) {
+            BlockUtil.forRelative(loc.getBlock(), block -> {
+                if (manager.getMechanicPartially(block.getLocation()) == event.getMechanic()) {
                     assemblers.add(assembler);
                 }
-            }
+            });
         }
     }
 

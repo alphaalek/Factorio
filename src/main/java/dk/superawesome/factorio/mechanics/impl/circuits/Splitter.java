@@ -49,15 +49,14 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
     }
 
     private void setupNearby() {
-        for (BlockFace face : Routes.RELATIVES) {
-            Block block = loc.getBlock().getRelative(face);
+        BlockUtil.forRelative(loc.getBlock(), block -> {
             if (block.getType() == Material.PISTON && BlockUtil.getPointingBlock(block, false).equals(loc.getBlock())) {
                 // ignore input block
-                continue;
+                return;
             }
 
             setup(block);
-        }
+        });
     }
 
     private void setup(Block block) {
