@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SmelterProfile implements GuiMechanicProfile<Smelter> {
@@ -101,10 +102,18 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
     @Override
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
-                .make(1)
-                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(12))
-                .mark(Smelter.INGREDIENT_CAPACITY_MARK, Array.fromData(10))
-                .mark(Smelter.FUEL_CAPACITY_MARK, Array.fromData(10))
+                .make(5)
+                .setDescription(2, Arrays.asList("§eLager: 12 stacks §f-> §e15 stacks", "§eBrændstof: 10 stacks §f-> §e14 stacks", "§eIngredienser: 10 stacks §f-> §e16 stacks"))
+                .setDescription(3, Arrays.asList("§eLager: 15 stacks §f-> §e22 stacks", "§eBrændstof: 14 stacks §f-> §e20 stacks", "§eIngredienser: 16 stacks §f-> §e24 stacks"))
+                .setDescription(4, Arrays.asList("§eLager: 22 stacks §f-> §e32 stacks", "§eBrændstof: 20 stacks §f-> §e32 stacks", "§eIngredienser: 24 stacks §f-> §e36 stacks"))
+                .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eBrændstof: 32 stacks §f-> §e48 stacks", "§eIngredienser: 36 stacks §f-> §e54 stacks"))
+
+                .mark(MechanicLevel.XP_REQUIRES_MARK, Array.fromData(1000d, 2500d, 5000d, 10000d))
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(4096d, 12288d, 20480d, 51200d))
+
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(12, 15, 22, 32, 64))
+                .mark(Smelter.INGREDIENT_CAPACITY_MARK, Array.fromData(10, 16, 24, 36, 54))
+                .mark(Smelter.FUEL_CAPACITY_MARK, Array.fromData(10, 14, 20, 32, 48))
                 .build();
     }
 

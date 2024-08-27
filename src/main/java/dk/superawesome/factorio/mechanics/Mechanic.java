@@ -31,6 +31,8 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener, Source {
 
     MechanicLevel getLevel();
 
+    void setLevel(int level);
+
     Management getManagement();
 
     MechanicProfile<M> getProfile();

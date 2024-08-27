@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.util.db;
 
 import dk.superawesome.factorio.mechanics.db.DatabaseConnection;
+import org.bukkit.Bukkit;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

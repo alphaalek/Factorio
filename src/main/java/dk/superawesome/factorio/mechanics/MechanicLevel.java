@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.util.Array;
+import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Optional;
 public class MechanicLevel {
 
     public static final int XP_REQUIRES_MARK = 4;
+    public static final int LEVEL_COST_MARK = 5;
 
     public interface Registry {
 
@@ -56,7 +58,7 @@ public class MechanicLevel {
                 return new Registry() {
                     @Override
                     public Array<Object> get(int level) {
-                        return data.get(level);
+                        return data.get(level - 1);
                     }
 
                     @Override
@@ -82,11 +84,18 @@ public class MechanicLevel {
     private final int level;
     private final int max;
 
+    private final Registry registry;
+
     public MechanicLevel(Mechanic<?> mechanic, int level) {
-        this.data = Optional.ofNullable(mechanic.getProfile().getLevelRegistry()).map(a -> a.get(level)).orElseGet(Array::new);
-        this.description = Optional.ofNullable(mechanic.getProfile().getLevelRegistry()).map(a -> a.getDescription(level)).orElseGet(ArrayList::new);
-        this.max = Optional.ofNullable(mechanic.getProfile().getLevelRegistry()).map(Registry::getMax).orElse(1);
+        this.registry = mechanic.getProfile().getLevelRegistry();
+        this.data = Optional.ofNullable(registry).map(a -> a.get(level)).orElseGet(Array::new);
+        this.description = Optional.ofNullable(registry).map(a -> a.getDescription(level)).orElseGet(ArrayList::new);
+        this.max = Optional.ofNullable(registry).map(Registry::getMax).orElse(1);
         this.level = level;
+    }
+
+    public Registry getRegistry() {
+        return registry;
     }
 
     public List<String> getDescription() {

@@ -32,13 +32,13 @@ public class MechanicController {
         this.managementSerializer = managementSerializer;
 
         Query createMechanics = new Query(
-                "CREATE TABLE IF NOT EXISTS mechanics (" +
+                "CREATE TABLE IF NOT EXISTS mechanics2 (" +
                 "id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, " +
                 "type VARCHAR(18) NOT NULL, " +
                 "location VARCHAR(64) NOT NULL, " +
                 "rotation ENUM('NORTH', 'EAST', 'SOUTH', 'WEST') NOT NULL, " +
                 "level INT DEFAULT 1, " +
-                "xp DOUBLE(16, 2), " +
+                "xp DOUBLE(16, 2) DEFAULT 0, " +
                 "management TEXT, " +
                 "data TEXT);");
 
@@ -65,6 +65,10 @@ public class MechanicController {
         }
     }
 
+    public void close() throws SQLException {
+        this.connection.getConnection().close();
+    }
+
     public Serializer<Management> getManagementSerializer() {
         return this.managementSerializer;
     }
@@ -82,7 +86,7 @@ public class MechanicController {
                 .add(amount)
                 .add(amount);
 
-        query.executeUpdate(this.connection);
+        query.execute(this.connection);
     }
 
     public List<UUID> getDefaultMembersFor(UUID uuid) throws SQLException {
@@ -124,7 +128,7 @@ public class MechanicController {
 
     public void deleteAt(Location location) throws SQLException {
         Query query = new Query(
-                "DELETE FROM mechanics " +
+                "DELETE FROM mechanics2 " +
                 "WHERE location = ?"
                 ).add(Types.LOCATION.convert(location));
 
@@ -148,7 +152,7 @@ public class MechanicController {
         Management management = new Management(owner);
 
         Query query = new Query(
-                "INSERT INTO mechanics (type, location, rotation, management) " +
+                "INSERT INTO mechanics2 (type, location, rotation, management) " +
                 "VALUES (?, ?, ?, ?)"
                 )
                 .add(type)
@@ -162,7 +166,7 @@ public class MechanicController {
 
     public boolean exists(Location loc) throws SQLException {
         Query query = new Query(
-                "SELECT * from mechanics " +
+                "SELECT * from mechanics2 " +
                 "WHERE location = ? " +
                 "LIMIT 1"
                 )
@@ -174,7 +178,7 @@ public class MechanicController {
 
     public <T> T get(Location loc, String column, Query.CheckedFunction<ResultSet, T> function) throws SQLException {
         Query query = new Query(
-                "SELECT " + column + " from mechanics " +
+                "SELECT " + column + " from mechanics2 " +
                 "WHERE location = ? " +
                 "LIMIT 1"
                 )
@@ -205,7 +209,7 @@ public class MechanicController {
 
     public void set(Location loc, String column, Object val) throws SQLException {
         Query query = new Query(
-                "UPDATE mechanics " +
+                "UPDATE mechanics2 " +
                 "SET " + column + " = ? " +
                 "WHERE location = ? " +
                 "LIMIT 1"

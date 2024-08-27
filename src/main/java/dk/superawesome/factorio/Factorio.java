@@ -14,9 +14,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
 public final class Factorio extends JavaPlugin implements Listener {
 
@@ -80,6 +82,12 @@ public final class Factorio extends JavaPlugin implements Listener {
             for (Chunk chunk : world.getLoadedChunks()) {
                 Factorio.get().getMechanicManager(world).unloadMechanics(chunk);
             }
+        }
+
+        try {
+            mechanicController.close();
+        } catch (SQLException ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Failed to close database connection", ex);
         }
     }
 

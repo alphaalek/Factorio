@@ -1,14 +1,21 @@
 package dk.superawesome.factorio.gui;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.api.events.MechanicUpgradeEvent;
 import dk.superawesome.factorio.mechanics.GuiMechanicProfile;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.MechanicLevel;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<UpgradeMechanicGui<M>> {
 
@@ -33,26 +40,97 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
         MechanicLevel level = mechanic.getLevel();
         if (level.getMax() > 1) {
             double xpRequires = mechanic.getLevel().getDouble(MechanicLevel.XP_REQUIRES_MARK);
-            double per = xpRequires / level.getMax();
+            double per = xpRequires / 4;
 
             double xp = mechanic.getXP();
             for (int i = 2; i <= Math.min(5, level.getMax()); i++) {
                 int slot = 1 + (i - 2) * 2;
+                List<String> desc = new ArrayList<>();
+                if (level.getLevel() + 1 == i) {
+                    desc.addAll(mechanic.getLevel().getRegistry().getDescription(i));
+                    desc.addAll(
+                            Arrays.asList("",
+                                    "§e§oKræver §b§o" + mechanic.getLevel().getRegistry().get(i).get(MechanicLevel.XP_REQUIRES_MARK) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)",
+                                    "§e§oKoster " + mechanic.getLevel().getRegistry().get(i).get(MechanicLevel.LEVEL_COST_MARK) + " emeralder")
+                    );
+                } else {
+                    desc.add("§c§o???");
+                }
+
                 inventory.setItem(slot, new ItemBuilder(Material.END_CRYSTAL).setAmount(i)
-                        .setName("§6Level " + i)
-                        .changeLore(l -> l.addAll(mechanic.getLevel().getDescription()))
+                        .setName("§6Level §l" + i)
+                        .changeLore(l -> l.addAll(desc))
                         .build());
 
+                int has = 0;
                 for (int j = 4; j > 0; j--) {
+                    int l = 5 - j;
                     int xpSlot = slot + j * 9;
-                    if (xp > per * (5 - j)) {
+
+                    if (level.getLevel() >= i) {
+                        inventory.setItem(xpSlot, new ItemStack(Material.GREEN_STAINED_GLASS_PANE));
+                    } else if (per == 0 || xp > per * (5 - j)) {
                         inventory.setItem(xpSlot, new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE));
+                        has++;
                     } else {
                         inventory.setItem(xpSlot, new ItemStack(Material.RED_STAINED_GLASS_PANE));
                     }
                 }
+
+                if (level.getLevel() + 1 == i) {
+                    int buySlot = slot + 5 * 9;
+                    if (has == 4) {
+                        inventory.setItem(buySlot, new ItemBuilder(Material.EXPERIENCE_BOTTLE)
+                                .setName("§aOpgrader")
+                                .addLore("§eOpgrader maskinen til §6Level §l" + i)
+                                .addLore("")
+                                .addLore("§e§oKoster " + mechanic.getLevel().getRegistry().get(i).get(MechanicLevel.LEVEL_COST_MARK) + " emeralder")
+                                .build());
+                    } else {
+                        inventory.setItem(buySlot, new ItemBuilder(Material.BARRIER)
+                                .setName("§cIkke nok §bXP")
+                                .addLore("§c§oOpgradering kræver §b§o" + mechanic.getLevel().getRegistry().get(i).get(MechanicLevel.XP_REQUIRES_MARK) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)")
+                                .build());
+                    }
+                }
             }
         }
+    }
+
+    @Override
+    public boolean onClickIn(InventoryClickEvent event) {
+        if (event.getCurrentItem() != null) {
+            Player player = (Player) event.getWhoClicked();
+            if (event.getCurrentItem().getType() == Material.BARRIER) {
+                player.sendMessage("§cDu har ikke nok §bXP §ctil at opgradere maskinen.");
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
+                return true;
+            } else if (event.getCurrentItem().getType() == Material.EXPERIENCE_BOTTLE) {
+                int level = -1;
+                switch (event.getSlot()) {
+                    case 46 -> level = 2;
+                    case 48 -> level = 3;
+                    case 50 -> level = 4;
+                    case 52 -> level = 5;
+                }
+                if (level != -1) {
+                    MechanicUpgradeEvent upgradeEvent = new MechanicUpgradeEvent(player, mechanic, level, (double) mechanic.getLevel().getRegistry().get(level).get(MechanicLevel.LEVEL_COST_MARK));
+                    Bukkit.getPluginManager().callEvent(upgradeEvent);
+                    if (!upgradeEvent.isCancelled()) {
+                        mechanic.setLevel(level);
+
+                        // when closing and opening right after each other, we won't trigger the onClose logic
+                        player.closeInventory();
+                        player.openInventory(inventory);
+
+                        player.sendMessage("§eDu opgraderede maskinen " + mechanic.getProfile().getName() + " til §6Level §l" + level + ".");
+                        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1f);
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
