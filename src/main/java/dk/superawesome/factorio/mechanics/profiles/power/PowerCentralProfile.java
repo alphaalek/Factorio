@@ -54,7 +54,7 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
 
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 43008, 81920))
 
-                .mark(PowerCentral.CAPACITY, Array.fromData(1000d, 5000, 15000, 45000, 150000))
+                .mark(PowerCentral.CAPACITY, Array.fromData(1000d, 5000d, 15000d, 45000d, 150000d))
                 .build();
     }
 
