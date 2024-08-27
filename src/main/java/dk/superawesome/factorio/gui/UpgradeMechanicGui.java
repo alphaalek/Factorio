@@ -121,7 +121,7 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
 
                         // when closing and opening right after each other, we won't trigger the onClose logic
                         player.closeInventory();
-                        player.openInventory(inventory);
+                        player.openInventory(new UpgradeMechanicGui<>(mechanic).getInventory());
 
                         player.sendMessage("§eDu opgraderede maskinen " + mechanic.getProfile().getName() + " til §6Level §l" + level + ".");
                         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1f);
