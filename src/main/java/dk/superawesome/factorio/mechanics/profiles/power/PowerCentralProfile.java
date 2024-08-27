@@ -47,10 +47,10 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .setDescription(2, Arrays.asList("§eEnergi: 1000J §f-> §e5000J"))
-                .setDescription(3, Arrays.asList("§eEnergi: 5000J §f-> §e15000J"))
-                .setDescription(4, Arrays.asList("§eEnergi: 15000J §f-> §e45000J"))
-                .setDescription(5, Arrays.asList("§eEnergi: 45000J §f-> §e150000J"))
+                .setDescription(2, Arrays.asList("§eKapacitet: 1000J §f-> §e5000J"))
+                .setDescription(3, Arrays.asList("§eKapacitet: 5000J §f-> §e15000J"))
+                .setDescription(4, Arrays.asList("§eKapacitet: 15000J §f-> §e45000J"))
+                .setDescription(5, Arrays.asList("§eKapacitet: 45000J §f-> §e150000J"))
 
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 43008d, 81920d))
 
