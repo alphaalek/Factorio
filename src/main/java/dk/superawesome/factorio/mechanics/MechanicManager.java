@@ -172,7 +172,7 @@ public class MechanicManager implements Listener {
     public void onWorldSave(WorldSaveEvent event) {
         if (event.getWorld().equals(this.world)) {
             Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), () -> {
-                for (Mechanic<?> mechanic : mechanics.values()) {
+                for (Mechanic<?> mechanic : new ArrayList<>(mechanics.values())) {
                     mechanic.save();
                 }
             });
