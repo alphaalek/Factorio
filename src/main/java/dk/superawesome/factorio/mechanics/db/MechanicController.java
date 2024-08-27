@@ -74,13 +74,14 @@ public class MechanicController {
 
     public void registerTransformed(Assembler.Types type, double amount) throws SQLException {
         Query query = new Query(
-                "UPDATE mechanics_assembler_transformed " +
-                "SET transformed = transformed + ? " +
-                "WHERE type = ?")
+                "INSERT INTO mechanics_assembler_transformed " +
+                "VALUES (?, ?) " +
+                "ON DUPLICATE KEY UPDATE transformed = transformed + ?")
+                .add(type.name())
                 .add(amount)
-                .add(type.name());
+                .add(amount);
 
-        query.execute(this.connection);
+        query.executeUpdate(this.connection);
     }
 
     public List<UUID> getDefaultMembersFor(UUID uuid) throws SQLException {
