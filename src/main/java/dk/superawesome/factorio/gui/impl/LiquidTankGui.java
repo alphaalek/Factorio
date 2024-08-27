@@ -72,7 +72,7 @@ public class LiquidTankGui extends MechanicGui<LiquidTankGui, LiquidTank>{
                     ItemStack stack = new ItemBuilder(fluidMaterial)
                             .setAmount(amount)
                             .setName("§eBeholder: " + getMechanic().getFluid())
-                            .addLore("§e" + getMechanic().getFluidAmount() + "§8/§e" + getMechanic().getCapacity())
+                            .addLore("§e" + getMechanic().getFluidAmount() + "mL§8/§e" + getMechanic().getCapacity() + "mL")
                             .build();
                     getInventory().setItem(j, stack);
                 }

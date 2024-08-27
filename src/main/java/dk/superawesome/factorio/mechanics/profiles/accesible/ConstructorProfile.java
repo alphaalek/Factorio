@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
@@ -74,8 +75,16 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
     @Override
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
-                .make(1)
-                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(12))
+                .make(5)
+                .setDescription(2, Arrays.asList("§eLager: 12 stacks §f-> §e15 stacks"))
+                .setDescription(3, Arrays.asList("§eLager: 15 stacks §f-> §e22 stacks"))
+                .setDescription(4, Arrays.asList("§eLager: 22 stacks §f-> §e32 stacks"))
+                .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks"))
+
+                .mark(MechanicLevel.XP_REQUIRES_MARK, Array.fromData(1000d, 2500d, 5000d, 10000d))
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(4096d, 12288d, 20480d, 51200d))
+
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(12, 15, 22, 32, 64))
                 .build();
     }
 

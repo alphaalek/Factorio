@@ -43,6 +43,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
             new BlockVector(-1, 0, 0)
     );
 
+    private final XPDist xpDist = new XPDist(100, 0.01, 0.065);
     private final DelayHandler thinkDelayHandler = new DelayHandler(20);
     private Block lever;
     private Block campfire;
@@ -120,6 +121,8 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
             FuelState state = useFuel();
             if (state != FuelState.ABORT) {
                 availableEnergy = prevCurrentFuel != null ? prevCurrentFuel.getEnergyAmount() : prevFuel.getEnergyAmount(); // both can't be null, but has to check current fuel first
+
+                xp += xpDist.poll() * (1 + Math.min(1 / 2d, 1d / fuel.getType().ordinal()));
 
                 GeneratorGui gui = this.<GeneratorGui>getGuiInUse().get();
                 if (gui != null) {

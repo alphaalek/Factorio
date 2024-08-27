@@ -11,6 +11,7 @@ import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class EmeraldForgeProfile implements GuiMechanicProfile<EmeraldForge> {
@@ -47,6 +48,13 @@ public class EmeraldForgeProfile implements GuiMechanicProfile<EmeraldForge> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
+                .setDescription(2, Arrays.asList("§eLager: 10.000 emeralder §f-> §e50.000 emeralder"))
+                .setDescription(3, Arrays.asList("§eLager: 50.000 emeralder §f-> §e100.000 emeralder"))
+                .setDescription(4, Arrays.asList("§eLager: 100.000 emeralder §f-> §e250.000 emeralder"))
+                .setDescription(5, Arrays.asList("§eLager: 250.000 emeralder §f-> §e500.000 emeralder"))
+
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 20480d, 51200))
+
                 .mark(MoneyCollection.CAPACITY_MARK, Array.fromData(10_000, 50_000, 100_000, 250_000, 500_000))
                 .build();
     }

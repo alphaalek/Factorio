@@ -1,6 +1,5 @@
 package dk.superawesome.factorio.mechanics.impl.accessible;
 
-import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.impl.ConstructorGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -18,11 +17,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class Constructor extends AbstractMechanic<Constructor> implements AccessibleMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
+    private final XPDist xpDist = new XPDist(100, 0.025, 0.075);
     private final DelayHandler thinkDelayHandler = new DelayHandler(20);
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
@@ -171,6 +174,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         }
 
         // remove one amount from all items in the crafting grid and simulate the crafting
+        int a = 0;
         for (int i = 0; i < 9; i++) {
             ItemStack crafting = craftingGridItems[i];
             if (crafting != null && crafting.getAmount() == 1) {
@@ -185,9 +189,12 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
             }
 
             if (crafting != null) {
+                a++;
                 crafting.setAmount(crafting.getAmount() - 1);
             }
         }
+
+        xp += xpDist.poll() * a;
 
         // update the storage type if not set
         if (storageType == null) {

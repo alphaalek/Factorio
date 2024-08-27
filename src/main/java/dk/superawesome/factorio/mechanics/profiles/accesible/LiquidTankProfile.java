@@ -11,6 +11,7 @@ import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class LiquidTankProfile implements GuiMechanicProfile<LiquidTank> {
@@ -46,8 +47,15 @@ public class LiquidTankProfile implements GuiMechanicProfile<LiquidTank> {
     @Override
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
-                .make(1)
-                .mark(FluidCollection.CAPACITY_MARK, Array.fromData(100))
+                .make(5)
+                .setDescription(2, Arrays.asList("§eTank: 100mL §f-> §e250mL"))
+                .setDescription(3, Arrays.asList("§eTank: 250mL §f-> §e500mL"))
+                .setDescription(4, Arrays.asList("§eTank: 500mL §f-> §e1000mL"))
+                .setDescription(5, Arrays.asList("§eTank: 1000mL §f-> §e2500mL"))
+
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 20480d, 51200))
+
+                .mark(FluidCollection.CAPACITY_MARK, Array.fromData(100, 250, 500, 1000, 2500))
                 .build();
     }
 

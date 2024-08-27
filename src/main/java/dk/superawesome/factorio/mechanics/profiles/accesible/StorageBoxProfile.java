@@ -57,7 +57,6 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
                 .setDescription(4, Arrays.asList("§eLager: 150 stacks §f-> §e250 stacks"))
                 .setDescription(5, Arrays.asList("§eLager: 250 stacks §f-> §e400 stacks"))
 
-                .mark(MechanicLevel.XP_REQUIRES_MARK, Array.fromData(0d, 0d, 0d, 0d))
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(2048d, 8192d, 16384d, 40960d))
 
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(36, 75, 150, 250, 500))

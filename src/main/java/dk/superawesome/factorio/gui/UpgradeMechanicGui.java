@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<UpgradeMechanicGui<M>> {
 
@@ -39,18 +40,18 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
     private void loadLevels() {
         MechanicLevel level = mechanic.getLevel();
         if (level.getMax() > 1) {
-            double xpRequires = mechanic.getLevel().getDouble(MechanicLevel.XP_REQUIRES_MARK);
+            double xpRequires = Optional.<Double>ofNullable(mechanic.getLevel().get(MechanicLevel.XP_REQUIRES_MARK)).orElse(0d);
             double per = xpRequires / 4;
 
             double xp = mechanic.getXP();
             for (int i = 2; i <= Math.min(5, level.getMax()); i++) {
                 int slot = 1 + (i - 2) * 2;
                 List<String> desc = new ArrayList<>();
-                if (level.getLevel() + 1 == i) {
+                if (level.getLevel() + 1 >= i) {
                     desc.addAll(mechanic.getLevel().getRegistry().getDescription(i));
                     desc.addAll(
                             Arrays.asList("",
-                                    "§e§oKræver §b§o" + mechanic.getLevel().getRegistry().get(i).get(MechanicLevel.XP_REQUIRES_MARK) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)",
+                                    "§e§oKræver §b§o" + mechanic.getLevel().getRegistry().get(i).getOr(MechanicLevel.XP_REQUIRES_MARK, () -> 0d) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)",
                                     "§e§oKoster " + mechanic.getLevel().getRegistry().get(i).get(MechanicLevel.LEVEL_COST_MARK) + " emeralder")
                     );
                 } else {
@@ -89,7 +90,7 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                     } else {
                         inventory.setItem(buySlot, new ItemBuilder(Material.BARRIER)
                                 .setName("§cIkke nok §bXP")
-                                .addLore("§c§oOpgradering kræver §b§o" + mechanic.getLevel().getRegistry().get(i).get(MechanicLevel.XP_REQUIRES_MARK) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)")
+                                .addLore("§c§oOpgradering kræver §b§o" + mechanic.getLevel().getRegistry().get(i).getOr(MechanicLevel.XP_REQUIRES_MARK, () -> 0d) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)")
                                 .build());
                     }
                 }
@@ -120,7 +121,6 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                         mechanic.setLevel(level);
 
                         // when closing and opening right after each other, we won't trigger the onClose logic
-                        player.closeInventory();
                         player.openInventory(new UpgradeMechanicGui<>(mechanic).getInventory());
 
                         player.sendMessage("§eDu opgraderede maskinen " + mechanic.getProfile().getName() + " til §6Level §l" + level + ".");

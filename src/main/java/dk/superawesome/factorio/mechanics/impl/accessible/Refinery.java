@@ -1,6 +1,5 @@
 package dk.superawesome.factorio.mechanics.impl.accessible;
 
-import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.impl.RefineryGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -26,6 +25,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     public static final int VOLUME_MARK = 1;
 
+    private final XPDist xpDist = new XPDist(100, 0.75, 1.5);
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
     private int volumeAmount;
@@ -113,6 +113,8 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
                         ((Player)viewer).playSound(viewer.getLocation(), filled.getFillSound(), 0.5f, 0.5f);
                     }
                 }
+
+                xp += xpDist.poll() * filled.getVolume().getFluidRequires();
 
                 // update filled amount
                 filledAmount++;
