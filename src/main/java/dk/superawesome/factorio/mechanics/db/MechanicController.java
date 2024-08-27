@@ -38,6 +38,7 @@ public class MechanicController {
                 "location VARCHAR(64) NOT NULL, " +
                 "rotation ENUM('NORTH', 'EAST', 'SOUTH', 'WEST') NOT NULL, " +
                 "level INT DEFAULT 1, " +
+                "xp DOUBLE(16, 2), " +
                 "management TEXT, " +
                 "data TEXT);");
 
@@ -197,6 +198,11 @@ public class MechanicController {
                 .orElse(1);
     }
 
+    public double getXP(Location loc) throws SQLException {
+        return Optional.ofNullable(get(loc, "xp", result -> result.getDouble("xp")))
+                .orElse(0d);
+    }
+
     public void set(Location loc, String column, Object val) throws SQLException {
         Query query = new Query(
                 "UPDATE mechanics " +
@@ -220,5 +226,9 @@ public class MechanicController {
 
     public void setManagement(Location loc, String data) throws SQLException {
         set(loc, "management", data);
+    }
+
+    public void setXP(Location loc, double xp) throws SQLException {
+        set(loc, "xp", xp);
     }
 }

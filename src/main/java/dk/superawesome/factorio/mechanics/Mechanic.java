@@ -21,13 +21,15 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener, Source {
 
     boolean canBeDeleted();
 
+    double getXP();
+
     TickThrottle getTickThrottle();
 
     Location getLocation();
 
     BlockFace getRotation();
 
-    int getLevel();
+    MechanicLevel getLevel();
 
     Management getManagement();
 

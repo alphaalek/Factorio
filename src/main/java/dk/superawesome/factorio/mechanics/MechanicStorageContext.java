@@ -110,4 +110,16 @@ public class MechanicStorageContext {
     public int getLevel() throws SQLException {
         return this.controller.getLevel(this.location);
     }
+
+    public void setLevel(int level) throws SQLException {
+        this.controller.setLevel(this.location, level);
+    }
+
+    public double getXP() throws SQLException {
+        return this.controller.getXP(this.location);
+    }
+
+    public void setXP(double xp) throws SQLException {
+        this.controller.setXP(this.location, xp);
+    }
 }

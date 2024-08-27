@@ -11,6 +11,7 @@ import dk.superawesome.factorio.util.Array;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -51,7 +52,13 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
+                .setDescription(2, Arrays.asList("Storage: §e36 §f-> §e75"))
+                .setDescription(3, Arrays.asList("Storage: §e75 §f-> §e150"))
+                .setDescription(4, Arrays.asList("Storage: §e150 §f-> §e250"))
+                .setDescription(5, Arrays.asList("Storage: §e250 §f-> §e400"))
+
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(36, 75, 150, 250, 400))
+                .mark(MechanicLevel.XP_REQUIRES_MARK, Array.fromData(0, 0, 0, 0))
                 .build();
     }
 

@@ -21,10 +21,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     protected final TickThrottle tickThrottle = new TickThrottle();
     protected final Location loc;
     protected final BlockFace rot;
-    protected final MechanicLevel level;
     protected final MechanicStorageContext context;
     protected final Management management;
 
+    protected MechanicLevel level;
+    protected double xp;
     private boolean exists = true;
 
     public AbstractMechanic(Location loc, BlockFace rotation, MechanicStorageContext context) {
@@ -34,6 +35,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
         try {
             this.level = MechanicLevel.from(this, context.getLevel());
+            this.xp = context.getXP();
             this.management = context.getManagement();
         } catch (SQLException | IOException ex) {
             throw new RuntimeException("Failed to load mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
@@ -65,7 +67,8 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
             }
 
             // save data for this mechanic
-            this.context.getController().setLevel(this.loc, this.level.getLevel());
+            this.context.setLevel(this.level.getLevel());
+            this.context.setXP(this.xp);
             this.context.uploadManagement(this.management);
 
             save(this.context);
@@ -98,8 +101,8 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     }
 
     @Override
-    public int getLevel() {
-        return level.getLevel();
+    public MechanicLevel getLevel() {
+        return level;
     }
 
     @Override
@@ -119,6 +122,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     }
 
     @Override
+    public double getXP() {
+        return xp;
+    }
+
+    @Override
     public BlockFace getRotation() {
         return rot;
     }
@@ -135,6 +143,6 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     @Override
     public String toString() {
-        return getProfile().getName() + (getProfile().getLevelRegistry() != null ? " (Lvl " + getLevel() + ")" : "");
+        return getProfile().getName() + (getProfile().getLevelRegistry() != null ? " (Lvl " + level.getLevel() + ")" : "");
     }
 }
