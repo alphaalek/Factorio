@@ -53,7 +53,7 @@ public class LiquidTankProfile implements GuiMechanicProfile<LiquidTank> {
                 .setDescription(4, Arrays.asList("§eTank: 500mL §f-> §e1000mL"))
                 .setDescription(5, Arrays.asList("§eTank: 1000mL §f-> §e2500mL"))
 
-                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 20480d, 51200))
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 20480d, 51200d))
 
                 .mark(FluidCollection.CAPACITY_MARK, Array.fromData(100, 250, 500, 1000, 2500))
                 .build();

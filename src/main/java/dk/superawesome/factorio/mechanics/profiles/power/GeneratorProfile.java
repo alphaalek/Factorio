@@ -57,7 +57,7 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
                 .setDescription(5, Arrays.asList("§eLager: 162 stacks §f-> §e256 stacks"))
 
                 .mark(MechanicLevel.XP_REQUIRES_MARK, Array.fromData(2500d, 7500d, 15000d, 30000d))
-                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 43008, 81920))
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 43008d, 81920d))
 
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(24, 48, 96, 162, 256))
                 .build();

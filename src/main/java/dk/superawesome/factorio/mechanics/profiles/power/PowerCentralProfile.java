@@ -52,7 +52,7 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
                 .setDescription(4, Arrays.asList("§eEnergi: 15000J §f-> §e45000J"))
                 .setDescription(5, Arrays.asList("§eEnergi: 45000J §f-> §e150000J"))
 
-                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 43008, 81920))
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 43008d, 81920d))
 
                 .mark(PowerCentral.CAPACITY, Array.fromData(1000d, 5000d, 15000d, 45000d, 150000d))
                 .build();

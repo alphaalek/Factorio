@@ -53,7 +53,7 @@ public class EmeraldForgeProfile implements GuiMechanicProfile<EmeraldForge> {
                 .setDescription(4, Arrays.asList("§eLager: 100.000 emeralder §f-> §e250.000 emeralder"))
                 .setDescription(5, Arrays.asList("§eLager: 250.000 emeralder §f-> §e500.000 emeralder"))
 
-                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 20480d, 51200))
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 20480d, 51200d))
 
                 .mark(MoneyCollection.CAPACITY_MARK, Array.fromData(10_000, 50_000, 100_000, 250_000, 500_000))
                 .build();

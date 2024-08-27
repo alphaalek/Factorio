@@ -115,7 +115,7 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
                 .setDescription(4, Arrays.asList("§eLager: 22 stacks §f-> §e32 stacks", "§eBeholder: 18 stacks §f-> §e24 stacks"))
                 .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eBeholder: 24 stacks §f-> §e32 stacks"))
 
-                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(8192d, 16384d, 40960d, 81920))
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(8192d, 16384d, 40960d, 81920d))
 
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(12, 15, 22, 32, 64))
                 .mark(Refinery.VOLUME_MARK, Array.fromData(8, 12, 18, 24, 32))
