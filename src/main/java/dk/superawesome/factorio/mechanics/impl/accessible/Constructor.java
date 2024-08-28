@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 
 public class Constructor extends AbstractMechanic<Constructor> implements AccessibleMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
-    private final XPDist xpDist = new XPDist(100, 0.025, 0.075);
+    private final XPDist xpDist = new XPDist(100, 0.005, 0.05);
     private final DelayHandler thinkDelayHandler = new DelayHandler(20);
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 

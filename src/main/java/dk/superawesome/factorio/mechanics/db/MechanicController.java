@@ -1,15 +1,20 @@
 package dk.superawesome.factorio.mechanics.db;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.mechanics.Management;
-import dk.superawesome.factorio.mechanics.MechanicSerializer;
-import dk.superawesome.factorio.mechanics.MechanicStorageContext;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
 import dk.superawesome.factorio.util.Serializer;
 import dk.superawesome.factorio.util.db.Query;
 import dk.superawesome.factorio.util.db.Types;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.sign.Side;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -32,7 +37,7 @@ public class MechanicController {
         this.managementSerializer = managementSerializer;
 
         Query createMechanics = new Query(
-                "CREATE TABLE IF NOT EXISTS mechanics2 (" +
+                "CREATE TABLE IF NOT EXISTS mechanics (" +
                 "id INT PRIMARY KEY AUTO_INCREMENT NOT NULL, " +
                 "type VARCHAR(18) NOT NULL, " +
                 "location VARCHAR(64) NOT NULL, " +
@@ -98,7 +103,7 @@ public class MechanicController {
 
         List<UUID> members = new ArrayList<>();
         return Optional.ofNullable(
-                query.executeQuery(this.connection, rs -> {
+                query.executeQueryCall(this.connection, rs -> {
                     do {
                         members.add(UUID.fromString(rs.getString("member")));
                     } while (rs.next());
@@ -128,7 +133,7 @@ public class MechanicController {
 
     public void deleteAt(Location location) throws SQLException {
         Query query = new Query(
-                "DELETE FROM mechanics2 " +
+                "DELETE FROM mechanics " +
                 "WHERE location = ?"
                 ).add(Types.LOCATION.convert(location));
 
@@ -152,7 +157,7 @@ public class MechanicController {
         Management management = new Management(owner);
 
         Query query = new Query(
-                "INSERT INTO mechanics2 (type, location, rotation, management) " +
+                "INSERT INTO mechanics (type, location, rotation, management) " +
                 "VALUES (?, ?, ?, ?)"
                 )
                 .add(type)
@@ -166,25 +171,25 @@ public class MechanicController {
 
     public boolean exists(Location loc) throws SQLException {
         Query query = new Query(
-                "SELECT * from mechanics2 " +
+                "SELECT * from mechanics " +
                 "WHERE location = ? " +
                 "LIMIT 1"
                 )
                 .add(Types.LOCATION.convert(loc));
 
         return Boolean.TRUE.equals(
-                query.<Boolean>executeQuery(this.connection, __ -> true));
+                query.<Boolean>executeQueryCall(this.connection, __ -> true));
     }
 
     public <T> T get(Location loc, String column, Query.CheckedFunction<ResultSet, T> function) throws SQLException {
         Query query = new Query(
-                "SELECT " + column + " from mechanics2 " +
+                "SELECT " + column + " from mechanics " +
                 "WHERE location = ? " +
                 "LIMIT 1"
                 )
                 .add(Types.LOCATION.convert(loc));
 
-        return query.<T>executeQuery(this.connection, function::sneaky);
+        return query.<T>executeQueryCall(this.connection, function::sneaky);
     }
 
     public String getData(Location loc) throws SQLException {
@@ -209,7 +214,7 @@ public class MechanicController {
 
     public void set(Location loc, String column, Object val) throws SQLException {
         Query query = new Query(
-                "UPDATE mechanics2 " +
+                "UPDATE mechanics " +
                 "SET " + column + " = ? " +
                 "WHERE location = ? " +
                 "LIMIT 1"

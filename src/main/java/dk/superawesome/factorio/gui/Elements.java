@@ -223,14 +223,6 @@ public class Elements {
                 return;
             }
 
-            // call mechanic remove event to event handlers
-            MechanicRemoveEvent removeEvent = new MechanicRemoveEvent(player, mechanic);
-            Bukkit.getPluginManager().callEvent(removeEvent);
-            if (removeEvent.isCancelled()) {
-                // this event was cancelled. (why though?)
-                return;
-            }
-
             Factorio.get().getMechanicManager(player.getWorld()).removeMechanic(player, mechanic);
         }
 

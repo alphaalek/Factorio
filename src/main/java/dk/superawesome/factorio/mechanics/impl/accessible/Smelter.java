@@ -54,7 +54,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         }
     }
 
-    private final XPDist xpDist = new XPDist(100, 0.075, 0.15);
+    private final XPDist xpDist = new XPDist(100, 0.001, 0.01);
     private final DelayHandler thinkDelayHandler = new DelayHandler(20);
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
@@ -257,7 +257,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         ingredientAmount -= 1;
         storageAmount += smeltResult.getAmount();
 
-        xp += xpDist.poll() * (1 + Math.min(1 / 2d, 1d / fuel.getType().ordinal()));
+        xp += xpDist.poll();
 
         SmelterGui gui = this.<SmelterGui>getGuiInUse().get();
         if (gui != null) {

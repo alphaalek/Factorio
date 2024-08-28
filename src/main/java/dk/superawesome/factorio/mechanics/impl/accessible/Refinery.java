@@ -25,7 +25,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     public static final int VOLUME_MARK = 1;
 
-    private final XPDist xpDist = new XPDist(100, 0.75, 1.5);
+    private final XPDist xpDist = new XPDist(100, 0.3, 1.3);
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
     private int volumeAmount;

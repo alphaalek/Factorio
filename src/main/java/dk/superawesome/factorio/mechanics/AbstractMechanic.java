@@ -92,6 +92,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     }
 
     @Override
+    public void onUpgrade(int newLevel) {
+
+    }
+
+    @Override
     public void onBlocksLoaded(Player by) {
 
     }

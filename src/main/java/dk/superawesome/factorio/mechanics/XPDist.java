@@ -9,6 +9,10 @@ public class XPDist {
     private int lastIndex;
 
     public XPDist(int amount, double rangeStart, double rangeEnd) {
+        if (amount == 0) {
+            throw new IllegalArgumentException("0 amount");
+        }
+
         Random rand = new Random();
         amounts = new double[amount];
         for (int i = 0; i < amount; i++) {

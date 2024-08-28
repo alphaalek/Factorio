@@ -1,7 +1,6 @@
 package dk.superawesome.factorio.util.db;
 
 import dk.superawesome.factorio.mechanics.db.DatabaseConnection;
-import org.bukkit.Bukkit;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,7 +37,14 @@ public class Query {
         return null;
     }
 
-    public <V> V executeQuery(DatabaseConnection connection, CheckedFunction<ResultSet, V> function) throws SQLException {
+    public void executeQuery(DatabaseConnection connection, CheckedConsumer<ResultSet> function) throws SQLException {
+        create(connection, s -> executeQueryCall(connection, r -> {
+            function.sneaky(r);
+            return null;
+        }));
+    }
+
+    public <V> V executeQueryCall(DatabaseConnection connection, CheckedFunction<ResultSet, V> function) throws SQLException {
         return create(connection, s -> {
             ResultSet set = s.executeQuery();
             V val = null;

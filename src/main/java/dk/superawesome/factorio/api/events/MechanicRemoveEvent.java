@@ -16,7 +16,7 @@ public class MechanicRemoveEvent extends MechanicEvent {
     public int getLevelCost() {
         int cost = 0;
         if (mechanic.getLevel().lvl() > 1) {
-            for (int i = 2; i <= mechanic.getLevel().lvl(); i++) {
+            for (int i = 1; i < mechanic.getLevel().lvl(); i++) {
                 cost += (double) mechanic.getProfile().getLevelRegistry().get(i).get(MechanicLevel.LEVEL_COST_MARK);
             }
         }

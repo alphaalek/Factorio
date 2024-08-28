@@ -15,6 +15,7 @@ public class DelayHandler {
 
     public void setDelay(int delay) {
         this.delay = delay;
+        lastCheckTick = Tick.currentTick;
     }
 
     public boolean ready() {

@@ -15,6 +15,8 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener, Source {
 
     void save();
 
+    void onUpgrade(int newLevel);
+
     void onBlocksLoaded(Player by);
 
     boolean exists();

@@ -40,7 +40,7 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
     private void loadLevels() {
         MechanicLevel level = mechanic.getLevel();
         if (level.getMax() > 1) {
-            double xpRequires = Optional.<Double>ofNullable(mechanic.getLevel().get(MechanicLevel.XP_REQUIRES_MARK)).orElse(0d);
+            double xpRequires = (double) Optional.ofNullable(mechanic.getLevel().getRegistry().get(level.lvl()).get(MechanicLevel.XP_REQUIRES_MARK)).orElse(0d);
             double per = xpRequires / 4;
 
             double xp = mechanic.getXP();
@@ -51,8 +51,8 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                     desc.addAll(mechanic.getLevel().getRegistry().getDescription(i));
                     desc.addAll(
                             Arrays.asList("",
-                                    "§e§oKræver §b§o" + mechanic.getLevel().getRegistry().get(i).getOr(MechanicLevel.XP_REQUIRES_MARK, () -> 0d) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)",
-                                    "§e§oKoster " + mechanic.getLevel().getRegistry().get(i).get(MechanicLevel.LEVEL_COST_MARK) + " emeralder")
+                                    "§e§oKræver §b§o" + mechanic.getLevel().getRegistry().get(i - 1).getOr(MechanicLevel.XP_REQUIRES_MARK, () -> 0d) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)",
+                                    "§e§oKoster " + mechanic.getLevel().getRegistry().get(i - 1).get(MechanicLevel.LEVEL_COST_MARK) + " emeralder")
                     );
                 } else {
                     desc.add("§c§o???");
@@ -85,12 +85,14 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                                 .setName("§aOpgrader")
                                 .addLore("§eOpgrader maskinen til §6Level §l" + i)
                                 .addLore("")
-                                .addLore("§e§oKoster " + mechanic.getLevel().getRegistry().get(i).get(MechanicLevel.LEVEL_COST_MARK) + " emeralder")
+                                .addLore("§e§oKoster " + mechanic.getLevel().getRegistry().get(i - 1).get(MechanicLevel.LEVEL_COST_MARK) + " emeralder")
+                                .addLore("")
+                                .addLore("§c§oVær opmærksom på, du kun får 40% af prisen tilbage.")
                                 .build());
                     } else {
                         inventory.setItem(buySlot, new ItemBuilder(Material.BARRIER)
                                 .setName("§cIkke nok §bXP")
-                                .addLore("§c§oOpgradering kræver §b§o" + mechanic.getLevel().getRegistry().get(i).getOr(MechanicLevel.XP_REQUIRES_MARK, () -> 0d) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)")
+                                .addLore("§c§oOpgradering kræver §b§o" + mechanic.getLevel().getRegistry().get(i - 1).getOr(MechanicLevel.XP_REQUIRES_MARK, () -> 0d) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)")
                                 .build());
                     }
                 }
@@ -115,16 +117,13 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                     case 52 -> level = 5;
                 }
                 if (level != -1) {
-                    MechanicUpgradeEvent upgradeEvent = new MechanicUpgradeEvent(player, mechanic, level, (double) mechanic.getLevel().getRegistry().get(level).get(MechanicLevel.LEVEL_COST_MARK));
+                    MechanicUpgradeEvent upgradeEvent = new MechanicUpgradeEvent(player, mechanic, level, (double) mechanic.getLevel().getRegistry().get(level - 1).get(MechanicLevel.LEVEL_COST_MARK));
                     Bukkit.getPluginManager().callEvent(upgradeEvent);
                     if (!upgradeEvent.isCancelled()) {
                         mechanic.setLevel(level);
 
                         // when closing and opening right after each other, we won't trigger the onClose logic
                         player.openInventory(new UpgradeMechanicGui<>(mechanic).getInventory());
-
-                        player.sendMessage("§eDu opgraderede maskinen " + mechanic.getProfile().getName() + " til §6Level §l" + level + ".");
-                        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1f);
                     }
                 }
             }
