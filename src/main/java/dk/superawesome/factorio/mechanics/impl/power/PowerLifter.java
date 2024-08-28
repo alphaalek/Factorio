@@ -9,7 +9,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.Repeater;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,11 +16,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.CraftingRecipe;
 import org.bukkit.util.BlockVector;
 
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -141,6 +138,13 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
                                 powered = true;
                             }
                         });
+                    } else if (b.getType() == Material.OBSERVER) {
+                        if (Factorio.get().getMechanicManager(b.getWorld()).getMechanicAt(b.getLocation()) instanceof PowerLifter lifter) {
+                            Block point = BlockUtil.getPointingBlock(b, true);
+                            if (point != null && point.getType() == Material.OBSERVER && point.equals(loc.getBlock())) {
+                                powered = lifter.powered;
+                            }
+                        }
                     }
                 });
 
