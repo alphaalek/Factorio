@@ -32,7 +32,7 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
     public void loadItems() {
         super.loadItems();
 
-        for (int i : Arrays.asList(0, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 50, 53)) {
+        for (int i : Arrays.asList(0, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 50)) {
             getInventory().setItem(i, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
         }
 
