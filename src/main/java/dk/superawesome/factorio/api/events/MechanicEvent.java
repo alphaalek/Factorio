@@ -8,7 +8,7 @@ import org.bukkit.event.Event;
 public abstract class MechanicEvent extends Event implements Cancellable {
 
     private boolean cancelled;
-    private final Mechanic<?> mechanic;
+    protected final Mechanic<?> mechanic;
     private final Player player;
 
     public MechanicEvent(Player player, Mechanic<?> mechanic) {

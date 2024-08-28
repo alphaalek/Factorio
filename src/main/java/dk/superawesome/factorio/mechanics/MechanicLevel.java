@@ -1,7 +1,6 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.util.Array;
-import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +105,7 @@ public class MechanicLevel {
         return max;
     }
 
-    public int getLevel() {
+    public int lvl() {
         return this.level;
     }
 

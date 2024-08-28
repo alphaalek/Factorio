@@ -47,7 +47,7 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
             for (int i = 2; i <= Math.min(5, level.getMax()); i++) {
                 int slot = 1 + (i - 2) * 2;
                 List<String> desc = new ArrayList<>();
-                if (level.getLevel() + 1 >= i) {
+                if (level.lvl() + 1 >= i) {
                     desc.addAll(mechanic.getLevel().getRegistry().getDescription(i));
                     desc.addAll(
                             Arrays.asList("",
@@ -68,7 +68,7 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                     int l = 5 - j;
                     int xpSlot = slot + j * 9;
 
-                    if (level.getLevel() >= i) {
+                    if (level.lvl() >= i) {
                         inventory.setItem(xpSlot, new ItemStack(Material.GREEN_STAINED_GLASS_PANE));
                     } else if (per == 0 || xp > per * (5 - j)) {
                         inventory.setItem(xpSlot, new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE));
@@ -78,7 +78,7 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                     }
                 }
 
-                if (level.getLevel() + 1 == i) {
+                if (level.lvl() + 1 == i) {
                     int buySlot = slot + 5 * 9;
                     if (has == 4) {
                         inventory.setItem(buySlot, new ItemBuilder(Material.EXPERIENCE_BOTTLE)

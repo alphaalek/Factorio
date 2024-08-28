@@ -6,6 +6,7 @@ import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.TickThrottle;
 import dk.superawesome.factorio.util.db.Types;
+import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -67,7 +68,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
             }
 
             // save data for this mechanic
-            this.context.setLevel(this.level.getLevel());
+            this.context.setLevel(this.level.lvl());
             this.context.setXP(this.xp);
             this.context.uploadManagement(this.management);
 
@@ -128,7 +129,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     @Override
     public double getXP() {
-        return xp;
+        return StringUtil.formatDecimals(xp, 2);
     }
 
     @Override
@@ -148,6 +149,6 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     @Override
     public String toString() {
-        return getProfile().getName() + (getProfile().getLevelRegistry() != null ? " (Lvl " + level.getLevel() + ")" : "");
+        return getProfile().getName() + (getProfile().getLevelRegistry() != null ? " (Lvl " + level.lvl() + ")" : "");
     }
 }
