@@ -96,14 +96,14 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
             // evaluating the grade difference by the average between min and max values
             // adding 0.1, so we are bound to lower value when rounding to nearest grade
-            double diff = (max - min) / 5 + .1;
+            double diff = (max - min) / 5 + .01;
 
             double other = this.currentStates[1].getAsDouble();
             // start iterating over the columns and placing grades
             for (int i = 0; i < WIDTH; i++) {
                 double state = states[COLLECT_WIDTH - WIDTH + i];
                 int grade = -1;
-                if (state != -1 && max > min) {
+                if (state != -1 && max - min >= diff) {
                     double d = (state - min) / diff;
                     grade = (int) Math.round(d);
                 }
@@ -137,14 +137,12 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
                             if (grade > highestPrev && current == grade) {
                                 break;
-                            } else if (grade < lowestPrev && lowestPrev - current <= 1) {
+                            } else if (grade < lowestPrev && lowestPrev - current <= 2) {
                                 break;
                             }
 
                             current++;
                         }
-
-                        Bukkit.broadcastMessage("Smoothed " + i + " " + grade + " " + lowestPrev + " " + highestPrev + " " + g);
 
                         columns[i] = g;
                         smoothed = true;
@@ -160,7 +158,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                     // finally set the graph slots for this column
                     setSlots(i, columns[i], item);
                 } else {
-                    setSlots(i, max > min ? 1 : 3, item);
+                    setSlots(i, max - min >= diff ? 1 : 3, item);
                 }
             }
 
