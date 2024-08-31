@@ -23,25 +23,25 @@ public interface MechanicStorageGui {
 
     Storage getStorage(int context);
 
-    default int updateAddedItems(int amount, ItemStack item, List<Integer> slots) {
+    default int updateAddedItemsExternally(int amount, ItemStack item, List<Integer> slots) {
         return getMechanicGui().updateAddedItems(getInventory(), amount, item, slots);
     }
 
-    default int updateAddedItems(Function<Integer, ItemStack> getStack, BiConsumer<Integer, ItemStack> setStack,
-                                 int amount, ItemStack item, List<Integer> slots) {
+    default int updateAddedItemsExternally(Function<Integer, ItemStack> getStack, BiConsumer<Integer, ItemStack> setStack,
+                                           int amount, ItemStack item, List<Integer> slots) {
         return getMechanicGui().updateAddedItems(getStack, setStack, amount, item, slots);
     }
 
-    default int updateRemovedItems(int amount, ItemStack item, List<Integer> slots) {
+    default int updateRemovedItemsExternally(int amount, ItemStack item, List<Integer> slots) {
         return getMechanicGui().updateRemovedItems(getInventory(), amount, item, slots);
     }
 
-    default int updateRemovedItems(Function<Integer, ItemStack> getStack, int amount, ItemStack item, List<Integer> slots) {
+    default int updateRemovedItemsExternally(Function<Integer, ItemStack> getStack, int amount, ItemStack item, List<Integer> slots) {
         return getMechanicGui().updateRemovedItems(getStack, amount, item, slots);
     }
 
     default void updateAmount(int context, ItemStack added, Inventory source, int diff, List<Integer> slots) {
-        getMechanicGui().updateAmount(getMechanic().getProfile().getStorageProvider().createStorage(getMechanic(), context), source, diff, i -> updateRemovedItems(i, added, slots));
+        getMechanicGui().updateAmount(getMechanic().getProfile().getStorageProvider().createStorage(getMechanic(), context), source, diff, i -> updateRemovedItemsExternally(i, added, slots));
     }
 
     default int calculateAmount(List<Integer> slots) {

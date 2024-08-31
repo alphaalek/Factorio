@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.transfer;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.gui.MechanicStorageGui;
 import dk.superawesome.factorio.mechanics.Mechanic;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -25,12 +26,28 @@ public class VirtualOneWayContainer implements Inventory {
     private final Mechanic<?> mechanic;
     private final MechanicStorageGui gui;
 
-    public VirtualOneWayContainer(Mechanic<?> mechanic, Container<?> container, MechanicStorageGui gui, List<Integer> slots) {
+    public VirtualOneWayContainer(Mechanic<?> mechanic, TransferCollection collection, Container<?> container, MechanicStorageGui gui, List<Integer> slots) {
         this.mechanic = mechanic;
         this.gui = gui;
         this.slots = slots;
 
         imaginaryItems = new ItemStack[container.getCapacitySlots(mechanic.getLevel()) - slots.size()];
+        int left = collection.getTransferAmount() - gui.calculateAmount(slots);
+        if (left > 0) {
+            ItemStack stack = slots.stream().map(gui.getInventory()::getItem).filter(Objects::nonNull).findFirst().orElse(null);
+            if (stack == null) {
+                return; // ???
+            }
+
+            for (int i = 0; i < imaginaryItems.length && left > 0; i++) {
+                ItemStack item = stack.clone();
+                int amount = Math.min(item.getMaxStackSize(), left);
+                item.setAmount(amount);
+                left -= amount;
+
+                imaginaryItems[i] = item;
+            }
+        }
     }
 
     public MechanicStorageGui getStorageGui() {
@@ -84,9 +101,9 @@ public class VirtualOneWayContainer implements Inventory {
         int i = 0;
         for (ItemStack itemStack : itemStacks) {
             if (itemStack != null) {
-                int left = gui.updateAddedItems(itemStack.getAmount(), itemStack, slots);
+                int left = gui.updateAddedItemsExternally(itemStack.getAmount(), itemStack, slots);
                 if (left > 0) {
-                    left = gui.updateAddedItems(j -> imaginaryItems[j], (j, s) -> imaginaryItems[j] = s, left, itemStack, IntStream.range(0, imaginaryItems.length).boxed().collect(Collectors.toList()));
+                    left = gui.updateAddedItemsExternally(j -> imaginaryItems[j], (j, s) -> imaginaryItems[j] = s, left, itemStack, IntStream.range(0, imaginaryItems.length).boxed().collect(Collectors.toList()));
                     if (left > 0) {
                         ItemStack newItem = itemStack.clone();
                         newItem.setAmount(left);
@@ -106,9 +123,9 @@ public class VirtualOneWayContainer implements Inventory {
         int i = 0;
         for (ItemStack itemStack : itemStacks) {
             if (itemStack != null) {
-                int left = gui.updateRemovedItems(itemStack.getAmount(), itemStack, MechanicGui.reverseSlots(slots));
+                int left = gui.updateRemovedItemsExternally(itemStack.getAmount(), itemStack, MechanicGui.reverseSlots(slots));
                 if (left > 0) {
-                    left = gui.updateRemovedItems(j -> imaginaryItems[j], left, itemStack, IntStream.range(0, imaginaryItems.length).boxed().collect(Collectors.toList()));
+                    left = gui.updateRemovedItemsExternally(j -> imaginaryItems[j], left, itemStack, IntStream.range(0, imaginaryItems.length).boxed().collect(Collectors.toList()));
                     if (left > 0) {
                         ItemStack newItem = itemStack.clone();
                         newItem.setAmount(left);
@@ -124,11 +141,11 @@ public class VirtualOneWayContainer implements Inventory {
 
     @Override
     public ItemStack[] getContents() {
-        return Stream.concat(MechanicGui.reverseSlots(slots).stream(), IntStream.range(slots.size(), imaginaryItems.length).boxed()).map(this::getItem).toArray(ItemStack[]::new);
+        return Stream.concat(MechanicGui.reverseSlots(slots).stream(), IntStream.range(0, imaginaryItems.length).map(j -> j + slots.size()).boxed()).map(this::getItem).toArray(ItemStack[]::new);
     }
 
     private ItemStack[] getContentsOrdered() {
-        return Stream.concat(slots.stream(), IntStream.range(slots.size(), imaginaryItems.length).boxed()).map(this::getItem).toArray(ItemStack[]::new);
+        return Stream.concat(slots.stream(), IntStream.range(0, imaginaryItems.length).map(j -> j + slots.size()).boxed()).map(this::getItem).toArray(ItemStack[]::new);
     }
 
     @Override

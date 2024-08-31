@@ -5,6 +5,7 @@ import com.Acrobot.ChestShop.Events.TransactionEvent;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.gui.MechanicStorageGui;
+import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.mechanics.transfer.VirtualOneWayContainer;
 import dk.superawesome.factorio.util.statics.BlockUtil;
@@ -33,7 +34,10 @@ public class ShopManager implements Listener {
         recentOffer = null;
         recentContext = -1;
         recentAmount = -1;
-        if (mechanic instanceof ItemContainer container && mechanic instanceof AccessibleMechanic accessible) {
+        if (mechanic instanceof ItemContainer container
+                && mechanic instanceof ItemCollection collection
+                && mechanic instanceof AccessibleMechanic accessible) {
+
             BaseGui<?> gui = accessible.getOrCreateInventory(mechanic);
             if (gui instanceof MechanicStorageGui storageGui) {
                 TransactionEvent.TransactionType type = event.getTransactionType();
@@ -49,8 +53,12 @@ public class ShopManager implements Listener {
                     return;
                 }
 
-                // TODO: fix virtual one way container thinking all slots which the storage is applied to, can be added and will therefore not take account for going above capacity (edge case)
-                event.setOwnerInventory(recentContainer = (VirtualOneWayContainer) container.createVirtualOneWayInventory(mechanic, container, storageGui, isInput));
+                if (mechanic.getTickThrottle().tryThrottle()) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                event.setOwnerInventory(recentContainer = (VirtualOneWayContainer) container.createVirtualOneWayInventory(mechanic, collection, container, storageGui, isInput));
             }
             gui.handleClose(event.getClient());
         }
