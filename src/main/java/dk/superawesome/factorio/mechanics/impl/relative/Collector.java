@@ -64,7 +64,7 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
 
     @Override
     public boolean isTransferEmpty() {
-        return collected != null;
+        return collected == null;
     }
 
     @Override
