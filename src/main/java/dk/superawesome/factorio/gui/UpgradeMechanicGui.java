@@ -40,9 +40,6 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
     private void loadLevels() {
         MechanicLevel level = mechanic.getLevel();
         if (level.getMax() > 1) {
-            double xpRequires = (double) Optional.ofNullable(mechanic.getLevel().getRegistry().get(level.lvl()).get(MechanicLevel.XP_REQUIRES_MARK)).orElse(0d);
-            double per = xpRequires / 4;
-
             double xp = mechanic.getXP();
             for (int i = 2; i <= Math.min(5, level.getMax()); i++) {
                 int slot = 1 + (i - 2) * 2;
@@ -62,6 +59,9 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                         .setName("§6Level §l" + i)
                         .changeLore(l -> l.addAll(desc))
                         .build());
+
+                double xpRequires = (double) Optional.ofNullable(mechanic.getLevel().getRegistry().get(i - 1).get(MechanicLevel.XP_REQUIRES_MARK)).orElse(0d);
+                double per = xpRequires / 4;
 
                 int has = 0;
                 for (int j = 4; j > 0; j--) {
