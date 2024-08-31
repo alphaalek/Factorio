@@ -83,12 +83,11 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
         if (!outputBlocks.contains(BlockUtil.getBlock(event.getRoute().getWorld(), event.getRoute().getStart()))
                 && !event.getRoute().getOutputs(Routes.DEFAULT_CONTEXT).isEmpty()) {
             // iterate over blocks nearby and check if the route origin block is matching the block at the location of this splitter
-            for (BlockFace face : Routes.RELATIVES) {
-                if (event.getRoute().getStart().equals(BlockUtil.getVec(BlockUtil.getRel(loc, face.getDirection())))) {
+            BlockUtil.forRelative(BlockUtil.getBlock(loc.getWorld(), event.getRoute().getStart()), b -> {
+                if (loc.getBlock().equals(b)) {
                     outputBlocks.add(BlockUtil.getBlock(loc.getWorld(), event.getRoute().getStart()));
-                    break;
                 }
-            }
+            });
         }
     }
 

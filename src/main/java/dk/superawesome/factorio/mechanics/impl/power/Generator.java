@@ -294,11 +294,6 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public boolean hasEnergy() {
-        return availableEnergy > 0;
-    }
-
-    @Override
     public double take(double amount) {
         return takeEnergy(amount);
     }

@@ -11,7 +11,10 @@ import org.bukkit.entity.Player;
 
 public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMechanic, SignalSource, EnergyCollection {
 
-    private final DelayHandler thinkHandler = new DelayHandler(20);
+    private static final int SUN_LIGHT = 15;
+    private static final int MAX_ENERGY = 200;
+
+    private final DelayHandler thinkHandler = new DelayHandler(30);
 
     private Block daylightSensor;
     private double energy;
@@ -44,30 +47,21 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
     @Override
     public void think() {
         // night time
-        if (getLocation().getWorld().getTime() > 12000) {
+        if (loc.getWorld().getTime() > 12000) {
             return;
         }
 
-        if (daylightSensor.getLightFromSky() == 15 && !isAtMaxEnergy()) {
-            energy += (Math.random() * 55 + 20) / 30; // 20 to 75 / 30 = 0.666 to 2.5
-            Routes.startSignalRoute(getLocation().getBlock(), this, true, false);
-        } else if (hasEnergy()) {
-            Routes.startSignalRoute(getLocation().getBlock(), this, true, false);
+        if (daylightSensor.getLightFromSky() == SUN_LIGHT && energy < MAX_ENERGY) {
+            energy += (Math.random() * 55 + 20) / 50; // 20 to 75 / 50 = 0.4 to 1.5
         }
-    }
-
-    private boolean isAtMaxEnergy() {
-        return energy >= 200;
+        if (energy > 0) {
+            Routes.startSignalRoute(loc.getBlock(), this, true, false);
+        }
     }
 
     @Override
     public boolean handleOutput(Block block, Location loc, Block from) {
         return Routes.transferEnergyToPowerCentral(block, loc, this);
-    }
-
-    @Override
-    public boolean hasEnergy() {
-        return energy > 0;
     }
 
     @Override
@@ -89,16 +83,16 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
 
     @Override
     public int getMaxTransfer() {
-        return (int) energy;
+        return MAX_ENERGY;
     }
 
     @Override
     public int getTransferAmount() {
-        return (int) energy;
+        return (int) Math.ceil(energy);
     }
 
     @Override
     public double getTransferEnergyCost() {
-        return 1d / 30d;
+        return 1d / 8d;
     }
 }

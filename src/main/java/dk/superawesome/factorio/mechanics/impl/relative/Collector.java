@@ -84,6 +84,6 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
 
     @Override
     public double getTransferEnergyCost() {
-        return 1d / 8d;
+        return -1;
     }
 }

@@ -1,10 +1,8 @@
 package dk.superawesome.factorio.mechanics.transfer;
 
-public interface EnergyCollection extends TransferCollection{
+public interface EnergyCollection extends TransferCollection {
 
-        int CAPACITY_MARK = 0;
+    int CAPACITY_MARK = 0;
 
-        boolean hasEnergy();
-
-        double take(double amount);
+    double take(double amount);
 }

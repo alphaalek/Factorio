@@ -63,13 +63,15 @@ public class Routes {
         }
 
         // check if the power central has capacity for more energy
-        if (powerCentral.getCapacity() == powerCentral.getEnergy()) {
+        if (powerCentral.getCapacity() == powerCentral.getEnergy()
+                || powerCentral.getEnergy() < source.getTransferEnergyCost()) {
             return false;
         }
 
         // transfer energy
         double take = powerCentral.getCapacity() - powerCentral.getEnergy();
         double amount = source.take(take);
+        powerCentral.setEnergy(powerCentral.getEnergy() - source.getTransferEnergyCost());
         powerCentral.setEnergy(powerCentral.getEnergy() + amount);
 
         return true;

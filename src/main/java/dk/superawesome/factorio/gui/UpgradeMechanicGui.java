@@ -65,7 +65,6 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
 
                 int has = 0;
                 for (int j = 4; j > 0; j--) {
-                    int l = 5 - j;
                     int xpSlot = slot + j * 9;
 
                     if (level.lvl() >= i) {
@@ -87,7 +86,8 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                                 .addLore("")
                                 .addLore("§e§oKoster " + mechanic.getLevel().getRegistry().get(i - 1).get(MechanicLevel.LEVEL_COST_MARK) + " emeralder")
                                 .addLore("")
-                                .addLore("§c§oVær opmærksom på, du kun får 40% af prisen tilbage.")
+                                .addLore("§c§oVær opmærksom på, at du kun")
+                                .addLore("§c§ofår 75% af prisen tilbage.")
                                 .build());
                     } else {
                         inventory.setItem(buySlot, new ItemBuilder(Material.BARRIER)
