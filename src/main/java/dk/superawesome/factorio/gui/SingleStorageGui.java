@@ -203,11 +203,19 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
     }
 
     protected void handlePutOrTakeAll(InventoryClickEvent event) {
+        if (event.isShiftClick() && getMechanic().getTickThrottle().isThrottled()) {
+            return;
+        }
+
         Inventory playerInv = event.getWhoClicked().getInventory();
 
         if (event.getClick().isLeftClick()) {
             // create a put function
             Consumer<Double> put = a -> {
+                if (getMechanic().getTickThrottle().tryThrottle()) {
+                    return;
+                }
+
                 int space = Math.min(storage.getCapacity() - storage.getAmount(), (int) a.doubleValue());
                 // take all items from the player's inventory and put into the storage box
                 int left = updateRemovedItems(playerInv, space, storage.getStored(),
@@ -259,6 +267,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
             if (stored != null) {
                 // (1)
                 if (event.getClick().isShiftClick()) {
+                    getMechanic().getTickThrottle().throttle();
                     put.accept((double) storage.getCapacity() - storage.getAmount());
                 } else {
                     Material storedCopy = stored;
@@ -281,6 +290,10 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
 
             // create a take function
             Consumer<Double> take = a -> {
+                if (getMechanic().getTickThrottle().tryThrottle()) {
+                    return;
+                }
+
                 int boxAmount = (int) Math.min(a, storage.getAmount());
                 // put all items we can in the player's inventory from the storage box
                 int left = updateAddedItems(playerInv, boxAmount, storage.getStored(),
@@ -298,6 +311,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
             };
 
             if (event.getClick().isShiftClick()) {
+                getMechanic().getTickThrottle().throttle();
                 take.accept((double) storage.getAmount());
             } else {
                 openSignGuiAndCall((Player) event.getWhoClicked(), storage.getAmount() + "", take);

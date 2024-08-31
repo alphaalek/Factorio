@@ -151,7 +151,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             }
 
             if (CRAFTING_SLOTS.contains(event.getRawSlot()) && event.getClickedInventory() == getInventory()) {
-                if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
+                if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR && !getMechanic().getTickThrottle().isThrottled()) {
                     // update storage amount because this action can collect items from the storage slots
                     updateAmount(getStorage(STORAGE_CONTEXT), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
                 }
@@ -171,12 +171,15 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
             // check collect to cursor
             if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
+                boolean throttled = getMechanic().getTickThrottle().isThrottled();
                 if (event.getClickedInventory() != getInventory()) {
                     // ensure correct gui post action
                     fixSlotsTake(event.getWhoClicked().getInventory(), event.getView(), Stream.concat(CRAFTING_SLOTS.stream(), STORAGE_SLOTS.stream()).toList());
                 }
 
-                updateAmount(getStorage(STORAGE_CONTEXT), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
+                if (!throttled) {
+                    updateAmount(getStorage(STORAGE_CONTEXT), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
+                }
             }
         }
 

@@ -70,7 +70,7 @@ public class MechanicManager implements Listener {
 
     public void handleThinking() {
         for (ThinkingMechanic thinking : thinkingMechanics) {
-            if (!thinking.getTickThrottle().isThrottled() && thinking.getThinkDelayHandler().ready()) {
+            if (thinking.getThinkDelayHandler().ready()) {
                 thinking.think();
             }
         }
