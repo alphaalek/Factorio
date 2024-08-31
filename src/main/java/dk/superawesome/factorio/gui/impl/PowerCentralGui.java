@@ -26,13 +26,20 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                     mechanic::pollRecentConsumption,
                     mechanic::pollRecentProduction
                 },
-                e -> new ItemBuilder(Material.LIGHT_GRAY_WOOL)
+                e -> {
+                    ItemStack itemStack = new ItemBuilder(Material.LIGHT_GRAY_WOOL)
                         .setName("§eForbrug: " + StringUtil.formatDecimals(e[0], 2) + "W")
                         .addLore("§ePotentiel forbrug: " + StringUtil.formatDecimals(mechanic.getRecentMax(), 2) + "W")
                         .addLore("§eProduktion: " + StringUtil.formatDecimals(e[1], 2) + "W")
                         .addLore("§eEnergi: " + StringUtil.formatDecimals(mechanic.getEnergy(), 2) + "J")
                         .addLore("§eKapacitet: " + StringUtil.formatDecimals(mechanic.getCapacity(), 2) + "J")
-                        .build()
+                        .build();
+                    PowerCentralGui gui = mechanic.<PowerCentralGui>getGuiInUse().get();
+                    if (gui != null) {
+                        gui.updateDataSlot(itemStack);
+                    }
+                    return itemStack;
+                }
         );
     }
 
@@ -209,6 +216,12 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
     @Override
     public void updateItems() {
 
+    }
+
+    private void updateDataSlot(ItemStack itemStack) {
+        ItemStack item = itemStack.clone();
+        item.setType(Material.LIME_WOOL);
+        getInventory().setItem(49, item);
     }
 
     @Override
