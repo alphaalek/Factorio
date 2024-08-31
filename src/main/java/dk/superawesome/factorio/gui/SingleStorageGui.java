@@ -267,7 +267,6 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
             if (stored != null) {
                 // (1)
                 if (event.getClick().isShiftClick()) {
-                    getMechanic().getTickThrottle().throttle();
                     put.accept((double) storage.getCapacity() - storage.getAmount());
                 } else {
                     Material storedCopy = stored;
@@ -311,7 +310,6 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
             };
 
             if (event.getClick().isShiftClick()) {
-                getMechanic().getTickThrottle().throttle();
                 take.accept((double) storage.getAmount());
             } else {
                 openSignGuiAndCall((Player) event.getWhoClicked(), storage.getAmount() + "", take);
