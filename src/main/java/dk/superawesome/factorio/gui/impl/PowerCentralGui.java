@@ -137,7 +137,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
                             if (grade > highestPrev && current == grade) {
                                 break;
-                            } else if (grade < lowestPrev && lowestPrev - current <= 2) {
+                            } else if (grade < lowestPrev && lowestPrev - current <= 1) {
                                 break;
                             }
 
