@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.Mechanic;
+import dk.superawesome.factorio.mechanics.SignalInvoker;
 import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.Source;
 import dk.superawesome.factorio.mechanics.impl.power.PowerCentral;
@@ -247,6 +248,11 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     add(BlockUtil.getVec(facing));
                     addOutput(from.getWorld(), BlockUtil.getVec(BlockUtil.getPointingBlock(facing, false)), BlockUtil.getVec(facing), SignalSource.FROM_POWER_CENTRAL);
                     return;
+                } else {
+                    Mechanic<?> at = Factorio.get().getMechanicManager(from.getWorld()).getMechanicPartially(facing.getLocation());
+                    if (at instanceof SignalInvoker) {
+                        addOutput(from.getWorld(), BlockUtil.getVec(facing), BlockUtil.getVec(rel), SignalSource.FROM_POWER_CENTRAL);
+                    }
                 }
 
                 if (!expandWire(facing, rel, rel, 16)

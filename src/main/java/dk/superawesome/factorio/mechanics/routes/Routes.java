@@ -56,25 +56,26 @@ public class Routes {
         return false;
     }
 
-    public static boolean transferEnergyToPowerCentral(Block start, Location loc, EnergyCollection source) {
+    public static boolean transferEnergy(Block start, Location loc, EnergyCollection energySource, SignalSource signal) {
         Mechanic<?> mechanic = Factorio.get().getMechanicManager(start.getWorld()).getMechanicPartially(loc);
-        if (!(mechanic instanceof PowerCentral powerCentral)) {
-            return false;
+        if (mechanic instanceof SignalInvoker signalInvoker) {
+            return signalInvoker.invoke(signal);
+        } else if (mechanic instanceof PowerCentral powerCentral) {
+            // check if the power central has capacity for more energy
+            if (powerCentral.getCapacity() == powerCentral.getEnergy()) {
+                return false;
+            }
+
+            // transfer energy
+            double take = powerCentral.getCapacity() - powerCentral.getEnergy();
+            double amount = energySource.take(take);
+            powerCentral.setEnergy(powerCentral.getEnergy() - energySource.getTransferEnergyCost());
+            powerCentral.setEnergy(powerCentral.getEnergy() + amount);
+
+            return true;
         }
 
-        // check if the power central has capacity for more energy
-        if (powerCentral.getCapacity() == powerCentral.getEnergy()
-                || powerCentral.getEnergy() < source.getTransferEnergyCost()) {
-            return false;
-        }
-
-        // transfer energy
-        double take = powerCentral.getCapacity() - powerCentral.getEnergy();
-        double amount = source.take(take);
-        powerCentral.setEnergy(powerCentral.getEnergy() - source.getTransferEnergyCost());
-        powerCentral.setEnergy(powerCentral.getEnergy() + amount);
-
-        return true;
+        return false;
     }
 
     public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {

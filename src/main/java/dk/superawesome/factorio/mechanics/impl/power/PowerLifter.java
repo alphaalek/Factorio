@@ -42,7 +42,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     }
 
     @Override
-    public boolean invoke(PowerCentral source) {
+    public boolean invoke(SignalSource source) {
         if (invoked) {
             return false;
         }
@@ -58,7 +58,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         return transferred.get();
     }
 
-    public boolean invokeChild(PowerCentral source) {
+    public boolean invokeChild(SignalSource source) {
         if (invoked) {
             return false;
         }

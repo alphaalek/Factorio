@@ -61,7 +61,7 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
 
     @Override
     public boolean handleOutput(Block block, Location loc, Block from) {
-        return Routes.transferEnergyToPowerCentral(block, loc, this);
+        return Routes.transferEnergy(block, loc, this, this);
     }
 
     @Override
