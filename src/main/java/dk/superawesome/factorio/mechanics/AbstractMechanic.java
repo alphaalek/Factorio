@@ -45,7 +45,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     protected void loadFromStorage() {
         try  {
-            if (this.context.hasContext()) {
+            if (this.context.getController().validConnection() && this.context.hasContext()) {
                 load(this.context);
             }
         } catch (Exception ex) {
@@ -62,6 +62,10 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     @Override
     public void save() {
         try {
+            if (!this.context.getController().validConnection()) {
+                return;
+            }
+
             // ensure record exists
             if (!this.context.hasContext()) {
                 Factorio.get().getContextProvider().create(this.loc, this.rot, getProfile().getName(), this.management.getOwner());

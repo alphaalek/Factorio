@@ -137,6 +137,8 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                             current++;
                         }
 
+                        Bukkit.broadcastMessage("Smoothed " + i + " " + grade + " " + lowestPrev + " " + highestPrev + " " + g);
+
                         columns[i] = g;
                         smoothed = true;
                     }

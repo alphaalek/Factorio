@@ -38,6 +38,10 @@ public class DatabaseConnection {
         }
     }
 
+    public boolean validConnection() throws SQLException {
+        return connection != null && !connection.isClosed();
+    }
+
     private boolean loadDriver() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -58,6 +62,7 @@ public class DatabaseConnection {
         properties.setProperty("user", this.username);
         properties.setProperty("password", this.password);
         properties.setProperty("autoReconnect", "true");
+
         this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, properties);
         Factorio.get().getLogger().info("Successfully connected to database!");
     }
