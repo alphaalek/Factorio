@@ -17,16 +17,12 @@ public interface ItemContainer extends Container<ItemCollection> {
         return collection instanceof ItemCollection && collection != this;
     }
 
-    default Inventory createVirtualOneWayInventory(Mechanic<?> mechanic, ItemContainer container, MechanicStorageGui gui, boolean inputAsIteratorSlots) {
+    default Inventory createVirtualOneWayInventory(Mechanic<?> mechanic, Container<?> container, MechanicStorageGui gui, boolean inputAsIteratorSlots) {
         return new VirtualOneWayContainer(mechanic, container, gui,
                 inputAsIteratorSlots
                         ? mechanic.getProfile().getStorageProvider().getSlots(gui.getInputContext())
                         : mechanic.getProfile().getStorageProvider().getSlots(gui.getOutputContext())
         );
-    }
-
-    default int getCapacitySlots(MechanicLevel level) {
-        return level.getInt(ItemCollection.CAPACITY_MARK);
     }
 
     default <G extends BaseGui<G>> int put(ItemCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, HeapToStackAccess<ItemStack> access) {

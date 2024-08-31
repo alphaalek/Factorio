@@ -140,7 +140,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public int getCapacity() {
-        return level.getInt(ItemCollection.CAPACITY_MARK) *
+        return getCapacitySlots(level) *
                 Optional.ofNullable(type)
                         .map(Type::getMat)
                         .map(Material::getMaxStackSize)

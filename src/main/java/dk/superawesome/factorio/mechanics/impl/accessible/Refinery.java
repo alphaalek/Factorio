@@ -198,7 +198,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public int getCapacity() {
-        return level.getInt(ItemCollection.CAPACITY_MARK) *
+        return getCapacitySlots(level) *
                 Optional.ofNullable(filled)
                         .map(Filled::getOutputItemStack)
                         .map(ItemStack::getMaxStackSize)

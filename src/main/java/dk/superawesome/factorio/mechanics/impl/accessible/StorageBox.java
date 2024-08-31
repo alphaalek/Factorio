@@ -78,7 +78,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
 
     @Override
     public int getCapacity() {
-        return level.getInt(ItemCollection.CAPACITY_MARK) *
+        return getCapacitySlots(level) *
                 Optional.ofNullable(stored)
                         .map(ItemStack::getMaxStackSize)
                         .orElse(64);

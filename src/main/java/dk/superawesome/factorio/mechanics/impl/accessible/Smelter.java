@@ -164,7 +164,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public int getCapacity() {
-        return level.getInt(ItemCollection.CAPACITY_MARK) *
+        return getCapacitySlots(level) *
                 Optional.ofNullable(storageType)
                         .map(ItemStack::getMaxStackSize)
                         .orElse(64);

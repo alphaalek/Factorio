@@ -25,12 +25,12 @@ public class VirtualOneWayContainer implements Inventory {
     private final Mechanic<?> mechanic;
     private final MechanicStorageGui gui;
 
-    public VirtualOneWayContainer(Mechanic<?> mechanic, ItemContainer container, MechanicStorageGui gui, List<Integer> slots) {
+    public VirtualOneWayContainer(Mechanic<?> mechanic, Container<?> container, MechanicStorageGui gui, List<Integer> slots) {
         this.mechanic = mechanic;
         this.gui = gui;
         this.slots = slots;
 
-        imaginaryItems = new ItemStack[slots.size() - container.getCapacitySlots(mechanic.getLevel())];
+        imaginaryItems = new ItemStack[container.getCapacitySlots(mechanic.getLevel()) - slots.size()];
     }
 
     public MechanicStorageGui getStorageGui() {

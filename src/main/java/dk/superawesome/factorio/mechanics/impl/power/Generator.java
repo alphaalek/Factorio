@@ -204,7 +204,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public int getCapacity() {
-        return level.getInt(ItemCollection.CAPACITY_MARK) *
+        return getCapacitySlots(level) *
                 Optional.ofNullable(fuel)
                         .map(Fuel::getMaterial)
                         .map(Material::getMaxStackSize)
