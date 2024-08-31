@@ -13,19 +13,24 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class VirtualOneWayContainer implements Inventory {
 
     private int maxStack = 64;
 
+    private final ItemStack[] imaginaryItems;
     private final List<Integer> slots;
     private final Mechanic<?> mechanic;
     private final MechanicStorageGui gui;
 
-    public VirtualOneWayContainer(Mechanic<?> mechanic, MechanicStorageGui gui, List<Integer> slots) {
+    public VirtualOneWayContainer(Mechanic<?> mechanic, ItemContainer container, MechanicStorageGui gui, List<Integer> slots) {
         this.mechanic = mechanic;
         this.gui = gui;
         this.slots = slots;
+
+        imaginaryItems = new ItemStack[slots.size() - container.getCapacitySlots(mechanic.getLevel())];
     }
 
     public MechanicStorageGui getStorageGui() {
@@ -37,12 +42,12 @@ public class VirtualOneWayContainer implements Inventory {
     }
 
     public int getAmount() {
-        return gui.calculateAmount(slots);
+        return gui.calculateAmount(slots) + Arrays.stream(imaginaryItems).filter(Objects::nonNull).mapToInt(ItemStack::getAmount).sum();
     }
 
     @Override
     public int getSize() {
-        return slots.size();
+        return slots.size() + imaginaryItems.length;
     }
 
     @Override
@@ -57,12 +62,20 @@ public class VirtualOneWayContainer implements Inventory {
 
     @Override
     public ItemStack getItem(int i) {
-        return gui.getInventory().getItem(slots.get(i));
+        if (i >= slots.size()) {
+            return imaginaryItems[i - slots.size()];
+        } else {
+            return gui.getInventory().getItem(slots.get(i));
+        }
     }
 
     @Override
     public void setItem(int i, ItemStack itemStack) {
-        gui.getInventory().setItem(slots.get(i), itemStack);
+        if (i >= slots.size()) {
+            imaginaryItems[i - slots.size()] = itemStack;
+        } else {
+            gui.getInventory().setItem(slots.get(i), itemStack);
+        }
     }
 
     @Override
@@ -73,9 +86,12 @@ public class VirtualOneWayContainer implements Inventory {
             if (itemStack != null) {
                 int left = gui.updateAddedItems(itemStack.getAmount(), itemStack, slots);
                 if (left > 0) {
-                    ItemStack newItem = itemStack.clone();
-                    newItem.setAmount(left);
-                    remaining.put(i, newItem);
+                    left = gui.updateAddedItems(j -> imaginaryItems[j], (j, s) -> imaginaryItems[j] = s, left, itemStack, IntStream.range(0, imaginaryItems.length).boxed().collect(Collectors.toList()));
+                    if (left > 0) {
+                        ItemStack newItem = itemStack.clone();
+                        newItem.setAmount(left);
+                        remaining.put(i, newItem);
+                    }
                 }
             }
             i++;
@@ -92,9 +108,12 @@ public class VirtualOneWayContainer implements Inventory {
             if (itemStack != null) {
                 int left = gui.updateRemovedItems(itemStack.getAmount(), itemStack, MechanicGui.reverseSlots(slots));
                 if (left > 0) {
-                    ItemStack newItem = itemStack.clone();
-                    newItem.setAmount(left);
-                    remaining.put(i, newItem);
+                    left = gui.updateRemovedItems(j -> imaginaryItems[j], left, itemStack, IntStream.range(0, imaginaryItems.length).boxed().collect(Collectors.toList()));
+                    if (left > 0) {
+                        ItemStack newItem = itemStack.clone();
+                        newItem.setAmount(left);
+                        remaining.put(i, newItem);
+                    }
                 }
             }
             i++;
@@ -105,14 +124,18 @@ public class VirtualOneWayContainer implements Inventory {
 
     @Override
     public ItemStack[] getContents() {
-        return MechanicGui.reverseSlots(slots).stream().map(gui.getInventory()::getItem).toArray(ItemStack[]::new);
+        return Stream.concat(MechanicGui.reverseSlots(slots).stream(), IntStream.range(slots.size(), imaginaryItems.length).boxed()).map(this::getItem).toArray(ItemStack[]::new);
+    }
+
+    private ItemStack[] getContentsOrdered() {
+        return Stream.concat(slots.stream(), IntStream.range(slots.size(), imaginaryItems.length).boxed()).map(this::getItem).toArray(ItemStack[]::new);
     }
 
     @Override
     public void setContents(ItemStack[] itemStacks) throws IllegalArgumentException {
         int i = 0;
         for (int slot : slots) {
-            gui.getInventory().setItem(slot, itemStacks[i++]);
+            setItem(slot, itemStacks[i++]);
         }
     }
 
@@ -182,21 +205,21 @@ public class VirtualOneWayContainer implements Inventory {
     @Override
     public int first(Material material) throws IllegalArgumentException {
         int[] s = {-1};
-        Optional<Material> item = Arrays.stream(getContents()).peek(__ -> s[0]++).filter(Objects::nonNull).map(ItemStack::getType).filter(material::equals).findFirst();
+        Optional<Material> item = Arrays.stream(getContentsOrdered()).peek(__ -> s[0]++).filter(Objects::nonNull).map(ItemStack::getType).filter(material::equals).findFirst();
         return item.isEmpty() ? -1 : s[0];
     }
 
     @Override
     public int first(ItemStack itemStack) {
         int[] s = {-1};
-        Optional<ItemStack> item = Arrays.stream(getContents()).peek(__ -> s[0]++).filter(Objects::nonNull).filter(itemStack::isSimilar).findFirst();
+        Optional<ItemStack> item = Arrays.stream(getContentsOrdered()).peek(__ -> s[0]++).filter(Objects::nonNull).filter(itemStack::isSimilar).findFirst();
         return item.isEmpty() ? -1 : s[0];
     }
 
     @Override
     public int firstEmpty() {
         return Arrays.stream(getContents()).noneMatch(Objects::isNull) ? -1
-                : (int) Arrays.stream(getContents()).takeWhile(Objects::nonNull).count();
+                : (int) Arrays.stream(getContentsOrdered()).takeWhile(Objects::nonNull).count();
     }
 
     @Override

@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.transfer;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.gui.MechanicStorageGui;
 import dk.superawesome.factorio.mechanics.Mechanic;
+import dk.superawesome.factorio.mechanics.MechanicLevel;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,12 +17,16 @@ public interface ItemContainer extends Container<ItemCollection> {
         return collection instanceof ItemCollection && collection != this;
     }
 
-    default Inventory createVirtualOneWayInventory(Mechanic<?> mechanic, MechanicStorageGui gui, boolean inputAsIteratorSlots) {
-        return new VirtualOneWayContainer(mechanic, gui,
+    default Inventory createVirtualOneWayInventory(Mechanic<?> mechanic, ItemContainer container, MechanicStorageGui gui, boolean inputAsIteratorSlots) {
+        return new VirtualOneWayContainer(mechanic, container, gui,
                 inputAsIteratorSlots
                         ? mechanic.getProfile().getStorageProvider().getSlots(gui.getInputContext())
                         : mechanic.getProfile().getStorageProvider().getSlots(gui.getOutputContext())
         );
+    }
+
+    default int getCapacitySlots(MechanicLevel level) {
+        return level.getInt(ItemCollection.CAPACITY_MARK);
     }
 
     default <G extends BaseGui<G>> int put(ItemCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, HeapToStackAccess<ItemStack> access) {

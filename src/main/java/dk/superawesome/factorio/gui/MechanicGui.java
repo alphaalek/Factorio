@@ -21,7 +21,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -314,11 +316,12 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         }
     }
 
-    protected int updateAddedItems(Inventory inventory, int amount, ItemStack stored, List<Integer> slots) {
+    protected int updateAddedItems(Function<Integer, ItemStack> getStack, BiConsumer<Integer, ItemStack> setStack,
+                                   int amount, ItemStack stored, List<Integer> slots) {
         // find all the slots with items similar to the stored item and add to these slots
         int left = amount;
         for (int i : slots) {
-            ItemStack item = inventory.getItem(i);
+            ItemStack item = getStack.apply(i);
             if (item != null && item.isSimilar(stored)) {
                 int add = Math.min(left, item.getMaxStackSize() - item.getAmount());
 
@@ -334,7 +337,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         // we still have some items left to be added, find the empty slots and add to them
         if (left > 0) {
             for (int i : slots) {
-                ItemStack item = inventory.getItem(i);
+                ItemStack item = getStack.apply(i);
                 if (item == null) {
                     int add = Math.min(left, stored.getMaxStackSize());
 
@@ -342,7 +345,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
                     ItemStack added = stored.clone();
                     added.setAmount(add);
 
-                    inventory.setItem(i, added);
+                    setStack.accept(i, added);
                 }
 
                 if (left == 0) {
@@ -354,10 +357,14 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         return left;
     }
 
-    protected int updateRemovedItems(Inventory inventory, int amount, ItemStack stored, List<Integer> slots) {
+    protected int updateAddedItems(Inventory inventory, int amount, ItemStack stored, List<Integer> slots) {
+        return updateAddedItems(inventory::getItem, inventory::setItem, amount, stored, slots);
+    }
+
+    protected int updateRemovedItems(Function<Integer, ItemStack> getStack, int amount, ItemStack stored, List<Integer> slots) {
         int left = amount;
         for (int i : slots) {
-            ItemStack item = inventory.getItem(i);
+            ItemStack item = getStack.apply(i);
             if (item != null && item.isSimilar(stored)) {
                 int remove = Math.min(left, item.getAmount());
 
@@ -371,6 +378,10 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         }
 
         return left;
+    }
+
+    protected int updateRemovedItems(Inventory inventory, int amount, ItemStack stored, List<Integer> slots) {
+        return updateRemovedItems(inventory::getItem, amount, stored, slots);
     }
 
     protected void addItemsToSlots(ItemStack item, List<Integer> slots) {
