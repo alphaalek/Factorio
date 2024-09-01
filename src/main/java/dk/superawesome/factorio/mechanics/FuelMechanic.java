@@ -52,12 +52,12 @@ public interface FuelMechanic {
     Location getLocation();
 
     default <G extends BaseGui<G>> void putFuel(ItemCollection collection, ItemContainer container, PipePutEvent event, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui) {
-        if (getFuel() != null && collection.has(new ItemStack(getFuel().getMaterial())) || getFuel() == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
+        if (getFuel() != null && collection.has(new ItemStack(getFuel().material())) || getFuel() == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
             if (getFuelAmount() < getFuelCapacity()) {
                 int amount = container.put(collection, getFuelCapacity() - getFuelAmount(), inUse, doGui, new Container.HeapToStackAccess<>() {
                     @Override
                     public ItemStack get() {
-                        return Optional.ofNullable(getFuel()).map(Fuel::getMaterial).map(ItemStack::new).orElse(null);
+                        return Optional.ofNullable(getFuel()).map(Fuel::material).map(ItemStack::new).orElse(null);
                     }
 
                     @Override
@@ -154,13 +154,13 @@ public interface FuelMechanic {
 
     default void saveFuel(MechanicStorageContext context, ByteArrayOutputStream str) throws IOException {
         if (getFuel() != null) {
-            context.getSerializer().writeItemStack(str, new ItemStack(getFuel().getMaterial()));
+            context.getSerializer().writeItemStack(str, new ItemStack(getFuel().material()));
         } else {
             context.getSerializer().writeItemStack(str, null);
         }
         context.getSerializer().writeInt(str, getFuelAmount());
         if (getCurrentFuel() != null) {
-            context.getSerializer().writeItemStack(str, new ItemStack(getCurrentFuel().getMaterial()));
+            context.getSerializer().writeItemStack(str, new ItemStack(getCurrentFuel().material()));
             context.getSerializer().writeInt(str, (int) ((1 - getCurrentFuelAmount()) / getCurrentFuel().getFuelAmount()));
         } else {
             context.getSerializer().writeItemStack(str, null);
@@ -172,7 +172,7 @@ public interface FuelMechanic {
         return new Storage() {
             @Override
             public ItemStack getStored() {
-                return Optional.ofNullable(getFuel()).map(Fuel::getMaterial).map(ItemStack::new).orElse(null);
+                return Optional.ofNullable(getFuel()).map(Fuel::material).map(ItemStack::new).orElse(null);
             }
 
             @Override

@@ -180,7 +180,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     public int getFuelCapacity() {
         return level.getInt(FUEL_CAPACITY_MARK) *
                 Optional.ofNullable(fuel)
-                        .map(Fuel::getMaterial)
+                        .map(Fuel::material)
                         .map(Material::getMaxStackSize)
                         .orElse(64);
     }

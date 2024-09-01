@@ -62,7 +62,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             loadStorageTypes(getMechanic().getIngredient(), getMechanic().getIngredientAmount(), INGREDIENT_SLOTS);
         }
         if (getMechanic().getFuel() != null) {
-            loadStorageTypes(new ItemStack(getMechanic().getFuel().getMaterial()), getMechanic().getFuelAmount(), FUEL_SLOTS);
+            loadStorageTypes(new ItemStack(getMechanic().getFuel().material()), getMechanic().getFuelAmount(), FUEL_SLOTS);
         }
         if (getMechanic().getStorageType() != null) {
             loadStorageTypes(getMechanic().getStorageType(), getMechanic().getStorageAmount(), STORAGE_SLOTS);
@@ -116,7 +116,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     }
 
     public void updateAddedFuel(int amount) {
-        updateAddedItems(getInventory(), amount, new ItemStack(getMechanic().getFuel().getMaterial()), FUEL_SLOTS);
+        updateAddedItems(getInventory(), amount, new ItemStack(getMechanic().getFuel().material()), FUEL_SLOTS);
         updateStorageInfo();
     }
 
@@ -131,7 +131,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
     }
 
     public void updateRemovedFuel(int amount) {
-        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getFuel().getMaterial()), reverseSlots(FUEL_SLOTS));
+        updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getFuel().material()), reverseSlots(FUEL_SLOTS));
         updateStorageInfo();
     }
 
@@ -158,7 +158,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
             // disallow if fuel is not allowed
             if (modifyFuel
-                    && (getMechanic().getFuel() != null && getMechanic().getFuel().getMaterial() != item.getType() || getMechanic().getFuel() == null && !Fuel.isFuel(item.getType()))) {
+                    && (getMechanic().getFuel() != null && getMechanic().getFuel().material() != item.getType() || getMechanic().getFuel() == null && !Fuel.isFuel(item.getType()))) {
                 return true;
             }
         }
@@ -221,7 +221,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             }
 
             if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR)) {
-                if (getMechanic().getFuel() != null && getMechanic().getFuel().getMaterial() == event.getCursor().getType() || getMechanic().getFuel() == null && Fuel.isFuel(event.getCursor().getType())) {
+                if (getMechanic().getFuel() != null && getMechanic().getFuel().material() == event.getCursor().getType() || getMechanic().getFuel() == null && Fuel.isFuel(event.getCursor().getType())) {
                     updateFuelPost = true;
 
                     // update fuel if not set
@@ -290,7 +290,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                         }
 
                         if ((a = item.getAmount()) > 0
-                                && getMechanic().getFuel() != null && getMechanic().getFuel().getMaterial() == copy.getType() || getMechanic().getFuel() == null && Fuel.isFuel(item.getType())) {
+                                && getMechanic().getFuel() != null && getMechanic().getFuel().material() == copy.getType() || getMechanic().getFuel() == null && Fuel.isFuel(item.getType())) {
                             addItemsToSlots(item, FUEL_SLOTS);
                             getMechanic().setFuelAmount(getMechanic().getFuelAmount() + (a - item.getAmount()));
 
@@ -315,7 +315,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                     }
 
                     if (getMechanic().getFuel() != null
-                            && event.getCursor().getType() == getMechanic().getFuel().getMaterial()) {
+                            && event.getCursor().getType() == getMechanic().getFuel().material()) {
                         updateFuelPost = true;
                         break match;
                     }
@@ -368,7 +368,7 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
                         updateFuelPost = true;
 
                         // update fuel if not set or not equal
-                        if (getMechanic().getFuel() == null || getMechanic().getFuel().getMaterial() != hotbarItem.getType()) {
+                        if (getMechanic().getFuel() == null || getMechanic().getFuel().material() != hotbarItem.getType()) {
                             getMechanic().setFuel(Fuel.getFuel(hotbarItem.getType()));
                         }
 

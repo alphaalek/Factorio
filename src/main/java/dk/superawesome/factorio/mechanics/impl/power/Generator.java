@@ -213,14 +213,14 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     public int getCapacity() {
         return getCapacitySlots(level) *
                 Optional.ofNullable(fuel)
-                        .map(Fuel::getMaterial)
+                        .map(Fuel::material)
                         .map(Material::getMaxStackSize)
                         .orElse(64);
     }
 
     @Override
     public ItemStack getStored() {
-        return Optional.ofNullable(getFuel()).map(Fuel::getMaterial).map(ItemStack::new).orElse(null);
+        return Optional.ofNullable(getFuel()).map(Fuel::material).map(ItemStack::new).orElse(null);
     }
 
     @Override
