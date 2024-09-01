@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 public interface FuelMechanic {
 
@@ -177,6 +178,11 @@ public interface FuelMechanic {
             @Override
             public void setStored(ItemStack stored) {
                 setFuel(Fuel.getFuel(stored.getType()));
+            }
+
+            @Override
+            public Predicate<ItemStack> accepts() {
+                return item -> Fuel.getFuel(item.getType()) != null;
             }
 
             @Override

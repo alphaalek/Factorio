@@ -9,7 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.*;
 
 import java.util.*;
@@ -25,7 +24,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     private static final int GRID_WIDTH = 3;
     private static final int GRID_HEIGHT = 3;
     private static final List<Integer> CRAFTING_SLOTS = Arrays.asList(10, 11, 12, 19, 20, 21, 28, 29, 30);
-    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35);
+    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34);//, 35);
 
     private static final List<Recipe> commonRecipes = new ArrayList<>();
 
@@ -87,6 +86,8 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         }
         updateCrafting();
 
+        setupHandlePutOrTakeStorageStack(35, getStorage(STORAGE_CONTEXT), STORAGE_SLOTS, false, true);
+
         super.loadItems();
     }
 
@@ -95,6 +96,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         if (getMechanic().getStorageType() != null) {
             loadStorageTypes(getMechanic().getStorageType(), getMechanic().getStorageAmount(), STORAGE_SLOTS);
         }
+        updateStorageInfo();
     }
 
     public void updateDeclinedState(boolean declined) {
@@ -257,6 +259,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     public void updateAddedItems(int amount) {
         updateAddedItems(getInventory(), amount, getMechanic().getStorageType(), STORAGE_SLOTS);
+        updateStorageInfo();
     }
 
     public void updateRemovedItems(int amount) {
@@ -266,6 +269,7 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                         .map(STORAGE_SLOTS::get)
                         .sorted(Collections.reverseOrder())
                         .collect(Collectors.toList()));
+        updateStorageInfo();
     }
 
     private List<ItemStack> getOffer(int from) {

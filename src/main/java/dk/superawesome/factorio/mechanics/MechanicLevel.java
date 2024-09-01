@@ -10,6 +10,7 @@ public class MechanicLevel {
 
     public static final int XP_REQUIRES_MARK = 4;
     public static final int LEVEL_COST_MARK = 5;
+    public static final int THINK_DELAY_MARK = 6;
 
     public interface Registry {
 

@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
-    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12, 13);
+    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12);//, 13);
     private static final List<Integer> MONEY_SLOTS = Arrays.asList(28, 29, 30, 31, 37, 38, 39, 40, 46, 47, 48, 49);
 
     public AssemblerGui(Assembler mechanic, AtomicReference<AssemblerGui> inUseReference) {
@@ -46,7 +46,31 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
         loadAssemblerType();
         registerEvent(34, e -> openChooseAssemblerGui((Player) e.getWhoClicked()));
 
+        setupHandlePutOrTakeStorageStack(13, getStorage(getContext()), STORAGE_SLOTS, true, true);
+
         super.loadItems();
+    }
+
+    @Override
+    public int getContext() {
+        return CONTEXT;
+    }
+
+    @Override
+    protected boolean isItemAllowed(ItemStack item) {
+        return Assembler.Types.getTypeFromMaterial(item.getType()).isPresent();
+    }
+
+    @Override
+    public void updateItems() {
+        super.updateItems();
+//        if (getMechanic().getType() != null) {
+//            loadStorageTypes(new ItemStack(getMechanic().getType().getMat()), getMechanic().getIngredientAmount(), STORAGE_SLOTS);
+//        }
+        int moneyAmount = (int) Math.round(getMechanic().getMoneyAmount());
+        if (moneyAmount > 0) {
+            loadStorageTypes(new ItemStack(Material.EMERALD), moneyAmount, MONEY_SLOTS);
+        }
     }
 
     public void loadAssemblerType() {
@@ -169,26 +193,5 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
             }
 
         }.getInventory());
-    }
-
-    @Override
-    public int getContext() {
-        return 0;
-    }
-
-    @Override
-    protected boolean isItemAllowed(ItemStack item) {
-        return Assembler.Types.getTypeFromMaterial(item.getType()).isPresent();
-    }
-
-    @Override
-    public void updateItems() {
-        if (getMechanic().getType() != null) {
-            loadStorageTypes(new ItemStack(getMechanic().getType().getMat()), getMechanic().getIngredientAmount(), STORAGE_SLOTS);
-        }
-        int moneyAmount = (int) Math.round(getMechanic().getMoneyAmount());
-        if (moneyAmount > 0) {
-            loadStorageTypes(new ItemStack(Material.EMERALD), moneyAmount, MONEY_SLOTS);
-        }
     }
 }

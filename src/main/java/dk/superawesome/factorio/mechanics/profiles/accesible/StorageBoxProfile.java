@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.profiles.accesible;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
+import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.gui.impl.StorageBoxGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.accessible.StorageBox;
@@ -39,7 +40,7 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
     @Override
     public StorageProvider<StorageBox> getStorageProvider() {
         return StorageProvider.Builder.<StorageBox>makeContext()
-                .set(StorageBoxGui.STORAGE_CONTEXT, IntStream.range(0, StorageBoxGui.STORED_SIZE).boxed().collect(Collectors.toList()), m -> m)
+                .set(SingleStorageGui.CONTEXT, IntStream.range(0, StorageBoxGui.STORED_SIZE).boxed().collect(Collectors.toList()), m -> m)
                 .build();
     }
 
@@ -59,6 +60,7 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
 
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(2048d, 8192d, 16384d, 40960d))
 
+                .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 17, 16))
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(36, 75, 150, 250, 500))
                 .build();
     }

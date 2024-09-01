@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 public class GeneratorGui extends SingleStorageGui<GeneratorGui, Generator> {
 
-    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 29, 30, 31, 32, 33, 34);
+    public static final List<Integer> STORAGE_SLOTS = Arrays.asList(2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 29, 30, 31, 32, 33);//, 34);
 
     public GeneratorGui(Generator mechanic, AtomicReference<GeneratorGui> inUseReference) {
         super(mechanic, inUseReference, new InitCallbackHolder());
@@ -30,12 +30,14 @@ public class GeneratorGui extends SingleStorageGui<GeneratorGui, Generator> {
 
         updateFuelState();
 
+        setupHandlePutOrTakeStorageStack(34, Material.FURNACE_MINECART, getStorage(getContext()), STORAGE_SLOTS, true, true);
+
         super.loadItems();
     }
 
     @Override
     public int getContext() {
-        return 0;
+        return CONTEXT;
     }
 
     @Override

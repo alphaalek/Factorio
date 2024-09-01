@@ -121,6 +121,7 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                     Bukkit.getPluginManager().callEvent(upgradeEvent);
                     if (!upgradeEvent.isCancelled()) {
                         mechanic.setLevel(level);
+                        mechanic.onUpgrade(level);
 
                         // when closing and opening right after each other, we won't trigger the onClose logic
                         player.openInventory(new UpgradeMechanicGui<>(mechanic).getInventory());

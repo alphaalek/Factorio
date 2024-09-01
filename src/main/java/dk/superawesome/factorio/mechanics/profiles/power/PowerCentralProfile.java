@@ -13,6 +13,9 @@ import org.bukkit.block.BlockFace;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static dk.superawesome.factorio.util.statics.MathUtil.getIncreaseDifference;
+import static dk.superawesome.factorio.util.statics.MathUtil.ticksToMs;
+
 public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
 
     private final MechanicFactory<PowerCentral> factory = new PowerCentralMechanicFactory();
@@ -47,13 +50,14 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .setDescription(2, Arrays.asList("§eKapacitet: 1000J §f-> §e5000J"))
-                .setDescription(3, Arrays.asList("§eKapacitet: 5000J §f-> §e15000J"))
-                .setDescription(4, Arrays.asList("§eKapacitet: 15000J §f-> §e45000J"))
-                .setDescription(5, Arrays.asList("§eKapacitet: 45000J §f-> §e150000J"))
+                .setDescription(2, Arrays.asList("§eKapacitet: 1000J §f-> §e5000J", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) + "% hurtigere§f)"))
+                .setDescription(3, Arrays.asList("§eKapacitet: 5000J §f-> §e15000J", "§eHastighed: " + ticksToMs(19) + "ms §f-> §e" + ticksToMs(18) + "ms §f(§e"+ getIncreaseDifference(19, 18, true) + "% hurtigere§f)"))
+                .setDescription(4, Arrays.asList("§eKapacitet: 15000J §f-> §e45000J", "§eHastighed: " + ticksToMs(18) + "ms §f-> §e" + ticksToMs(17) + "ms §f(§e"+ getIncreaseDifference(18, 17, true) + "% hurtigere§f)"))
+                .setDescription(5, Arrays.asList("§eKapacitet: 45000J §f-> §e150000J", "§eHastighed: " + ticksToMs(17) + "ms §f-> §e" + ticksToMs(16) + "ms §f(§e"+ getIncreaseDifference(17, 16, true) + "% hurtigere§f)"))
 
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 43008d, 81920d))
 
+                .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 17, 16))
                 .mark(PowerCentral.CAPACITY, Array.fromData(1000d, 5000d, 15000d, 45000d, 150000d))
                 .build();
     }

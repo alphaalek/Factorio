@@ -44,7 +44,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     );
 
     private final XPDist xpDist = new XPDist(100, 0.0008, 0.0075);
-    private final DelayHandler thinkDelayHandler = new DelayHandler(20);
+    private final DelayHandler thinkDelayHandler = new DelayHandler(getLevel().get(MechanicLevel.THINK_DELAY_MARK));
     private Block lever;
     private Block campfire;
 
@@ -83,6 +83,12 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
         context.getSerializer().writeDouble(str, this.availableEnergy);
 
         context.uploadData(str);
+    }
+
+    @Override
+    public void onUpgrade(int newLevel) {
+        int newThinkDelay = (int) getProfile().getLevelRegistry().get(newLevel).get(MechanicLevel.THINK_DELAY_MARK);
+        thinkDelayHandler.setDelay(newThinkDelay);
     }
 
     @Override
@@ -128,6 +134,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
                 GeneratorGui gui = this.<GeneratorGui>getGuiInUse().get();
                 if (gui != null) {
                     gui.updateFuelState();
+                    gui.updateStorageInfo();
                 }
             }
         }
