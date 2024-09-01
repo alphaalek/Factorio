@@ -138,7 +138,11 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                 if (STORAGE_SLOTS.contains(event.getRawSlot())) {
                     // allow collecting items from storage slots, amount update is handled in onClickIn
                     return false;
-                } else if (event.getClickedInventory() != getInventory() && !getMechanic().getTickThrottle().isThrottled()) {
+                } else if (event.getClickedInventory() != getInventory()) {
+                    if (getMechanic().getTickThrottle().tryThrottle()) {
+                        return true;
+                    }
+
                     // ... otherwise put items into crafting slots
                     ItemStack stack = event.getClickedInventory().getItem(event.getSlot()); // get the literal item
                     if (stack != null) {
@@ -151,7 +155,11 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
             }
 
             if (CRAFTING_SLOTS.contains(event.getRawSlot()) && event.getClickedInventory() == getInventory()) {
-                if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR && !getMechanic().getTickThrottle().isThrottled()) {
+                if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
+                    if (getMechanic().getTickThrottle().tryThrottle()) {
+                        return true;
+                    }
+
                     // update storage amount because this action can collect items from the storage slots
                     updateAmount(getStorage(STORAGE_CONTEXT), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
                 }
@@ -171,15 +179,17 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
             // check collect to cursor
             if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
-                boolean throttled = getMechanic().getTickThrottle().isThrottled();
+                if (getMechanic().getTickThrottle().tryThrottle()) {
+                    return true;
+                }
+
                 if (event.getClickedInventory() != getInventory()) {
                     // ensure correct gui post action
                     fixSlotsTake(event.getWhoClicked().getInventory(), event.getView(), Stream.concat(CRAFTING_SLOTS.stream(), STORAGE_SLOTS.stream()).toList());
                 }
 
-                if (!throttled) {
-                    updateAmount(getStorage(STORAGE_CONTEXT), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
-                }
+                updateAmount(getStorage(STORAGE_CONTEXT), event.getWhoClicked().getInventory(), STORAGE_SLOTS, this::updateRemovedItems);
+                Bukkit.getScheduler().runTask(Factorio.get(), this::updateCrafting);
             }
         }
 
