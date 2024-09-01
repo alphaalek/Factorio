@@ -4,8 +4,6 @@ import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-import java.util.Set;
-
 public interface SignalSource {
 
     int FROM_POWER_CENTRAL = 0;

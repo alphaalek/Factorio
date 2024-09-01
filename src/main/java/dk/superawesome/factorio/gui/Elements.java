@@ -3,7 +3,6 @@ package dk.superawesome.factorio.gui;
 import de.rapha149.signgui.SignGUI;
 import de.rapha149.signgui.SignGUIAction;
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.mechanics.AccessibleMechanic;
 import dk.superawesome.factorio.mechanics.Management;
 import dk.superawesome.factorio.mechanics.Mechanic;

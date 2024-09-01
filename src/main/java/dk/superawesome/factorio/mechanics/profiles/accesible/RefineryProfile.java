@@ -19,9 +19,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
-import static dk.superawesome.factorio.util.statics.MathUtil.getIncreaseDifference;
-import static dk.superawesome.factorio.util.statics.MathUtil.ticksToMs;
-
 public class RefineryProfile implements GuiMechanicProfile<Refinery> {
 
     private static final MechanicFactory<Refinery> factory = new RefineryMechanicFactory();

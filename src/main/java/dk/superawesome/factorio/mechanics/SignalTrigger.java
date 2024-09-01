@@ -1,16 +1,12 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Powerable;
-import org.bukkit.block.data.type.RedstoneWire;
-import org.bukkit.block.data.type.Repeater;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;

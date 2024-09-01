@@ -1,7 +1,10 @@
 package dk.superawesome.factorio.mechanics.routes;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.Mechanic;
+import dk.superawesome.factorio.mechanics.SignalInvoker;
+import dk.superawesome.factorio.mechanics.SignalSource;
+import dk.superawesome.factorio.mechanics.Source;
 import dk.superawesome.factorio.mechanics.impl.power.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
 import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
