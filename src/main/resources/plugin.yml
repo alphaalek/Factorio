@@ -3,6 +3,7 @@ version: 1.0
 authors: [Alek05, MartinErSej]
 api-version: 1.13
 main: dk.superawesome.factorio.Factorio
+soft-depend: [ChestShop]
 
 commands:
   addmembertoall:
@@ -21,3 +22,7 @@ commands:
     usage: /removedefaultmember <spiller>
     description: Fjern en spiller som standard medlem af dine nybyggede maskiner.
   debug:
+    permission: factorio.debug
+    permission-message: Du har ikke adgang til dette kommando.
+    usage: /debug
+    description: Debug kommando.
