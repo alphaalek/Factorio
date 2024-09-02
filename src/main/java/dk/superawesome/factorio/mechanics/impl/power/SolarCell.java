@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMechanic, SignalSource, EnergyCollection {
 
     private static final int SUN_LIGHT = 15;
-    private static final int MAX_ENERGY = 100;
+    private static final double MAX_ENERGY = 100d;
 
     private final DelayHandler thinkHandler = new DelayHandler(30);
 
@@ -80,13 +80,13 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
     }
 
     @Override
-    public int getMaxTransfer() {
+    public double getMaxTransfer() {
         return MAX_ENERGY;
     }
 
     @Override
-    public int getTransferAmount() {
-        return (int) Math.ceil(energy);
+    public double getTransferAmount() {
+        return energy;
     }
 
     @Override

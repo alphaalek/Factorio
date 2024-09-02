@@ -31,7 +31,7 @@ public class VirtualOneWayContainer implements Inventory {
         this.slots = slots;
 
         imaginaryItems = new ItemStack[container.getCapacitySlots(mechanic.getLevel()) - slots.size()];
-        int left = collection.getTransferAmount() - gui.calculateAmount(slots);
+        int left = ((int) collection.getTransferAmount()) - gui.calculateAmount(slots);
         if (left > 0) {
             ItemStack stack = slots.stream()
                     .map(gui.getInventory()::getItem)

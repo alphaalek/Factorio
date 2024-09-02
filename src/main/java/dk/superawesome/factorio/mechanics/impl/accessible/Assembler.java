@@ -203,12 +203,12 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     }
 
     @Override
-    public int getMaxTransfer() {
+    public double getMaxTransfer() {
         return type.getType().getMat().getMaxStackSize();
     }
 
     @Override
-    public int getTransferAmount() {
+    public double getTransferAmount() {
         return ingredientAmount;
     }
 

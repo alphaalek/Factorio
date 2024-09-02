@@ -292,7 +292,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     @Override
     public List<ItemStack> take(int amount) {
 
-        return this.<SmelterGui>take(Math.min(getMaxTransfer(), amount), storageType, storageAmount, getGuiInUse(), SmelterGui::updateRemovedStorage, new HeapToStackAccess<>() {
+        return this.<SmelterGui>take((int) Math.min(getMaxTransfer(), amount), storageType, storageAmount, getGuiInUse(), SmelterGui::updateRemovedStorage, new HeapToStackAccess<>() {
             @Override
             public Integer get() {
                 return storageAmount;
@@ -316,12 +316,12 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     @Override
-    public int getMaxTransfer() {
+    public double getMaxTransfer() {
         return storageType.getMaxStackSize();
     }
 
     @Override
-    public int getTransferAmount() {
+    public double getTransferAmount() {
         return storageAmount;
     }
 
@@ -357,18 +357,22 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         }
     }
 
+    @Override
     public Fuel getFuel() {
         return fuel;
     }
 
+    @Override
     public void setFuel(Fuel fuel) {
         this.fuel = fuel;
     }
 
+    @Override
     public int getFuelAmount() {
         return fuelAmount;
     }
 
+    @Override
     public void setFuelAmount(int amount) {
         this.fuelAmount = amount;
 
@@ -415,6 +419,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         }
     }
 
+    @Override
     public float getCurrentFuelAmount() {
         return currentFuelAmount;
     }

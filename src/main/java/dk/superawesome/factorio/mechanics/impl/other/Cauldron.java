@@ -69,12 +69,12 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
     }
 
     @Override
-    public int getMaxTransfer() {
+    public double getMaxTransfer() {
         return this.fluid.getMaxTransfer();
     }
 
     @Override
-    public int getTransferAmount() {
+    public double getTransferAmount() {
         return this.amount;
     }
 

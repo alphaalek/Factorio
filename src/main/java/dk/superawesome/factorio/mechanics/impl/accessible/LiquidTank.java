@@ -66,7 +66,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     public void pipePut(FluidCollection collection, PipePutEvent event) {
         if ((fluid == null || collection.hasFluid(fluid)) && fluidAmount < getCapacity()) {
             Fluid takeFluid = collection.getFluid();
-            int take = collection.take(Math.min(getMaxTransfer(), getCapacity() - fluidAmount));
+            int take = collection.take((int) Math.min(getMaxTransfer(), getCapacity() - fluidAmount));
 
             if (take > 0) {
                 fluidAmount += take;
@@ -117,12 +117,12 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     }
 
     @Override
-    public int getMaxTransfer() {
+    public double getMaxTransfer() {
         return Optional.ofNullable(fluid).map(Fluid::getMaxTransfer).orElse(3);
     }
 
     @Override
-    public int getTransferAmount() {
+    public double getTransferAmount() {
         return fluidAmount;
     }
 

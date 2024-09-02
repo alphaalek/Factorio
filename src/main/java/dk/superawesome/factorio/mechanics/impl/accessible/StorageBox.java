@@ -96,7 +96,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
 
     @Override
     public List<ItemStack> take(int amount) {
-        return this.<StorageBoxGui>take(Math.min(getMaxTransfer(), amount), stored, this.amount, getGuiInUse(), StorageBoxGui::updateRemovedItems, new HeapToStackAccess<>() {
+        return this.<StorageBoxGui>take((int) Math.min(getMaxTransfer(), amount), stored, this.amount, getGuiInUse(), StorageBoxGui::updateRemovedItems, new HeapToStackAccess<>() {
             @Override
             public Integer get() {
                 return StorageBox.this.amount;
@@ -120,7 +120,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
     }
 
     @Override
-    public int getMaxTransfer() {
+    public double getMaxTransfer() {
         return stored.getMaxStackSize();
     }
 
@@ -134,10 +134,12 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
         return 1d / 4d;
     }
 
+    @Override
     public ItemStack getStored() {
         return stored;
     }
 
+    @Override
     public void setStored(ItemStack stack) {
         this.stored = stack;
     }
@@ -147,10 +149,12 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
         return amount;
     }
 
-    public int getTransferAmount() {
+    @Override
+    public double getTransferAmount() {
         return amount;
     }
 
+    @Override
     public void setAmount(int amount) {
         this.amount = amount;
 

@@ -8,9 +8,9 @@ public interface TransferCollection {
 
     DelayHandler getTransferDelayHandler();
 
-    int getMaxTransfer();
+    double getMaxTransfer();
 
-    int getTransferAmount();
+    double getTransferAmount();
 
     double getTransferEnergyCost();
 }

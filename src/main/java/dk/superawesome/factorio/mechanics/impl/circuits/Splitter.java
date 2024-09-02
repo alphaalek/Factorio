@@ -133,9 +133,9 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
             return false;
         }
 
-        int total = Math.min(collection.getMaxTransfer() * outputBlocks.size(), collection.getTransferAmount());
-        int each = (int) Math.floor(((double) total) / outputBlocks.size());
-        AtomicInteger remainder = new AtomicInteger(total - each * outputBlocks.size());
+        double total = Math.min(collection.getMaxTransfer() * outputBlocks.size(), collection.getTransferAmount());
+        int each = (int) Math.floor(total / outputBlocks.size());
+        AtomicInteger remainder = new AtomicInteger((int) total - each * outputBlocks.size());
 
         Iterator<Block> blockIterator = remainder.get() > 0 ? createEvenRemainderDistribution() : new ArrayList<>(outputBlocks).iterator();
 
@@ -172,12 +172,12 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
                         }
 
                         @Override
-                        public int getMaxTransfer() {
+                        public double getMaxTransfer() {
                             return itemCollection.getMaxTransfer();
                         }
 
                         @Override
-                        public int getTransferAmount() {
+                        public double getTransferAmount() {
                             return itemCollection.getTransferAmount();
                         }
 
@@ -204,12 +204,12 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
                         }
 
                         @Override
-                        public int getMaxTransfer() {
+                        public double getMaxTransfer() {
                             return moneyCollection.getMaxTransfer();
                         }
 
                         @Override
-                        public int getTransferAmount() {
+                        public double getTransferAmount() {
                             return moneyCollection.getTransferAmount();
                         }
 

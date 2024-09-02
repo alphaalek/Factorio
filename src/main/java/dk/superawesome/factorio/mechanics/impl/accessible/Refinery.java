@@ -229,12 +229,12 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     }
 
     @Override
-    public int getMaxTransfer() {
+    public double getMaxTransfer() {
         return filled.getOutputItemStack().getMaxStackSize();
     }
 
     @Override
-    public int getTransferAmount() {
+    public double getTransferAmount() {
         return filledAmount;
     }
 
@@ -265,7 +265,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public List<ItemStack> take(int amount) {
-        return this.<RefineryGui>take(Math.min(getMaxTransfer(), amount), filled.getOutputItemStack(), filledAmount, getGuiInUse(), RefineryGui::updateRemovedFilled, new HeapToStackAccess<>() {
+        return this.<RefineryGui>take((int) Math.min(getMaxTransfer(), amount), filled.getOutputItemStack(), filledAmount, getGuiInUse(), RefineryGui::updateRemovedFilled, new HeapToStackAccess<>() {
             @Override
             public Integer get() {
                 return filledAmount;

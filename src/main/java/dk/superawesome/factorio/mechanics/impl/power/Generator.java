@@ -179,12 +179,6 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
         this.<GeneratorGui>putFuel(collection, this, event, getGuiInUse(), GeneratorGui::updateAddedItems);
     }
 
-    private double takeEnergy(double energy) {
-        double take = Math.min(availableEnergy, energy);
-        availableEnergy -= take;
-        return take;
-    }
-
     @Override
     public int getContext() {
         return SignalSource.TO_POWER_CENTRAL;
@@ -301,7 +295,9 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public double take(double amount) {
-        return takeEnergy(amount);
+        double take = Math.min(availableEnergy, amount);
+        availableEnergy -= take;
+        return take;
     }
 
     @Override
@@ -320,17 +316,17 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public int getMaxTransfer() {
-        return (int) availableEnergy;
+    public double getMaxTransfer() {
+        return availableEnergy;
     }
 
     @Override
-    public int getTransferAmount() {
-        return (int) availableEnergy;
+    public double getTransferAmount() {
+        return availableEnergy;
     }
 
     @Override
     public double getTransferEnergyCost() {
-        return 1d / 20d;
+        return 1d / 32d;
     }
 }
