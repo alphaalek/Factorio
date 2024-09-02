@@ -17,13 +17,13 @@ public record Fuel(Material material, FuelType type) {
         LAVA_BUCKET(Material.LAVA_BUCKET, Material.BUCKET, 1f / 125f, 11.5d),
         BLAZE_ROD(Material.BLAZE_ROD, 1f / 16f, 16d),
         COAL_BLOCK(Material.COAL_BLOCK, 1f / 72, 6.5d),
-//        SAPLING(Tag.SAPLINGS::isTagged, 1f / 5f, 0.5d),
+        SAPLING(Tag.SAPLINGS::isTagged, 3, 0.5d),
         ;
 
         private final Predicate<Material> tester;
         private final Material waste;
-        private final double energyAmount;
         private final float fuelAmount;
+        private final double energyAmount;
 
         FuelType(Material mat, float fuelAmount, double energyAmount) {
             this(m -> m == mat, null, fuelAmount, energyAmount);

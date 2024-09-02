@@ -86,12 +86,24 @@ public interface FuelMechanic {
 
         // use fuel
         if (getCurrentFuelAmount() == 0 && getFuelAmount() > 0) {
+            Fuel fuel = getFuel();
+            float fuelAmount = fuel.getFuelAmount();
+
+            // Calculate how many units of fuel we need
+            int unitsRequired = (int) Math.ceil(fuelAmount); // 0.x -> 1, 1.x -> 2, etc.
+
+            // check if we not have enough fuel
+            if (getFuelAmount() < unitsRequired) {
+                // not enough fuel, abort
+                return FuelState.ABORT;
+            }
+
             // update view
-            removeFuel(1);
+            removeFuel(unitsRequired);
 
             // remove the fuel
-            setCurrentFuel(getFuel());
-            setFuelAmount(getFuelAmount() - 1);
+            setCurrentFuel(fuel);
+            setFuelAmount(getFuelAmount() - unitsRequired);
             setCurrentFuelAmount(1);
             if (getFuelAmount() == 0) {
                 setFuel(null);
