@@ -251,7 +251,9 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 } else {
                     Mechanic<?> at = Factorio.get().getMechanicManager(from.getWorld()).getMechanicPartially(facing.getLocation());
                     if (at instanceof SignalInvoker) {
+                        add(BlockUtil.getVec(facing));
                         addOutput(from.getWorld(), BlockUtil.getVec(facing), BlockUtil.getVec(rel), SignalSource.FROM_POWER_CENTRAL);
+                        return;
                     }
                 }
 
