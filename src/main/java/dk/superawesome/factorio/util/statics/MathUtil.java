@@ -3,7 +3,7 @@ package dk.superawesome.factorio.util.statics;
 public class MathUtil {
 
     public static double getIncreaseDifference(double from, double to) {
-        return Math.abs((to - from) / from);
+        return StringUtil.formatDecimals(Math.abs((to - from) / from), 2);
     }
 
     public static double getIncreaseDifference(double from, double to, boolean percentage) {
@@ -11,7 +11,7 @@ public class MathUtil {
     }
 
     public static double getDecreaseDifference(double from, double to) {
-        return Math.abs((from - to) / from);
+        return StringUtil.formatDecimals(Math.abs((from - to) / from), 2);
     }
 
     public static double getDecreaseDifference(double from, double to, boolean precentage) {
