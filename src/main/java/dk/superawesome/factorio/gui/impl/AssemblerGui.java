@@ -63,14 +63,12 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
     @Override
     public void updateItems() {
-        super.updateItems();
-//        if (getMechanic().getType() != null) {
-//            loadStorageTypes(new ItemStack(getMechanic().getType().getMat()), getMechanic().getIngredientAmount(), STORAGE_SLOTS);
-//        }
         int moneyAmount = (int) Math.round(getMechanic().getMoneyAmount());
         if (moneyAmount > 0) {
             loadStorageTypes(new ItemStack(Material.EMERALD), moneyAmount, MONEY_SLOTS);
         }
+
+        super.updateItems();
     }
 
     public void loadAssemblerType() {

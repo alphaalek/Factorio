@@ -49,8 +49,8 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
             updateDeclinedState(true);
         }
 
-        setupHandlePutOrTakeStorageStack(46, getStorage(INGREDIENT_CONTEXT), INGREDIENT_SLOTS, true, true);
-        setupHandlePutOrTakeStorageStack(49, getStorage(FUEL_CONTEXT), FUEL_SLOTS, true, true);
+        setupHandlePutOrTakeStorageStack(46, Material.CHEST_MINECART, getStorage(INGREDIENT_CONTEXT), INGREDIENT_SLOTS, true, true);
+        setupHandlePutOrTakeStorageStack(49, Material.FURNACE_MINECART, getStorage(FUEL_CONTEXT), FUEL_SLOTS, true, true);
         setupHandlePutOrTakeStorageStack(35, getStorage(STORED_CONTEXT), STORAGE_SLOTS, false, true);
 
         super.loadItems();
