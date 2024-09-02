@@ -65,7 +65,8 @@ public class Routes {
             return signalInvoker.invoke(signal);
         } else if (mechanic instanceof PowerCentral powerCentral) {
             // check if the power central has capacity for more energy
-            if (powerCentral.getCapacity() == powerCentral.getEnergy()) {
+            if (powerCentral.getCapacity() == powerCentral.getEnergy()
+                    || energySource.getTransferAmount() < energySource.getTransferEnergyCost()) {
                 return false;
             }
 

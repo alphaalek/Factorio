@@ -12,11 +12,10 @@ import org.bukkit.entity.Player;
 public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMechanic, SignalSource, EnergyCollection {
 
     private static final int SUN_LIGHT = 15;
-    private static final int MAX_ENERGY = 200;
+    private static final int MAX_ENERGY = 100;
 
     private final DelayHandler thinkHandler = new DelayHandler(30);
 
-    private Block daylightSensor;
     private double energy;
 
     public SolarCell(Location loc, BlockFace rotation, MechanicStorageContext context) {
@@ -25,8 +24,7 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
 
     @Override
     public void onBlocksLoaded(Player by) {
-        daylightSensor = getLocation().getBlock();
-        daylightSensor.setType(Material.DAYLIGHT_DETECTOR); //using day sensor, not night
+        loc.getBlock().setType(Material.DAYLIGHT_DETECTOR); // using day sensor, not night
     }
 
     @Override
@@ -51,7 +49,7 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
             return;
         }
 
-        if (daylightSensor.getLightFromSky() == SUN_LIGHT && energy < MAX_ENERGY) {
+        if (loc.getBlock().getLightFromSky() == SUN_LIGHT && energy < MAX_ENERGY) {
             energy += (Math.random() * 55 + 20) / 50; // 20 to 75 / 50 = 0.4 to 1.5
         }
         if (energy > 0) {

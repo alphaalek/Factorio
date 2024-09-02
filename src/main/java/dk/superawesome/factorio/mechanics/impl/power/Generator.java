@@ -118,7 +118,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     @Override
     public void think() {
         // check if the generator does not have any energy available for a power central
-        if (availableEnergy == 0) {
+        if (availableEnergy <= getTransferEnergyCost()) {
             // ... use fuel and generate energy if not
             Fuel prevFuel = fuel;
             Fuel prevCurrentFuel = currentFuel;
@@ -126,7 +126,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
             FuelState state = useFuel();
             if (state != FuelState.ABORT) {
                 Fuel useFuel = prevCurrentFuel != null ? prevCurrentFuel : prevFuel; // both can't be null, but has to check current fuel first
-                availableEnergy = useFuel.getEnergyAmount();
+                availableEnergy += useFuel.getEnergyAmount();
 
                 xp += xpDist.poll();
 
@@ -139,7 +139,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
         }
 
         // try to transfer energy if the generator has any energy available
-        if (availableEnergy > 0) {
+        if (availableEnergy > getTransferEnergyCost()) {
             double prevProvideEnergy = availableEnergy;
             Routes.startSignalRoute(lever, this, true, false);
 
