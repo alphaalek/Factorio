@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class Fuel {
+public record Fuel(Material material, FuelType type) {
 
     public enum FuelType {
         WOOD(Tag.PLANKS::isTagged, Material.STICK, 1f / 2f, 3d),
@@ -17,6 +17,7 @@ public class Fuel {
         LAVA_BUCKET(Material.LAVA_BUCKET, Material.BUCKET, 1f / 125f, 11.5d),
         BLAZE_ROD(Material.BLAZE_ROD, 1f / 16f, 16d),
         COAL_BLOCK(Material.COAL_BLOCK, 1f / 72, 6.5d),
+//        SAPLING(Tag.SAPLINGS::isTagged, 1f / 5f, 0.5d),
         ;
 
         private final Predicate<Material> tester;
@@ -55,22 +56,6 @@ public class Fuel {
     public static Fuel getFuel(Material mat) {
         return getType(mat).map(fuelType -> new Fuel(mat, fuelType)).orElse(null);
 
-    }
-
-    private final FuelType type;
-    private final Material material;
-
-    public Fuel(Material material, FuelType type) {
-        this.type = type;
-        this.material = material;
-    }
-
-    public FuelType getType() {
-        return type;
-    }
-
-    public Material getMaterial() {
-        return material;
     }
 
     public Material getWaste() {

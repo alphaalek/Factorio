@@ -2,13 +2,8 @@ package dk.superawesome.factorio.listeners;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.MechanicManager;
-import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.World;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;

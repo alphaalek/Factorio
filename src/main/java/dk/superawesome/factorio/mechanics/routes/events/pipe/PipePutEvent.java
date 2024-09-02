@@ -1,13 +1,10 @@
 package dk.superawesome.factorio.mechanics.routes.events.pipe;
 
 import dk.superawesome.factorio.mechanics.Source;
-import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import org.bukkit.block.Block;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;
-
-import java.util.Set;
 
 public class PipePutEvent extends BlockEvent {
 

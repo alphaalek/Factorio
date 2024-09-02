@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 public class RefineryProfile implements GuiMechanicProfile<Refinery> {
 
@@ -81,6 +82,11 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
                 @Override
                 public void setStored(ItemStack stored) {
                     Filled.getFilledStateByStack(stored).ifPresent(mechanic::setFilled);
+                }
+
+                @Override
+                public Predicate<ItemStack> accepts() {
+                    return item -> Filled.getFilledStateByStack(item).isPresent();
                 }
 
                 @Override

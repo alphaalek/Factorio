@@ -3,7 +3,6 @@ package dk.superawesome.factorio.mechanics.transfer;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.gui.MechanicStorageGui;
 import dk.superawesome.factorio.mechanics.Mechanic;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;

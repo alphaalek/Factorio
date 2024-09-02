@@ -1,7 +1,10 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.Circuit;
+import dk.superawesome.factorio.mechanics.MechanicProfile;
+import dk.superawesome.factorio.mechanics.MechanicStorageContext;
+import dk.superawesome.factorio.mechanics.Profiles;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;

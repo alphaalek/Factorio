@@ -23,13 +23,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 
 public class Assembler extends AbstractMechanic<Assembler> implements AccessibleMechanic, ThinkingMechanic, ItemContainer, MoneyCollection {
 
     private final XPDist xpDist = new XPDist(100, 0.035, 0.115);
-    private final DelayHandler thinkDelayHandler = new DelayHandler(20);
+    private final DelayHandler thinkDelayHandler = new DelayHandler(getLevel().get(MechanicLevel.THINK_DELAY_MARK));
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
     private Type type;
     private int ingredientAmount;
@@ -65,6 +68,12 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     }
 
     @Override
+    public void onUpgrade(int newLevel) {
+        int newThinkDelay = (int) getProfile().getLevelRegistry().get(newLevel).get(MechanicLevel.THINK_DELAY_MARK);
+        thinkDelayHandler.setDelay(newThinkDelay);
+    }
+
+    @Override
     public MechanicProfile<Assembler> getProfile() {
         return Profiles.ASSEMBLER;
     }
@@ -96,6 +105,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         if (gui != null) {
             gui.updateRemovedIngredients(type.getRequires());
             gui.setDisplayedMoney(moneyAmount);
+            gui.updateStorageInfo();
 
             for (HumanEntity player : gui.getInventory().getViewers()) {
                 ((Player)player).playSound(getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.25f, 1f);

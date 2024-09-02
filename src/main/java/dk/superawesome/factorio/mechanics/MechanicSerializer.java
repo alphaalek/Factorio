@@ -1,7 +1,6 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.util.db.Query;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;

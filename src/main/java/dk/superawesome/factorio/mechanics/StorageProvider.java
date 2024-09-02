@@ -1,7 +1,6 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.util.Array;
-import org.bukkit.Bukkit;
 
 import java.util.List;
 import java.util.function.Function;

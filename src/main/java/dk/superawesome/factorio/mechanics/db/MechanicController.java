@@ -1,20 +1,15 @@
 package dk.superawesome.factorio.mechanics.db;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.Management;
+import dk.superawesome.factorio.mechanics.MechanicSerializer;
+import dk.superawesome.factorio.mechanics.MechanicStorageContext;
 import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
 import dk.superawesome.factorio.util.Serializer;
 import dk.superawesome.factorio.util.db.Query;
 import dk.superawesome.factorio.util.db.Types;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
-import org.bukkit.block.sign.Side;
 
 import java.io.IOException;
 import java.sql.ResultSet;
