@@ -28,7 +28,7 @@ import java.util.stream.IntStream;
 public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> extends BaseGuiAdapter<G> {
 
     private final M mechanic;
-    private Map<Integer, Supplier<ItemStack>> storageInfoSlots = new HashMap<>();
+    private final Map<Integer, Supplier<ItemStack>> storageInfoSlots = new HashMap<>();
 
     public MechanicGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback, String title) {
         super(initCallback, inUseReference, BaseGui.DOUBLE_CHEST, title, true);

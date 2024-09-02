@@ -70,7 +70,7 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
 
                     @Override
                     public int getCapacity() {
-                        return mechanic.getCapacity();
+                        return mechanic.getIngredientCapacity();
                     }
                 })
                 .set(SmelterGui.FUEL_CONTEXT, SmelterGui.FUEL_SLOTS, FuelMechanic::convertFuelStorage)
