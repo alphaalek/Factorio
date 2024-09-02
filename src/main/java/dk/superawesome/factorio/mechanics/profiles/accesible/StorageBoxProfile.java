@@ -60,7 +60,7 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
 
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(2048d, 8192d, 16384d, 40960d))
 
-                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(36, 75, 150, 250, 500))
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(36, 75, 150, 250, 400))
                 .build();
     }
 
