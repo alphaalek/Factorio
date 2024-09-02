@@ -43,7 +43,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
             new BlockVector(-1, 0, 0)
     );
 
-    private final XPDist xpDist = new XPDist(100, 0.0008, 0.0075);
+    private final XPDist xpDist = new XPDist(100, 0.0025, 0.0095);
     private final DelayHandler thinkDelayHandler = new DelayHandler(20);
     private Block lever;
     private Block campfire;
