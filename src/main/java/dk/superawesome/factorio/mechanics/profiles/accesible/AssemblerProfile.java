@@ -92,7 +92,7 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .setDescription(2, Arrays.asList("§eLager: 8 stacks §f-> §e14 stacks", "§eEmeraldlager: 768 emeralder §f-> §e2000 emeralder", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)"))
+                .setDescription(2, Arrays.asList("§eLager: 7 stacks §f-> §e14 stacks", "§eEmeraldlager: 768 emeralder §f-> §e2000 emeralder", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)"))
                 .setDescription(3, Arrays.asList("§eLager: 14 stacks §f-> §e20 stacks", "§eEmeraldlager: 2000 emeralder §f-> §e5000 emeralder", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)"))
                 .setDescription(4, Arrays.asList("§eLager: 20 stacks §f-> §e32 stacks", "§eEmeraldlager: 5000 emeralder §f-> §e10000 emeralder", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)"))
                 .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eEmeraldlager: 10000 emeralder §f-> §e25000 emeralder", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)"))
@@ -102,7 +102,7 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
 
                 .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 17, 16))
 
-                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(8, 14, 20, 32, 64))
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(7, 14, 20, 32, 64))
                 .mark(MoneyCollection.CAPACITY_MARK, Array.fromData(64 * 12d, 2000d, 5000, 10000, 25000))
                 .build();
     }

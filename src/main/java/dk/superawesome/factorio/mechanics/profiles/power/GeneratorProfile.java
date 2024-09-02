@@ -54,7 +54,7 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .setDescription(2, Arrays.asList("§eLager: 24 stacks §f-> §e48 stacks", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)"))
+                .setDescription(2, Arrays.asList("§eLager: 23 stacks §f-> §e48 stacks", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)"))
                 .setDescription(3, Arrays.asList("§eLager: 48 stacks §f-> §e96 stacks", "§eHastighed: " + ticksToMs(19) + "ms §f-> §e" + ticksToMs(18) + "ms §f(§e"+ getIncreaseDifference(19, 18, true) +"% hurtigere§f)"))
                 .setDescription(4, Arrays.asList("§eLager: 96 stacks §f-> §e162 stacks", "§eHastighed: " + ticksToMs(18) + "ms §f-> §e" + ticksToMs(17) + "ms §f(§e"+ getIncreaseDifference(18, 17, true) +"% hurtigere§f)"))
                 .setDescription(5, Arrays.asList("§eLager: 162 stacks §f-> §e256 stacks", "§eHastighed: " + ticksToMs(17) + "ms §f-> §e" + ticksToMs(16) + "ms §f(§e"+ getIncreaseDifference(17, 16, true) +"% hurtigere§f)"))
@@ -63,7 +63,7 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 43008d, 81920d))
 
                 .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 17, 16))
-                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(24, 48, 96, 162, 256))
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(23, 48, 96, 162, 256))
                 .build();
     }
 
