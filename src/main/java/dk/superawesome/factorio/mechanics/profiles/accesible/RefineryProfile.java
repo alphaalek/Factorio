@@ -85,7 +85,7 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
                 }
 
                 @Override
-                public Predicate<ItemStack> accepts() {
+                public Predicate<ItemStack> getFilter() {
                     return item -> Filled.getFilledStateByStack(item).isPresent();
                 }
 

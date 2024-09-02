@@ -32,7 +32,7 @@ import java.util.logging.Level;
 public class Assembler extends AbstractMechanic<Assembler> implements AccessibleMechanic, ThinkingMechanic, ItemContainer, MoneyCollection {
 
     private final XPDist xpDist = new XPDist(100, 0.035, 0.115);
-    private final DelayHandler thinkDelayHandler = new DelayHandler(getLevel().get(MechanicLevel.THINK_DELAY_MARK));
+    private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
     private Type type;
     private int ingredientAmount;
@@ -69,8 +69,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public void onUpgrade(int newLevel) {
-        int newThinkDelay = (int) getProfile().getLevelRegistry().get(newLevel).get(MechanicLevel.THINK_DELAY_MARK);
-        thinkDelayHandler.setDelay(newThinkDelay);
+        thinkDelayHandler.setDelay(level.getInt(MechanicLevel.THINK_DELAY_MARK));
     }
 
     @Override

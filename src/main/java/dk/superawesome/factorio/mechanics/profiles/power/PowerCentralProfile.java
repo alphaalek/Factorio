@@ -58,6 +58,7 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 43008d, 81920d))
 
                 .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 17, 16))
+
                 .mark(PowerCentral.CAPACITY, Array.fromData(1000d, 5000d, 15000d, 45000d, 150000d))
                 .build();
     }

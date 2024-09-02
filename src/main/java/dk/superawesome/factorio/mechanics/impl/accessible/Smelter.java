@@ -55,7 +55,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     private final XPDist xpDist = new XPDist(100, 0.001, 0.01);
-    private final DelayHandler thinkDelayHandler = new DelayHandler(getLevel().get(MechanicLevel.THINK_DELAY_MARK));
+    private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
     private ItemStack ingredient;
@@ -128,8 +128,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public void onUpgrade(int newLevel) {
-        int newThinkDelay = (int) getProfile().getLevelRegistry().get(newLevel).get(MechanicLevel.THINK_DELAY_MARK);
-        thinkDelayHandler.setDelay(newThinkDelay);
+        thinkDelayHandler.setDelay(level.get(MechanicLevel.THINK_DELAY_MARK));
     }
 
     @Override

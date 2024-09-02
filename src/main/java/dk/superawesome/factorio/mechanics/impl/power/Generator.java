@@ -44,7 +44,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     );
 
     private final XPDist xpDist = new XPDist(100, 0.0025, 0.0095);
-    private final DelayHandler thinkDelayHandler = new DelayHandler(getLevel().get(MechanicLevel.THINK_DELAY_MARK));
+    private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
     private Block lever;
     private Block campfire;
 
@@ -87,8 +87,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public void onUpgrade(int newLevel) {
-        int newThinkDelay = (int) getProfile().getLevelRegistry().get(newLevel).get(MechanicLevel.THINK_DELAY_MARK);
-        thinkDelayHandler.setDelay(newThinkDelay);
+        thinkDelayHandler.setDelay(level.getInt(MechanicLevel.THINK_DELAY_MARK));
     }
 
     @Override

@@ -25,7 +25,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     private static final double SIGNAL_COST = 1d / 32d;
 
-    private final DelayHandler thinkDelayHandler = new DelayHandler(getLevel().get(MechanicLevel.THINK_DELAY_MARK));
+    private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
 
     private boolean hasGraph;
     private double recentProduction;
@@ -34,7 +34,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     private Block lever;
     private double energy;
     private boolean turnedOn;
-    private double recentMax = 0;
+    private double recentMax;
 
     public PowerCentral(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -57,8 +57,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     @Override
     public void onUpgrade(int newLevel) {
-        int newThinkDelay = (int) getProfile().getLevelRegistry().get(newLevel).get(MechanicLevel.THINK_DELAY_MARK);
-        thinkDelayHandler.setDelay(newThinkDelay);
+        thinkDelayHandler.setDelay(level.getInt(MechanicLevel.THINK_DELAY_MARK));
     }
 
     @Override

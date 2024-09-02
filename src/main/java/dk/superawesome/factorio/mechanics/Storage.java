@@ -10,9 +10,8 @@ public interface Storage {
 
     void setStored(ItemStack stored);
 
-    default Predicate<ItemStack> accepts() {
-        // accepts all items by default if no item is stored
-        return item -> getStored() == null || getStored().isSimilar(item);
+    default Predicate<ItemStack> getFilter() {
+        return i -> true;
     }
 
     int getAmount();

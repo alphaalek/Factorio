@@ -181,8 +181,8 @@ public interface FuelMechanic {
             }
 
             @Override
-            public Predicate<ItemStack> accepts() {
-                return item -> Fuel.getFuel(item.getType()) != null;
+            public Predicate<ItemStack> getFilter() {
+                return item -> Fuel.getType(item.getType()).isPresent();
             }
 
             @Override

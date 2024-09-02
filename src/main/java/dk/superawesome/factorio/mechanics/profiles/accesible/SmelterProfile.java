@@ -54,7 +54,7 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
                     }
 
                     @Override
-                    public Predicate<ItemStack> accepts() {
+                    public Predicate<ItemStack> getFilter() {
                         return mechanic::canSmelt;
                     }
 
@@ -121,6 +121,7 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(4096d, 12288d, 20480d, 51200d))
 
                 .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 17, 15))
+
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(12, 15, 22, 32, 64))
                 .mark(Smelter.INGREDIENT_CAPACITY_MARK, Array.fromData(10, 16, 24, 36, 54))
                 .mark(Smelter.FUEL_CAPACITY_MARK, Array.fromData(10, 14, 20, 32, 48))

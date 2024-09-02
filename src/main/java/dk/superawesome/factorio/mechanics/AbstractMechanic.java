@@ -117,7 +117,12 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     @Override
     public void setLevel(int level) {
+        boolean newLevel = this.level != null && level > this.level.lvl();
         this.level = MechanicLevel.from(this, level);
+
+        if (newLevel) {
+            onUpgrade(level);
+        }
     }
 
     @Override

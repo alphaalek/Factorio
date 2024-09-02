@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 import static dk.superawesome.factorio.util.statics.MathUtil.getIncreaseDifference;
 import static dk.superawesome.factorio.util.statics.MathUtil.ticksToMs;
@@ -51,6 +52,11 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
                                 .map(Assembler.Type::getMat)
                                 .map(ItemStack::new)
                                 .orElse(null);
+                    }
+
+                    @Override
+                    public Predicate<ItemStack> getFilter() {
+                        return item -> Assembler.Types.getTypeFromMaterial(item.getType()).isPresent();
                     }
 
                     @Override
@@ -95,6 +101,7 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 20480d, 51200d))
 
                 .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 17, 16))
+
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(8, 14, 20, 32, 64))
                 .mark(MoneyCollection.CAPACITY_MARK, Array.fromData(64 * 12d, 2000d, 5000, 10000, 25000))
                 .build();

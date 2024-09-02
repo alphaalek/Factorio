@@ -89,6 +89,7 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(4096d, 12288d, 20480d, 51200d))
 
                 .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 16, 14))
+
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(12, 15, 22, 32, 64))
                 .build();
     }
