@@ -105,7 +105,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                 int grade = -1;
                 if (state != -1 && max - min >= diff) {
                     double d = (state - min) / diff;
-                    grade = (int) Math.round(d);
+                    grade = (int) Math.floor(d);
                 }
 
                 // remove graph items for this column at last tick

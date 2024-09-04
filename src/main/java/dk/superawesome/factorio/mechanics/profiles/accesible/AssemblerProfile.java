@@ -98,9 +98,9 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
                 .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eEmeraldlager: 10000 emeralder §f-> §e25000 emeralder", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)"))
 
                 .mark(MechanicLevel.XP_REQUIRES_MARK, Array.fromData(1500d, 3000d, 7500d, 12500d))
-                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 20480d, 51200d))
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(4192d, 10288d, 18480d, 31200d))
 
-                .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 17, 16))
+                .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 17, 15))
 
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(7, 14, 20, 32, 64))
                 .mark(MoneyCollection.CAPACITY_MARK, Array.fromData(64 * 12d, 2000d, 5000, 10000, 25000))

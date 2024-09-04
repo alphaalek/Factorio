@@ -53,13 +53,13 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
                 .setDescription(2, Arrays.asList("§eKapacitet: 1000J §f-> §e5000J", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) + "% hurtigere§f)"))
                 .setDescription(3, Arrays.asList("§eKapacitet: 5000J §f-> §e15000J", "§eHastighed: " + ticksToMs(19) + "ms §f-> §e" + ticksToMs(18) + "ms §f(§e"+ getIncreaseDifference(19, 18, true) + "% hurtigere§f)"))
                 .setDescription(4, Arrays.asList("§eKapacitet: 15000J §f-> §e30000J", "§eHastighed: " + ticksToMs(18) + "ms §f-> §e" + ticksToMs(17) + "ms §f(§e"+ getIncreaseDifference(18, 17, true) + "% hurtigere§f)"))
-                .setDescription(5, Arrays.asList("§eKapacitet: 30000J §f-> §e60000J", "§eHastighed: " + ticksToMs(17) + "ms §f-> §e" + ticksToMs(16) + "ms §f(§e"+ getIncreaseDifference(17, 16, true) + "% hurtigere§f)"))
+                .setDescription(5, Arrays.asList("§eKapacitet: 30000J §f-> §e50000J", "§eHastighed: " + ticksToMs(17) + "ms §f-> §e" + ticksToMs(16) + "ms §f(§e"+ getIncreaseDifference(17, 16, true) + "% hurtigere§f)"))
 
-                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 43008d, 81920d))
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 23008d, 46972d))
 
                 .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 17, 16))
 
-                .mark(PowerCentral.CAPACITY, Array.fromData(1000d, 5000d, 15000d, 30000d, 60000d))
+                .mark(PowerCentral.CAPACITY, Array.fromData(1000d, 5000d, 15000d, 30000d, 50000d))
                 .build();
     }
 

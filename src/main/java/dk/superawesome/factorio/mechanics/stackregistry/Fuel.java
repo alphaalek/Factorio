@@ -14,7 +14,7 @@ public record Fuel(Material material, FuelType type) {
         LOG(Tag.LOGS::isTagged, 1f / 5f, 4.5d),
         COAL(Material.COAL, 1f / 8f, 7.5d),
         CHARCOAL(Material.CHARCOAL, 1f / 8f, 7.5d),
-        LAVA_BUCKET(Material.LAVA_BUCKET, Material.BUCKET, 1f / 125f, 11.5d),
+        LAVA_BUCKET(Material.LAVA_BUCKET, Material.BUCKET, 1f / 125f, 14d),
         BLAZE_ROD(Material.BLAZE_ROD, 1f / 20f, 28d),
         COAL_BLOCK(Material.COAL_BLOCK, 1f / 72, 9d),
         SAPLING(Tag.SAPLINGS::isTagged, 3, 0.5d),

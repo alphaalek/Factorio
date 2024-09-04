@@ -38,6 +38,10 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
         }
     }
 
+    protected void setupRelativeBlocks() {
+        setupRelativeBlocks(__ -> {}, __ -> {});
+    }
+
     protected void setupRelativeBlocks(Consumer<Block> findBlock, Consumer<Mechanic<?>> findMechanic) {
         MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
 

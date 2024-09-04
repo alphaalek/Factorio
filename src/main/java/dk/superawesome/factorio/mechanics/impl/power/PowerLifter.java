@@ -33,7 +33,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
 
     @Override
     public void onBlocksLoaded(Player by) {
-        setupRelativeBlocks(__ -> {}, __ -> {});
+        setupRelativeBlocks();
     }
 
     @Override
@@ -63,17 +63,17 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
             return false;
         }
 
-        AtomicBoolean transferred = new AtomicBoolean();
+        boolean transferred = false;
         invoked = true;
         for (Block lever : levers) {
             boolean did = Routes.startSignalRoute(lever, source, false, false);
             if (did) {
-                transferred.set(true);
+                transferred = true;
             }
         }
         invoked = false;
 
-        if (transferred.get()) {
+        if (transferred) {
             powered = true;
             return true;
         }

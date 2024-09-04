@@ -53,14 +53,14 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .setDescription(2, Arrays.asList("§eLager: 36 stacks §f-> §e75 stacks"))
-                .setDescription(3, Arrays.asList("§eLager: 75 stacks §f-> §e150 stacks"))
-                .setDescription(4, Arrays.asList("§eLager: 150 stacks §f-> §e250 stacks"))
-                .setDescription(5, Arrays.asList("§eLager: 250 stacks §f-> §e400 stacks"))
+                .setDescription(2, Arrays.asList("§eLager: 36 stacks §f-> §e100 stacks"))
+                .setDescription(3, Arrays.asList("§eLager: 100 stacks §f-> §e250 stacks"))
+                .setDescription(4, Arrays.asList("§eLager: 250 stacks §f-> §e400 stacks"))
+                .setDescription(5, Arrays.asList("§eLager: 400 stacks §f-> §e700 stacks"))
 
-                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(2048d, 8192d, 16384d, 40960d))
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(3048d, 8192d, 16384d, 34960d))
 
-                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(36, 75, 150, 250, 400))
+                .mark(ItemCollection.CAPACITY_MARK, Array.fromData(36, 100, 250, 400, 750))
                 .build();
     }
 

@@ -86,7 +86,7 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
                 .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eHastighed: " + ticksToMs(17) + "ms §f-> §e" + ticksToMs(14) + "ms §f(§e"+ getIncreaseDifference(20, 14, true) +"% hurtigere§f)"))
 
                 .mark(MechanicLevel.XP_REQUIRES_MARK, Array.fromData(1000d, 2500d, 5000d, 10000d))
-                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(4096d, 12288d, 20480d, 51200d))
+                .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(4096d, 8384d, 18480d, 36200d))
 
                 .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 16, 14))
 
