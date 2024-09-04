@@ -133,7 +133,6 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
                 GeneratorGui gui = this.<GeneratorGui>getGuiInUse().get();
                 if (gui != null) {
                     gui.updateFuelState();
-                    gui.updateStorageInfo();
                 }
             }
         }

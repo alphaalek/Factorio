@@ -259,7 +259,6 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     public void updateAddedItems(int amount) {
         updateAddedItems(getInventory(), amount, getMechanic().getStorageType(), STORAGE_SLOTS);
-        updateStorageInfo();
     }
 
     public void updateRemovedItems(int amount) {
@@ -269,7 +268,6 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                         .map(STORAGE_SLOTS::get)
                         .sorted(Collections.reverseOrder())
                         .collect(Collectors.toList()));
-        updateStorageInfo();
     }
 
     private List<ItemStack> getOffer(int from) {

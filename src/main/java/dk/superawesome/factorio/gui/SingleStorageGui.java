@@ -230,6 +230,11 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
             }
         }
 
+        // fix empty storage set for failed interaction
+        if (storage.getStored() != null && storage.getAmount() == 0) {
+            storage.setStored(null);
+        }
+
         fixPutSlots = false;
     }
 }

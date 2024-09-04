@@ -104,7 +104,6 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         if (gui != null) {
             gui.updateRemovedIngredients(type.getRequires());
             gui.setDisplayedMoney(moneyAmount);
-            gui.updateStorageInfo();
 
             for (HumanEntity player : gui.getInventory().getViewers()) {
                 ((Player)player).playSound(getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.25f, 1f);

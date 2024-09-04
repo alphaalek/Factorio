@@ -354,6 +354,8 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
             }
         }
 
+        updateStorageInfo();
+
         return left;
     }
 
@@ -376,6 +378,8 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
                 }
             }
         }
+
+        updateStorageInfo();
 
         return left;
     }
@@ -515,7 +519,6 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
                 if (amount > 0) {
                     storage.setAmount(storage.getAmount() + amount);
                     updateAddedItems(getInventory(), amount, storage.getStored(), slots);
-                    updateStorageInfo();
                 }
             };
 
@@ -528,11 +531,10 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
 
                 // update the stored item stack
                 if (highest != null) {
-                    if (event.getClick().isShiftClick()) {
-                        // update the stored amount and put into the storage box at (1)
-                        storage.setStored(new ItemStack(highest));
-                    } else {
-                        stored = highest;
+                    // update the stored amount and put into the storage at (1)
+                    stored = highest;
+
+                    if (!event.getClick().isShiftClick()) {
                         Consumer<Double> putCopy = put;
                         put = i -> {
                             if (storage.getStored() == null) {
@@ -558,7 +560,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
                     put.accept((double) storage.getCapacity() - storage.getAmount());
                 } else {
                     Material storedCopy = stored;
-                    // evaluate total amount of the storage box stored item present in the player's inventory
+                    // evaluate total amount of the stored item present in the player's inventory
                     int amount = Arrays.stream(playerInv.getContents())
                             .filter(Objects::nonNull)
                             .filter(i -> i.getType().equals(storedCopy))
@@ -595,7 +597,6 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
 
                 updateRemovedItems(getInventory(), amount, storage.getStored(), slots);
                 storage.setAmount(storage.getAmount() - amount);
-                updateStorageInfo();
             };
 
             if (event.getClick().isShiftClick()) {

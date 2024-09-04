@@ -107,32 +107,26 @@ public class SmelterGui extends MechanicGui<SmelterGui, Smelter> {
 
     public void updateAddedStorage(int amount) {
         updateAddedItems(getInventory(), amount, getMechanic().getStorageType(), STORAGE_SLOTS);
-        updateStorageInfo();
     }
 
     public void updateAddedIngredients(int amount) {
         updateAddedItems(getInventory(), amount, getMechanic().getIngredient(), INGREDIENT_SLOTS);
-        updateStorageInfo();
     }
 
     public void updateAddedFuel(int amount) {
         updateAddedItems(getInventory(), amount, new ItemStack(getMechanic().getFuel().material()), FUEL_SLOTS);
-        updateStorageInfo();
     }
 
     public void updateRemovedStorage(int amount) {
         updateRemovedItems(getInventory(), amount, getMechanic().getStorageType(), reverseSlots(STORAGE_SLOTS));
-        updateStorageInfo();
     }
 
     public void updateRemovedIngredients(int amount) {
         updateRemovedItems(getInventory(), amount, getMechanic().getIngredient(), reverseSlots(INGREDIENT_SLOTS));
-        updateStorageInfo();
     }
 
     public void updateRemovedFuel(int amount) {
         updateRemovedItems(getInventory(), amount, new ItemStack(getMechanic().getFuel().material()), reverseSlots(FUEL_SLOTS));
-        updateStorageInfo();
     }
 
     @Override

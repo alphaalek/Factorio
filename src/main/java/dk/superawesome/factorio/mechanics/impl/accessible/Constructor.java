@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 
 public class Constructor extends AbstractMechanic<Constructor> implements AccessibleMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
-    private final XPDist xpDist = new XPDist(100, 0.005, 0.05);
+    private final XPDist xpDist = new XPDist(100, 0.001, 0.005);
     private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
@@ -212,8 +212,6 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         ConstructorGui gui = this.<ConstructorGui>getGuiInUse().get();
         if (gui != null) {
             gui.updateAddedItems(recipeResult.getAmount());
-            gui.updateStorageInfo();
-
             for (HumanEntity player : gui.getInventory().getViewers()) {
                 ((Player)player).playSound(getLocation(), Sound.BLOCK_WOOD_HIT, 0.5f, 1f);
             }
