@@ -172,7 +172,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     @Override
     public boolean preSignal(AbstractRoute.Signal signal, boolean firstCall) {
-        double signalCost = signal.getLocations().size() * SIGNAL_COST;
+        double signalCost = (signal.getLocations().size() - 1) * SIGNAL_COST;
         if (this.energy < signalCost) {
             if (recentMax == 0) {
                 recentMax = signalCost;
@@ -190,7 +190,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     @Override
     public void postSignal(AbstractRoute.Signal signal, int outputs) {
-        double signalCost = signal.getLocations().size() * SIGNAL_COST;
+        double signalCost = (signal.getLocations().size() - 1) * SIGNAL_COST;
         double ratio = (outputs == 0 || signal.getOutputs(FROM_POWER_CENTRAL).isEmpty()) ? 1 : ((double)outputs) / signal.getOutputs(FROM_POWER_CENTRAL).size();
 
         double back = signalCost * ratio;
@@ -206,7 +206,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     @Override
     public boolean handleOutput(Block block, Location loc, Block from) {
-        return Routes.invokeSignalOutput(block, loc, from, this);
+        return Routes.invokePCOutput(block, loc, from, this);
     }
 
     public double getRecentMax() {

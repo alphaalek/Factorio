@@ -63,8 +63,6 @@ public class SignChangeListener implements Listener {
                                 if (!(mechanic.getProfile().getBuilding() instanceof Matcher)) {
                                     event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), drop);
                                 }
-                            } else {
-                                event.getPlayer().sendMessage("§cNoget gik galt! Kontakt en udvikler.");
                             }
                             break build;
                         }

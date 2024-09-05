@@ -181,10 +181,11 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
             // piston = pipe output
             if (mat == Material.PISTON) {
+                add(relVec);
                 Block point = BlockUtil.getPointingBlock(rel, false);
                 // ... however only if the piston is not pointing towards the block where the pipe search came from
                 if (!point.equals(from)) {
-                    add(relVec);
+                    add(BlockUtil.getVec(point));
                     addOutput(from.getWorld(), BlockUtil.getVec(point), BlockUtil.getVec(rel));
                 }
             // glass = pipe expand
@@ -243,18 +244,23 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 add(relVec);
 
                 Block facing = BlockUtil.getPointingBlock(rel, true);
-                // facing sticky piston - signal output (for power-central to mechanics)
+                // facing sticky piston - signal output
                 if (facing.getType() == Material.STICKY_PISTON) {
                     add(BlockUtil.getVec(facing));
-                    addOutput(from.getWorld(), BlockUtil.getVec(BlockUtil.getPointingBlock(facing, false)), BlockUtil.getVec(facing), SignalSource.FROM_POWER_CENTRAL);
-                    return;
-                } else {
-                    Mechanic<?> at = Factorio.get().getMechanicManager(from.getWorld()).getMechanicPartially(facing.getLocation());
-                    if (at instanceof SignalInvoker) {
-                        add(BlockUtil.getVec(facing));
-                        addOutput(from.getWorld(), BlockUtil.getVec(facing), BlockUtil.getVec(rel), SignalSource.FROM_POWER_CENTRAL);
-                        return;
+
+                    exists: {
+                        Block facingFacing = BlockUtil.getPointingBlock(facing, false);
+                        Mechanic<?> mechanic = Factorio.get().getMechanicManager(rel.getWorld()).getMechanicAt(facingFacing.getLocation());
+                        if (mechanic instanceof SignalInvoker) {
+                            addOutput(from.getWorld(), BlockUtil.getVec(facingFacing), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
+                        } else if (mechanic != null) {
+                            addOutput(from.getWorld(), BlockUtil.getVec(facingFacing), BlockUtil.getVec(facing), SignalSource.FROM_POWER_CENTRAL);
+                        } else break exists;
+
+                        add(BlockUtil.getVec(facingFacing));
                     }
+
+                    return;
                 }
 
                 if (!expandWire(facing, rel, rel, 16)
@@ -263,15 +269,15 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                     Routes.expandRoute(this, rel, relVec, ((Directional)rel.getBlockData()).getFacing().getOppositeFace());
                 }
 
-            // comparator - signal output (for generator to power-central)
+            // comparator - signal output
             } else if (mat == Material.COMPARATOR && BlockUtil.getPointingBlock(rel, false).equals(from)) {
                 add(relVec);
 
                 Block facing = BlockUtil.getPointingBlock(rel, true);
-
-                Mechanic<?> at = Factorio.get().getMechanicManager(from.getWorld()).getMechanicPartially(facing.getLocation());
-                if (at instanceof PowerCentral) {
-                    addOutput(from.getWorld(), BlockUtil.getVec(facing), BlockUtil.getVec(rel), SignalSource.TO_POWER_CENTRAL);
+                Mechanic<?> mechanic = Factorio.get().getMechanicManager(rel.getWorld()).getMechanicPartially(facing.getLocation());
+                if (mechanic instanceof PowerCentral) {
+                    addOutput(rel.getWorld(), BlockUtil.getVec(facing), BlockUtil.getVec(rel), SignalSource.TO_POWER_CENTRAL);
+                    add(BlockUtil.getVec(facing));
                 }
 
                 expandWire(facing, rel, rel, 16);

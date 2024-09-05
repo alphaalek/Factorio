@@ -29,7 +29,7 @@ public class Routes {
     public static final BlockFace[] SIGNAL_EXPAND_DIRECTIONS = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
     public static final BlockFace[] RELATIVES = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
-    public static boolean invokeSignalOutput(Block block, Location loc, Block start, PowerCentral source) {
+    public static boolean invokePCOutput(Block block, Location loc, Block start, PowerCentral source) {
         Mechanic<?> at = Factorio.get().getMechanicManager(block.getWorld()).getMechanicAt(loc);
         if (at instanceof SignalInvoker invoker) {
             return invoker.invoke(source);
@@ -59,7 +59,7 @@ public class Routes {
         return false;
     }
 
-    public static boolean transferEnergy(Block start, Location loc, EnergyCollection energySource, SignalSource signal) {
+    public static boolean invokeEnergySourceOutput(Block start, Location loc, EnergyCollection energySource, SignalSource signal) {
         Mechanic<?> mechanic = Factorio.get().getMechanicManager(start.getWorld()).getMechanicPartially(loc);
         if (mechanic instanceof SignalInvoker signalInvoker) {
             return signalInvoker.invoke(signal);

@@ -256,6 +256,8 @@ public class MechanicManager implements Listener {
         Buildings.build(sign.getWorld(), mechanic);
         mechanic.onBlocksLoaded(owner);
 
+        Routes.removeNearbyRoutes(pointing);
+
         try {
             for (UUID defaultMember : Factorio.get().getMechanicController().getDefaultMembersFor(owner.getUniqueId())) {
                 mechanic.getManagement().getMembers().add(defaultMember);
@@ -318,6 +320,7 @@ public class MechanicManager implements Listener {
             return;
         }
         Buildings.remove(player.getWorld(), mechanic);
+
         Routes.removeNearbyRoutes(mechanic.getLocation().getBlock());
 
         // player stuff

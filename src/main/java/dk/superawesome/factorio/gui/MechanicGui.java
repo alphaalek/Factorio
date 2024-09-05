@@ -297,6 +297,10 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
     protected void updateAmount(Storage storage, Inventory source, int diff, Consumer<Integer> leftover) {
         getMechanic().getTickThrottle().throttle();
 
+        if (storage.getStored() == null) {
+            return;
+        }
+
         // check if the storage has enough space for these items
         if (diff > 0 && storage.getAmount() + diff > storage.getCapacity()) {
             // evaluate leftovers
@@ -311,6 +315,11 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         } else {
             // update storage amount in storage box
             storage.setAmount(storage.getAmount() + diff);
+        }
+
+        // fix empty storage set for failed interaction
+        if (storage.getStored() != null && storage.getAmount() == 0) {
+            storage.setStored(null);
         }
 
         updateStorageInfo();
