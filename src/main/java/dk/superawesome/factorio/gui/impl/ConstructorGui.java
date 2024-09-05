@@ -304,6 +304,9 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
         // set the crafting slot to the recipe result
         getInventory().setItem(47, this.craft);
         getMechanic().setRecipeResult(this.craft);
+
+        // clear the current state for this constructor, because something has been changed in the grid
+        getMechanic().makeNewState();
     }
 
     private void searchRecipeIn(Iterator<Recipe> recipeIterator) {

@@ -34,11 +34,29 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     private ItemStack storageType;
     private int storageAmount;
 
+    private ConstructorState state;
     private boolean declinedState;
 
     public Constructor(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
         loadFromStorage();
+        makeNewState();
+    }
+
+    private static class ConstructorState {
+
+        private final ItemStack[] unitStacks = new ItemStack[9];
+
+        public ConstructorState(Constructor constructor) {
+            for (int i = 0; i < 9; i++) {
+                ItemStack gridItem = constructor.craftingGridItems[i];
+                if (gridItem != null) {
+                    ItemStack unit = gridItem.clone();
+                    unit.setAmount(1);
+                    unitStacks[i] = unit;
+                }
+            }
+        }
     }
 
     @Override
@@ -94,36 +112,39 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
             return;
         }
 
-        for (ItemStack craft : craftingGridItems) {
-            // check if this slot contains anything and can hold more
+        for (int i = 0; i < 9; i++) {
+            ItemStack craft = craftingGridItems[i];
             if (craft == null || craft.getAmount() == craft.getMaxStackSize()) {
                 continue;
             }
 
-            // poll the item for this crafting slot from the item collection
-            ItemStack req = craft.clone();
-            req.setAmount(1);
+            ItemStack unit = state.unitStacks[i];
+            if (collection.has(unit)) {
+                List<ItemStack> stacks = collection.take(unit.getAmount());
 
-            if (collection.has(req)) {
-                List<ItemStack> stacks = collection.take(req.getAmount());
-                if (!stacks.isEmpty() && stacks.get(0).isSimilar(craft)) {
-                    // find an item which has a lower amount than the currently checked item
-                    // this is done to ensure evenly distribution among the items in the crafting grid
-                    for (ItemStack oCraft : craftingGridItems) {
-                        if (oCraft != craft
-                                && oCraft != null
-                                && oCraft.isSimilar(craft)
-                                && oCraft.getAmount() < craft.getAmount()
-                                && oCraft.getAmount() < oCraft.getMaxStackSize()) {
-                            craft = oCraft;
-                            break;
+                if (!stacks.isEmpty()) {
+                    // loop through the stacks collected and try to put into the grid
+                    for (ItemStack stack : stacks) {
+                        if (craft.isSimilar(stack)) {
+                            // find an item which has a lower amount than the currently checked item
+                            // this is done to ensure evenly distribution among the items in the crafting grid
+                            for (ItemStack oCraft : craftingGridItems) {
+                                if (oCraft != craft
+                                        && oCraft != null
+                                        && oCraft.isSimilar(craft)
+                                        && oCraft.getAmount() < craft.getAmount()
+                                        && oCraft.getAmount() < oCraft.getMaxStackSize()) {
+                                    craft = oCraft;
+                                    break;
+                                }
+                            }
+
+                            int prev = craft.getAmount();
+                            craft.setAmount(Math.min(craft.getMaxStackSize(), craft.getAmount() + stacks.get(0).getAmount()));
+                            if (prev < craft.getAmount()) {
+                                event.setTransferred(true);
+                            }
                         }
-                    }
-
-                    int prev = craft.getAmount();
-                    craft.setAmount(Math.min(craft.getMaxStackSize(), craft.getAmount() + stacks.get(0).getAmount()));
-                    if (prev < craft.getAmount()) {
-                        event.setTransferred(true);
                     }
                 }
             }
@@ -311,5 +332,9 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         if (this.storageAmount == 0) {
             this.storageType = null;
         }
+    }
+
+    public void makeNewState() {
+        this.state = new ConstructorState(this);
     }
 }
