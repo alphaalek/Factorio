@@ -524,7 +524,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
 
             Material stored = null;
             if (storage.getStored() == null) {
-                // the storage box does not have any stored item
+                // the storage does not have any stored item
                 // find the item type in the player inventory which occurs the most
                 Map<Material, Integer> typeAmounts = new HashMap<>();
                 Material highest = findHighestItemCount(playerInv, typeAmounts, storage.getFilter());
@@ -552,6 +552,8 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
 
             if (stored == null && storage.getStored() != null) {
                 stored = storage.getStored().getType();
+            } else if (stored != null && storage.getStored() == null) {
+                storage.setStored(new ItemStack(stored));
             }
 
             if (stored != null) {
@@ -595,8 +597,9 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
                     return;
                 }
 
-                updateRemovedItems(getInventory(), amount, storage.getStored(), slots);
+                ItemStack stored = storage.getStored(); // save stored item if all items are collected
                 storage.setAmount(storage.getAmount() - amount);
+                updateRemovedItems(getInventory(), amount, stored, slots);
             };
 
             if (event.getClick().isShiftClick()) {

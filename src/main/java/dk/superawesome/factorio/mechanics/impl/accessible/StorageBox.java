@@ -142,6 +142,10 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
     @Override
     public void setStored(ItemStack stack) {
         this.stored = stack;
+
+        if (this.stored == null) {
+            this.amount = 0;
+        }
     }
 
     @Override

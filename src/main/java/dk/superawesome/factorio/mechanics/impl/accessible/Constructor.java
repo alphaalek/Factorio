@@ -295,6 +295,10 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     public void setStorageType(ItemStack stack) {
         this.storageType = stack;
+
+        if (this.storageType == null) {
+            this.storageAmount = 0;
+        }
     }
 
     public int getStorageAmount() {

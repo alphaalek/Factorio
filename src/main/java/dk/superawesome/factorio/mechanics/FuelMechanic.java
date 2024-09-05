@@ -189,7 +189,7 @@ public interface FuelMechanic {
 
             @Override
             public void setStored(ItemStack stored) {
-                setFuel(Fuel.getFuel(stored.getType()));
+                setFuel(Optional.ofNullable(stored).map(i -> Fuel.getFuel(i.getType())).orElse(null));
             }
 
             @Override

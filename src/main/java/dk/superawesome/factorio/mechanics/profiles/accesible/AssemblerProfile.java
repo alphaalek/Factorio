@@ -61,7 +61,7 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
 
                     @Override
                     public void setStored(ItemStack stored) {
-                        Optional<Assembler.Types> type = Assembler.Types.getTypeFromMaterial(stored.getType());
+                        Optional<Assembler.Types> type = Optional.ofNullable(stored).flatMap(i -> Assembler.Types.getTypeFromMaterial(i.getType()));
                         type.ifPresent(mechanic::setType);
                     }
 

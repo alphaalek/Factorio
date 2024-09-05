@@ -365,6 +365,10 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     @Override
     public void setFuel(Fuel fuel) {
         this.fuel = fuel;
+
+        if (this.fuel == null) {
+            this.fuelAmount = 0;
+        }
     }
 
     @Override
@@ -389,6 +393,10 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     @Override
     public void setCurrentFuel(Fuel fuel) {
         this.currentFuel = fuel;
+
+        if (this.currentFuel == null) {
+            this.currentFuelAmount = 0;
+        }
     }
 
     public ItemStack getSmeltResult() {
@@ -405,6 +413,10 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     public void setStorageType(ItemStack stack) {
         this.storageType = stack;
+
+        if (this.storageType == null) {
+            this.storageAmount = 0;
+        }
     }
 
     public int getStorageAmount() {

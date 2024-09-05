@@ -5,6 +5,7 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.building.Buildings;
+import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
 import dk.superawesome.factorio.mechanics.transfer.Container;
@@ -317,6 +318,7 @@ public class MechanicManager implements Listener {
             return;
         }
         Buildings.remove(player.getWorld(), mechanic);
+        Routes.removeNearbyRoutes(mechanic.getLocation().getBlock());
 
         // player stuff
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 0.5f, 0.6f);
