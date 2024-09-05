@@ -66,7 +66,7 @@ public class Routes {
         } else if (mechanic instanceof PowerCentral powerCentral) {
             // check if the power central has capacity for more energy
             if (powerCentral.getCapacity() == powerCentral.getEnergy()
-                    || energySource.getTransferAmount() < energySource.getTransferEnergyCost()) {
+                    || energySource.getTransferAmount() < energySource.getTransferEnergyCost() * 2) {
                 return false;
             }
 
