@@ -73,10 +73,10 @@ public class Routes {
             // transfer energy
             double take = powerCentral.getCapacity() - powerCentral.getEnergy();
             double amount = energySource.take(take);
+            powerCentral.setEnergy(powerCentral.getEnergy() + amount);
             if (powerCentral.getEnergy() < powerCentral.getCapacity()) {
                 powerCentral.setEnergy(powerCentral.getEnergy() - energySource.getTransferEnergyCost());
             }
-            powerCentral.setEnergy(powerCentral.getEnergy() + amount);
 
             return true;
         }
