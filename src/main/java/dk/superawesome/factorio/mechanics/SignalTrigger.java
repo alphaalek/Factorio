@@ -57,6 +57,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
             }
         });
 
+        // reset lever states
         triggerLevers();
     }
 

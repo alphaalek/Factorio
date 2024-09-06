@@ -65,6 +65,8 @@ public class MechanicManager implements Listener {
                     // unable to load mechanic properly due to corrupt data
                     state.getBlock().setType(Material.AIR);
                 }
+
+                Routes.removeNearbyRoutes(state.getBlock());
             }
         }
     }

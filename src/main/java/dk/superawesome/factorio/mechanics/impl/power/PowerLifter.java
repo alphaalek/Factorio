@@ -74,7 +74,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         invoked = false;
 
         if (transferred) {
-            powered = true;
+            triggerLevers(true);
             return true;
         }
 
@@ -88,7 +88,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
             if (point != null && point.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(point, false).equals(loc.getBlock())) {
                 powered = event.getNewCurrent() > 0;
 
-                Bukkit.getScheduler().runTask(Factorio.get(), () -> startLift(l -> l.triggerLevers(powered)));
+                startLift(l -> l.triggerLevers(powered));
             }
         }
     }
@@ -126,24 +126,21 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     public void onBlockBreak(BlockBreakEvent event) {
         super.handleBlockBreak(event);
 
-        if (BlockUtil.isDiagonal3DFast(event.getBlock(), loc.getBlock())) {
+        if (BlockUtil.isDiagonal2DFast(event.getBlock(), loc.getBlock())) {
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                 boolean prevPowered = powered;
-
                 powered = false;
                 BlockUtil.forRelative(loc.getBlock(), b -> {
-                    if (b.getType() == Material.STICKY_PISTON) {
+                    if (b.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(b, false).equals(loc.getBlock())) {
                         BlockUtil.forRelative(b, b2 -> {
-                            if (b2.getType() == Material.REPEATER && ((Repeater)b2.getBlockData()).isPowered()) {
+                            if (b2.getType() == Material.REPEATER && BlockUtil.getPointingBlock(b2, true).equals(b) && ((Repeater)b2.getBlockData()).isPowered()) {
                                 powered = true;
                             }
                         });
-                    } else if (b.getType() == Material.OBSERVER) {
+                    // TODO: Is this really needed? And might it even show it's powered without actually being it sometimes?
+                    } else if (b.getType() == Material.OBSERVER && BlockUtil.getPointingBlock(b, true).equals(loc.getBlock())) {
                         if (Factorio.get().getMechanicManager(b.getWorld()).getMechanicAt(b.getLocation()) instanceof PowerLifter lifter) {
-                            Block point = BlockUtil.getPointingBlock(b, true);
-                            if (point != null && point.getType() == Material.OBSERVER && point.equals(loc.getBlock())) {
-                                powered = lifter.powered;
-                            }
+                            powered = lifter.powered;
                         }
                     }
                 });
