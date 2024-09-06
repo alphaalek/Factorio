@@ -118,7 +118,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     @Override
     public void think() {
         // check if the generator does not have any energy available for a power central
-        if (availableEnergy <= getTransferEnergyCost()) {
+        if (availableEnergy <= getTransferEnergyCost() * 2) {
             // ... use fuel and generate energy if not
             Fuel prevFuel = fuel;
             Fuel prevCurrentFuel = currentFuel;
