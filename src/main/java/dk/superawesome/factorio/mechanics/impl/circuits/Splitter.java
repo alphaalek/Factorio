@@ -142,6 +142,7 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
         boolean transferred = false;
         while (blockIterator.hasNext()) {
             Block block = blockIterator.next();
+
             if (!collection.isTransferEmpty()) {
                 TransferCollection wrappedCollection;
                 if (collection instanceof ItemCollection itemCollection) {
