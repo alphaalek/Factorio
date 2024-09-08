@@ -123,6 +123,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     }
 
     @Override
+    public void onUpdate() {
+
+    }
+
+    @Override
     public boolean exists() {
         return exists;
     }

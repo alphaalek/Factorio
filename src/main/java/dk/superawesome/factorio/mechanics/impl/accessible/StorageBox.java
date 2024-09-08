@@ -5,8 +5,11 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
+import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
@@ -82,6 +85,13 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
                 Optional.ofNullable(stored)
                         .map(ItemStack::getMaxStackSize)
                         .orElse(64);
+    }
+
+    @Override
+    public void onUpdate() {
+        Sign sign = getSign();
+        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(((double)amount) / getCapacity(), 2) + "% fyldt");
+        sign.update();
     }
 
     @Override

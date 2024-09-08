@@ -16,7 +16,7 @@ public abstract class Circuit<M extends Mechanic<M>, C extends TransferCollectio
 
     @Override
     public void pipePut(C collection, PipePutEvent event) {
-        if (calledInput) {
+        if (calledInput) { // ensure no loop
             return;
         }
 

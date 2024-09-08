@@ -180,6 +180,7 @@ public class MechanicManager implements Listener {
             Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), () -> {
                 for (Mechanic<?> mechanic : new ArrayList<>(mechanics.values())) {
                     mechanic.save();
+                    mechanic.onUpdate();
                 }
             });
         }
