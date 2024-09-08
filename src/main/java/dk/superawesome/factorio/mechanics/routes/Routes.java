@@ -17,6 +17,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -30,6 +31,10 @@ public class Routes {
     public static final BlockFace[] RELATIVES = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
     public static boolean invokePCOutput(Block block, Location loc, Block start, PowerCentral source) {
+        return invokePCOutput(block, loc, Collections.singletonList(start), source);
+    }
+
+    public static boolean invokePCOutput(Block block, Location loc, List<Block> starts, PowerCentral source) {
         Mechanic<?> at = Factorio.get().getMechanicManager(block.getWorld()).getMechanicAt(loc);
         if (at instanceof SignalInvoker invoker) {
             return invoker.invoke(source);
@@ -51,9 +56,11 @@ public class Routes {
         }
 
         // start the pipe route
-        if (startTransferRoute(start, event.getTransfer(), source, false)) {
-            source.setEnergy(source.getEnergy() - event.getTransfer().getTransferEnergyCost());
-            return true;
+        for (Block start : starts) {
+            if (startTransferRoute(start, event.getTransfer(), source, false)) {
+                source.setEnergy(source.getEnergy() - event.getTransfer().getTransferEnergyCost());
+                return true;
+            }
         }
 
         return false;

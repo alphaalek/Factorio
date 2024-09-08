@@ -96,15 +96,16 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
             return Smelter::canSmeltStatic;
         }
 
-        return findItem(stack, name).map(i -> (Predicate<ItemStack>) i::isSimilar)
+        return findItem(name).map(i -> (Predicate<ItemStack>) i::isSimilar)
                 .orElse(findTag(stack, name).map(tag -> (Predicate<ItemStack>) item -> tag.isTagged(item.getType()))
                         .orElse(null)
                 );
     }
 
-    public static Optional<ItemStack> findItem(Stack<String> stack, String name) {
+    public static Optional<ItemStack> findItem(String name) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equalsIgnoreCase(name))
+                .filter(Material::isItem)
                 .findFirst()
                 .map(ItemStack::new);
     }

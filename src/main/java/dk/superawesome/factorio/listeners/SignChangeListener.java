@@ -38,7 +38,8 @@ public class SignChangeListener implements Listener {
             if (partiallyAt instanceof AccessibleMechanic) {
                 event.setLine(1, "Lvl " + partiallyAt.getLevel().lvl());
             }
-        } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
+        } else if (Tag.SIGNS.isTagged(event.getBlock().getType())
+                || Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
             Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
             if (manager.getProfileFrom((Sign) event.getBlock().getState()).isPresent()
                     && (on == null || on.getState() instanceof TileState)) {

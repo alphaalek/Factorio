@@ -21,6 +21,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.Directional;
 import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -263,7 +264,7 @@ public class MechanicManager implements Listener {
 
         Mechanic<?> mechanic;
         try {
-            BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
+            BlockFace rotation = ((Directional)sign.getBlockData()).getFacing();
             mechanic = loadMechanicFromSign(profile.get(), sign, (type, on) -> contextProvider.create(on.getLocation(), rotation, type, owner.getUniqueId()));
             if (mechanic == null) {
                 return MechanicBuildResponse.NO_SUCH;

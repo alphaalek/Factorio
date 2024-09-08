@@ -10,6 +10,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PowerExpander extends AbstractMechanic<PowerExpander> implements SignalInvoker {
@@ -23,7 +24,7 @@ public class PowerExpander extends AbstractMechanic<PowerExpander> implements Si
     @Override
     public void onBlocksLoaded(Player by) {
         rel.clear();
-        for (BlockFace dir : Routes.SIGNAL_EXPAND_DIRECTIONS) {
+        for (BlockFace dir : Routes.RELATIVES) {
             rel.add(loc.getBlock().getRelative(dir));
         }
     }
@@ -40,7 +41,7 @@ public class PowerExpander extends AbstractMechanic<PowerExpander> implements Si
             for (Block rel : this.rel) {
                 if (rel.getType() == Material.STICKY_PISTON) {
                     Block point = BlockUtil.getPointingBlock(rel, false);
-                    if (Routes.invokePCOutput(point, point.getLocation(), rel, pc)) {
+                    if (Routes.invokePCOutput(point, point.getLocation(), Arrays.asList(point, rel), pc)) {
                         transferred = true;
                     }
                 }
