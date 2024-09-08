@@ -1,10 +1,13 @@
 package dk.superawesome.factorio.api.events;
 
+import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+
+import java.util.List;
 
 public class MechanicMoveEvent extends MechanicEvent {
 
@@ -25,6 +28,10 @@ public class MechanicMoveEvent extends MechanicEvent {
 
     public BlockFace getRotation() {
         return rotation;
+    }
+
+    public List<Location> getLocations() {
+        return Buildings.getLocations(mechanic, to, rotation);
     }
 
     @Override

@@ -64,7 +64,7 @@ public class Buildings {
         return buildings;
     }
 
-    private static List<Location> getLocations(Mechanic<?> mechanic, Location rel, BlockFace rot) {
+    public static List<Location> getLocations(Mechanic<?> mechanic, Location rel, BlockFace rot) {
         List<Location> locs = new ArrayList<>();
         for (BlockVector relVec : mechanic.getProfile().getBuilding().getRelatives()) {
             Location loc = BlockUtil.getRel(rel, BlockUtil.rotateVec(relVec, Building.DEFAULT_ROTATION, rot));
