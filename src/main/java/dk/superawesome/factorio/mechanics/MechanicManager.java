@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics;
 import com.google.common.collect.Sets;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicBuildEvent;
+import dk.superawesome.factorio.api.events.MechanicMoveEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.routes.Routes;
@@ -215,6 +216,13 @@ public class MechanicManager implements Listener {
         if (!Buildings.canMoveTo(to, rot, mechanic)) {
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
             player.sendMessage("§cDer er ikke nok plads til at flytte maskinen!");
+            return false;
+        }
+
+        MechanicMoveEvent event = new MechanicMoveEvent(player, mechanic, to, rot);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            player.sendMessage("§cDu kan ikke flytte maskinen hertil!");
             return false;
         }
 

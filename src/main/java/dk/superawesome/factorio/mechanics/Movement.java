@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.api.events.MechanicMoveEvent;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
