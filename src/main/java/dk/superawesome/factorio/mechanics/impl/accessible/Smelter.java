@@ -198,6 +198,10 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         return WASTE_OUTPUT_RELATIVES;
     }
 
+    public static boolean canSmeltStatic(ItemStack item) {
+        return FURNACE_RECIPES.stream().anyMatch(r -> r.getInputChoice().test(item));
+    }
+
     public boolean canSmelt(ItemStack item) {
         boolean can = FURNACE_RECIPES.stream().peek(r -> cachedSmeltResult = r.getResult()).anyMatch(r -> r.getInputChoice().test(item));
 

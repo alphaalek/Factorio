@@ -3,7 +3,9 @@ package dk.superawesome.factorio.mechanics.impl.circuits;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.impl.accessible.Smelter;
 import dk.superawesome.factorio.mechanics.routes.Routes;
+import dk.superawesome.factorio.mechanics.stackregistry.Fuel;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.util.MaterialTags;
@@ -87,6 +89,13 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
     }
 
     public static Predicate<ItemStack> findFilter(Stack<String> stack, String name) {
+        stack.push(name.toLowerCase());
+        if (name.equalsIgnoreCase("fuel")) {
+            return i -> Fuel.getType(i.getType()).isPresent();
+        } else if (name.equalsIgnoreCase("smeltable")) {
+            return Smelter::canSmeltStatic;
+        }
+
         return findItem(stack, name).map(i -> (Predicate<ItemStack>) i::isSimilar)
                 .orElse(findTag(stack, name).map(tag -> (Predicate<ItemStack>) item -> tag.isTagged(item.getType()))
                         .orElse(null)
@@ -96,7 +105,6 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
     public static Optional<ItemStack> findItem(Stack<String> stack, String name) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equalsIgnoreCase(name))
-                .peek(m -> stack.push(m.name().toLowerCase()))
                 .findFirst()
                 .map(ItemStack::new);
     }
