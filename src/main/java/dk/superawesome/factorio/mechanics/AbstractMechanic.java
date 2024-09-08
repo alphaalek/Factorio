@@ -8,6 +8,7 @@ import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.TickThrottle;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.StringUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -108,9 +109,9 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
         // transfer sign lines
         Sign prevSign = (Sign) signBlock.getState();
         this.loc.getBlock().getRelative(this.rot).setType(signBlock.getType());
-        Sign sign = getSign();
-        this.getProfile().getBuilding().rotate(sign.getBlock(), this.rot);
+        this.getProfile().getBuilding().rotate(this.loc.getBlock().getRelative(this.rot), this.rot);
 
+        Sign sign = getSign();
         sign.getSide(Side.FRONT).setLine(0, prevSign.getSide(Side.FRONT).getLine(0));
         sign.getSide(Side.FRONT).setLine(1, prevSign.getSide(Side.FRONT).getLine(1));
         sign.getSide(Side.FRONT).setLine(2, prevSign.getSide(Side.FRONT).getLine(2));
