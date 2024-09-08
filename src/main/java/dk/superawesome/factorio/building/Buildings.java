@@ -126,7 +126,6 @@ public class Buildings {
     }
 
     public static void build(World world, Mechanic<?> mechanic) {
-        Bukkit.broadcastMessage("Placing " + mechanic.getRotation());
         Building building = mechanic.getProfile().getBuilding();
         if (building instanceof Buildable buildable) {
             int i = 0;

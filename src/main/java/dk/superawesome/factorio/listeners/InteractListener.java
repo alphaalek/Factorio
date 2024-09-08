@@ -34,10 +34,11 @@ public class InteractListener implements Listener {
                     event.setCancelled(true);
                     moveMechanic(event.getPlayer(), mechanic);
                 } else if ((!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.AIR))
-                        && !mechanic.getProfile().isInteractable() && event.getAction() == Action.RIGHT_CLICK_BLOCK
-                        && mechanic.getProfile() instanceof GuiMechanicProfile<?>) {
+                        && !mechanic.getProfile().isInteractable() && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     event.setCancelled(true);
-                    interactMechanic(event.getPlayer(), mechanic);
+                    if (mechanic.getProfile() instanceof GuiMechanicProfile<?>) {
+                        interactMechanic(event.getPlayer(), mechanic);
+                    }
                 }
             } else if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.WOODEN_AXE)
                     && !checkDoubleAccess(event.getPlayer())) {
