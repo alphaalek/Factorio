@@ -9,7 +9,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.type.Repeater;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -34,6 +33,8 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     @Override
     public void onBlocksLoaded(Player by) {
         setupRelativeBlocks();
+
+        startLift(p -> p.triggerLevers());
     }
 
     @Override
@@ -126,29 +127,12 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     public void onBlockBreak(BlockBreakEvent event) {
         super.handleBlockBreak(event);
 
-        if (BlockUtil.isDiagonal2DFast(event.getBlock(), loc.getBlock())) {
-            Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-                boolean prevPowered = powered;
-                powered = false;
-                BlockUtil.forRelative(loc.getBlock(), b -> {
-                    if (b.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(b, false).equals(loc.getBlock())) {
-                        BlockUtil.forRelative(b, b2 -> {
-                            if (b2.getType() == Material.REPEATER && BlockUtil.getPointingBlock(b2, true).equals(b) && ((Repeater)b2.getBlockData()).isPowered()) {
-                                powered = true;
-                            }
-                        });
-                    // TODO: Is this really needed? And might it even show it's powered without actually being it sometimes?
-                    } else if (b.getType() == Material.OBSERVER && BlockUtil.getPointingBlock(b, true).equals(loc.getBlock())) {
-                        if (Factorio.get().getMechanicManager(b.getWorld()).getMechanicAt(b.getLocation()) instanceof PowerLifter lifter) {
-                            powered = lifter.powered;
-                        }
-                    }
-                });
-
-                if (prevPowered != powered) {
-                    startLift(p -> p.triggerLevers(powered));
-                }
-            });
+        if (BlockUtil.isRelativeFast(event.getBlock(), loc.getBlock())) {
+            MechanicManager manager = Factorio.get().getMechanicManager(event.getBlock().getWorld());
+            Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
+            if (mechanic.equals(PowerLifter.this)) {
+                startLift(p -> p.triggerLevers(false));
+            }
         }
     }
 
