@@ -40,12 +40,14 @@ public class SignChangeListener implements Listener {
             }
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
             Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
-            if (on == null
-                    || manager.getProfileFrom((Sign) event.getBlock().getState()).isPresent() && on.getState() instanceof TileState) {
+            if (manager.getProfileFrom((Sign) event.getBlock().getState()).isPresent()
+                    && (on == null || on.getState() instanceof TileState)) {
                 event.getPlayer().sendMessage("§cDu kan ikke placere en maskine på denne block!");
                 event.setCancelled(true);
                 event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(event.getPlayer().getInventory().getItemInMainHand().getType()));
                 event.getBlock().setType(Material.AIR);
+                return;
+            } else if (on == null) {
                 return;
             }
 
