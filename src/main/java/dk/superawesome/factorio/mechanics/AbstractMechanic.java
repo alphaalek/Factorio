@@ -47,6 +47,8 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
         } catch (SQLException | IOException ex) {
             throw new RuntimeException("Failed to load mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
         }
+
+        onUpdate();
     }
 
     protected void loadFromStorage() {
