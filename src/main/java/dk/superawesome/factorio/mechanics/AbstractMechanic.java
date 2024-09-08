@@ -9,6 +9,8 @@ import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
@@ -95,9 +97,15 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
         // to be overridden if needed
     }
 
+    protected Sign getSign() {
+        return (Sign) loc.getBlock().getRelative(rot).getState();
+    }
+
     @Override
     public void onUpgrade(int newLevel) {
-
+        Sign sign = getSign();
+        sign.getSide(Side.FRONT).setLine(1, "Lvl " + newLevel);
+        sign.update();
     }
 
     @Override

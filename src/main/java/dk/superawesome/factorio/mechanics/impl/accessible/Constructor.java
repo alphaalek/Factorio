@@ -99,6 +99,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     @Override
     public void onUpgrade(int newLevel) {
         thinkDelayHandler.setDelay(level.getInt(MechanicLevel.THINK_DELAY_MARK));
+        super.onUpgrade(newLevel);
     }
 
     @Override

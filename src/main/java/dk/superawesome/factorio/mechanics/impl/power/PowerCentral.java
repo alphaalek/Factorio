@@ -58,6 +58,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     @Override
     public void onUpgrade(int newLevel) {
         thinkDelayHandler.setDelay(level.getInt(MechanicLevel.THINK_DELAY_MARK));
+        super.onUpgrade(newLevel);
     }
 
     @Override

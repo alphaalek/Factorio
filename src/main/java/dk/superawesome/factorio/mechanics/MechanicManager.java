@@ -300,7 +300,12 @@ public class MechanicManager implements Listener {
 
         // load this mechanic
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
-        return load(profile, context.<SQLException>sneaky(profile.getName(), on), on.getLocation(), rotation);
+        Mechanic<?> mechanic = load(profile, context.<SQLException>sneaky(profile.getName(), on), on.getLocation(), rotation);
+
+        sign.getSide(Side.FRONT).setLine(1, "Lvl " + mechanic.getLevel());
+        sign.update();
+
+        return mechanic;
     }
 
     public void removeMechanic(Player player, Mechanic<?> mechanic) {

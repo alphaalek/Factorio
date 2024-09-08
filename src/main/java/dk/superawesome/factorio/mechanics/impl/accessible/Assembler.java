@@ -70,6 +70,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     @Override
     public void onUpgrade(int newLevel) {
         thinkDelayHandler.setDelay(level.getInt(MechanicLevel.THINK_DELAY_MARK));
+        super.onUpgrade(newLevel);
     }
 
     @Override

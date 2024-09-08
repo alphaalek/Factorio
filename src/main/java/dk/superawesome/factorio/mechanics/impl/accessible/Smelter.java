@@ -129,6 +129,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     @Override
     public void onUpgrade(int newLevel) {
         thinkDelayHandler.setDelay(level.get(MechanicLevel.THINK_DELAY_MARK));
+        super.onUpgrade(newLevel);
     }
 
     @Override

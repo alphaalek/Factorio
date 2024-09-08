@@ -88,6 +88,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     @Override
     public void onUpgrade(int newLevel) {
         thinkDelayHandler.setDelay(level.getInt(MechanicLevel.THINK_DELAY_MARK));
+        super.onUpgrade(newLevel);
     }
 
     @Override
