@@ -77,7 +77,7 @@ public class InteractListener implements Listener {
 
             // open the mechanic inventory
             if (accessible.openInventory(mechanic, player)) {
-                player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, 0.375f, 0.5f);
+                player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, 0.25f, 0.5f);
             }
         }
     }
