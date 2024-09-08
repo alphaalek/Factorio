@@ -2,10 +2,7 @@ package dk.superawesome.factorio.listeners;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Matcher;
-import dk.superawesome.factorio.mechanics.Management;
-import dk.superawesome.factorio.mechanics.Mechanic;
-import dk.superawesome.factorio.mechanics.MechanicBuildResponse;
-import dk.superawesome.factorio.mechanics.MechanicManager;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
@@ -38,7 +35,9 @@ public class SignChangeListener implements Listener {
 
             // ensure first line persists to be identifiable for the mechanic at this sign block
             event.setLine(0, "[" + partiallyAt.getProfile().getSignName() + "]");
-            event.setLine(1, "Lvl " + partiallyAt.getLevel().lvl());
+            if (partiallyAt instanceof AccessibleMechanic) {
+                event.setLine(1, "Lvl " + partiallyAt.getLevel().lvl());
+            }
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
             Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
             if (on == null
