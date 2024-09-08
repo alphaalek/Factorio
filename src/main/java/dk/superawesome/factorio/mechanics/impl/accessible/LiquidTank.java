@@ -6,8 +6,11 @@ import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.stackregistry.Fluid;
 import dk.superawesome.factorio.mechanics.transfer.FluidCollection;
 import dk.superawesome.factorio.mechanics.transfer.FluidContainer;
+import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -55,6 +58,13 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
         context.getSerializer().writeInt(str, fluidAmount);
 
         context.uploadData(str);
+    }
+
+    @Override
+    public void onUpdate() {
+        Sign sign = getSign();
+        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(((double)fluidAmount) / getCapacity(), 2) + "% fyldt");
+        sign.update();
     }
 
     @Override

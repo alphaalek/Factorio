@@ -5,8 +5,11 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.mechanics.transfer.MoneyContainer;
+import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,6 +37,13 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
         context.getSerializer().writeDouble(stream, this.moneyAmount);
 
         context.uploadData(stream);
+    }
+
+    @Override
+    public void onUpdate() {
+        Sign sign = getSign();
+        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(((double)moneyAmount) / getCapacity(), 2) + "% fyldt");
+        sign.update();
     }
 
     @Override
