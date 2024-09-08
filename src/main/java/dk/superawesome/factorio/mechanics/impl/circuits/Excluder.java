@@ -19,10 +19,11 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class Excluder extends Circuit<Excluder, ItemCollection> implements ItemContainer {
 
-    private final List<ItemStack> filter = new ArrayList<>();
+    private final List<Predicate<ItemStack>> filter = new ArrayList<>();
 
     public Excluder(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -47,7 +48,7 @@ public class Excluder extends Circuit<Excluder, ItemCollection> implements ItemC
 
     @Override
     public boolean pipePut(ItemCollection collection) {
-        for (ItemStack filter : this.filter) {
+        for (Predicate<ItemStack> filter : this.filter) {
             if (collection.has(filter)) {
                 return false;
             }

@@ -6,9 +6,11 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
+import dk.superawesome.factorio.util.MaterialTags;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
@@ -18,10 +20,11 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class Filter extends Circuit<Filter, ItemCollection> implements ItemContainer {
 
-    private final List<ItemStack> filter = new ArrayList<>();
+    private final List<Predicate<ItemStack>> filter = new ArrayList<>();
 
     public Filter(Location loc, BlockFace rotation, MechanicStorageContext context) {
         super(loc, rotation, context);
@@ -39,7 +42,7 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
         }
     }
 
-    public static void loadItems(List<ItemStack> filter, Sign sign, Player by, Mechanic<?> mechanic) {
+    public static void loadItems(List<Predicate<ItemStack>> filter, Sign sign, Player by, Mechanic<?> mechanic) {
         // remove previous filter items if any present
         filter.clear();
 
@@ -47,7 +50,7 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
         for (String line : Arrays.copyOfRange(sign.getSide(Side.FRONT).getLines(), 1, 4)) {
             Arrays.stream(line.split(","))
                     .map(String::trim)
-                    .map(Filter::findItem)
+                    .map(s -> findFilter(new Stack<>(), s))
                     .forEach(filter::add);
         }
         filter.removeAll(Collections.singletonList(null));
@@ -64,12 +67,13 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
             for (int i = 1; i < 4; i++) {
                 String line = sign.getSide(Side.FRONT).getLine(i);
                 StringBuilder builder = new StringBuilder();
+                Stack<String> stack = new Stack<>();
                 Arrays.stream(line.split(","))
                         .map(String::trim)
-                        .map(Filter::findItem)
+                        .map(s -> findFilter(stack, s))
                         .filter(Objects::nonNull)
                         .peek(__ -> builder.append(","))
-                        .forEach(item -> builder.append(item.getType().name().toLowerCase()));
+                        .forEach(item -> builder.append(stack.pop()));
 
                 if (!builder.isEmpty()) {
                     sign.getSide(Side.FRONT).setLine(i, builder.substring(1));
@@ -82,12 +86,31 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
         }
     }
 
-    public static ItemStack findItem(String name) {
+    public static Predicate<ItemStack> findFilter(Stack<String> stack, String name) {
+        return findItem(stack, name).map(i -> (Predicate<ItemStack>) i::isSimilar)
+                .orElse(findTag(stack, name).map(tag -> (Predicate<ItemStack>) item -> tag.isTagged(item.getType()))
+                        .orElse(null)
+                );
+    }
+
+    public static Optional<ItemStack> findItem(Stack<String> stack, String name) {
         return Arrays.stream(Material.values())
                 .filter(m -> m.name().equalsIgnoreCase(name))
+                .peek(m -> stack.push(m.name().toLowerCase()))
                 .findFirst()
-                .map(ItemStack::new)
-                .orElse(null);
+                .map(ItemStack::new);
+    }
+
+    public static Optional<Tag<Material>> findTag(Stack<String> stack, String name) {
+        if (name.startsWith("tag:")) {
+            return MaterialTags.LIST.entrySet().stream()
+                    .filter(t -> t.getKey().equalsIgnoreCase(name.substring(4)))
+                    .peek(t -> stack.push("tag:" + t.getKey()))
+                    .map(Map.Entry::getValue)
+                    .findFirst();
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -102,7 +125,7 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
 
     @Override
     public boolean pipePut(ItemCollection collection) {
-        for (ItemStack filter : this.filter) {
+        for (Predicate<ItemStack> filter : this.filter) {
             if (collection.has(filter)) {
                 return Routes.startTransferRoute(loc.getBlock(), collection, this, false);
             }
