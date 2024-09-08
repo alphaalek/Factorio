@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics;
 
 import com.google.common.collect.Sets;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.api.events.MechanicMoveEvent;
@@ -11,6 +12,7 @@ import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
+import dk.superawesome.factorio.util.WorldGuard;
 import dk.superawesome.factorio.util.db.Query;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.BlockUtil;
@@ -225,6 +227,12 @@ public class MechanicManager implements Listener {
             player.sendMessage("§cDu kan ikke flytte maskinen hertil!");
             return false;
         }
+        for (Location loc : event.getLocations()) {
+            if (!WorldGuard.canBuild(player, loc)) {
+                player.sendMessage("§cDu kan ikke flytte maskinen hertil!");
+                return false;
+            }
+        }
 
         Routes.removeNearbyRoutes(mechanic.getLocation().getBlock());
 
@@ -332,8 +340,10 @@ public class MechanicManager implements Listener {
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
         Mechanic<?> mechanic = load(profile, context.<SQLException>sneaky(profile.getName(), on), on.getLocation(), rotation);
 
-        sign.getSide(Side.FRONT).setLine(1, "Lvl " + mechanic.getLevel().lvl());
-        sign.update();
+        if (mechanic instanceof AccessibleMechanic) {
+            sign.getSide(Side.FRONT).setLine(1, "Lvl " + mechanic.getLevel().lvl());
+            sign.update();
+        }
 
         return mechanic;
     }
