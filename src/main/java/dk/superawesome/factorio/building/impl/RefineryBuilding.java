@@ -17,7 +17,7 @@ public class RefineryBuilding implements Building, Buildable {
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
             (b, r) -> b.setType(Material.LOOM),
             (b, r) -> b.setType(Material.LODESTONE),
-            (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */
+            (b, r) -> {}
     );
 
     @Override

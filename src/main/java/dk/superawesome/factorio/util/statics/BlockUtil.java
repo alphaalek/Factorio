@@ -111,6 +111,20 @@ public class BlockUtil {
         }
     }
 
+    public static BlockFace getPrimaryDirection(double yaw) {
+        yaw = (yaw % 360 + 360) % 360;
+
+        if (yaw >= 315 || yaw < 45) {
+            return BlockFace.SOUTH;
+        } else if (yaw >= 45 && yaw < 135) {
+            return BlockFace.WEST;
+        } else if (yaw >= 135 && yaw < 225) {
+            return BlockFace.NORTH;
+        } else { // yaw >= 225 && yaw < 315
+            return BlockFace.EAST;
+        }
+    }
+
     public static boolean blockEquals(Location loc1, Location loc2) {
         return loc1.getBlockX() == loc2.getBlockX()
                 && loc1.getBlockY() == loc2.getBlockY()

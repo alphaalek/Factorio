@@ -30,13 +30,13 @@ public class Excluder extends Circuit<Excluder, ItemCollection> implements ItemC
 
     @Override
     public void onBlocksLoaded(Player by) {
-        Filter.loadItems(filter, (Sign) loc.getBlock().getRelative(rot).getState(), by, loc, this);
+        Filter.loadItems(filter, (Sign) this.loc.getBlock().getRelative(this.rot).getState(), by, this);
     }
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        if (event.getBlock().equals(loc.getBlock().getRelative(rot))) {
-            Bukkit.getScheduler().runTask(Factorio.get(), () -> Filter.loadItems(filter, (Sign) event.getBlock().getState(), event.getPlayer(), loc, this));
+        if (event.getBlock().equals(this.loc.getBlock().getRelative(this.rot))) {
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> Filter.loadItems(filter, (Sign) event.getBlock().getState(), event.getPlayer(), this));
         }
     }
 
@@ -53,7 +53,7 @@ public class Excluder extends Circuit<Excluder, ItemCollection> implements ItemC
             }
         }
 
-        return Routes.startTransferRoute(loc.getBlock(), collection, this, false);
+        return Routes.startTransferRoute(this.loc.getBlock(), collection, this, false);
     }
 
     @Override

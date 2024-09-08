@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.building;
 
 import dk.superawesome.factorio.util.Identifiable;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;

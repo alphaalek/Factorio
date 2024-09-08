@@ -227,7 +227,11 @@ public class Elements {
 
         @Override
         public ItemStack getItem() {
-            return new ItemBuilder(Material.RED_WOOL).setName("§cSlet Maskine").build();
+            return new ItemBuilder(Material.RED_WOOL)
+                    .setName("§cSlet Maskine")
+                    .addLore("§cVær opmærksom på, at du kan")
+                    .addLore("§crykke din maskine med en træøkse.")
+                    .build();
         }
     };
 }

@@ -63,13 +63,22 @@ public class MechanicStorageContext {
     }
 
     private final MechanicController controller;
-    private final Location location;
     private final Management fallbackManagement;
+
+    private Location location;
 
     public MechanicStorageContext(MechanicController controller, Location location, Management fallbackManagement) {
         this.controller = controller;
         this.location = location;
         this.fallbackManagement = fallbackManagement;
+    }
+
+    public void move(Location loc, BlockFace rot) throws SQLException {
+        if (hasContext() && this.controller.validConnection()) {
+            this.controller.move(this.location, loc, rot);
+        }
+
+        this.location = loc;
     }
 
     public MechanicController getController() {

@@ -29,17 +29,20 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
 
     @Override
     public void onBlocksLoaded(Player by) {
-        loadItems(filter, (Sign) loc.getBlock().getRelative(rot).getState(), by, loc, this);
+        loadItems(filter, (Sign) this.loc.getBlock().getRelative(this.rot).getState(), by, this);
     }
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        if (event.getBlock().equals(loc.getBlock().getRelative(rot))) {
-            Bukkit.getScheduler().runTask(Factorio.get(), () -> loadItems(filter, (Sign) event.getBlock().getState(), event.getPlayer(), loc, this));
+        if (event.getBlock().equals(this.loc.getBlock().getRelative(this.rot))) {
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> loadItems(filter, (Sign) event.getBlock().getState(), event.getPlayer(), this));
         }
     }
 
-    public static void loadItems(List<ItemStack> filter, Sign sign, Player by, Location loc, Mechanic<?> mechanic) {
+    public static void loadItems(List<ItemStack> filter, Sign sign, Player by, Mechanic<?> mechanic) {
+        // remove previous filter items if any present
+        filter.clear();
+
         // get all lines except the first
         for (String line : Arrays.copyOfRange(sign.getSide(Side.FRONT).getLines(), 1, 4)) {
             Arrays.stream(line.split(","))
@@ -50,8 +53,8 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
         filter.removeAll(Collections.singletonList(null));
 
         if (filter.isEmpty()) {
-            Factorio.get().getMechanicManager(loc.getWorld()).unload(mechanic);
-            Buildings.remove(loc.getWorld(), mechanic);
+            Factorio.get().getMechanicManagerFor(mechanic).unload(mechanic);
+            Buildings.remove(mechanic, mechanic.getLocation(), mechanic.getRotation(), true);
 
             if (by != null) {
                 by.sendMessage("§cUgyldig item valgt!");

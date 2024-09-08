@@ -211,6 +211,28 @@ public class MechanicManager implements Listener {
         return Optional.empty();
     }
 
+    public boolean moveMechanic(Player player, Mechanic<?> mechanic, Location to, BlockFace rot, Block sign) {
+        if (!Buildings.canMoveTo(to, rot, mechanic)) {
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+            player.sendMessage("§cDer er ikke nok plads til at flytte maskinen!");
+            return false;
+        }
+
+        Routes.removeNearbyRoutes(mechanic.getLocation().getBlock());
+
+        this.mechanics.remove(BlockUtil.getVec(mechanic.getLocation()));
+        this.mechanics.put(BlockUtil.getVec(to), mechanic);
+
+        mechanic.move(to, rot, sign);
+        mechanic.onBlocksLoaded(player);
+
+        // player stuff
+        to.getWorld().playSound(to, Sound.BLOCK_ANVIL_PLACE, 0.375f, 1f);
+        player.sendMessage("§eDu flyttede maskinen " + mechanic + " til " + Types.LOCATION.convert(to) + ".");
+
+        return true;
+    }
+
     public MechanicBuildResponse buildMechanic(Sign sign, Player owner) {
         Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
         if (profile.isEmpty()) {
@@ -302,7 +324,7 @@ public class MechanicManager implements Listener {
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
         Mechanic<?> mechanic = load(profile, context.<SQLException>sneaky(profile.getName(), on), on.getLocation(), rotation);
 
-        sign.getSide(Side.FRONT).setLine(1, "Lvl " + mechanic.getLevel());
+        sign.getSide(Side.FRONT).setLine(1, "Lvl " + mechanic.getLevel().lvl());
         sign.update();
 
         return mechanic;
@@ -326,7 +348,8 @@ public class MechanicManager implements Listener {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to delete mechanic at location " + mechanic.getLocation(), ex);
             return;
         }
-        Buildings.remove(player.getWorld(), mechanic);
+        Buildings.remove(mechanic, mechanic.getLocation(), mechanic.getRotation(), true);
+        Movement.removeMechanic(player, mechanic);
 
         Routes.removeNearbyRoutes(mechanic.getLocation().getBlock());
 

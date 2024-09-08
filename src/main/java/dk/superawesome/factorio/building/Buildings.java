@@ -4,10 +4,9 @@ import dk.superawesome.factorio.building.impl.*;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.util.Array;
 import dk.superawesome.factorio.util.statics.BlockUtil;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockVector;
 
@@ -65,10 +64,10 @@ public class Buildings {
         return buildings;
     }
 
-    private static List<Location> getLocations(Mechanic<?> mechanic) {
+    private static List<Location> getLocations(Mechanic<?> mechanic, Location rel, BlockFace rot) {
         List<Location> locs = new ArrayList<>();
         for (BlockVector relVec : mechanic.getProfile().getBuilding().getRelatives()) {
-            Location loc = BlockUtil.getRel(mechanic.getLocation(), BlockUtil.rotateVec(relVec, Building.DEFAULT_ROTATION, mechanic.getRotation()));
+            Location loc = BlockUtil.getRel(rel, BlockUtil.rotateVec(relVec, Building.DEFAULT_ROTATION, rot));
             locs.add(loc);
         }
 
@@ -76,7 +75,7 @@ public class Buildings {
     }
 
     public static boolean intersects(Location loc, Mechanic<?> mechanic) {
-        for (Location relLoc : getLocations(mechanic)) {
+        for (Location relLoc : getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation())) {
             if (BlockUtil.blockEquals(relLoc, loc)) {
                 return true;
             }
@@ -85,9 +84,20 @@ public class Buildings {
         return false;
     }
 
+    public static boolean canMoveTo(Location to, BlockFace rotation, Mechanic<?> mechanic) {
+        for (Location relLoc : getLocations(mechanic, to, rotation)) {
+            // check if this block can be placed in the world
+            if (relLoc.getBlock().getType() != Material.AIR) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static boolean hasSpaceFor(Block sign, Mechanic<?> mechanic) {
         if (mechanic.getProfile().getBuilding() instanceof Buildable) {
-            for (Location relLoc : getLocations(mechanic)) {
+            for (Location relLoc : getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation())) {
                 // check if this block can be placed in the world
                 if (!relLoc.getBlock().equals(sign)
                         && !relLoc.getBlock().getLocation().equals(mechanic.getLocation())
@@ -105,7 +115,7 @@ public class Buildings {
         if (building instanceof Matcher matcher) {
             int i = 0;
             // check if all the placed blocks matches the matcher
-            for (Location relLoc : getLocations(mechanic)) {
+            for (Location relLoc : getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation())) {
                 if (!matcher.getMaterials().get(i++).test(relLoc.getBlock().getType())) {
                     return false;
                 }
@@ -116,28 +126,35 @@ public class Buildings {
     }
 
     public static void build(World world, Mechanic<?> mechanic) {
+        Bukkit.broadcastMessage("Placing " + mechanic.getRotation());
         Building building = mechanic.getProfile().getBuilding();
         if (building instanceof Buildable buildable) {
             int i = 0;
-            for (Location relLoc : getLocations(mechanic)) {
+            for (Location relLoc : getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation())) {
                 buildable.getBlocks().get(i++)
                         .accept(world.getBlockAt(relLoc), mechanic.getRotation());
             }
         }
     }
 
-    public static void remove(World world, Mechanic<?> mechanic) {
-        Block sign = mechanic.getLocation().getBlock().getRelative(mechanic.getRotation());
-        for (ItemStack drops : sign.getDrops()) {
-            world.dropItemNaturally(mechanic.getLocation(), drops);
+    public static void remove(Mechanic<?> mechanic, Location loc, BlockFace rot, boolean dropSign) {
+        Block sign = loc.getBlock().getRelative(rot);
+        if (dropSign) {
+            for (ItemStack drops : sign.getDrops()) {
+                loc.getWorld().dropItemNaturally(loc, drops);
+            }
         }
 
         if (mechanic.getProfile().getBuilding() instanceof Buildable) {
-            for (Location relLoc : getLocations(mechanic)) {
-                world.getBlockAt(relLoc).setType(Material.AIR, false); // don't apply physics
+            for (Location relLoc : getLocations(mechanic, loc, rot)) {
+                loc.getWorld().getBlockAt(relLoc).setType(Material.AIR, false); // don't apply physics
             }
         } else {
             sign.setType(Material.AIR);
         }
+    }
+
+    public static void remove(Mechanic<?> mechanic, boolean dropSign) {
+        remove(mechanic, mechanic.getLocation(), mechanic.getRotation(), dropSign);
     }
 }

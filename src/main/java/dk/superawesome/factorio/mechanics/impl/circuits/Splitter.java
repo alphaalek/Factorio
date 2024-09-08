@@ -41,6 +41,7 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
 
     @Override
     public void onBlocksLoaded(Player by) {
+        outputBlocks.clear();
         setupNearby();
     }
 

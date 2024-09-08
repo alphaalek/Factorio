@@ -57,17 +57,17 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     @Override
     public void onUpgrade(int newLevel) {
-        thinkDelayHandler.setDelay(level.getInt(MechanicLevel.THINK_DELAY_MARK));
+        this.thinkDelayHandler.setDelay(this.level.getInt(MechanicLevel.THINK_DELAY_MARK));
         super.onUpgrade(newLevel);
     }
 
     @Override
     public void onBlocksLoaded(Player by) {
-        lever = getLocation().getBlock().getRelative(rot.getOppositeFace());
+        lever = getLocation().getBlock().getRelative(this.rot.getOppositeFace());
         if (lever.getType() != Material.LEVER) {
             // invalid power central
             Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
-            Buildings.remove(loc.getWorld(), this);
+            Buildings.remove(this, this.loc, this.rot, true);
         } else {
             // update block state
             updateLight();

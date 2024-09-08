@@ -17,7 +17,7 @@ public class EmeraldForgeBuilding implements Building, Buildable {
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
             (b, r) -> b.setType(Material.EMERALD_BLOCK),
             (b, r) -> b.setType(Material.BEACON),
-            (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */
+            (b, r) -> {}
     );
 
     @Override

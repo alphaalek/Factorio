@@ -28,6 +28,8 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
 
     @Override
     public void onBlocksLoaded(Player by) {
+        takeMechanic = null;
+        putMechanic = null;
         // check IO after all other mechanics has been loaded
         Bukkit.getScheduler().runTask(Factorio.get(), this::checkIO);
     }

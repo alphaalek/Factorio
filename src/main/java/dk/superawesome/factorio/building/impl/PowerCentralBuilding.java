@@ -29,7 +29,7 @@ public class PowerCentralBuilding implements Building, Buildable {
             (b, r) -> b.setType(Material.SMOOTH_STONE),
             (b, r) -> b.setType(Material.REDSTONE_LAMP),
             (b, r) -> b.setType(Material.REDSTONE_TORCH),
-            (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */,
+            (b, r) -> {},
             (b, r) -> setLever(b, BlockUtil.getRotationRelative(DEFAULT_ROTATION, DEFAULT_ROTATION.getOppositeFace(), r))
     );
 

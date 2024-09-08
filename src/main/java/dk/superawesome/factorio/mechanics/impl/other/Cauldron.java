@@ -30,10 +30,9 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
     }
 
     private void checkCauldron() {
-        if (loc.getBlock().getType() == Material.CAULDRON) {
-            this.fluid = null;
-            this.amount = 0;
-        } else if (loc.getBlock().getType() == Material.WATER_CAULDRON) {
+        this.fluid = null;
+        this.amount = 0;
+        if (loc.getBlock().getType() == Material.WATER_CAULDRON) {
             Levelled cauldron = (Levelled) loc.getBlock().getBlockData();
             amount = cauldron.getLevel();
             fluid = Fluid.WATER;

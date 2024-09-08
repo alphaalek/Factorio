@@ -17,7 +17,7 @@ public class ConstructorBuilding implements Building, Buildable {
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
             (b, r) -> b.setType(Material.OAK_PLANKS),
             (b, r) -> b.setType(Material.CRAFTING_TABLE),
-            (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */
+            (b, r) -> {}
     );
 
     @Override

@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
@@ -8,6 +9,7 @@ import dk.superawesome.factorio.util.TickThrottle;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
@@ -22,10 +24,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     protected final AtomicReference<? extends BaseGui<?>> inUse = new AtomicReference<>();
     protected final TickThrottle tickThrottle = new TickThrottle();
-    protected final Location loc;
-    protected final BlockFace rot;
     protected final MechanicStorageContext context;
     protected final Management management;
+
+    protected Location loc;
+    protected BlockFace rot;
 
     protected MechanicLevel level;
     protected double xp;
@@ -82,6 +85,40 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
         } catch (Exception ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to save mechanic " + this + ", " + getLocation(), ex);
         }
+    }
+
+    @Override
+    public void move(Location loc, BlockFace rot, Block signBlock) {
+        Location prevLoc = this.loc;
+        BlockFace prevRot = this.rot;
+
+        this.loc = loc;
+        this.rot = rot;
+
+        // change the stored location and rotation data
+        try {
+            this.context.move(loc, rot);
+        } catch (Exception ex) {
+            Factorio.get().getLogger().log(Level.SEVERE, "Failed to move mechanic " + this + ", " + getLocation(), ex);
+        }
+
+        // place the blocks for the mechanic at the new place
+        Buildings.build(loc.getWorld(), this);
+
+        // transfer sign lines
+        Sign prevSign = (Sign) signBlock.getState();
+        this.loc.getBlock().getRelative(this.rot).setType(signBlock.getType());
+        Sign sign = getSign();
+        this.getProfile().getBuilding().rotate(sign.getBlock(), this.rot);
+
+        sign.getSide(Side.FRONT).setLine(0, prevSign.getSide(Side.FRONT).getLine(0));
+        sign.getSide(Side.FRONT).setLine(1, prevSign.getSide(Side.FRONT).getLine(1));
+        sign.getSide(Side.FRONT).setLine(2, prevSign.getSide(Side.FRONT).getLine(2));
+        sign.getSide(Side.FRONT).setLine(3, prevSign.getSide(Side.FRONT).getLine(3));
+        sign.update();
+
+        // remove the previous blocks
+        Buildings.remove(this, prevLoc, prevRot, false);
     }
 
     @Override

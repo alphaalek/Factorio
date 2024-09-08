@@ -17,7 +17,7 @@ public class AssemblerBuilding implements Building, Buildable {
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
             (b, r) -> b.setType(Material.CRYING_OBSIDIAN),
             (b, r) -> b.setType(Material.ENCHANTING_TABLE),
-            (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */
+            (b, r) -> {}
     );
 
     @Override

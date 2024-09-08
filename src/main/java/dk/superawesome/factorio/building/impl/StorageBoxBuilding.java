@@ -20,7 +20,7 @@ public class StorageBoxBuilding implements Building, Buildable {
                 b.setType(Material.CHEST);
                 rotate(b, r);
             },
-            (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */
+            (b, r) -> {}
     );
 
     @Override

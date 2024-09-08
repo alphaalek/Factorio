@@ -130,6 +130,18 @@ public class MechanicController {
         query.execute(this.connection);
     }
 
+    public void move(Location from, Location to, BlockFace rot) throws SQLException {
+        Query query = new Query(
+                "UPDATE mechanics " +
+                "SET location = ?, rotation = ? " +
+                "WHERE location = ?")
+                .add(Types.LOCATION.convert(to))
+                .add(rot.name())
+                .add(Types.LOCATION.convert(from));
+
+        query.execute(this.connection);
+    }
+
     public void deleteAt(Location location) throws SQLException {
         Query query = new Query(
                 "DELETE FROM mechanics " +

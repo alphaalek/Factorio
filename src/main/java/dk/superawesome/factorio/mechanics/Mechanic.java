@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.util.TickThrottle;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -14,6 +15,8 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener, Source {
     void unload();
 
     void save();
+
+    void move(Location loc, BlockFace rot, Block sign);
 
     void onUpgrade(int newLevel);
 

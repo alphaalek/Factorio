@@ -29,7 +29,7 @@ public class GeneratorBuilding implements Building, Buildable {
             (b, r) -> b.setType(Material.BRICKS),
             (b, r) -> b.setType(Material.SMOKER),
             (b, r) -> b.setType(Material.CAMPFIRE),
-            (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */,
+            (b, r) -> {},
             (b, r) -> setLever(b, BlockUtil.getRotationRelative(DEFAULT_ROTATION, DEFAULT_ROTATION.getOppositeFace(), r))
     );
 

@@ -7,6 +7,7 @@ import dk.superawesome.factorio.util.TickValue;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,13 +28,31 @@ public class InteractListener implements Listener {
         if (event.getClickedBlock() != null) {
             MechanicManager manager = Factorio.get().getMechanicManager(event.getClickedBlock().getWorld());
             Mechanic<?> mechanic = manager.getMechanicPartially(event.getClickedBlock().getLocation());
-            if (mechanic != null && !mechanic.getProfile().isInteractable() && event.getAction() == Action.RIGHT_CLICK_BLOCK && (!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR)) {
-                event.setCancelled(true);
+            if (mechanic != null) {
 
-                if (mechanic.getProfile() instanceof GuiMechanicProfile<?>) {
+                if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.WOODEN_AXE)) {
+                    event.setCancelled(true);
+                    moveMechanic(event.getPlayer(), mechanic);
+                } else if ((!event.getPlayer().isSneaking() || event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.AIR))
+                        && !mechanic.getProfile().isInteractable() && event.getAction() == Action.RIGHT_CLICK_BLOCK
+                        && mechanic.getProfile() instanceof GuiMechanicProfile<?>) {
+                    event.setCancelled(true);
                     interactMechanic(event.getPlayer(), mechanic);
                 }
+            } else if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.WOODEN_AXE)
+                    && !checkDoubleAccess(event.getPlayer())) {
+                event.setCancelled(true);
+
+                if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                    Movement.finishMovement(event.getPlayer(), event.getClickedBlock().getRelative(BlockFace.UP).getLocation());
+                } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+                    Movement.unregisterMovement(event.getPlayer());
+                }
             }
+        } else if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.WOODEN_AXE) && event.getAction() == Action.LEFT_CLICK_AIR
+                && !checkDoubleAccess(event.getPlayer())) {
+            event.setCancelled(true);
+            Movement.unregisterMovement(event.getPlayer());
         }
     }
 
@@ -42,7 +61,10 @@ public class InteractListener implements Listener {
         MechanicManager manager = Factorio.get().getMechanicManager(event.getBlock().getWorld());
         Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
         if (mechanic != null) {
-            if (mechanic.getProfile().getBuilding() instanceof Matcher) {
+            if (event.getPlayer().getInventory().getItemInMainHand().equals(Material.WOODEN_AXE)) {
+                event.setCancelled(true);
+                moveMechanic(event.getPlayer(), mechanic);
+            } else if (mechanic.getProfile().getBuilding() instanceof Matcher) {
                 // check access
                 if (!mechanic.getManagement().hasAccess(event.getPlayer(), Management.DELETE)) {
                     event.getPlayer().sendMessage("§cDu har ikke adgang til at fjerne maskinen (" + Bukkit.getOfflinePlayer(mechanic.getManagement().getOwner()).getName() + ")!");
@@ -59,18 +81,41 @@ public class InteractListener implements Listener {
         }
     }
 
+    private boolean checkDoubleAccess(Player player) {
+        // ensure no double messages for blocks that calls interact event twice (e.g. interacting with Power Central)
+        if (interactedPlayers.get().contains(player.getUniqueId())) {
+            return true;
+        }
+        interactedPlayers.get().add(player.getUniqueId());
+        return false;
+    }
+
+    private void moveMechanic(Player player, Mechanic<?> mechanic) {
+        if (checkDoubleAccess(player)) {
+            return;
+        }
+
+        // check if the player has access to move this mechanic
+        if (!mechanic.getManagement().hasAccess(player, Management.MOVE)) {
+            // no access
+            player.sendMessage("§cDu har ikke adgang til at rykke denne maskine! (" + Bukkit.getOfflinePlayer(mechanic.getManagement().getOwner()).getName() + ")");
+            player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.4f, 0.4f);
+            return;
+        }
+
+        Movement.registerMovement(player, mechanic);
+    }
+
     private void interactMechanic(Player player, Mechanic<?> mechanic) {
         if (mechanic instanceof AccessibleMechanic accessible) {
-            // ensure no double messages for blocks that calls interact event twice (e.g. interacting with Power Central)
-            if (interactedPlayers.get().contains(player.getUniqueId())) {
+            if (checkDoubleAccess(player)) {
                 return;
             }
-            interactedPlayers.get().add(player.getUniqueId());
 
             // check if the player has access to open this mechanic
             if (!mechanic.getManagement().hasAccess(player, Management.OPEN)) {
                 // no access
-                player.sendMessage("§cDu har ikke adgang til at åbne denne maskine (" + Bukkit.getOfflinePlayer(mechanic.getManagement().getOwner()).getName() + ")!");
+                player.sendMessage("§cDu har ikke adgang til at åbne denne maskine! (" + Bukkit.getOfflinePlayer(mechanic.getManagement().getOwner()).getName() + ")");
                 player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.4f, 0.4f);
                 return;
             }

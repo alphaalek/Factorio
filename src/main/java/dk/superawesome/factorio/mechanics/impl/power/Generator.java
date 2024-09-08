@@ -93,12 +93,12 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public void onBlocksLoaded(Player by) {
-        lever = getLocation().getBlock().getRelative(rot.getOppositeFace());
+        lever = getLocation().getBlock().getRelative(this.rot.getOppositeFace());
         campfire = getLocation().getBlock().getRelative(0, 2, 0);
         if (lever.getType() != Material.LEVER || campfire.getType() != Material.CAMPFIRE) {
             // invalid generator
             Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
-            Buildings.remove(loc.getWorld(), this);
+            Buildings.remove(this, this.loc, this.rot, true);
             return;
         }
 

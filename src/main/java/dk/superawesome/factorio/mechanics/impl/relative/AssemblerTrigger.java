@@ -109,6 +109,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     @Override
     public void onBlocksLoaded(Player by) {
+        assemblers.clear();
         loadPrice((Sign) loc.getBlock().getRelative(rot).getState(), by);
 
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
@@ -171,8 +172,8 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
         // check if no valid filter found for this line
         if (!usePrice && !usePercentage) {
-            Factorio.get().getMechanicManager(loc.getWorld()).unload(this);
-            Buildings.remove(loc.getWorld(), this);
+            Factorio.get().getMechanicManager(this.loc.getWorld()).unload(this);
+            Buildings.remove(this, this.loc, this.rot, true);
 
             if (by != null) {
                 by.sendMessage("§cUgyldig pris eller procent!");

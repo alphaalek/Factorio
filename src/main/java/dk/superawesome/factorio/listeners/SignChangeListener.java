@@ -38,6 +38,7 @@ public class SignChangeListener implements Listener {
 
             // ensure first line persists to be identifiable for the mechanic at this sign block
             event.setLine(0, "[" + partiallyAt.getProfile().getSignName() + "]");
+            event.setLine(1, "Lvl " + partiallyAt.getLevel().lvl());
         } else if (Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
             Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
             if (on == null

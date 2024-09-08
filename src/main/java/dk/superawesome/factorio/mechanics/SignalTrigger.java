@@ -43,8 +43,9 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
     }
 
     protected void setupRelativeBlocks(Consumer<Block> findBlock, Consumer<Mechanic<?>> findMechanic) {
-        MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
+        levers.clear();
 
+        MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
         BlockUtil.forRelative(loc.getBlock(), block -> {
             if (block.getType() == Material.LEVER) {
                 levers.add(block);

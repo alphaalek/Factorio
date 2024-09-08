@@ -20,7 +20,7 @@ public class SmelterBuilding implements Building, Buildable {
                 b.setType(Material.BLAST_FURNACE);
                 rotate(b, r);
             },
-            (b, r) -> {} /* setPointingSign(b, relatives.get(0), r) */
+            (b, r) -> {}
     );
 
     @Override
