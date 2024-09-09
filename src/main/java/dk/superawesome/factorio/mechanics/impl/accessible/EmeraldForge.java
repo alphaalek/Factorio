@@ -42,7 +42,7 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
     @Override
     public void onUpdate() {
         Sign sign = getSign();
-        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(moneyAmount / getCapacity(), 2) + "% fyldt");
+        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(moneyAmount / getCapacity() * 100, 2) + "% fyldt");
         sign.update();
     }
 

@@ -63,7 +63,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     @Override
     public void onUpdate() {
         Sign sign = getSign();
-        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(((double)fluidAmount) / getCapacity(), 2) + "% fyldt");
+        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(((double)fluidAmount) / getCapacity() * 100, 2) + "% fyldt");
         sign.update();
     }
 
