@@ -53,6 +53,11 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
 
     public abstract void updateItems();
 
+    @Override
+    public void onClose(Player player, boolean anyViewersLeft) {
+        mechanic.onUpdate();
+    }
+
     protected List<GuiElement> getGuiElements() {
         return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
     }

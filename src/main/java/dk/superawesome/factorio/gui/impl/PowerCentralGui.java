@@ -233,5 +233,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
             getMechanic().setHasGraph(false);
         }
+
+        super.onClose(player, anyViewersLeft);
     }
 }

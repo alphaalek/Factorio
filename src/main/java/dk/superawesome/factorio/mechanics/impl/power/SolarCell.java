@@ -12,9 +12,9 @@ import org.bukkit.entity.Player;
 public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMechanic, SignalSource, EnergyCollection {
 
     private static final int SUN_LIGHT = 15;
-    private static final double MAX_ENERGY = 100d;
+    private static final double MAX_ENERGY = 25d;
 
-    private final DelayHandler thinkHandler = new DelayHandler(30);
+    private final DelayHandler thinkHandler = new DelayHandler(40);
 
     private double energy;
 
