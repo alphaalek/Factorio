@@ -10,6 +10,7 @@ import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -54,6 +55,9 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
         }
 
         Block hopper = getLocation().getBlock().getRelative(BlockFace.DOWN);
+        if (hopper.getType() != Material.HOPPER) {
+            Bukkit.getLogger().info("Found invalid hopper mechanic: " + this.loc);
+        }
         Mechanic<?> putMechanic = manager.getMechanicPartially(BlockUtil.getPointingBlock(hopper, false).getLocation());
         if (putMechanic instanceof ItemContainer) {
             this.putMechanic = (ItemContainer) putMechanic;
