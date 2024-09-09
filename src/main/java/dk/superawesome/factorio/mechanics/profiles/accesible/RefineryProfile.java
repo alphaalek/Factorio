@@ -30,7 +30,7 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.REFINERY;
     }
 
@@ -136,8 +136,8 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
     private static class RefineryMechanicFactory implements MechanicFactory<Refinery> {
 
         @Override
-        public Refinery create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Refinery(loc, rotation, context);
+        public Refinery create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Refinery(loc, rotation, context, hasWallSign);
         }
     }
 

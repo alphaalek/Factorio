@@ -25,8 +25,8 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
     private ItemStack stored;
     private int amount;
 
-    public StorageBox(Location location, BlockFace rotation, MechanicStorageContext context) {
-        super(location, rotation, context);
+    public StorageBox(Location location, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(location, rotation, context, hasWallSign);
         loadFromStorage();
     }
 

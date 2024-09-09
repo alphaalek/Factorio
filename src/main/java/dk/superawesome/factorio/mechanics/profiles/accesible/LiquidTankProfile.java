@@ -25,7 +25,7 @@ public class LiquidTankProfile implements GuiMechanicProfile<LiquidTank> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.LIQUID_TANK;
     }
 
@@ -67,8 +67,8 @@ public class LiquidTankProfile implements GuiMechanicProfile<LiquidTank> {
     private static class LiquidTankMechanicFactory implements MechanicFactory<LiquidTank> {
 
         @Override
-        public LiquidTank create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new LiquidTank(loc, rotation, context);
+        public LiquidTank create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new LiquidTank(loc, rotation, context, hasWallSign);
         }
     }
 

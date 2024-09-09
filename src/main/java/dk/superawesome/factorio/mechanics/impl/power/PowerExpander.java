@@ -17,8 +17,8 @@ public class PowerExpander extends AbstractMechanic<PowerExpander> implements Si
 
     private final List<Block> rel = new ArrayList<>();
 
-    public PowerExpander(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public PowerExpander(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
     }
 
     @Override

@@ -17,8 +17,8 @@ public class FilterProfile implements MechanicProfile<Filter> {
     }
 
     @Override
-    public Building getBuilding() {
-        return Buildings.GATE;
+    public Building getBuilding(Mechanic<?> forMechanic) {
+        return Buildings.GATE.get(forMechanic);
     }
 
     @Override
@@ -49,8 +49,8 @@ public class FilterProfile implements MechanicProfile<Filter> {
     private static class FilterMechanicFactory implements MechanicFactory<Filter> {
 
         @Override
-        public Filter create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Filter(loc, rotation, context);
+        public Filter create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Filter(loc, rotation, context, hasWallSign);
         }
     }
 }

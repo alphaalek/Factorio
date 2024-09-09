@@ -23,8 +23,8 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
 
     protected boolean powered;
 
-    public SignalTrigger(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public SignalTrigger(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
     }
 
     protected void triggerLever(Block block, boolean powered) {

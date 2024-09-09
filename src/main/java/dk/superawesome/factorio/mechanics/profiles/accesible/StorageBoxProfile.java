@@ -28,7 +28,7 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.STORAGE_BOX;
     }
 
@@ -56,7 +56,7 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
                 .setDescription(2, Arrays.asList("§eLager: 36 stacks §f-> §e100 stacks"))
                 .setDescription(3, Arrays.asList("§eLager: 100 stacks §f-> §e250 stacks"))
                 .setDescription(4, Arrays.asList("§eLager: 250 stacks §f-> §e400 stacks"))
-                .setDescription(5, Arrays.asList("§eLager: 400 stacks §f-> §e700 stacks"))
+                .setDescription(5, Arrays.asList("§eLager: 400 stacks §f-> §e750 stacks"))
 
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(3048d, 8192d, 16384d, 34960d))
 
@@ -72,8 +72,8 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
     private static class StorageBoxMechanicFactory implements MechanicFactory<StorageBox> {
 
         @Override
-        public StorageBox create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new StorageBox(loc, rotation, context);
+        public StorageBox create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new StorageBox(loc, rotation, context, hasWallSign);
         }
     }
 

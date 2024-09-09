@@ -17,7 +17,7 @@ public class CollectorProfile implements MechanicProfile<Collector> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.COLLECTOR;
     }
 
@@ -44,8 +44,8 @@ public class CollectorProfile implements MechanicProfile<Collector> {
     private static class CollectorMechanicFactory implements MechanicFactory<Collector> {
 
         @Override
-        public Collector create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Collector(loc, rotation, context);
+        public Collector create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Collector(loc, rotation, context, hasWallSign);
         }
     }
 }

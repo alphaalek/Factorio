@@ -38,8 +38,8 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     private int ingredientAmount;
     private double moneyAmount;
 
-    public Assembler(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public Assembler(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
         loadFromStorage();
     }
 

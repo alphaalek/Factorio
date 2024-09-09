@@ -16,8 +16,8 @@ public class PowerExpanderProfile implements MechanicProfile<PowerExpander> {
     }
 
     @Override
-    public Building getBuilding() {
-        return Buildings.GATE;
+    public Building getBuilding(Mechanic<?> forMechanic) {
+        return Buildings.GATE.get(forMechanic);
     }
 
     @Override
@@ -43,8 +43,8 @@ public class PowerExpanderProfile implements MechanicProfile<PowerExpander> {
     private static class PowerExpanderMechanicFactory implements MechanicFactory<PowerExpander> {
 
         @Override
-        public PowerExpander create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new PowerExpander(loc, rotation, context);
+        public PowerExpander create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new PowerExpander(loc, rotation, context, hasWallSign);
         }
     }
 }

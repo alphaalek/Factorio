@@ -87,8 +87,8 @@ public class MechanicManager implements Listener {
         return mechanics.values();
     }
 
-    public Mechanic<?> load(MechanicProfile<?> profile, MechanicStorageContext context, Location loc, BlockFace rotation) {
-        Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, context);
+    public Mechanic<?> load(MechanicProfile<?> profile, MechanicStorageContext context, Location loc, BlockFace rotation, boolean hasWallSign) {
+        Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, context, hasWallSign);
         if (mechanic instanceof ThinkingMechanic) {
             thinkingMechanics.add((ThinkingMechanic) mechanic);
         }
@@ -232,10 +232,13 @@ public class MechanicManager implements Listener {
             player.sendMessage("§cDu kan ikke flytte maskinen hertil!");
             return false;
         }
-        for (Location loc : event.getLocations()) {
-            if (!WorldGuard.canBuild(player, loc)) {
-                player.sendMessage("§cDu kan ikke flytte maskinen hertil!");
-                return false;
+        // check for WorldGuard access
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
+            for (Location loc : event.getLocations()) {
+                if (!WorldGuard.canBuild(player, loc)) {
+                    player.sendMessage("§cDu kan ikke flytte maskinen hertil!");
+                    return false;
+                }
             }
         }
 
@@ -343,7 +346,7 @@ public class MechanicManager implements Listener {
 
         // load this mechanic
         BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
-        Mechanic<?> mechanic = load(profile, context.<SQLException>sneaky(profile.getName(), on), on.getLocation(), rotation);
+        Mechanic<?> mechanic = load(profile, context.<SQLException>sneaky(profile.getName(), on), on.getLocation(), rotation, Tag.WALL_SIGNS.isTagged(sign.getType()));
 
         if (mechanic instanceof AccessibleMechanic) {
             sign.getSide(Side.FRONT).setLine(1, "Lvl " + mechanic.getLevel().lvl());

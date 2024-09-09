@@ -11,7 +11,7 @@ public interface MechanicProfile<M extends Mechanic<M>> extends Identifiable {
         return getName();
     }
 
-    Building getBuilding();
+    Building getBuilding(Mechanic<?> forMechanic);
 
     MechanicFactory<M> getFactory();
 

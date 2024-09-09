@@ -22,7 +22,7 @@ public class LiquidTankBuilding implements Building, Buildable {
 
     @Override
     public List<BlockVector> getRelatives() {
-        return DEFAULT_RELATIVES;
+        return DEFAULT_MECHANIC_RELATIVES;
     }
 
     @Override

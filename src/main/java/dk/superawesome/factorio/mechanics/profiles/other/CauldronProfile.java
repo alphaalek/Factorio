@@ -17,7 +17,7 @@ public class CauldronProfile implements MechanicProfile<Cauldron> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.CAULDRON;
     }
 
@@ -44,8 +44,8 @@ public class CauldronProfile implements MechanicProfile<Cauldron> {
     private static class CauldronMechanicFactory implements MechanicFactory<Cauldron> {
 
         @Override
-        public Cauldron create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Cauldron(loc, rotation, context);
+        public Cauldron create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Cauldron(loc, rotation, context, hasWallSign);
         }
     }
 

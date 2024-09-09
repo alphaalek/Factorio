@@ -17,7 +17,7 @@ public class SolarCellProfile implements MechanicProfile<SolarCell> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.SOLAR_CELL;
     }
 
@@ -44,8 +44,8 @@ public class SolarCellProfile implements MechanicProfile<SolarCell> {
     private static class SolarCellMechanicFactory implements MechanicFactory<SolarCell> {
 
         @Override
-        public SolarCell create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new SolarCell(loc, rotation, context);
+        public SolarCell create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new SolarCell(loc, rotation, context, hasWallSign);
         }
     }
 }

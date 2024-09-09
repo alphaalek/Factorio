@@ -37,8 +37,8 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     private ConstructorState state;
     private boolean declinedState;
 
-    public Constructor(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public Constructor(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
         loadFromStorage();
         makeNewState();
     }

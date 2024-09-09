@@ -20,8 +20,8 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
     private Fluid fluid;
     private int amount;
 
-    public Cauldron(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public Cauldron(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
     }
 
     @Override

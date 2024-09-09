@@ -17,7 +17,7 @@ public class ComparatorProfile implements MechanicProfile<Comparator> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.COMPARATOR;
     }
 
@@ -44,8 +44,8 @@ public class ComparatorProfile implements MechanicProfile<Comparator> {
     private static class ComparatorMechanicFactory implements MechanicFactory<Comparator> {
 
         @Override
-        public Comparator create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Comparator(loc, rotation, context);
+        public Comparator create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Comparator(loc, rotation, context, hasWallSign);
         }
     }
 }

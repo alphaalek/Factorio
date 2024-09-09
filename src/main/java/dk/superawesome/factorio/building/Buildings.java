@@ -22,7 +22,7 @@ public class Buildings {
     public static final Building COMPARATOR;
     public static final Building CONSTRUCTOR;
     public static final Building EMERALD_FORGE;
-    public static final Building GATE;
+    public static final BuildingCollection GATE;
     public static final Building GENERATOR;
     public static final Building LIQUID_TANK;
     public static final Building SMELTER;
@@ -53,20 +53,20 @@ public class Buildings {
         REFINERY          = loadBuilding(new RefineryBuilding());
     }
 
-    private static final Array<Building> buildings;
+    private static final Array<BlockCollection> buildings;
 
-    public static Building loadBuilding(Building building) {
+    public static <B extends BlockCollection> B loadBuilding(B building) {
         buildings.set(building, building);
         return building;
     }
 
-    public static Array<Building> getBuildings() {
+    public static Array<BlockCollection> getBuildings() {
         return buildings;
     }
 
     public static List<Location> getLocations(Mechanic<?> mechanic, Location rel, BlockFace rot) {
         List<Location> locs = new ArrayList<>();
-        for (BlockVector relVec : mechanic.getProfile().getBuilding().getRelatives()) {
+        for (BlockVector relVec : mechanic.getBuilding().getRelatives()) {
             Location loc = BlockUtil.getRel(rel, BlockUtil.rotateVec(relVec, Building.DEFAULT_ROTATION, rot));
             locs.add(loc);
         }
@@ -96,7 +96,7 @@ public class Buildings {
     }
 
     public static boolean hasSpaceFor(Block sign, Mechanic<?> mechanic) {
-        if (mechanic.getProfile().getBuilding() instanceof Buildable) {
+        if (mechanic.getBuilding() instanceof Buildable) {
             for (Location relLoc : getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation())) {
                 // check if this block can be placed in the world
                 if (!relLoc.getBlock().equals(sign)
@@ -111,7 +111,7 @@ public class Buildings {
     }
 
     public static boolean checkCanBuild(Mechanic<?> mechanic) {
-        Building building = mechanic.getProfile().getBuilding();
+        Building building = mechanic.getBuilding();
         if (building instanceof Matcher matcher) {
             int i = 0;
             // check if all the placed blocks matches the matcher
@@ -126,7 +126,7 @@ public class Buildings {
     }
 
     public static void build(World world, Mechanic<?> mechanic) {
-        Building building = mechanic.getProfile().getBuilding();
+        Building building = mechanic.getBuilding();
         if (building instanceof Buildable buildable) {
             int i = 0;
             for (Location relLoc : getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation())) {
@@ -144,7 +144,7 @@ public class Buildings {
             }
         }
 
-        if (mechanic.getProfile().getBuilding() instanceof Buildable) {
+        if (mechanic.getBuilding() instanceof Buildable) {
             for (Location relLoc : getLocations(mechanic, loc, rot)) {
                 loc.getWorld().getBlockAt(relLoc).setType(Material.AIR, false); // don't apply physics
             }

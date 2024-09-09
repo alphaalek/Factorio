@@ -10,8 +10,8 @@ public abstract class Circuit<M extends Mechanic<M>, C extends TransferCollectio
 
     private boolean calledInput;
 
-    public Circuit(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public Circuit(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
     }
 
     @Override

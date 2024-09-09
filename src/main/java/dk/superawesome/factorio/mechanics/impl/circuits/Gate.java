@@ -24,8 +24,8 @@ public class Gate extends Circuit<Gate, TransferCollection> implements Container
 
     private boolean open = true;
 
-    public Gate(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public Gate(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
     }
 
     @Override

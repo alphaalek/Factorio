@@ -18,10 +18,10 @@ import java.util.function.BiConsumer;
 public class PowerCentralBuilding implements Building, Buildable {
 
     private final List<BlockVector> relatives = Arrays.asList(
-            new BlockVector(),
+            ORIGIN,
             new BlockVector(0, 1, 0),
             new BlockVector(0, 2, 0),
-            new BlockVector(-1, 0, 0),
+            WALL_SIGN,
             new BlockVector(1, 0, 0)
     );
 

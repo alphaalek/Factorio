@@ -14,18 +14,13 @@ import java.util.function.Predicate;
 public class SolarCellBuilding implements Building, Matcher {
 
     private final List<Predicate<Material>> materials = Arrays.asList(
-        match(Material.DAYLIGHT_DETECTOR),
+        Matcher.match(Material.DAYLIGHT_DETECTOR),
         Tag.WALL_SIGNS::isTagged
-    );
-
-    private final List<BlockVector> relatives = Arrays.asList(
-        new BlockVector(),
-        new BlockVector(-1, 0, 0)
     );
 
     @Override
     public List<BlockVector> getRelatives() {
-        return relatives;
+        return SMALL_MECHANIC_RELATIVES;
     }
 
     @Override

@@ -17,8 +17,8 @@ public class ExcluderProfile implements MechanicProfile<Excluder> {
     }
 
     @Override
-    public Building getBuilding() {
-        return Buildings.GATE;
+    public Building getBuilding(Mechanic<?> forMechanic) {
+        return Buildings.GATE.get(forMechanic);
     }
 
     @Override
@@ -44,8 +44,8 @@ public class ExcluderProfile implements MechanicProfile<Excluder> {
     private static class ExcluderMechanicFactory implements MechanicFactory<Excluder> {
 
         @Override
-        public Excluder create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Excluder(loc, rotation, context);
+        public Excluder create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Excluder(loc, rotation, context, hasWallSign);
         }
     }
 }

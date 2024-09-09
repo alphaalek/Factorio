@@ -72,8 +72,8 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     private ItemStack storageType;
     private int storageAmount;
 
-    public Smelter(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public Smelter(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
         loadFromStorage();
     }
 

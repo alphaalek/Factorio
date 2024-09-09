@@ -5,12 +5,10 @@ import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
-import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.entity.Player;
 
@@ -36,8 +34,8 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     private boolean turnedOn;
     private double recentMax;
 
-    public PowerCentral(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public PowerCentral(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
         loadFromStorage();
     }
 
@@ -99,18 +97,12 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     @Override
     public void updateLight() {
-        if (loc.getWorld() != null) {
-            Block block = loc.getWorld().getBlockAt(BlockUtil.getRel(loc, getProfile().getBuilding().getRelatives().get(1)));
-            BlockData data = block.getBlockData();
-            if (data instanceof org.bukkit.block.data.Lightable) {
-                ((org.bukkit.block.data.Lightable)data).setLit(turnedOn);
-                block.setBlockData(data);
-            }
+        Block block = loc.getBlock().getRelative(BlockFace.UP);
+        Lightable.setLit(block, turnedOn);
 
-            Switch lever = (Switch) this.lever.getBlockData();
-            lever.setPowered(turnedOn);
-            this.lever.setBlockData(lever);
-        }
+        Switch lever = (Switch) this.lever.getBlockData();
+        lever.setPowered(turnedOn);
+        this.lever.setBlockData(lever);
     }
 
     @Override

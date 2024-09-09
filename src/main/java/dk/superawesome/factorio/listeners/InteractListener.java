@@ -65,7 +65,7 @@ public class InteractListener implements Listener {
             if (event.getPlayer().getInventory().getItemInMainHand().equals(Material.WOODEN_AXE)) {
                 event.setCancelled(true);
                 moveMechanic(event.getPlayer(), mechanic);
-            } else if (mechanic.getProfile().getBuilding() instanceof Matcher) {
+            } else if (mechanic.getBuilding() instanceof Matcher) {
                 // check access
                 if (!mechanic.getManagement().hasAccess(event.getPlayer(), Management.DELETE)) {
                     event.getPlayer().sendMessage("§cDu har ikke adgang til at fjerne maskinen (" + Bukkit.getOfflinePlayer(mechanic.getManagement().getOwner()).getName() + ")!");

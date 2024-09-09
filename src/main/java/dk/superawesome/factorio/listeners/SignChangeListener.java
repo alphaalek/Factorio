@@ -39,7 +39,7 @@ public class SignChangeListener implements Listener {
                 event.setLine(1, "Lvl " + partiallyAt.getLevel().lvl());
             }
             Bukkit.getScheduler().runTask(Factorio.get(), partiallyAt::onUpdate);
-        } else if (Tag.SIGNS.isTagged(event.getBlock().getType())
+        } else if (Tag.STANDING_SIGNS.isTagged(event.getBlock().getType())
                 || Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
             Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
             if (manager.getProfileFrom((Sign) event.getBlock().getState()).isPresent()
@@ -64,7 +64,7 @@ public class SignChangeListener implements Listener {
                             Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
                             if (mechanic != null) {
                                 event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
-                                if (!(mechanic.getProfile().getBuilding() instanceof Matcher)) {
+                                if (!(mechanic.getBuilding() instanceof Matcher)) {
                                     event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), drop);
                                 }
                             }

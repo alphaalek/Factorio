@@ -20,8 +20,8 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
 
     private double moneyAmount;
 
-    public EmeraldForge(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public EmeraldForge(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
         loadFromStorage();
     }
 

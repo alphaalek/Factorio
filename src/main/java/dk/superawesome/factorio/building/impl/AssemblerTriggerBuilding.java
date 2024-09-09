@@ -13,19 +13,14 @@ import java.util.function.Predicate;
 
 public class AssemblerTriggerBuilding implements Building, Matcher {
 
-    private final List<BlockVector> relatives = Arrays.asList(
-        new BlockVector(),
-        new BlockVector(-1, 0, 0)
-    );
-
     private final List<Predicate<Material>> materials = Arrays.asList(
-        match(Material.BOOKSHELF),
+        Matcher.match(Material.BOOKSHELF),
         Tag.WALL_SIGNS::isTagged
     );
 
     @Override
     public List<BlockVector> getRelatives() {
-        return relatives;
+        return SMALL_MECHANIC_RELATIVES;
     }
 
     @Override

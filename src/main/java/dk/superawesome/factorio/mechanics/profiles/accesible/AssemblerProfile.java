@@ -33,7 +33,7 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.ASSEMBLER;
     }
 
@@ -115,8 +115,8 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
     private static class AssemblerMechanicFactory implements MechanicFactory<Assembler> {
 
         @Override
-        public Assembler create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Assembler(loc, rotation, context);
+        public Assembler create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Assembler(loc, rotation, context, hasWallSign);
         }
     }
 

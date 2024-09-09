@@ -8,7 +8,6 @@ import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.TickThrottle;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.StringUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -27,6 +26,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     protected final TickThrottle tickThrottle = new TickThrottle();
     protected final MechanicStorageContext context;
     protected final Management management;
+    protected final boolean hasWallSign;
 
     protected Location loc;
     protected BlockFace rot;
@@ -35,10 +35,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     protected double xp;
     private boolean exists = true;
 
-    public AbstractMechanic(Location loc, BlockFace rotation, MechanicStorageContext context) {
+    public AbstractMechanic(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
         this.loc = loc;
         this.rot = rotation;
         this.context = context;
+        this.hasWallSign = hasWallSign;
 
         try {
             this.level = MechanicLevel.from(this, context.getLevel());
@@ -47,7 +48,6 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
         } catch (SQLException | IOException ex) {
             throw new RuntimeException("Failed to load mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
         }
-
     }
 
     protected void loadFromStorage() {
@@ -110,7 +110,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
         // transfer sign lines
         Sign prevSign = (Sign) signBlock.getState();
         this.loc.getBlock().getRelative(this.rot).setType(signBlock.getType());
-        this.getProfile().getBuilding().rotate(this.loc.getBlock().getRelative(this.rot), this.rot);
+        getBuilding().rotate(this.loc.getBlock().getRelative(this.rot), this.rot);
 
         Sign sign = getSign();
         sign.getSide(Side.FRONT).setLine(0, prevSign.getSide(Side.FRONT).getLine(0));
@@ -142,7 +142,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     }
 
     protected Sign getSign() {
-        return (Sign) loc.getBlock().getRelative(rot).getState();
+        return (Sign) getBuilding().getSign(this).getState();
     }
 
     @Override
@@ -201,6 +201,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     @Override
     public BlockFace getRotation() {
         return rot;
+    }
+
+    @Override
+    public boolean hasWallSign() {
+        return hasWallSign;
     }
 
     @Override

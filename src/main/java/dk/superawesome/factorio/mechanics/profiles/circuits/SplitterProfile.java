@@ -17,8 +17,8 @@ public class SplitterProfile implements MechanicProfile<Splitter> {
     }
 
     @Override
-    public Building getBuilding() {
-        return Buildings.GATE;
+    public Building getBuilding(Mechanic<?> forMechanic) {
+        return Buildings.GATE.get(forMechanic);
     }
 
     @Override
@@ -44,8 +44,8 @@ public class SplitterProfile implements MechanicProfile<Splitter> {
     private static class SplitterMechanicFactory implements MechanicFactory<Splitter> {
 
         @Override
-        public Splitter create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Splitter(loc, rotation, context);
+        public Splitter create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Splitter(loc, rotation, context, hasWallSign);
         }
     }
 }

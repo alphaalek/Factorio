@@ -14,14 +14,14 @@ import java.util.function.Predicate;
 public class CollectorBuilding implements Building, Matcher {
 
     private final List<BlockVector> relatives = Arrays.asList(
-            new BlockVector(),
+            ORIGIN,
             new BlockVector(0, -1, 0),
-            new BlockVector(-1, 0, 0)
+            WALL_SIGN
     );
 
     private final List<Predicate<Material>> materials = Arrays.asList(
-            match(Material.CAULDRON),
-            match(Material.HOPPER),
+            Matcher.match(Material.CAULDRON),
+            Matcher.match(Material.HOPPER),
             Tag.WALL_SIGNS::isTagged
     );
 

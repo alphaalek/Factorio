@@ -28,8 +28,8 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
 
     private final List<Predicate<ItemStack>> filter = new ArrayList<>();
 
-    public Filter(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public Filter(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
     }
 
     @Override

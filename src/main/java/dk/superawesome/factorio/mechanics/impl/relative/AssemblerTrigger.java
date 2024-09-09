@@ -33,8 +33,8 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     private double minPrice, minPercentage;
     private final List<Assembler> assemblers = new ArrayList<>();
 
-    public AssemblerTrigger(Location loc, BlockFace rotation, MechanicStorageContext context) {
-        super(loc, rotation, context);
+    public AssemblerTrigger(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+        super(loc, rotation, context, hasWallSign);
     }
 
     @Override

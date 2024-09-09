@@ -29,7 +29,7 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.GENERATOR;
     }
 
@@ -75,8 +75,8 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
     private static class GeneratorMechanicFactory implements MechanicFactory<Generator> {
 
         @Override
-        public Generator create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Generator(loc, rotation, context);
+        public Generator create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Generator(loc, rotation, context, hasWallSign);
         }
     }
 

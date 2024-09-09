@@ -27,7 +27,7 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.POWER_CENTRAL;
     }
 
@@ -71,8 +71,8 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
     private static class PowerCentralMechanicFactory implements MechanicFactory<PowerCentral> {
 
         @Override
-        public PowerCentral create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new PowerCentral(loc, rotation, context);
+        public PowerCentral create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new PowerCentral(loc, rotation, context, hasWallSign);
         }
     }
 

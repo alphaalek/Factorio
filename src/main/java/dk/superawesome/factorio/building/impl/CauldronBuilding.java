@@ -13,19 +13,14 @@ import java.util.function.Predicate;
 
 public class CauldronBuilding implements Building, Matcher {
 
-    private final List<BlockVector> relatives = Arrays.asList(
-            new BlockVector(),
-            new BlockVector(-1, 0, 0)
-    );
-
     private final List<Predicate<Material>> materials = Arrays.asList(
-            matchAny(Material.CAULDRON, Material.WATER_CAULDRON, Material.LAVA_CAULDRON, Material.POWDER_SNOW_CAULDRON),
+            Matcher.matchAny(Material.CAULDRON, Material.WATER_CAULDRON, Material.LAVA_CAULDRON, Material.POWDER_SNOW_CAULDRON),
             Tag.WALL_SIGNS::isTagged
     );
 
     @Override
     public List<BlockVector> getRelatives() {
-        return relatives;
+        return SMALL_MECHANIC_RELATIVES;
     }
 
     @Override

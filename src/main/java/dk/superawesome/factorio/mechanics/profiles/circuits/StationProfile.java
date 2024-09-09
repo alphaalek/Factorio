@@ -17,8 +17,8 @@ public class StationProfile implements MechanicProfile<Station> {
     }
 
     @Override
-    public Building getBuilding() {
-        return Buildings.GATE;
+    public Building getBuilding(Mechanic<?> forMechanic) {
+        return Buildings.GATE.get(forMechanic);
     }
 
     @Override
@@ -44,8 +44,8 @@ public class StationProfile implements MechanicProfile<Station> {
     private static class StationMechanicFactory implements MechanicFactory<Station> {
 
         @Override
-        public Station create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Station(loc, rotation, context);
+        public Station create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Station(loc, rotation, context, hasWallSign);
         }
     }
 }

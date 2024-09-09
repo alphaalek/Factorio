@@ -17,7 +17,7 @@ public class PowerLifterProfile implements MechanicProfile<PowerLifter> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.POWER_LIFTER;
     }
 
@@ -44,8 +44,8 @@ public class PowerLifterProfile implements MechanicProfile<PowerLifter> {
     private static class PowerLifterMechanicFactory implements MechanicFactory<PowerLifter> {
 
         @Override
-        public PowerLifter create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new PowerLifter(loc, rotation, context);
+        public PowerLifter create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new PowerLifter(loc, rotation, context, hasWallSign);
         }
     }
 }

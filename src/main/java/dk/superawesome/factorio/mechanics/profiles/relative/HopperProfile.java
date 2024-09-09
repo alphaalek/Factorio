@@ -17,7 +17,7 @@ public class HopperProfile implements MechanicProfile<Hopper> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.COLLECTOR;
     }
 
@@ -44,8 +44,8 @@ public class HopperProfile implements MechanicProfile<Hopper> {
     private static class HopperMechanicFactory implements MechanicFactory<Hopper> {
 
         @Override
-        public Hopper create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Hopper(loc, rotation, context);
+        public Hopper create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Hopper(loc, rotation, context, hasWallSign);
         }
     }
 }

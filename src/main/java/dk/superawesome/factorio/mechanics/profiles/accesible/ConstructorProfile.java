@@ -30,7 +30,7 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.CONSTRUCTOR;
     }
 
@@ -102,8 +102,8 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
     private static class ConstructorMechanicFactory implements MechanicFactory<Constructor> {
 
         @Override
-        public Constructor create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new Constructor(loc, rotation, context);
+        public Constructor create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new Constructor(loc, rotation, context, hasWallSign);
         }
     }
 

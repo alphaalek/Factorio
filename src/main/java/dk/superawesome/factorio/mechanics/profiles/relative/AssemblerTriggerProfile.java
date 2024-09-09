@@ -22,7 +22,7 @@ public class AssemblerTriggerProfile implements MechanicProfile<AssemblerTrigger
     }
 
     @Override
-    public Building getBuilding() {
+    public Building getBuilding(Mechanic<?> forMechanic) {
         return Buildings.ASSEMBLER_TRIGGER;
     }
 
@@ -54,8 +54,8 @@ public class AssemblerTriggerProfile implements MechanicProfile<AssemblerTrigger
     private static class AssemblerTriggerMechanicFactory implements MechanicFactory<AssemblerTrigger> {
 
         @Override
-        public AssemblerTrigger create(Location loc, BlockFace rotation, MechanicStorageContext context) {
-            return new AssemblerTrigger(loc, rotation, context);
+        public AssemblerTrigger create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+            return new AssemblerTrigger(loc, rotation, context, hasWallSign);
         }
     }
 }

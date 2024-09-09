@@ -13,19 +13,14 @@ import java.util.function.Predicate;
 
 public class ComparatorBuilding implements Building, Matcher {
 
-    private final List<BlockVector> relatives = Arrays.asList(
-            new BlockVector(0, 0, 0),
-            new BlockVector(-1, 0, 0)
-    );
-
     private final List<Predicate<Material>> materials = Arrays.asList(
-            match(Material.OBSERVER),
+            Matcher.match(Material.OBSERVER),
             Tag.WALL_SIGNS::isTagged
     );
 
     @Override
     public List<BlockVector> getRelatives() {
-        return relatives;
+        return SMALL_MECHANIC_RELATIVES;
     }
 
     @Override

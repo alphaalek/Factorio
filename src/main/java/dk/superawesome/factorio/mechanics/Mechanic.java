@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.mechanics;
 
+import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.util.TickThrottle;
 import org.bukkit.Location;
@@ -11,6 +12,10 @@ import org.bukkit.event.Listener;
 import java.util.concurrent.atomic.AtomicReference;
 
 public interface Mechanic<M extends Mechanic<M>> extends Listener, Source {
+
+    default Building getBuilding() {
+        return getProfile().getBuilding(this);
+    }
 
     void unload();
 
@@ -27,6 +32,8 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener, Source {
     boolean exists();
 
     boolean canBeDeleted();
+
+    boolean hasWallSign();
 
     double getXP();
 
