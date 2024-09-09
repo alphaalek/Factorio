@@ -45,7 +45,7 @@ public class SignChangeListener implements Listener {
         } else if (manager.getProfileFrom(event).isPresent() &&
                 (Tag.STANDING_SIGNS.isTagged(event.getBlock().getType()) || Tag.WALL_SIGNS.isTagged(event.getBlock().getType()))) {
             Block on = manager.getBlockOn((Sign) event.getBlock().getState());
-            if (on == null || on.getState() instanceof TileState /* deny placing mechanics on tile entities */) {
+            if (on == null) {
                 event.getPlayer().sendMessage("§cDu kan ikke placere en maskine på denne block!");
                 event.setCancelled(true);
                 event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(event.getPlayer().getInventory().getItemInMainHand().getType()));
@@ -58,7 +58,6 @@ public class SignChangeListener implements Listener {
                 BlockUtil.rotate(event.getBlock(), BlockUtil.getCartesianRotation(BlockUtil.getFacing(event.getBlock())));
             }
 
-            ItemStack drop = new ItemStack(on.getType());
             // try to build the mechanic in the next tick
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                 MechanicBuildResponse response = manager.buildMechanic((Sign) event.getBlock().getState(), on, event.getPlayer());
@@ -69,9 +68,8 @@ public class SignChangeListener implements Listener {
                             Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
                             if (mechanic != null) {
                                 event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
-                                if (!(mechanic.getBuilding() instanceof Matcher)) {
-                                    event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), drop);
-                                }
+                            } else{
+                                event.getBlock().setType(Material.AIR);
                             }
                             break build;
                         }

@@ -139,8 +139,13 @@ public class Buildings {
         if (building instanceof Buildable buildable) {
             int i = 0;
             for (Location relLoc : getLocations(mechanic)) {
+                Block block = world.getBlockAt(relLoc);
+                if (block.getType() != Material.AIR) {
+                    block.breakNaturally();
+                }
+
                 buildable.getBlocks().get(i++)
-                        .accept(world.getBlockAt(relLoc), mechanic.getRotation());
+                        .accept(block, mechanic.getRotation());
             }
         }
     }
