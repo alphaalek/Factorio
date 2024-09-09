@@ -38,6 +38,7 @@ public class SignChangeListener implements Listener {
             if (partiallyAt instanceof AccessibleMechanic) {
                 event.setLine(1, "Lvl " + partiallyAt.getLevel().lvl());
             }
+            Bukkit.getScheduler().runTask(Factorio.get(), partiallyAt::onUpdate);
         } else if (Tag.SIGNS.isTagged(event.getBlock().getType())
                 || Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
             Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
