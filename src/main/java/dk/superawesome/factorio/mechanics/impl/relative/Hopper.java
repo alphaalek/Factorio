@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.impl.relative;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
+import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
@@ -48,16 +49,20 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
     public void checkIO() {
         MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
 
-        Block up = getLocation().getBlock().getRelative(BlockFace.UP);
+        Block hopper = this.loc.getBlock().getRelative(BlockFace.DOWN);
+        if (hopper.getType() != Material.HOPPER) {
+            // invalid hopper
+            manager.unload(this);
+            Buildings.remove(this, this.loc, this.rot, true);
+            return;
+        }
+
+        Block up = this.loc.getBlock().getRelative(BlockFace.UP);
         Mechanic<?> takeMechanic = manager.getMechanicPartially(up.getLocation());
         if (takeMechanic instanceof ItemCollection) {
             this.takeMechanic = (ItemCollection) takeMechanic;
         }
 
-        Block hopper = getLocation().getBlock().getRelative(BlockFace.DOWN);
-        if (hopper.getType() != Material.HOPPER) {
-            Bukkit.getLogger().info("Found invalid hopper mechanic: " + this.loc);
-        }
         Mechanic<?> putMechanic = manager.getMechanicPartially(BlockUtil.getPointingBlock(hopper, false).getLocation());
         if (putMechanic instanceof ItemContainer) {
             this.putMechanic = (ItemContainer) putMechanic;

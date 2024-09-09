@@ -48,7 +48,6 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
             throw new RuntimeException("Failed to load mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
         }
 
-        onUpdate();
     }
 
     protected void loadFromStorage() {
@@ -155,7 +154,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     @Override
     public void onBlocksLoaded(Player by) {
-
+        onUpdate();
     }
 
     @Override
