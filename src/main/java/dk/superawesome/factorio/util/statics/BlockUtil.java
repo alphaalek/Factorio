@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.util.statics;
 
 import dk.superawesome.factorio.mechanics.routes.Routes;
+import dk.superawesome.factorio.util.Action;
 import dk.superawesome.factorio.util.BlockValidator;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -8,7 +9,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.Sign;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Rotatable;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
@@ -42,7 +44,7 @@ public class BlockUtil {
         if (data instanceof org.bukkit.block.data.Directional) {
             return block.getRelative(
                     doOpposite(
-                        ((org.bukkit.block.data.Directional)data).getFacing(), opposite
+                        getFacing(block), opposite
                     )
             );
         }
@@ -136,41 +138,54 @@ public class BlockUtil {
         return opposite ? face.getOppositeFace() : face;
     }
 
-    public static BlockFace getFaceBetween(Block from, Block to) {
-        Vector vec = new Vector(from.getX() - to.getX(), from.getY() - to.getY(), from.getZ() - to.getZ());
-        if (vec.getX() != 0 || vec.getY() != 0 || vec.getZ() != 0) {
-            vec.normalize();
-        }
-
-        for (BlockFace face : BlockFace.values()) {
-            if (face.getDirection().equals(vec)) {
-                return face;
-            }
-        }
-
-        throw new IllegalStateException();
-    }
-
     public static BlockFace getRotationRelative(BlockFace def, BlockFace rel, BlockFace rot) {
         int diff = Math.abs(def.ordinal() - rel.ordinal());
         int ord = (rot.ordinal() + diff) % 4;
         return BlockFace.values()[ord];
     }
 
-    public static void setSignFacing(Block block, Block towards, boolean opposite) {
-        Sign sign = (Sign) block.getBlockData();
-        sign.setRotation(
-                doOpposite(
-                        getFaceBetween(block, towards), opposite
-                )
-        );
-        block.setBlockData(sign);
+    public static BlockFace getFacing(Block block) {
+        if (block.getBlockData() instanceof Directional dr) {
+            return dr.getFacing();
+        } else if (block.getBlockData() instanceof Rotatable rt) {
+            return rt.getRotation();
+        } else {
+            return null;
+        }
+    }
+
+    public static void rotate(Block block, BlockFace rot) {
+        BlockData data = block.getBlockData();
+        if (data instanceof Directional dr) {
+            dr.setFacing(rot);
+            block.setBlockData(data);
+        } else if (data instanceof Rotatable rt) {
+            rt.setRotation(rot);
+            block.setBlockData(data);
+        }
+    }
+
+    public static BlockFace getCartesianRotation(BlockFace rot) {
+        return switch (rot) {
+            case NORTH, NORTH_EAST, NORTH_NORTH_EAST, NORTH_WEST, NORTH_NORTH_WEST -> BlockFace.NORTH;
+            case SOUTH, SOUTH_EAST, SOUTH_SOUTH_EAST, SOUTH_WEST, SOUTH_SOUTH_WEST -> BlockFace.SOUTH;
+            case EAST, EAST_NORTH_EAST, EAST_SOUTH_EAST -> BlockFace.EAST;
+            case WEST, WEST_NORTH_WEST, WEST_SOUTH_WEST -> BlockFace.WEST;
+            default -> BlockFace.SELF;
+        };
     }
 
     public static void forRelative(Block block, Consumer<Block> doFor) {
         for (BlockFace face : Routes.RELATIVES) {
             doFor.accept(block.getRelative(face));
         }
+    }
+
+    public static void forRelative(Block block, Action<Block> doFor) {
+        for (BlockFace face : Routes.RELATIVES) {
+            doFor.accept(block.getRelative(face));
+        }
+        doFor.onFinish();
     }
 
     public static boolean isRelativeFast(Block b1, Block b2) {

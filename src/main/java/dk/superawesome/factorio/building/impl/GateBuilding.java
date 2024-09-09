@@ -3,6 +3,7 @@ package dk.superawesome.factorio.building.impl;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.BuildingCollection;
 import dk.superawesome.factorio.building.Matcher;
+import dk.superawesome.factorio.building.TopBuilding;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.Profiles;
 import dk.superawesome.factorio.mechanics.impl.circuits.Gate;
@@ -49,7 +50,7 @@ public class GateBuilding implements BuildingCollection {
         }
     }
 
-    static class Top implements Building, Matcher {
+    static class Top implements TopBuilding, Matcher {
 
         private final List<BlockVector> relatives = Arrays.asList(
                 ORIGIN,
@@ -60,11 +61,6 @@ public class GateBuilding implements BuildingCollection {
                 Matcher.match(Material.CAULDRON),
                 Tag.STANDING_SIGNS::isTagged
         );
-
-        @Override
-        public Block getSign(Mechanic<?> mechanic) {
-            return BlockUtil.getRel(mechanic.getLocation(), BlockUtil.rotateVec(TOP_SIGN, DEFAULT_ROTATION, mechanic.getRotation())).getBlock();
-        }
 
         @Override
         public List<BlockVector> getRelatives() {

@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.mechanics.transfer.Container;
@@ -104,23 +105,24 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to move mechanic " + this + ", " + getLocation(), ex);
         }
 
+        Sign prevSign = (Sign) signBlock.getState();
+        String[] lines = new String[4];
+        for (int i = 0; i < 4; i++) {
+            lines[i] = prevSign.getSide(Side.FRONT).getLine(i);
+        }
+
         // place the blocks for the mechanic at the new place
-        Buildings.build(loc.getWorld(), this);
+        Buildings.copy(loc.getWorld(), prevLoc.getWorld(), prevLoc, prevRot, this.loc, this.rot, this);
 
         // transfer sign lines
-        Sign prevSign = (Sign) signBlock.getState();
-        this.loc.getBlock().getRelative(this.rot).setType(signBlock.getType());
-        getBuilding().rotate(this.loc.getBlock().getRelative(this.rot), this.rot);
-
         Sign sign = getSign();
-        sign.getSide(Side.FRONT).setLine(0, prevSign.getSide(Side.FRONT).getLine(0));
-        sign.getSide(Side.FRONT).setLine(1, prevSign.getSide(Side.FRONT).getLine(1));
-        sign.getSide(Side.FRONT).setLine(2, prevSign.getSide(Side.FRONT).getLine(2));
-        sign.getSide(Side.FRONT).setLine(3, prevSign.getSide(Side.FRONT).getLine(3));
+        for (int i = 0; i < 4; i++) {
+            sign.getSide(Side.FRONT).setLine(i, lines[i]);
+        }
         sign.update();
 
         // remove the previous blocks
-        Buildings.remove(this, prevLoc, prevRot, false);
+        Buildings.destroy(this, prevLoc, prevRot, Buildings.getLocations(this));
     }
 
     @Override

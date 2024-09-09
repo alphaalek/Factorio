@@ -40,9 +40,8 @@ public class Routes {
             return invoker.invoke(source);
         }
 
-        PipeSuckEvent event = new PipeSuckEvent(block);
+        PipeSuckEvent event = new PipeSuckEvent(block, loc);
         Bukkit.getPluginManager().callEvent(event);
-
         if (event.getTransfer() == null) {
             return false;
         }

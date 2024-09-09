@@ -110,7 +110,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     @Override
     public void onBlocksLoaded(Player by) {
         assemblers.clear();
-        loadPrice((Sign) loc.getBlock().getRelative(rot).getState(), by);
+        loadPrice(getSign(), by);
 
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
             setupRelativeBlocks(at -> triggerLever(at, true), at -> {
@@ -125,7 +125,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        if (event.getBlock().equals(loc.getBlock().getRelative(rot))) {
+        if (event.getBlock().equals(getSign().getBlock())) {
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                 loadPrice((Sign) event.getBlock().getState(), event.getPlayer());
                 think();

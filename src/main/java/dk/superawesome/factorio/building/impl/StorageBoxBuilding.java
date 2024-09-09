@@ -3,6 +3,7 @@ package dk.superawesome.factorio.building.impl;
 import dk.superawesome.factorio.building.Buildable;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.mechanics.Profiles;
+import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -18,7 +19,7 @@ public class StorageBoxBuilding implements Building, Buildable {
             (b, r) -> b.setType(Material.OAK_PLANKS),
             (b, r) -> {
                 b.setType(Material.CHEST);
-                rotate(b, r);
+                BlockUtil.rotate(b, r);
             },
             (b, r) -> {}
     );

@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.listeners;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Matcher;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.util.db.Types;
@@ -10,8 +11,10 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.TileState;
+import org.bukkit.block.data.Directional;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -39,24 +42,26 @@ public class SignChangeListener implements Listener {
                 event.setLine(1, "Lvl " + partiallyAt.getLevel().lvl());
             }
             Bukkit.getScheduler().runTask(Factorio.get(), partiallyAt::onUpdate);
-        } else if (Tag.STANDING_SIGNS.isTagged(event.getBlock().getType())
-                || Tag.WALL_SIGNS.isTagged(event.getBlock().getType())) {
-            Block on = BlockUtil.getPointingBlock(event.getBlock(), true);
-            if (manager.getProfileFrom((Sign) event.getBlock().getState()).isPresent()
-                    && (on == null || on.getState() instanceof TileState)) {
+        } else if (manager.getProfileFrom(event).isPresent() &&
+                (Tag.STANDING_SIGNS.isTagged(event.getBlock().getType()) || Tag.WALL_SIGNS.isTagged(event.getBlock().getType()))) {
+            Block on = manager.getBlockOn((Sign) event.getBlock().getState());
+            if (on == null || on.getState() instanceof TileState /* deny placing mechanics on tile entities */) {
                 event.getPlayer().sendMessage("§cDu kan ikke placere en maskine på denne block!");
                 event.setCancelled(true);
                 event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(event.getPlayer().getInventory().getItemInMainHand().getType()));
                 event.getBlock().setType(Material.AIR);
                 return;
-            } else if (on == null) {
-                return;
+            }
+
+            // fix direction for standing signs
+            if (Tag.STANDING_SIGNS.isTagged(event.getBlock().getType())) {
+                BlockUtil.rotate(event.getBlock(), BlockUtil.getCartesianRotation(BlockUtil.getFacing(event.getBlock())));
             }
 
             ItemStack drop = new ItemStack(on.getType());
             // try to build the mechanic in the next tick
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-                MechanicBuildResponse response = manager.buildMechanic((Sign) event.getBlock().getState(), event.getPlayer());
+                MechanicBuildResponse response = manager.buildMechanic((Sign) event.getBlock().getState(), on, event.getPlayer());
                 build: {
                     switch (response) {
                         case SUCCESS -> {

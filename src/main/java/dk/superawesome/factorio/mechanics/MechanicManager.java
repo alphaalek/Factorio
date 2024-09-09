@@ -1,7 +1,6 @@
 package dk.superawesome.factorio.mechanics;
 
 import com.google.common.collect.Sets;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.api.events.MechanicMoveEvent;
@@ -21,12 +20,12 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.bukkit.block.data.Directional;
 import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
@@ -34,6 +33,8 @@ import org.bukkit.util.Vector;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 public class MechanicManager implements Listener {
@@ -61,9 +62,9 @@ public class MechanicManager implements Listener {
 
     public void loadMechanics(Chunk chunk) {
         for (BlockState state : chunk.getTileEntities()) {
-            if (state instanceof Sign && Tag.WALL_SIGNS.isTagged(state.getType())
-                    && getProfileFrom((Sign) state).isPresent()
-                    && getMechanicAt(BlockUtil.getPointingBlock(state.getBlock(), true).getLocation()) == null) {
+            if (state instanceof Sign
+                    && (Tag.WALL_SIGNS.isTagged(state.getType()) || Tag.STANDING_SIGNS.isTagged(state.getType()))
+                    && getProfileFrom((Sign) state).isPresent()) {
                 // load this mechanic
                 if (!loadMechanic((Sign) state)) {
                     // unable to load mechanic properly due to corrupt data
@@ -158,7 +159,7 @@ public class MechanicManager implements Listener {
     @EventHandler
     public void onPipeSuck(PipeSuckEvent event) {
         if (event.getBlock().getWorld().equals(this.world)) {
-            Mechanic<?> mechanic = getMechanicAt(event.getBlock().getLocation());
+            Mechanic<?> mechanic = getMechanicAt(event.getLocation());
             if (mechanic instanceof TransferCollection) {
                 event.setTransfer((TransferCollection) mechanic);
             }
@@ -196,11 +197,21 @@ public class MechanicManager implements Listener {
     }
 
     public Optional<MechanicProfile<?>> getProfileFrom(Sign sign) {
-        if (!sign.getSide(Side.FRONT).getLine(0).trim().startsWith("[")
-                || !sign.getSide(Side.FRONT).getLine(0).trim().endsWith("]")) {
+        Optional<MechanicProfile<?>> profile = getProfileFrom(sign.getSide(Side.FRONT)::getLine, sign.getSide(Side.FRONT)::setLine);
+        sign.update();
+        return profile;
+    }
+
+    public Optional<MechanicProfile<?>> getProfileFrom(SignChangeEvent event) {
+        return getProfileFrom(event::getLine, event::setLine);
+    }
+
+    public Optional<MechanicProfile<?>> getProfileFrom(Function<Integer, String> get, BiConsumer<Integer, String> set) {
+        if (!get.apply(0).trim().startsWith("[")
+                || !get.apply(0).trim().endsWith("]")) {
             return Optional.empty();
         }
-        String type = sign.getSide(Side.FRONT).getLine(0).trim().substring(1, sign.getSide(Side.FRONT).getLine(0).trim().length() - 1);
+        String type = get.apply(0).trim().substring(1, get.apply(0).trim().length() - 1);
 
         List<MechanicProfile<?>> match = Profiles.getProfiles()
                 .stream()
@@ -210,8 +221,7 @@ public class MechanicManager implements Listener {
             MechanicProfile<?> profile = match.get(0);
 
             // fix lowercase/uppercase and my headache
-            sign.getSide(Side.FRONT).setLine(0, "[" + profile.getSignName() + "]");
-            sign.update();
+            set.accept(0, "[" + profile.getSignName() + "]");
 
             return Optional.of(profile);
         }
@@ -257,21 +267,30 @@ public class MechanicManager implements Listener {
         return true;
     }
 
-    public MechanicBuildResponse buildMechanic(Sign sign, Player owner) {
+    public Block getBlockOn(Sign sign) {
+        if (Tag.WALL_SIGNS.isTagged(sign.getType())) {
+            return BlockUtil.getPointingBlock(sign.getBlock(), true);
+        } else if (Tag.STANDING_SIGNS.isTagged(sign.getType())) {
+             return sign.getBlock().getRelative(BlockFace.DOWN);
+        } else {
+            return null;
+        }
+    }
+
+    public MechanicBuildResponse buildMechanic(Sign sign, Block on, Player owner) {
         Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
         if (profile.isEmpty()) {
             return MechanicBuildResponse.NO_SUCH;
         }
 
-        Block pointing = BlockUtil.getPointingBlock(sign.getBlock(), true);
-        if (pointing != null && getMechanicPartially(pointing.getLocation()) != null) {
+        if (getMechanicPartially(on.getLocation()) != null) {
             return MechanicBuildResponse.ALREADY_EXISTS;
         }
 
         Mechanic<?> mechanic;
         try {
-            BlockFace rotation = ((Directional)sign.getBlockData()).getFacing();
-            mechanic = loadMechanicFromSign(profile.get(), sign, (type, on) -> contextProvider.create(on.getLocation(), rotation, type, owner.getUniqueId()));
+            BlockFace rotation = BlockUtil.getFacing(sign.getBlock());
+            mechanic = loadMechanicFromSign(profile.get(), sign, on, rotation, type -> contextProvider.create(on.getLocation(), rotation, type, owner.getUniqueId()));
             if (mechanic == null) {
                 return MechanicBuildResponse.NO_SUCH;
             }
@@ -283,7 +302,8 @@ public class MechanicManager implements Listener {
         MechanicBuildEvent event = new MechanicBuildEvent(owner, mechanic);
         verify: {
             MechanicBuildResponse response;
-            if (!Buildings.checkCanBuild(mechanic)) {
+            if (!Buildings.checkCanBuild(mechanic)
+                    || Tag.STANDING_SIGNS.isTagged(sign.getType()) && !mechanic.getBuilding().acceptsStandingSign()) {
                 response = MechanicBuildResponse.NOT_PLACED_BLOCKS;
             } else if (!Buildings.hasSpaceFor(sign.getBlock(), mechanic)) {
                 response = MechanicBuildResponse.NOT_ENOUGH_SPACE;
@@ -304,7 +324,7 @@ public class MechanicManager implements Listener {
         Buildings.build(sign.getWorld(), mechanic);
         mechanic.onBlocksLoaded(owner);
 
-        Routes.removeNearbyRoutes(pointing);
+        Routes.removeNearbyRoutes(on);
 
         try {
             for (UUID defaultMember : Factorio.get().getMechanicController().getDefaultMembersFor(owner.getUniqueId())) {
@@ -323,10 +343,25 @@ public class MechanicManager implements Listener {
     public boolean loadMechanic(Sign sign) {
         try {
             Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
-            if (profile.isPresent()) {
-                Mechanic<?> mechanic = loadMechanicFromSign(profile.get(), sign, (__, on) -> contextProvider.findAt(on.getLocation()));
+            Block on = getBlockOn(sign);
+            if (on != null && profile.isPresent()) {
+                // check if there is already a mechanic at this location
+                if (getMechanicPartially(on.getLocation()) != null) {
+                    return false;
+                }
+
+                // load the mechanic
+                Mechanic<?> mechanic = loadMechanicFromSign(profile.get(), sign, on, BlockUtil.getFacing(sign.getBlock()), __ -> contextProvider.findAt(on.getLocation()));
+
+                // ensure only standing signs for buildings that allow it
+                if (Tag.STANDING_SIGNS.isTagged(sign.getType()) && !mechanic.getBuilding().acceptsStandingSign()) {
+                    return false;
+                }
+
                 if (mechanic != null) {
                     mechanic.onBlocksLoaded(null);
+                } else {
+                    return false;
                 }
             }
             return true;
@@ -337,16 +372,9 @@ public class MechanicManager implements Listener {
         return false;
     }
 
-    private Mechanic<?> loadMechanicFromSign(MechanicProfile<?> profile, Sign sign, Query.CheckedBiFunction<String, Block, MechanicStorageContext> context) throws IOException, SQLException {
-        // get the block which the sign is hanging on, because this block is the root of the mechanic
-        Block on = BlockUtil.getPointingBlock(sign.getBlock(), true);
-        if (on == null) {
-            return null;
-        }
-
+    private Mechanic<?> loadMechanicFromSign(MechanicProfile<?> profile, Sign sign, Block on, BlockFace rotation, Query.CheckedFunction<String, MechanicStorageContext> context) throws IOException, SQLException {
         // load this mechanic
-        BlockFace rotation = ((org.bukkit.block.data.type.WallSign)sign.getBlockData()).getFacing();
-        Mechanic<?> mechanic = load(profile, context.<SQLException>sneaky(profile.getName(), on), on.getLocation(), rotation, Tag.WALL_SIGNS.isTagged(sign.getType()));
+        Mechanic<?> mechanic = load(profile, context.<SQLException>sneaky(profile.getName()), on.getLocation(), rotation, Tag.WALL_SIGNS.isTagged(sign.getType()));
 
         if (mechanic instanceof AccessibleMechanic) {
             sign.getSide(Side.FRONT).setLine(1, "Lvl " + mechanic.getLevel().lvl());

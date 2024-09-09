@@ -46,7 +46,7 @@ public class Movement {
         Mechanic<?> mechanic = selections.get(player.getUniqueId());
 
         BlockFace rot = BlockUtil.getPrimaryDirection(player.getLocation().getYaw()).getOppositeFace();
-        Block sign = mechanic.getLocation().getBlock().getRelative(mechanic.getRotation());
+        Block sign = mechanic.getBuilding().getSign(mechanic);
         if (Factorio.get().getMechanicManager(to.getWorld()).moveMechanic(player, mechanic, to, rot, sign)) {
             selections.remove(player.getUniqueId());
         }

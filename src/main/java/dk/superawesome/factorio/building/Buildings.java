@@ -1,16 +1,21 @@
 package dk.superawesome.factorio.building;
 
+import com.google.common.util.concurrent.Runnables;
 import dk.superawesome.factorio.building.impl.*;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.util.Array;
+import dk.superawesome.factorio.util.ChainRunnable;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockVector;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Buildings {
@@ -74,8 +79,12 @@ public class Buildings {
         return locs;
     }
 
+    public static List<Location> getLocations(Mechanic<?> mechanic) {
+        return getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation());
+    }
+
     public static boolean intersects(Location loc, Mechanic<?> mechanic) {
-        for (Location relLoc : getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation())) {
+        for (Location relLoc : getLocations(mechanic)) {
             if (BlockUtil.blockEquals(relLoc, loc)) {
                 return true;
             }
@@ -87,7 +96,7 @@ public class Buildings {
     public static boolean canMoveTo(Location to, BlockFace rotation, Mechanic<?> mechanic) {
         for (Location relLoc : getLocations(mechanic, to, rotation)) {
             // check if this block can be placed in the world
-            if (relLoc.getBlock().getType() != Material.AIR) {
+            if (relLoc.getBlock().getType() != Material.AIR && !getLocations(mechanic).contains(relLoc)) {
                 return false;
             }
         }
@@ -97,7 +106,7 @@ public class Buildings {
 
     public static boolean hasSpaceFor(Block sign, Mechanic<?> mechanic) {
         if (mechanic.getBuilding() instanceof Buildable) {
-            for (Location relLoc : getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation())) {
+            for (Location relLoc : getLocations(mechanic)) {
                 // check if this block can be placed in the world
                 if (!relLoc.getBlock().equals(sign)
                         && !relLoc.getBlock().getLocation().equals(mechanic.getLocation())
@@ -115,7 +124,7 @@ public class Buildings {
         if (building instanceof Matcher matcher) {
             int i = 0;
             // check if all the placed blocks matches the matcher
-            for (Location relLoc : getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation())) {
+            for (Location relLoc : getLocations(mechanic)) {
                 if (!matcher.getMaterials().get(i++).test(relLoc.getBlock().getType())) {
                     return false;
                 }
@@ -129,15 +138,38 @@ public class Buildings {
         Building building = mechanic.getBuilding();
         if (building instanceof Buildable buildable) {
             int i = 0;
-            for (Location relLoc : getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation())) {
+            for (Location relLoc : getLocations(mechanic)) {
                 buildable.getBlocks().get(i++)
                         .accept(world.getBlockAt(relLoc), mechanic.getRotation());
             }
         }
     }
 
+    public static void copy(World fromWorld, World toWorld, Location from, BlockFace fromRot, Location to, BlockFace toRot, Mechanic<?> mechanic) {
+        int i = 0;
+        List<Location> locations = Buildings.getLocations(mechanic, from, fromRot);
+
+        ChainRunnable runnable = ChainRunnable.empty();
+        for (Location relLoc : getLocations(mechanic, to, toRot)) {
+            Block relBlock = fromWorld.getBlockAt(relLoc);
+            Block fromBlock = toWorld.getBlockAt(locations.get(i++));
+
+            BlockUtil.rotate(fromBlock, toRot);
+
+            // we have to store the block data to be copied
+            Material type = fromBlock.getType();
+            BlockData data = fromBlock.getBlockData().clone();
+            runnable = runnable.thenDo(() -> {
+                relBlock.setType(type, false);
+                relBlock.setBlockData(data);
+            });
+        }
+
+        runnable.run();
+    }
+
     public static void remove(Mechanic<?> mechanic, Location loc, BlockFace rot, boolean dropSign) {
-        Block sign = loc.getBlock().getRelative(rot);
+        Block sign = mechanic.getBuilding().getSign(mechanic);
         if (dropSign) {
             for (ItemStack drops : sign.getDrops()) {
                 loc.getWorld().dropItemNaturally(loc, drops);
@@ -145,11 +177,21 @@ public class Buildings {
         }
 
         if (mechanic.getBuilding() instanceof Buildable) {
-            for (Location relLoc : getLocations(mechanic, loc, rot)) {
-                loc.getWorld().getBlockAt(relLoc).setType(Material.AIR, false); // don't apply physics
-            }
+            destroy(mechanic, loc, rot);
         } else {
             sign.setType(Material.AIR);
+        }
+    }
+
+    public static void destroy(Mechanic<?> mechanic, Location loc, BlockFace rot) {
+        destroy(mechanic, loc, rot, Collections.emptyList());
+    }
+
+    public static void destroy(Mechanic<?> mechanic, Location loc, BlockFace rot, List<Location> ignore) {
+        for (Location relLoc : getLocations(mechanic, loc, rot)) {
+            if (!ignore.contains(relLoc)) {
+                loc.getWorld().getBlockAt(relLoc).setType(Material.AIR, false); // don't apply physics
+            }
         }
     }
 

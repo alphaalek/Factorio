@@ -31,13 +31,13 @@ public class Excluder extends Circuit<Excluder, ItemCollection> implements ItemC
 
     @Override
     public void onBlocksLoaded(Player by) {
-        Filter.loadItems(filter, (Sign) this.loc.getBlock().getRelative(this.rot).getState(), by, this);
+        Filter.loadItems(filter, getSign(), by, this);
     }
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        if (event.getBlock().equals(this.loc.getBlock().getRelative(this.rot))) {
-            Bukkit.getScheduler().runTask(Factorio.get(), () -> Filter.loadItems(filter, (Sign) event.getBlock().getState(), event.getPlayer(), this));
+        if (event.getBlock().equals(getSign().getBlock())) {
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> Filter.loadItems(filter, getSign(), event.getPlayer(), this));
         }
     }
 
