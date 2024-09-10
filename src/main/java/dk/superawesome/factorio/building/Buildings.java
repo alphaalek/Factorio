@@ -134,14 +134,20 @@ public class Buildings {
         return true;
     }
 
-    public static void build(World world, Mechanic<?> mechanic) {
+    public static void build(World world, Mechanic<?> mechanic, List<Location> ignore) {
         Building building = mechanic.getBuilding();
         if (building instanceof Buildable buildable) {
             int i = 0;
             for (Location relLoc : getLocations(mechanic)) {
+                if (ignore.contains(relLoc)) {
+                    continue;
+                }
+
                 Block block = world.getBlockAt(relLoc);
                 if (block.getType() != Material.AIR) {
-                    block.breakNaturally();
+                    for (ItemStack drop : block.getDrops()) {
+                        world.dropItemNaturally(relLoc, drop);
+                    }
                 }
 
                 buildable.getBlocks().get(i++)

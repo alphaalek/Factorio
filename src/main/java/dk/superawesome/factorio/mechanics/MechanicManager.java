@@ -321,7 +321,7 @@ public class MechanicManager implements Listener {
         }
 
         // place the blocks for this mechanic
-        Buildings.build(sign.getWorld(), mechanic);
+        Buildings.build(sign.getWorld(), mechanic, Collections.singletonList(sign.getLocation()));
         mechanic.onBlocksLoaded(owner);
 
         Routes.removeNearbyRoutes(on);

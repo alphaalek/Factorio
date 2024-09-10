@@ -16,9 +16,9 @@ import java.util.function.BiConsumer;
 public class SmelterBuilding implements Building, Buildable {
 
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
-            (b, r) -> b.setType(Material.COBBLESTONE),
+            (b, r) -> b.setType(Material.COBBLESTONE, false),
             (b, r) -> {
-                b.setType(Material.BLAST_FURNACE);
+                b.setType(Material.BLAST_FURNACE, false);
                 BlockUtil.rotate(b, r);
             },
             (b, r) -> {}
