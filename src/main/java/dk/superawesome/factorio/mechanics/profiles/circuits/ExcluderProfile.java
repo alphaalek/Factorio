@@ -37,6 +37,11 @@ public class ExcluderProfile implements MechanicProfile<Excluder> {
     }
 
     @Override
+    public boolean isInteractable() {
+        return true;
+    }
+
+    @Override
     public int getID() {
         return 20;
     }

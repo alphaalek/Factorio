@@ -6,6 +6,7 @@ import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.api.events.MechanicMoveEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.building.Buildings;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
@@ -90,8 +91,8 @@ public class MechanicManager implements Listener {
 
     public Mechanic<?> load(MechanicProfile<?> profile, MechanicStorageContext context, Location loc, BlockFace rotation, boolean hasWallSign) {
         Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, context, hasWallSign);
-        if (mechanic instanceof ThinkingMechanic) {
-            thinkingMechanics.add((ThinkingMechanic) mechanic);
+        if (mechanic instanceof ThinkingMechanic tm) {
+            thinkingMechanics.add(tm);
         }
 
         mechanics.put(BlockUtil.getVec(loc), mechanic);
@@ -160,8 +161,8 @@ public class MechanicManager implements Listener {
     public void onPipeSuck(PipeSuckEvent event) {
         if (event.getBlock().getWorld().equals(this.world)) {
             Mechanic<?> mechanic = getMechanicAt(event.getLocation());
-            if (mechanic instanceof TransferCollection) {
-                event.setTransfer((TransferCollection) mechanic);
+            if (mechanic instanceof TransferCollection tc) {
+                event.setTransfer(tc);
             }
         }
     }
@@ -170,8 +171,8 @@ public class MechanicManager implements Listener {
     public void onPipePut(PipePutEvent event) {
         if (event.getBlock().getWorld().equals(this.world)) {
             Mechanic<?> mechanic = getMechanicAt(event.getBlock().getLocation());
-            if (mechanic instanceof Container && ((Container<?>)mechanic).accepts(event.getTransfer()) && mechanic != event.getFrom()) {
-                doTransfer((Container<?>) mechanic, event.getTransfer(), event);
+            if (mechanic instanceof Container<?> c && c.accepts(event.getTransfer()) && mechanic != event.getFrom()) {
+                doTransfer(c, event.getTransfer(), event);
             }
         }
     }
@@ -217,7 +218,7 @@ public class MechanicManager implements Listener {
                 .stream()
                 .filter(b -> b.getSignName().toLowerCase().startsWith(type.toLowerCase()))
                 .toList();
-        if (match.size() == 1) { // ensure only one possible mechanic
+        if (match.size() == 1) { // ensure only one possible match
             MechanicProfile<?> profile = match.get(0);
 
             // fix lowercase/uppercase and my headache
@@ -290,7 +291,9 @@ public class MechanicManager implements Listener {
         Mechanic<?> mechanic;
         try {
             BlockFace rotation = BlockUtil.getFacing(sign.getBlock());
-            mechanic = loadMechanicFromSign(profile.get(), sign, on, rotation, type -> contextProvider.create(on.getLocation(), rotation, type, owner.getUniqueId()));
+
+            MechanicStorageContext context = contextProvider.create(on.getLocation(), rotation, profile.get().getName(), owner.getUniqueId());
+            mechanic = loadMechanicFromSign(profile.get(), sign, on, rotation, context);
             if (mechanic == null) {
                 return MechanicBuildResponse.NO_SUCH;
             }
@@ -351,7 +354,7 @@ public class MechanicManager implements Listener {
                 }
 
                 // load the mechanic
-                Mechanic<?> mechanic = loadMechanicFromSign(profile.get(), sign, on, BlockUtil.getFacing(sign.getBlock()), __ -> contextProvider.findAt(on.getLocation()));
+                Mechanic<?> mechanic = loadMechanicFromSign(profile.get(), sign, on, BlockUtil.getFacing(sign.getBlock()), contextProvider.findAt(on.getLocation()));
 
                 // ensure only standing signs for buildings that allow it
                 if (Tag.STANDING_SIGNS.isTagged(sign.getType()) && !mechanic.getBuilding().acceptsStandingSign()) {
@@ -372,9 +375,9 @@ public class MechanicManager implements Listener {
         return false;
     }
 
-    private Mechanic<?> loadMechanicFromSign(MechanicProfile<?> profile, Sign sign, Block on, BlockFace rotation, Query.CheckedFunction<String, MechanicStorageContext> context) throws IOException, SQLException {
+    private Mechanic<?> loadMechanicFromSign(MechanicProfile<?> profile, Sign sign, Block on, BlockFace rotation, MechanicStorageContext context) throws IOException, SQLException {
         // load this mechanic
-        Mechanic<?> mechanic = load(profile, context.<SQLException>sneaky(profile.getName()), on.getLocation(), rotation, Tag.WALL_SIGNS.isTagged(sign.getType()));
+        Mechanic<?> mechanic = load(profile, context, on.getLocation(), rotation, Tag.WALL_SIGNS.isTagged(sign.getType()));
 
         if (mechanic instanceof AccessibleMechanic) {
             sign.getSide(Side.FRONT).setLine(1, "Lvl " + mechanic.getLevel().lvl());
