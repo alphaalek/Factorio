@@ -69,7 +69,7 @@ public class SignChangeListener implements Listener {
                             if (mechanic != null) {
                                 event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
                             } else{
-                                event.getBlock().setType(Material.AIR);
+                                event.getPlayer().sendMessage("§cNoget gik galt!");
                             }
                             break build;
                         }

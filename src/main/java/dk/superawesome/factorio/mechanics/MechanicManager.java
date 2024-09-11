@@ -4,16 +4,15 @@ import com.google.common.collect.Sets;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicBuildEvent;
 import dk.superawesome.factorio.api.events.MechanicMoveEvent;
+import dk.superawesome.factorio.api.events.MechanicLoadEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.building.Buildings;
-import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.WorldGuard;
-import dk.superawesome.factorio.util.db.Query;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.*;
@@ -338,6 +337,9 @@ public class MechanicManager implements Listener {
             owner.sendMessage("§cDer opstod en fejl ved tilføjelse af standard medlemmer.");
         }
 
+        MechanicLoadEvent postEvent = new MechanicLoadEvent(mechanic);
+        Bukkit.getPluginManager().callEvent(postEvent);
+
         // play sound
         sign.getWorld().playSound(sign.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.475f, 1f);
         return MechanicBuildResponse.SUCCESS;
@@ -361,11 +363,10 @@ public class MechanicManager implements Listener {
                     return false;
                 }
 
-                if (mechanic != null) {
-                    mechanic.onBlocksLoaded(null);
-                } else {
-                    return false;
-                }
+                mechanic.onBlocksLoaded(null);
+
+                MechanicLoadEvent postEvent = new MechanicLoadEvent(mechanic);
+                Bukkit.getPluginManager().callEvent(postEvent);
             }
             return true;
         } catch (SQLException | IOException ex) {

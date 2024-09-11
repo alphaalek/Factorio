@@ -140,6 +140,7 @@ public class Buildings {
             int i = 0;
             for (Location relLoc : getLocations(mechanic)) {
                 if (ignore.contains(relLoc)) {
+                    i++;
                     continue;
                 }
 

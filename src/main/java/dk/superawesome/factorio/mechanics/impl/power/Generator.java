@@ -10,6 +10,7 @@ import dk.superawesome.factorio.mechanics.stackregistry.Fuel;
 import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -93,11 +94,11 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public void onBlocksLoaded(Player by) {
-        lever = getLocation().getBlock().getRelative(this.rot.getOppositeFace());
-        campfire = getLocation().getBlock().getRelative(0, 2, 0);
+        lever = this.loc.getBlock().getRelative(this.rot.getOppositeFace());
+        campfire = this.loc.getBlock().getRelative(0, 2, 0);
         if (lever.getType() != Material.LEVER || campfire.getType() != Material.CAMPFIRE) {
             // invalid generator
-            Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
+            Factorio.get().getMechanicManager(this.loc.getWorld()).unload(this);
             Buildings.remove(this, this.loc, this.rot, true);
             return;
         }

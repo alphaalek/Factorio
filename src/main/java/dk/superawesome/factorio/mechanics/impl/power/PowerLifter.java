@@ -1,6 +1,8 @@
 package dk.superawesome.factorio.mechanics.impl.power;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.api.events.MechanicLoadEvent;
+import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.statics.BlockUtil;
@@ -9,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.Repeater;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -33,8 +36,6 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     @Override
     public void onBlocksLoaded(Player by) {
         setupRelativeBlocks();
-
-        startLift(p -> p.triggerLevers());
     }
 
     @Override
@@ -75,7 +76,6 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         invoked = false;
 
         if (transferred) {
-            triggerLevers(true);
             return true;
         }
 
@@ -84,12 +84,12 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
 
     @EventHandler
     public void onSignal(BlockRedstoneEvent event) {
-        if (BlockUtil.isDiagonalYFast(event.getBlock(), loc.getBlock()) && event.getBlock().getType() == Material.REPEATER) {
+        if (BlockUtil.isDiagonal2DFast(event.getBlock(), loc.getBlock()) && event.getBlock().getType() == Material.REPEATER) {
             Block point = BlockUtil.getPointingBlock(event.getBlock(), true);
             if (point != null && point.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(point, false).equals(loc.getBlock())) {
                 powered = event.getNewCurrent() > 0;
 
-                startLift(l -> l.triggerLevers(powered));
+                startLift(lifter -> lifter.triggerLevers(powered));
             }
         }
     }
@@ -116,6 +116,33 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         }
     }
 
+    private void invokeRoot() {
+        BlockUtil.forRelative(this.loc.getBlock(), b -> {
+            if (b.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(b, false).equals(this.loc.getBlock())) {
+                BlockUtil.forRelative(b, b2 -> {
+                    if (b2.getType() == Material.REPEATER && BlockUtil.getPointingBlock(b2, true).equals(b)) {
+                        powered = ((Repeater)b2.getBlockData()).isPowered();
+                        startLift(lifter -> lifter.triggerLevers(powered));
+                    }
+                });
+            }
+        });
+    }
+
+    @EventHandler
+    public void onMechanicRemove(MechanicRemoveEvent event) {
+        if (event.getMechanic() == this) {
+            startLift(__ -> triggerLevers(false));
+        }
+    }
+
+    @EventHandler
+    public void onMechanicLoad(MechanicLoadEvent event) {
+        if (event.getMechanic() instanceof PowerLifter) {
+            invokeRoot();
+        }
+    }
+
     @EventHandler
     @Override
     public void onBlockPlace(BlockPlaceEvent event) {
@@ -126,14 +153,6 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     @Override
     public void onBlockBreak(BlockBreakEvent event) {
         super.handleBlockBreak(event);
-
-        if (BlockUtil.isRelativeFast(event.getBlock(), loc.getBlock())) {
-            MechanicManager manager = Factorio.get().getMechanicManager(event.getBlock().getWorld());
-            Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
-            if (mechanic.equals(PowerLifter.this)) {
-                startLift(p -> p.triggerLevers(false));
-            }
-        }
     }
 
     @EventHandler
