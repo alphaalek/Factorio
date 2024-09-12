@@ -11,7 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.type.Repeater;
+import org.bukkit.block.data.Powerable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -28,6 +28,8 @@ import java.util.function.Consumer;
 public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInvoker {
 
     private boolean invoked;
+    private boolean isRoot;
+    private int poweredBy;
 
     public PowerLifter(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
         super(loc, rotation, context, hasWallSign);
@@ -75,11 +77,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         }
         invoked = false;
 
-        if (transferred) {
-            return true;
-        }
-
-        return false;
+        return transferred;
     }
 
     @EventHandler
@@ -87,9 +85,40 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         if (BlockUtil.isDiagonal2DFast(event.getBlock(), loc.getBlock()) && event.getBlock().getType() == Material.REPEATER) {
             Block point = BlockUtil.getPointingBlock(event.getBlock(), true);
             if (point != null && point.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(point, false).equals(loc.getBlock())) {
-                powered = event.getNewCurrent() > 0;
+                boolean prev = powered;
+                double xDiff = this.loc.getX() - event.getBlock().getX();
+                double zDiff = this.loc.getZ() - event.getBlock().getZ();
+                // mask relative signals
+                if (xDiff > 0) {
+                    if (event.getNewCurrent() > 0) {
+                        poweredBy |= 1;
+                    } else {
+                        poweredBy &= ~1;
+                    }
+                } else if (xDiff < 0) {
+                    if (event.getNewCurrent() > 0) {
+                        poweredBy |= 2;
+                    } else {
+                        poweredBy &= ~2;
+                    }
+                } else if (zDiff > 0) {
+                    if (event.getNewCurrent() > 0) {
+                        poweredBy |= 4;
+                    } else {
+                        poweredBy &= ~4;
+                    }
+                } else if (zDiff < 0) {
+                    if (event.getNewCurrent() > 0) {
+                        poweredBy |= 8;
+                    } else {
+                        poweredBy &= ~8;
+                    }
+                }
+                powered = poweredBy > 0;
 
-                startLift(lifter -> lifter.triggerLevers(powered));
+                if (powered != prev) {
+                    startLift(lifter -> lifter.triggerLevers(powered));
+                }
             }
         }
     }
@@ -101,7 +130,8 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
 
     private void doLift(Block from, Set<BlockVector> route, Consumer<PowerLifter> andThen) {
         Block point = BlockUtil.getPointingBlock(loc.getBlock(), true);
-        if (point != null && point.getType() == Material.OBSERVER && (from == null || !BlockUtil.getPointingBlock(point, true).equals(from))) {
+        if (point != null && point.getType() == Material.OBSERVER
+                && (from == null || !BlockUtil.getPointingBlock(point, true).equals(from))) {
             BlockVector vec = BlockUtil.getVec(point);
             if (route.contains(vec)) {
                 return;
@@ -117,16 +147,34 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     }
 
     private void invokeRoot() {
+        isRoot = false;
+        poweredBy = 0; // only used for root anyway, so we can clear it without any consequences
         BlockUtil.forRelative(this.loc.getBlock(), b -> {
             if (b.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(b, false).equals(this.loc.getBlock())) {
                 BlockUtil.forRelative(b, b2 -> {
-                    if (b2.getType() == Material.REPEATER && BlockUtil.getPointingBlock(b2, true).equals(b)) {
-                        powered = ((Repeater)b2.getBlockData()).isPowered();
-                        startLift(lifter -> lifter.triggerLevers(powered));
+                    if (b2.getType() == Material.REPEATER && BlockUtil.getPointingBlock(b2, true).equals(b) && ((Powerable)b2.getBlockData()).isPowered()) {
+                        isRoot = true;
+                        double xDiff = this.loc.getX() - b2.getX();
+                        double zDiff = this.loc.getZ() - b2.getZ();
+                        // mask relative signals
+                        if (xDiff > 0) {
+                            poweredBy |= 1;
+                        } else if (xDiff < 0) {
+                            poweredBy |= 2;
+                        } else if (zDiff > 0) {
+                            poweredBy |= 4;
+                        } else if (zDiff < 0) {
+                            poweredBy |= 8;
+                        }
                     }
                 });
             }
         });
+
+        if (isRoot) {
+            powered = poweredBy > 0;
+            startLift(lifter -> lifter.triggerLevers(powered));
+        }
     }
 
     @EventHandler
@@ -145,14 +193,18 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
 
     @EventHandler
     @Override
-    public void onBlockPlace(BlockPlaceEvent event) {
-        super.handleBlockPlace(event);
+    public void onBlockBreak(BlockBreakEvent event) {
+        super.handleBlockBreak(event);
+
+        if (BlockUtil.isRelativeFast(this.loc.getBlock(), event.getBlock()) || BlockUtil.isDiagonalYFast(this.loc.getBlock(), event.getBlock())) {
+            invokeRoot();
+        }
     }
 
     @EventHandler
     @Override
-    public void onBlockBreak(BlockBreakEvent event) {
-        super.handleBlockBreak(event);
+    public void onBlockPlace(BlockPlaceEvent event) {
+        super.handleBlockPlace(event);
     }
 
     @EventHandler
