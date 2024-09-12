@@ -4,9 +4,6 @@ import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
-import org.bukkit.block.data.Rotatable;
 import org.bukkit.util.BlockVector;
 
 import java.util.Arrays;
@@ -36,8 +33,8 @@ public interface Building extends BlockCollection {
         return BlockUtil.getRel(mechanic.getLocation(), BlockUtil.rotateVec(WALL_SIGN, DEFAULT_ROTATION, mechanic.getRotation())).getBlock();
     }
 
-    default boolean acceptsStandingSign() {
-        return false;
+    default boolean deniesStandingSign() {
+        return true;
     }
 
     List<BlockVector> getRelatives(); // facing default rotation

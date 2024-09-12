@@ -10,7 +10,8 @@ public interface TopBuilding extends Building {
         return BlockUtil.getRel(mechanic.getLocation(), BlockUtil.rotateVec(TOP_SIGN, DEFAULT_ROTATION, mechanic.getRotation())).getBlock();
     }
 
-    default boolean acceptsStandingSign() {
-        return true;
+    @Override
+    default boolean deniesStandingSign() {
+        return false;
     }
 }

@@ -305,7 +305,7 @@ public class MechanicManager implements Listener {
         verify: {
             MechanicBuildResponse response;
             if (!Buildings.checkCanBuild(mechanic)
-                    || Tag.STANDING_SIGNS.isTagged(sign.getType()) && !mechanic.getBuilding().acceptsStandingSign()) {
+                    || Tag.STANDING_SIGNS.isTagged(sign.getType()) && mechanic.getBuilding().deniesStandingSign()) {
                 response = MechanicBuildResponse.NOT_PLACED_BLOCKS;
             } else if (!Buildings.hasSpaceFor(sign.getBlock(), mechanic)) {
                 response = MechanicBuildResponse.NOT_ENOUGH_SPACE;
@@ -359,7 +359,7 @@ public class MechanicManager implements Listener {
                 Mechanic<?> mechanic = loadMechanicFromSign(profile.get(), sign, on, BlockUtil.getFacing(sign.getBlock()), contextProvider.findAt(on.getLocation()));
 
                 // ensure only standing signs for buildings that allow it
-                if (Tag.STANDING_SIGNS.isTagged(sign.getType()) && !mechanic.getBuilding().acceptsStandingSign()) {
+                if (Tag.STANDING_SIGNS.isTagged(sign.getType()) && mechanic.getBuilding().deniesStandingSign()) {
                     return false;
                 }
 

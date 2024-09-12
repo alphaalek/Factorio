@@ -159,14 +159,17 @@ public class Buildings {
 
     public static void copy(World fromWorld, World toWorld, Location from, BlockFace fromRot, Location to, BlockFace toRot, Mechanic<?> mechanic) {
         int i = 0;
-        List<Location> locations = Buildings.getLocations(mechanic, from, fromRot);
+        List<Location> locations = getLocations(mechanic, from, fromRot);
 
         ChainRunnable runnable = ChainRunnable.empty();
         for (Location relLoc : getLocations(mechanic, to, toRot)) {
             Block relBlock = fromWorld.getBlockAt(relLoc);
             Block fromBlock = toWorld.getBlockAt(locations.get(i++));
 
-            BlockUtil.rotate(fromBlock, toRot);
+            BlockFace rot = BlockUtil.getFacing(fromBlock);
+            if (rot != null) {
+                BlockUtil.rotate(fromBlock, BlockUtil.getRotationRelative(fromRot, rot, toRot));
+            }
 
             // we have to store the block data to be copied
             Material type = fromBlock.getType();

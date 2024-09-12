@@ -43,7 +43,10 @@ public class PowerExpander extends AbstractMechanic<PowerExpander> implements Si
 
             BlockUtil.forRelative(this.loc.getBlock(), new Action<>() {
 
-                Block invoker = null;
+                // can't be empty when invoke#onFinish is called
+                // because otherwise this PowerExpander (SignalInvoker) wouldn't be invoked itself
+                // since it needs a sticky piston relative to the origin block
+                final List<Block> invoker = new ArrayList<>();
                 ChainRunnable invoke = ChainRunnable.empty();
 
                 @Override
@@ -52,12 +55,14 @@ public class PowerExpander extends AbstractMechanic<PowerExpander> implements Si
                         Block point = BlockUtil.getPointingBlock(block, false);
                         if (!point.equals(PowerExpander.this.loc.getBlock())) {
                             invoke = invoke.thenDo(() -> {
-                                if (Routes.invokePCOutput(point, point.getLocation(), Arrays.asList(point, invoker), pc)) {
+                                List<Block> outputs = new ArrayList<>(invoker);
+                                outputs.add(point);
+                                if (Routes.invokePCOutput(point, point.getLocation(), outputs, pc)) {
                                     transferred.set(true);
                                 }
                             });
                         } else {
-                            invoker = block;
+                            invoker.add(block);
                         }
                     }
                 }
