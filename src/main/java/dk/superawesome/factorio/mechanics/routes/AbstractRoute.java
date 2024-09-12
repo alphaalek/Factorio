@@ -22,12 +22,12 @@ import org.bukkit.util.BlockVector;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends OutputEntry> {
+public abstract class AbstractRoute<R extends AbstractRoute<R, O>, O> {
 
     private static final Map<World, Map<BlockVector, List<AbstractRoute<?, ?>>>> cachedRoutes = new HashMap<>();
     private static final Map<World, Map<BlockVector, AbstractRoute<?, ?>>> cachedOriginRoutes = new HashMap<>();
 
-    public static <R extends AbstractRoute<R, ? extends OutputEntry>> R getCachedOriginRoute(World world, BlockVector vec) {
+    public static <R extends AbstractRoute<R, ?>> R getCachedOriginRoute(World world, BlockVector vec) {
         return (R) cachedOriginRoutes.computeIfAbsent(world, d -> new HashMap<>())
                 .get(new BlockVector(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ()));
     }
@@ -37,7 +37,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
                 .getOrDefault(new BlockVector(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ()), new ArrayList<>());
     }
 
-    public static <R extends AbstractRoute<R, ? extends OutputEntry>> void addRouteToCache(AbstractRoute<?, ?> route) {
+    public static <R extends AbstractRoute<R, ?>> void addRouteToCache(AbstractRoute<?, ?> route) {
         if (cachedRoutes.isEmpty()) {
             cachedRoutes.put(route.getWorld(), new HashMap<>());
         }
@@ -54,7 +54,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         }
     }
 
-    public static <R extends AbstractRoute<R, ? extends OutputEntry>> void removeRouteFromCache(AbstractRoute<?, ?> route) {
+    public static <R extends AbstractRoute<R, ?>> void removeRouteFromCache(AbstractRoute<?, ?> route) {
         if (cachedRoutes.isEmpty()) {
             return;
         }
@@ -67,7 +67,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         ((R) route).getFactory().callRemoveEvent((R) route);
     }
 
-    public static class TransferOutputEntry implements OutputEntry {
+    public static class TransferOutputEntry {
 
         protected final Block block;
 
@@ -81,14 +81,9 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
             return event.transferred();
         }
-
-        @Override
-        public BlockVector getVec() {
-            return BlockUtil.getVec(block);
-        }
     }
 
-    public static class SignalOutputEntry implements OutputEntry {
+    public static class SignalOutputEntry {
 
         protected final Block block;
         protected final Location loc;
@@ -103,14 +98,9 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         public boolean handle(SignalSource source) {
             return source.handleOutput(block, loc, from);
         }
-
-        @Override
-        public BlockVector getVec() {
-            return BlockUtil.getVec(block);
-        }
     }
 
-    protected final Array<Queue<P>> outputs = new Array<>();
+    protected final Array<Queue<O>> outputs = new Array<>();
     protected final Set<BlockVector> locations = new HashSet<>();
     protected final Map<BlockVector, List<BlockVector>> visited = new HashMap<>();
 
@@ -146,7 +136,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
         return locations;
     }
 
-    public Queue<P> getOutputs(int context) {
+    public Queue<O> getOutputs(int context) {
         return outputs.get(context, LinkedList::new);
     }
 
@@ -162,7 +152,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, P>, P extends Out
 
     public abstract void search(Block from, BlockVector relVec, Block rel, boolean isFromOrigin);
 
-    protected abstract P createOutputEntry(World world, BlockVector vec, BlockVector from);
+    protected abstract O createOutputEntry(World world, BlockVector vec, BlockVector from);
 
     public static class Pipe extends AbstractRoute<Pipe, TransferOutputEntry> {
 

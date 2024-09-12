@@ -1,10 +1,9 @@
 package dk.superawesome.factorio.mechanics.routes.events;
 
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
-import dk.superawesome.factorio.mechanics.routes.OutputEntry;
 import org.bukkit.event.Event;
 
-public abstract class RouteEvent<R extends AbstractRoute<R, ? extends OutputEntry>> extends Event {
+public abstract class RouteEvent<R extends AbstractRoute<R, ?>> extends Event {
 
     private final R route;
 

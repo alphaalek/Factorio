@@ -90,7 +90,7 @@ public class Routes {
         return false;
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R setupRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+    public static <R extends AbstractRoute<R, ?>> R setupRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = AbstractRoute.getCachedOriginRoute(start.getWorld(), BlockUtil.getVec(start));
         if (route == null) {
             route = createNewRoute(start, factory, onlyExpandIfOriginValid);
@@ -110,7 +110,7 @@ public class Routes {
                 .start(source, firstCall);
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> R createNewRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+    public static <R extends AbstractRoute<R, ?>> R createNewRoute(Block start, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         R route = factory.create(BlockUtil.getVec(start), start.getWorld());
         startRoute(route, start, onlyExpandIfOriginValid);
 
@@ -170,7 +170,7 @@ public class Routes {
         }
     }
 
-    public static <R extends AbstractRoute<R, P>, P extends OutputEntry> void setupForcibly(Block block, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
+    public static <R extends AbstractRoute<R, ?>> void setupForcibly(Block block, RouteFactory<R> factory, boolean onlyExpandIfOriginValid) {
         updateNearbyRoutes(block, true, modified -> {
             if (modified.isEmpty()) {
                 setupRoute(block, factory, onlyExpandIfOriginValid);

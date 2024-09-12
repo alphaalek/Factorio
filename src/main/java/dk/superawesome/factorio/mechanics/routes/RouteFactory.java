@@ -8,7 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.util.BlockVector;
 
-public interface RouteFactory<R extends AbstractRoute<R, ? extends OutputEntry>> {
+public interface RouteFactory<R extends AbstractRoute<R, ?>> {
 
     R create(BlockVector start, World world);
 
