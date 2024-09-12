@@ -5,6 +5,7 @@ import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.Routes;
+import dk.superawesome.factorio.mechanics.routes.impl.Signal;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -164,7 +165,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     @Override
-    public boolean preSignal(AbstractRoute.Signal signal, boolean firstCall) {
+    public boolean preSignal(Signal signal, boolean firstCall) {
         double signalCost = (signal.getLocations().size() - 1) * SIGNAL_COST;
         if (this.energy < signalCost) {
             if (recentMax == 0) {
@@ -182,7 +183,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     @Override
-    public void postSignal(AbstractRoute.Signal signal, int outputs) {
+    public void postSignal(Signal signal, int outputs) {
         double signalCost = (signal.getLocations().size() - 1) * SIGNAL_COST;
         double ratio = (outputs == 0 || signal.getOutputs(FROM_POWER_CENTRAL).isEmpty()) ? 1 : ((double)outputs) / signal.getOutputs(FROM_POWER_CENTRAL).size();
 

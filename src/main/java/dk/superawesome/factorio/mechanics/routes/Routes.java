@@ -7,6 +7,8 @@ import dk.superawesome.factorio.mechanics.SignalSource;
 import dk.superawesome.factorio.mechanics.Source;
 import dk.superawesome.factorio.mechanics.impl.power.PowerCentral;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeSuckEvent;
+import dk.superawesome.factorio.mechanics.routes.impl.Pipe;
+import dk.superawesome.factorio.mechanics.routes.impl.Signal;
 import dk.superawesome.factorio.mechanics.transfer.EnergyCollection;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.statics.BlockUtil;
@@ -23,8 +25,8 @@ import java.util.function.Consumer;
 
 public class Routes {
 
-    public static final RouteFactory<AbstractRoute.Pipe> transferRouteFactory = new RouteFactory.PipeRouteFactory();
-    public static final RouteFactory<AbstractRoute.Signal> signalRouteFactory = new RouteFactory.SignalRouteFactory();
+    public static final RouteFactory<Pipe> transferRouteFactory = new RouteFactory.PipeRouteFactory();
+    public static final RouteFactory<Signal> signalRouteFactory = new RouteFactory.SignalRouteFactory();
 
     public static final int DEFAULT_CONTEXT = 0;
     public static final BlockFace[] SIGNAL_EXPAND_DIRECTIONS = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
@@ -144,7 +146,7 @@ public class Routes {
         BlockVector fromVec = BlockUtil.getVec(from);
 
         // iterate over all blocks around this block
-        for (BlockFace face : route instanceof AbstractRoute.Signal ? SIGNAL_EXPAND_DIRECTIONS : RELATIVES) {
+        for (BlockFace face : route instanceof Signal ? SIGNAL_EXPAND_DIRECTIONS : RELATIVES) {
             BlockVector relVec = BlockUtil.getVec(BlockUtil.getRel(from.getLocation(), face.getDirection()));
             // search relative vector
             if (!route.hasVisited(fromVec, relVec)) {
@@ -215,12 +217,12 @@ public class Routes {
 
                     if (!relRoutes.isEmpty()) {
                         for (AbstractRoute<?, ?> relRoute : relRoutes) {
-                            if (relRoute instanceof AbstractRoute.Pipe) {
+                            if (relRoute instanceof Pipe) {
                                 // ignore edge blocks for pipes
                                 if ((Math.abs(x) == 1 || Math.abs(z) == 1) && Math.abs(y) == 1) {
                                     continue;
                                 }
-                            } else if (relRoute instanceof AbstractRoute.Signal) {
+                            } else if (relRoute instanceof Signal) {
                                 // ignore up/down blocks for signal
                                 if (x == 0 && z == 0 && Math.abs(y) == 1) {
                                     continue;

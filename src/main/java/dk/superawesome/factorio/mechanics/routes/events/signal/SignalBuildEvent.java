@@ -1,14 +1,14 @@
 package dk.superawesome.factorio.mechanics.routes.events.signal;
 
-import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.events.RouteEvent;
+import dk.superawesome.factorio.mechanics.routes.impl.Signal;
 import org.bukkit.event.HandlerList;
 
-public class SignalBuildEvent extends RouteEvent<AbstractRoute.Signal> {
+public class SignalBuildEvent extends RouteEvent<Signal> {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public SignalBuildEvent(AbstractRoute.Signal signal) {
+    public SignalBuildEvent(Signal signal) {
         super(signal);
     }
 

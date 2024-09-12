@@ -4,6 +4,8 @@ import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeBuildEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeRemoveEvent;
 import dk.superawesome.factorio.mechanics.routes.events.signal.SignalBuildEvent;
 import dk.superawesome.factorio.mechanics.routes.events.signal.SignalRemoveEvent;
+import dk.superawesome.factorio.mechanics.routes.impl.Pipe;
+import dk.superawesome.factorio.mechanics.routes.impl.Signal;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.util.BlockVector;
@@ -16,38 +18,38 @@ public interface RouteFactory<R extends AbstractRoute<R, ?>> {
 
     void callRemoveEvent(R route);
 
-    class PipeRouteFactory implements RouteFactory<AbstractRoute.Pipe> {
+    class PipeRouteFactory implements RouteFactory<Pipe> {
 
         @Override
-        public AbstractRoute.Pipe create(BlockVector start, World world) {
-            return new AbstractRoute.Pipe(start, world);
+        public Pipe create(BlockVector start, World world) {
+            return new Pipe(start, world);
         }
 
         @Override
-        public void callBuildEvent(AbstractRoute.Pipe route) {
+        public void callBuildEvent(Pipe route) {
             Bukkit.getPluginManager().callEvent(new PipeBuildEvent(route));
         }
 
         @Override
-        public void callRemoveEvent(AbstractRoute.Pipe route) {
+        public void callRemoveEvent(Pipe route) {
             Bukkit.getPluginManager().callEvent(new PipeRemoveEvent(route));
         }
     }
 
-    class SignalRouteFactory implements RouteFactory<AbstractRoute.Signal> {
+    class SignalRouteFactory implements RouteFactory<Signal> {
 
         @Override
-        public AbstractRoute.Signal create(BlockVector start, World world) {
-            return new AbstractRoute.Signal(start, world);
+        public Signal create(BlockVector start, World world) {
+            return new Signal(start, world);
         }
 
         @Override
-        public void callBuildEvent(AbstractRoute.Signal route) {
+        public void callBuildEvent(Signal route) {
             Bukkit.getPluginManager().callEvent(new SignalBuildEvent(route));
         }
 
         @Override
-        public void callRemoveEvent(AbstractRoute.Signal route) {
+        public void callRemoveEvent(Signal route) {
             Bukkit.getPluginManager().callEvent(new SignalRemoveEvent(route));
         }
     }

@@ -1,14 +1,14 @@
 package dk.superawesome.factorio.mechanics.routes.events.pipe;
 
-import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.events.RouteEvent;
+import dk.superawesome.factorio.mechanics.routes.impl.Pipe;
 import org.bukkit.event.HandlerList;
 
-public class PipeRemoveEvent extends RouteEvent<AbstractRoute.Pipe> {
+public class PipeRemoveEvent extends RouteEvent<Pipe> {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public PipeRemoveEvent(AbstractRoute.Pipe pipe) {
+    public PipeRemoveEvent(Pipe pipe) {
         super(pipe);
     }
 
