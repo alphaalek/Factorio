@@ -47,7 +47,7 @@ public class Signal extends AbstractRoute<Signal, Signal.SignalOutputEntry> {
 
     @Override
     public RouteFactory<Signal> getFactory() {
-        return new RouteFactory.SignalRouteFactory();
+        return RouteFactory.SignalRouteFactory.FACTORY;
     }
 
     @Override

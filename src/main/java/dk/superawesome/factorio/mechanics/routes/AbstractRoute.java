@@ -50,7 +50,9 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, O>, O> {
                         .add(route);
             }
 
-            ((R) route).getFactory().callBuildEvent((R) route);
+            if (route.getFactory().getEventHandler() != null) {
+                ((R) route).getFactory().getEventHandler().callBuildEvent((R) route);
+            }
         }
     }
 
@@ -64,7 +66,9 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, O>, O> {
             cachedRoutes.get(route.getWorld()).getOrDefault(loc, new ArrayList<>()).remove(route);
         }
 
-        ((R) route).getFactory().callRemoveEvent((R) route);
+        if (route.getFactory().getEventHandler() != null) {
+            ((R) route).getFactory().getEventHandler().callRemoveEvent((R) route);
+        }
     }
 
     protected final Array<Queue<O>> outputs = new Array<>();

@@ -89,25 +89,25 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
                 double xDiff = this.loc.getX() - event.getBlock().getX();
                 double zDiff = this.loc.getZ() - event.getBlock().getZ();
                 // mask relative signals
-                if (xDiff > 0) {
+                if (xDiff > 0 && zDiff == 0) {
                     if (event.getNewCurrent() > 0) {
                         poweredBy |= 1;
                     } else {
                         poweredBy &= ~1;
                     }
-                } else if (xDiff < 0) {
+                } else if (xDiff < 0 && zDiff == 0) {
                     if (event.getNewCurrent() > 0) {
                         poweredBy |= 2;
                     } else {
                         poweredBy &= ~2;
                     }
-                } else if (zDiff > 0) {
+                } else if (zDiff > 0 && xDiff == 0) {
                     if (event.getNewCurrent() > 0) {
                         poweredBy |= 4;
                     } else {
                         poweredBy &= ~4;
                     }
-                } else if (zDiff < 0) {
+                } else if (zDiff < 0 && xDiff == 0) {
                     if (event.getNewCurrent() > 0) {
                         poweredBy |= 8;
                     } else {
@@ -157,13 +157,13 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
                         double xDiff = this.loc.getX() - b2.getX();
                         double zDiff = this.loc.getZ() - b2.getZ();
                         // mask relative signals
-                        if (xDiff > 0) {
+                        if (xDiff > 0 && zDiff == 0) {
                             poweredBy |= 1;
-                        } else if (xDiff < 0) {
+                        } else if (xDiff < 0 && zDiff == 0) {
                             poweredBy |= 2;
-                        } else if (zDiff > 0) {
+                        } else if (zDiff > 0 && xDiff == 0) {
                             poweredBy |= 4;
-                        } else if (zDiff < 0) {
+                        } else if (zDiff < 0 && xDiff == 0) {
                             poweredBy |= 8;
                         }
                     }

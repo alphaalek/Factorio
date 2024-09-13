@@ -25,9 +25,6 @@ import java.util.function.Consumer;
 
 public class Routes {
 
-    public static final RouteFactory<Pipe> transferRouteFactory = new RouteFactory.PipeRouteFactory();
-    public static final RouteFactory<Signal> signalRouteFactory = new RouteFactory.SignalRouteFactory();
-
     public static final int DEFAULT_CONTEXT = 0;
     public static final BlockFace[] SIGNAL_EXPAND_DIRECTIONS = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
     public static final BlockFace[] RELATIVES = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
@@ -103,12 +100,12 @@ public class Routes {
     }
 
     public static boolean startTransferRoute(Block start, TransferCollection collection, Source from, boolean onlyExpandIfOriginValid) {
-        return setupRoute(start, transferRouteFactory, onlyExpandIfOriginValid)
+        return setupRoute(start, RouteFactory.PipeRouteFactory.FACTORY, onlyExpandIfOriginValid)
                 .start(collection, from);
     }
 
     public static boolean startSignalRoute(Block start, SignalSource source, boolean firstCall, boolean onlyExpandIfOriginValid) {
-        return setupRoute(start, signalRouteFactory, onlyExpandIfOriginValid)
+        return setupRoute(start, RouteFactory.SignalRouteFactory.FACTORY, onlyExpandIfOriginValid)
                 .start(source, firstCall);
     }
 
@@ -146,7 +143,7 @@ public class Routes {
         BlockVector fromVec = BlockUtil.getVec(from);
 
         // iterate over all blocks around this block
-        for (BlockFace face : route instanceof Signal ? SIGNAL_EXPAND_DIRECTIONS : RELATIVES) {
+        for (BlockFace face : route.getFactory().getRelatives()) {
             BlockVector relVec = BlockUtil.getVec(BlockUtil.getRel(from.getLocation(), face.getDirection()));
             // search relative vector
             if (!route.hasVisited(fromVec, relVec)) {

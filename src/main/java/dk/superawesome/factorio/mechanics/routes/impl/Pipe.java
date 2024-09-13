@@ -39,7 +39,7 @@ public class Pipe extends AbstractRoute<Pipe, Pipe.TransferOutputEntry> {
 
     @Override
     public RouteFactory<Pipe> getFactory() {
-        return new RouteFactory.PipeRouteFactory();
+        return RouteFactory.PipeRouteFactory.FACTORY;
     }
 
     @Override

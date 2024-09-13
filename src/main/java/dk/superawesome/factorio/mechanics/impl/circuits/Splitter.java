@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics.impl.circuits;
 
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.RouteFactory;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeBuildEvent;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipeRemoveEvent;
@@ -57,7 +58,7 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
     }
 
     private void setup(Block block) {
-        Routes.setupForcibly(block, Routes.transferRouteFactory, true);
+        Routes.setupForcibly(block, RouteFactory.PipeRouteFactory.FACTORY, true);
         validating = true;
         Routes.removeNearbyRoutes(block);
         validating = false;
