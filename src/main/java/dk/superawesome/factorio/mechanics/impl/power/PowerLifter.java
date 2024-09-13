@@ -79,7 +79,8 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
 
         @Override
         public void search(Block from, BlockVector relVec, Block rel, boolean isFromOrigin) {
-            if (rel.getType() == Material.OBSERVER) {
+            if (rel.getType() == Material.OBSERVER
+                    && Factorio.get().getMechanicManager(from.getWorld()).getMechanicAt(relVec) instanceof PowerLifter) {
                 Block facing = BlockUtil.getPointingBlock(rel, true);
                 if (isFromOrigin || !facing.equals(from)) {
                     addOutput(from.getWorld(), relVec, BlockUtil.getVec(from));
@@ -190,6 +191,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
 
     private void invokeRoot() {
         isRoot = false;
+        powered = false;
         poweredBy = 0; // only used for root anyway, so we can clear it without any consequences
         BlockUtil.forRelative(this.loc.getBlock(), b -> {
             if (b.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(b, false).equals(this.loc.getBlock())) {
@@ -222,7 +224,14 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     @EventHandler
     public void onMechanicRemove(MechanicRemoveEvent event) {
         if (event.getMechanic() == this) {
-            startLift(__ -> triggerLevers(false));
+            // set levers off
+            triggerLevers(false);
+
+            // because the route is removed before the remove event is called, we have to make the first route expand manually
+            Mechanic<?> mechanic = Factorio.get().getMechanicManagerFor(this).getMechanicAt(BlockUtil.getPointingBlock(this.loc.getBlock(), true).getLocation());
+            if (mechanic instanceof PowerLifter lifter) {
+                lifter.startLift(lifterChild -> lifterChild.triggerLevers(false));
+            }
         }
     }
 
@@ -239,7 +248,11 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         super.handleBlockBreak(event);
 
         if (BlockUtil.isRelativeFast(this.loc.getBlock(), event.getBlock()) || BlockUtil.isDiagonalYFast(this.loc.getBlock(), event.getBlock())) {
-            invokeRoot();
+           Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+               if (exists) {
+                   invokeRoot();
+               }
+           });
         }
     }
 

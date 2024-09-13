@@ -34,7 +34,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
     protected MechanicLevel level;
     protected double xp;
-    private boolean exists = true;
+    protected boolean exists = true;
 
     public AbstractMechanic(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
         this.loc = loc;
