@@ -39,7 +39,7 @@ public class Elements {
         }
 
         @Override
-        public ItemStack getItem() {
+        public ItemStack getItem(Mechanic<?> mechanic) {
             return new ItemBuilder(Material.WRITABLE_BOOK).setName("§eOpgradér Maskine").build();
         }
     };
@@ -196,7 +196,7 @@ public class Elements {
         }
 
         @Override
-        public ItemStack getItem() {
+        public ItemStack getItem(Mechanic<?> mechanic) {
             return new ItemBuilder(Material.NAME_TAG).setName("§eKonfigurér Medlemmer").build();
         }
     };
@@ -226,7 +226,7 @@ public class Elements {
         }
 
         @Override
-        public ItemStack getItem() {
+        public ItemStack getItem(Mechanic<?> mechanic) {
             return new ItemBuilder(Material.RED_WOOL)
                     .setName("§cSlet Maskine")
                     .addLore("§cVær opmærksom på, at du kan")

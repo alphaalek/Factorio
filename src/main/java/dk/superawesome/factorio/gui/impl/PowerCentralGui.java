@@ -1,18 +1,23 @@
 package dk.superawesome.factorio.gui.impl;
 
 import dk.superawesome.factorio.Factorio;
+import dk.superawesome.factorio.gui.Elements;
+import dk.superawesome.factorio.gui.GuiElement;
 import dk.superawesome.factorio.gui.MechanicGui;
+import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.impl.power.PowerCentral;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
@@ -43,10 +48,33 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
         );
     }
 
+    private static final GuiElement ACTIVATE_BUTTON = new GuiElement() {
+
+        @Override
+        public void handle(InventoryClickEvent event, Player player, MechanicGui<?, ?> gui) {
+            PowerCentral pc = (PowerCentral) gui.getMechanic();
+            if (pc.isActivated()) {
+                pc.setActivated(false);
+                player.sendMessage("§cDu har nu deaktiveret Power Central!");
+            } else {
+                pc.setActivated(true);
+                player.sendMessage("§aDu har nu aktiveret Power Central!");
+            }
+
+            // reload on/off button
+            gui.loadItems();
+        }
+
+        @Override
+        public ItemStack getItem(Mechanic<?> mechanic) {
+            return new ItemBuilder(Material.REDSTONE_TORCH).setName(((PowerCentral)mechanic).isActivated() ? "§cDeaktivér Power Central" : "§aAktivér Power Central").build();
+        }
+    };
+
     private final List<BukkitTask> tasks = new ArrayList<>();
 
     public PowerCentralGui(PowerCentral mechanic, AtomicReference<PowerCentralGui> inUseReference) {
-        super(mechanic, inUseReference, new InitCallbackHolder());
+        super(mechanic, inUseReference, new InitCallbackHolder(), mechanic + " " + (mechanic.isActivated() ? "§a(Til)" : "§c(Fra)"));
         initCallback.call();
 
         this.tasks.add(
@@ -235,5 +263,10 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
         }
 
         super.onClose(player, anyViewersLeft);
+    }
+
+    @Override
+    protected List<GuiElement> getGuiElements() {
+        return Arrays.asList(ACTIVATE_BUTTON, Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
     }
 }

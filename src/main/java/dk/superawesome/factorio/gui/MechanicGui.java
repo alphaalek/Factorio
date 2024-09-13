@@ -45,7 +45,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         for (GuiElement element : getGuiElements()) {
             int slot = 51 + i++;
             registerEvent(slot, event -> element.handle(event, (Player) event.getWhoClicked(), this));
-            getInventory().setItem(slot, element.getItem());
+            getInventory().setItem(slot, element.getItem(mechanic));
         }
 
         updateItems();

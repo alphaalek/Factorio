@@ -26,6 +26,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
 
+    private boolean activated;
     private boolean hasGraph;
     private double recentProduction;
     private double recentConsumption;
@@ -44,12 +45,14 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     public void load(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayInputStream str = context.getData();
         this.energy = context.getSerializer().readDouble(str);
+        this.activated = !context.getSerializer().readBoolean(str);
     }
 
     @Override
     public void save(MechanicStorageContext context) throws IOException, SQLException {
         ByteArrayOutputStream str = new ByteArrayOutputStream();
         context.getSerializer().writeDouble(str, this.energy);
+        context.getSerializer().writeBoolean(str, !this.activated);
 
         context.uploadData(str);
     }
@@ -80,17 +83,31 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     @Override
     public void think() {
+        // check if the PC is activated or not
+        if (!activated) {
+            if (turnedOn) {
+                turnedOn = false;
+                updateLight();
+            }
+
+            // don't proceed to think
+            return;
+        }
+
         double prev = energy;
         if (energy > 0) {
+            // send signal through the PC
             Routes.startSignalRoute(lever, this, true, false);
 
             if (!turnedOn && energy < prev) {
+                // the PC used energy, power on
                 turnedOn = true;
                 updateLight();
             }
         }
 
         if ((energy == 0 || energy == prev) && turnedOn) {
+            // the PC didn't use any energy, power off
             turnedOn = false;
             updateLight();
         }
@@ -209,5 +226,13 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     public void setRecentMax(double recentMax) {
         this.recentMax = recentMax;
+    }
+
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
+
+    public boolean isActivated() {
+        return activated;
     }
 }

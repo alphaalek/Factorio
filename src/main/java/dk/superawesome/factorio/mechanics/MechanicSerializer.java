@@ -114,4 +114,12 @@ public class MechanicSerializer {
     public void writeDouble(ByteArrayOutputStream stream, double val) throws IOException {
         writeData(stream, data -> data.writeDouble(val));
     }
+
+    public boolean readBoolean(ByteArrayInputStream stream) throws IOException {
+        return readData(stream, 1, false, DataInputStream::readBoolean);
+    }
+
+    public void writeBoolean(ByteArrayOutputStream stream, boolean val) throws IOException {
+        writeData(stream, data -> data.writeBoolean(val));
+    }
 }
