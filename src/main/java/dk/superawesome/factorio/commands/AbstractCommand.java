@@ -19,19 +19,16 @@ public abstract class AbstractCommand implements CommandExecutor {
         return Optional.ofNullable(
                 // check for username
                 Optional.of(Bukkit.getOfflinePlayer(argument))
-                    .filter(oPlayer -> oPlayer.hasPlayedBefore() || oPlayer.isOnline())
-                        // if not present, check for uuid
-                        .orElse(
-                            Optional.of(argument)
-                                .flatMap(s ->
-                                    UUID_REGEX.matcher(s).matches() ?
-                                        Optional.of(Bukkit.getOfflinePlayer(UUID.fromString(s))) :
-                                        Optional.empty()
-                                )
-                                .filter(oPlayer -> oPlayer.hasPlayedBefore() || oPlayer.isOnline())
-                                // still not present, no valid target found
-                                .orElse(null)
-                        )
+                    .filter(OfflinePlayer::hasPlayedBefore)
+                    // if not present, check for uuid
+                    .orElse(
+                        Optional.of(argument)
+                            .filter(s -> UUID_REGEX.matcher(s).matches())
+                            .map(u -> Bukkit.getOfflinePlayer(UUID.fromString(u)))
+                            .filter(OfflinePlayer::hasPlayedBefore)
+                            // still not present, no valid target found
+                            .orElse(null)
+                    )
         );
     }
 

@@ -21,6 +21,12 @@ commands:
   removedefaultmember:
     usage: /removedefaultmember <spiller>
     description: Fjern en spiller som standard medlem af dine nybyggede maskiner.
+  addmember:
+    usage: /addmember <spiller>
+    description: Tilføj en spiller som medlem af en maskine.
+  removemember:
+    usage: /removemember <spiller>
+    description: Fjern en spiller som medlem fra en maskine.
   debug:
     permission: factorio.debug
     permission-message: Du har ikke adgang til dette kommando.

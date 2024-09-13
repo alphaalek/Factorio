@@ -65,6 +65,8 @@ public final class Factorio extends JavaPlugin implements Listener {
         getCommand("adddefaultmember").setExecutor(new AddDefaultMember());
         getCommand("removedefaultmember").setExecutor(new RemoveDefaultMember());
         getCommand("removememberfromall").setExecutor(new RemoveMemberFromAll());
+        getCommand("addmember").setExecutor(new AddMember());
+        getCommand("removemember").setExecutor(new RemoveMember());
         getCommand("debug").setExecutor(new Debug());
 
         Tick.start();
