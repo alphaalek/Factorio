@@ -118,8 +118,8 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         }
 
         AtomicBoolean transferred = new AtomicBoolean();
-        startLift(l -> {
-            boolean did = l.invokeChild(source);
+        startLift(lifter -> {
+            boolean did = lifter.invokeChild(source);
             if (did) {
                 transferred.set(true);
             }
@@ -248,11 +248,11 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         super.handleBlockBreak(event);
 
         if (BlockUtil.isRelativeFast(this.loc.getBlock(), event.getBlock()) || BlockUtil.isDiagonalYFast(this.loc.getBlock(), event.getBlock())) {
-           Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-               if (exists) {
-                   invokeRoot();
-               }
-           });
+            Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+                if (exists) {
+                    invokeRoot();
+                }
+            });
         }
     }
 
