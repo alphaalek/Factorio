@@ -43,7 +43,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
     public void loadItems() {
         int i = 0;
         for (GuiElement element : getGuiElements()) {
-            int slot = 51 + i++;
+            int slot = 53 - i++;
             registerEvent(slot, event -> element.handle(event, (Player) event.getWhoClicked(), this));
             getInventory().setItem(slot, element.getItem(mechanic));
         }
@@ -59,7 +59,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
     }
 
     protected List<GuiElement> getGuiElements() {
-        return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
+        return Arrays.asList(Elements.DELETE, Elements.MEMBERS, Elements.UPGRADE);
     }
 
     public M getMechanic() {

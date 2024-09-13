@@ -111,9 +111,4 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
             openSignGuiAndCall(player, StringUtil.formatDecimals(getMechanic().getMoneyAmount(), 2) + "", take);
         }
     }
-
-    @Override
-    public List<GuiElement> getGuiElements() {
-        return Arrays.asList(Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
-    }
 }

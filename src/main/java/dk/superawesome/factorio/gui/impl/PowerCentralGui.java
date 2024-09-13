@@ -61,8 +61,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                 player.sendMessage("§aDu har nu aktiveret Power Central!");
             }
 
-            // reload on/off button
-            gui.loadItems();
+            player.closeInventory();
         }
 
         @Override
@@ -128,6 +127,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
             double other = this.currentStates[1].getAsDouble();
             // start iterating over the columns and placing grades
+            ItemStack prevItem = null;
             for (int i = 0; i < WIDTH; i++) {
                 double state = states[COLLECT_WIDTH - WIDTH + i];
                 int grade = -1;
@@ -143,51 +143,55 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                 }
 
                 ItemStack item = this.item.apply(new Double[] { Math.max(0, state), Math.max(0, other) });
-                boolean smoothed = false;
                 // smooth out graph
-                if (grade != -1 && i > 0 && columns[i - 1] != grade) {
+                if (grade != -1 && i > 0 && Math.abs((columns[i - 1] & GRADE_MASK) - grade) > 1) {
                     int lowestPrev = getLowestGrade(columns[i - 1]);
                     int highestPrev = columns[i - 1] & GRADE_MASK;
-                    lowestPrev--; highestPrev--; // make 0-index based
 
-                    // check if we have to smooth out the graph
-                    if (grade < lowestPrev || grade > highestPrev) {
-                        int g = 0;
-                        int current = grade;
-                        // ensure correct low-to-high
-                        if (grade > highestPrev) {
-                            current = highestPrev + 1;
+                    grade++; // make 1-index based
+                    int g = 0;
+                    int current = grade;
+
+                    int prev = columns[i - 1];
+                    // mask grades
+                    for (;;) {
+                        if (current < lowestPrev && current != grade) {
+                            // mask prev grade if decrease
+                            columns[i - 1] = (columns[i - 1] << 4) | current;
+                        } else {
+                            g = (g << 4) | current;
                         }
 
-                        // mask grades
-                        for (;;) {
-                            g = (g << 4) | (current + 1);
-
-                            if (grade > highestPrev && current == grade) {
-                                break;
-                            } else if (grade < lowestPrev && lowestPrev - current <= 1) {
+                        if (grade > highestPrev) {
+                            current--;
+                            if (current == highestPrev) {
                                 break;
                             }
-
+                        } else if (grade < lowestPrev) {
                             current++;
+                            if (current == lowestPrev) {
+                                break;
+                            }
                         }
-
-                        columns[i] = g;
-                        smoothed = true;
                     }
+
+                    if (prev != columns[i - 1]) {
+                        setSlots(i - 1, columns[i - 1], prevItem);
+                    }
+
+                    columns[i] = g > 0 ? g : grade;
+                } else {
+                    columns[i] = grade + 1; // make 1-index based
                 }
 
                 if (grade != -1) {
-                    // this column wasn't smoothed out, just use the original grade
-                    if (!smoothed) {
-                        columns[i] = grade + 1;
-                    }
-
                     // finally set the graph slots for this column
                     setSlots(i, columns[i], item);
                 } else {
                     setSlots(i, max - min >= diff ? 1 : 3, item);
                 }
+
+                prevItem = item;
             }
 
             // update new states after ticking
@@ -265,8 +269,7 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
         super.onClose(player, anyViewersLeft);
     }
 
-    @Override
     protected List<GuiElement> getGuiElements() {
-        return Arrays.asList(ACTIVATE_BUTTON, Elements.UPGRADE, Elements.MEMBERS, Elements.DELETE);
+        return Arrays.asList(Elements.DELETE, Elements.MEMBERS, Elements.UPGRADE, ACTIVATE_BUTTON);
     }
 }
