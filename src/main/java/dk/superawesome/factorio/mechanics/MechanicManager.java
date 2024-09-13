@@ -153,7 +153,11 @@ public class MechanicManager implements Listener {
     }
 
     public Mechanic<?> getMechanicAt(Location loc) {
-        return mechanics.get(BlockUtil.getVec(loc));
+        return getMechanicAt(BlockUtil.getVec(loc));
+    }
+
+    public Mechanic<?> getMechanicAt(BlockVector vec) {
+        return mechanics.get(vec);
     }
 
     @EventHandler

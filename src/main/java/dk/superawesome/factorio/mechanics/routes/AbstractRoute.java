@@ -113,6 +113,7 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, O>, O> {
 
     public void addOutput(World world, BlockVector vec, BlockVector from, int context) {
         outputs.get(context, LinkedList::new).add(createOutputEntry(world, vec, from));
+        locations.add(vec);
     }
 
     public void addOutput(World world, BlockVector vec, BlockVector from) {

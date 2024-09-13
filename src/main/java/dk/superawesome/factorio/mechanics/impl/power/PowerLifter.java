@@ -4,11 +4,14 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicLoadEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.mechanics.*;
+import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
+import dk.superawesome.factorio.mechanics.routes.RouteFactory;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Powerable;
@@ -21,11 +24,24 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.BlockVector;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInvoker {
+
+    private static final RouteFactory<PowerLifterRoute> ROUTE_FACTORY = new RouteFactory<>() {
+        @Override
+        public PowerLifterRoute create(BlockVector start, World world) {
+            return new PowerLifterRoute(world, start);
+        }
+
+        @Override
+        public EventHandler<PowerLifterRoute> getEventHandler() {
+            return null;
+        }
+    };
 
     private boolean invoked;
     private boolean isRoot;
@@ -43,6 +59,55 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     @Override
     public MechanicProfile<PowerLifter> getProfile() {
         return Profiles.POWER_LIFTER;
+    }
+
+    private interface RouteOutput {
+
+        void handle(Consumer<PowerLifter> andThen);
+    }
+
+    private static class PowerLifterRoute extends AbstractRoute<PowerLifterRoute, RouteOutput> {
+
+        public PowerLifterRoute(World world, BlockVector start) {
+            super(world, start);
+        }
+
+        @Override
+        public RouteFactory<PowerLifterRoute> getFactory() {
+            return ROUTE_FACTORY;
+        }
+
+        @Override
+        public void search(Block from, BlockVector relVec, Block rel, boolean isFromOrigin) {
+            if (rel.getType() == Material.OBSERVER) {
+                Block facing = BlockUtil.getPointingBlock(rel, true);
+                if (isFromOrigin || !facing.equals(from)) {
+                    addOutput(from.getWorld(), relVec, BlockUtil.getVec(from));
+                    Routes.expandRoute(this, rel, from);
+                }
+            }
+        }
+
+        @Override
+        protected RouteOutput createOutputEntry(World world, BlockVector vec, BlockVector from) {
+            Mechanic<?> mechanic = Factorio.get().getMechanicManager(world).getMechanicAt(vec);
+            if (mechanic instanceof PowerLifter lifter) {
+                return andThen -> andThen.accept(lifter);
+            }
+
+            return andThen -> {};
+        }
+
+        public void start(Consumer<PowerLifter> andThen) {
+            for (RouteOutput entry : getOutputs(Routes.DEFAULT_CONTEXT)) {
+                entry.handle(andThen);
+            }
+        }
+    }
+
+    private void startLift(Consumer<PowerLifter> andThen) {
+        Routes.setupRoute(this.loc.getBlock(), ROUTE_FACTORY, false)
+                .start(andThen);
     }
 
     @Override
@@ -119,29 +184,6 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
                 if (powered != prev) {
                     startLift(lifter -> lifter.triggerLevers(powered));
                 }
-            }
-        }
-    }
-
-    private void startLift(Consumer<PowerLifter> andThen) {
-        andThen.accept(this);
-        doLift(null, new HashSet<>(), andThen);
-    }
-
-    private void doLift(Block from, Set<BlockVector> route, Consumer<PowerLifter> andThen) {
-        Block point = BlockUtil.getPointingBlock(loc.getBlock(), true);
-        if (point != null && point.getType() == Material.OBSERVER
-                && (from == null || !BlockUtil.getPointingBlock(point, true).equals(from))) {
-            BlockVector vec = BlockUtil.getVec(point);
-            if (route.contains(vec)) {
-                return;
-            }
-
-            route.add(vec);
-            Mechanic<?> at = Factorio.get().getMechanicManagerFor(this).getMechanicAt(point.getLocation());
-            if (at instanceof PowerLifter lifter) {
-                andThen.accept(lifter);
-                lifter.doLift(point, route, andThen);
             }
         }
     }

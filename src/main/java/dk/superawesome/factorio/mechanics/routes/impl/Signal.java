@@ -62,17 +62,13 @@ public class Signal extends AbstractRoute<Signal, Signal.SignalOutputEntry> {
             if (facing.getType() == Material.STICKY_PISTON) {
                 add(BlockUtil.getVec(facing));
 
-                exists: {
-                    Block facingFacing = BlockUtil.getPointingBlock(facing, false);
-                    Mechanic<?> mechanic = Factorio.get().getMechanicManager(rel.getWorld()).getMechanicAt(facingFacing.getLocation());
-                    if (mechanic instanceof SignalInvoker) {
-                        addOutput(from.getWorld(), BlockUtil.getVec(facingFacing), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
-                    }
-                    if (mechanic != null) {
-                        addOutput(from.getWorld(), BlockUtil.getVec(facingFacing), BlockUtil.getVec(facing), SignalSource.FROM_POWER_CENTRAL);
-                    } else break exists;
-
-                    add(BlockUtil.getVec(facingFacing));
+                Block facingFacing = BlockUtil.getPointingBlock(facing, false);
+                Mechanic<?> mechanic = Factorio.get().getMechanicManager(rel.getWorld()).getMechanicAt(facingFacing.getLocation());
+                if (mechanic instanceof SignalInvoker) {
+                    addOutput(from.getWorld(), BlockUtil.getVec(facingFacing), BlockUtil.getVec(facing), SignalSource.TO_POWER_CENTRAL);
+                }
+                if (mechanic != null) {
+                    addOutput(from.getWorld(), BlockUtil.getVec(facingFacing), BlockUtil.getVec(facing), SignalSource.FROM_POWER_CENTRAL);
                 }
 
                 return;
@@ -92,7 +88,6 @@ public class Signal extends AbstractRoute<Signal, Signal.SignalOutputEntry> {
             Mechanic<?> mechanic = Factorio.get().getMechanicManager(rel.getWorld()).getMechanicPartially(facing.getLocation());
             if (mechanic instanceof PowerCentral) {
                 addOutput(rel.getWorld(), BlockUtil.getVec(facing), BlockUtil.getVec(rel), SignalSource.TO_POWER_CENTRAL);
-                add(BlockUtil.getVec(facing));
             }
 
             expandWire(facing, rel, rel, 16);
@@ -172,14 +167,14 @@ public class Signal extends AbstractRoute<Signal, Signal.SignalOutputEntry> {
 
         // handle signal outputs
         int mechanics = 0;
-        for (SignalOutputEntry entry : outputs.get(source.getContext(), LinkedList::new)) {
+        for (SignalOutputEntry entry : getOutputs(source.getContext())) {
             if (entry.handle(source)) {
                 mechanics++;
             }
         }
 
         // handle power related mechanic stress
-        if (outputs.get(source.getContext()).isEmpty() || mechanics < outputs.get(source.getContext()).size()) {
+        if (getOutputs(source.getContext()).isEmpty() || mechanics < getOutputs(source.getContext()).size()) {
             source.postSignal(this, mechanics);
         }
 

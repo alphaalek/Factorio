@@ -52,8 +52,7 @@ public class Pipe extends AbstractRoute<Pipe, Pipe.TransferOutputEntry> {
             Block point = BlockUtil.getPointingBlock(rel, false);
             // ... however only if the piston is not pointing towards the block where the pipe search came from
             if (!point.equals(from)) {
-                add(BlockUtil.getVec(point));
-                addOutput(from.getWorld(), BlockUtil.getVec(point), BlockUtil.getVec(rel));
+                addOutput(from.getWorld(), BlockUtil.getVec(point), relVec);
             }
             // glass = pipe expand
         } else if (
@@ -76,7 +75,7 @@ public class Pipe extends AbstractRoute<Pipe, Pipe.TransferOutputEntry> {
 
     public boolean start(TransferCollection collection, Source from) {
         boolean transferred = false;
-        for (TransferOutputEntry entry : outputs.get(Routes.DEFAULT_CONTEXT, LinkedList::new)) {
+        for (TransferOutputEntry entry : getOutputs(Routes.DEFAULT_CONTEXT)) {
             if (entry.handle(collection, from)) {
                 transferred = true;
             }
