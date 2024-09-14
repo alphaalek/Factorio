@@ -7,6 +7,8 @@ import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.AbstractRoute;
 import dk.superawesome.factorio.mechanics.routes.RouteFactory;
 import dk.superawesome.factorio.mechanics.routes.Routes;
+import dk.superawesome.factorio.util.Tick;
+import dk.superawesome.factorio.util.TickThrottle;
 import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,15 +19,14 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.BlockVector;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -43,6 +44,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         }
     };
 
+    private final TickThrottle invokeThrottle = new TickThrottle();
     private boolean invoked;
     private boolean isRoot;
     private int poweredBy;
@@ -189,7 +191,11 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         }
     }
 
-    private void invokeRoot() {
+    private void invokeRoot(List<Block> unpowered) {
+        if (invokeThrottle.tryThrottle()) {
+            return;
+        }
+
         isRoot = false;
         powered = false;
         poweredBy = 0; // only used for root anyway, so we can clear it without any consequences
@@ -198,17 +204,20 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
                 BlockUtil.forRelative(b, b2 -> {
                     if (b2.getType() == Material.REPEATER && BlockUtil.getPointingBlock(b2, true).equals(b) && ((Powerable)b2.getBlockData()).isPowered()) {
                         isRoot = true;
-                        double xDiff = this.loc.getX() - b2.getX();
-                        double zDiff = this.loc.getZ() - b2.getZ();
-                        // mask relative signals
-                        if (xDiff > 0 && zDiff == 0) {
-                            poweredBy |= 1;
-                        } else if (xDiff < 0 && zDiff == 0) {
-                            poweredBy |= 2;
-                        } else if (zDiff > 0 && xDiff == 0) {
-                            poweredBy |= 4;
-                        } else if (zDiff < 0 && xDiff == 0) {
-                            poweredBy |= 8;
+
+                        if (!unpowered.contains(b2)) {
+                            double xDiff = this.loc.getX() - b2.getX();
+                            double zDiff = this.loc.getZ() - b2.getZ();
+                            // mask relative signals
+                            if (xDiff > 0 && zDiff == 0) {
+                                poweredBy |= 1;
+                            } else if (xDiff < 0 && zDiff == 0) {
+                                poweredBy |= 2;
+                            } else if (zDiff > 0 && xDiff == 0) {
+                                poweredBy |= 4;
+                            } else if (zDiff < 0 && xDiff == 0) {
+                                poweredBy |= 8;
+                            }
                         }
                     }
                 });
@@ -221,17 +230,14 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         }
     }
 
+    private void invokeRoot() {
+        invokeRoot(Collections.emptyList());
+    }
+
     @EventHandler
     public void onMechanicRemove(MechanicRemoveEvent event) {
         if (event.getMechanic() == this) {
-            // set levers off
-            triggerLevers(false);
-
-            // because the route is removed before the remove event is called, we have to make the first route expand manually
-            Mechanic<?> mechanic = Factorio.get().getMechanicManagerFor(this).getMechanicAt(BlockUtil.getPointingBlock(this.loc.getBlock(), true).getLocation());
-            if (mechanic instanceof PowerLifter lifter) {
-                lifter.startLift(lifterChild -> lifterChild.triggerLevers(false));
-            }
+            startLift(lifterChild -> lifterChild.triggerLevers(false));
         }
     }
 
@@ -242,27 +248,30 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true) // call after listener for BlockBreakEvent that invokes MechanicRemoveEvent
     @Override
     public void onBlockBreak(BlockBreakEvent event) {
         super.handleBlockBreak(event);
 
         if (BlockUtil.isRelativeFast(this.loc.getBlock(), event.getBlock()) || BlockUtil.isDiagonalYFast(this.loc.getBlock(), event.getBlock())) {
-            Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-                if (exists) {
-                    invokeRoot();
-                }
-            });
+            invokeRoot(Collections.singletonList(event.getBlock()));
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     @Override
     public void onBlockPlace(BlockPlaceEvent event) {
         super.handleBlockPlace(event);
+
+        MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
+        BlockUtil.forRelative(event.getBlock(), b -> {
+            if (manager.getMechanicAt(BlockUtil.getVec(b)) instanceof PowerLifter) {
+                invokeRoot();
+            }
+        });
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     @Override
     public void onLeverPull(PlayerInteractEvent event) {
         super.handleLeverPull(event);
