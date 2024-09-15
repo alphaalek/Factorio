@@ -25,7 +25,9 @@ import java.util.function.Predicate;
 
 public class Constructor extends AbstractMechanic<Constructor> implements AccessibleMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
-    private final XPDist xpDist = new XPDist(100, 0.001, 0.005);
+    public static final int UNIT_TRANSFER_AMOUNT_MARK = 1;
+
+    private final XPDist xpDist = new XPDist(100, 0.0025, 0.01);
     private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
@@ -121,31 +123,25 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
             ItemStack unit = state.unitStacks[i];
             if (collection.has(unit)) {
-                List<ItemStack> stacks = collection.take(unit.getAmount());
+                // find an item which has a lower amount than the currently checked item
+                // this is done to ensure evenly distribution among the items in the crafting grid
+                for (ItemStack oCraft : craftingGridItems) {
+                    if (oCraft != craft
+                            && oCraft != null
+                            && oCraft.isSimilar(craft)
+                            && oCraft.getAmount() < craft.getAmount()
+                            && oCraft.getAmount() < oCraft.getMaxStackSize()) {
+                        craft = oCraft;
+                    }
+                }
 
-                if (!stacks.isEmpty()) {
-                    // loop through the stacks collected and try to put into the grid
-                    for (ItemStack stack : stacks) {
-                        if (craft.isSimilar(stack)) {
-                            // find an item which has a lower amount than the currently checked item
-                            // this is done to ensure evenly distribution among the items in the crafting grid
-                            for (ItemStack oCraft : craftingGridItems) {
-                                if (oCraft != craft
-                                        && oCraft != null
-                                        && oCraft.isSimilar(craft)
-                                        && oCraft.getAmount() < craft.getAmount()
-                                        && oCraft.getAmount() < oCraft.getMaxStackSize()) {
-                                    craft = oCraft;
-                                    break;
-                                }
-                            }
+                List<ItemStack> stacks = collection.take(Math.min(level.getInt(UNIT_TRANSFER_AMOUNT_MARK), craft.getMaxStackSize() - craft.getAmount()));
 
-                            int prev = craft.getAmount();
-                            craft.setAmount(Math.min(craft.getMaxStackSize(), craft.getAmount() + stacks.get(0).getAmount()));
-                            if (prev < craft.getAmount()) {
-                                event.setTransferred(true);
-                            }
-                        }
+                // loop through the stacks collected and try to put into the grid
+                for (ItemStack stack : stacks) {
+                    if (craft.isSimilar(stack)) {
+                        craft.setAmount(craft.getAmount() + stack.getAmount());
+                        event.setTransferred(true);
                     }
                 }
             }

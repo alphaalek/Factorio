@@ -197,8 +197,10 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
         }
 
         isRoot = false;
+        // only used for root anyway, so we can clear these without any consequences
         powered = false;
-        poweredBy = 0; // only used for root anyway, so we can clear it without any consequences
+        poweredBy = 0;
+        // check for root lifter
         BlockUtil.forRelative(this.loc.getBlock(), b -> {
             if (b.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(b, false).equals(this.loc.getBlock())) {
                 BlockUtil.forRelative(b, b2 -> {
@@ -237,7 +239,7 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     @EventHandler
     public void onMechanicRemove(MechanicRemoveEvent event) {
         if (event.getMechanic() == this) {
-            startLift(lifterChild -> lifterChild.triggerLevers(false));
+            startLift(lifter -> lifter.triggerLevers(false));
         }
     }
 

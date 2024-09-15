@@ -80,16 +80,17 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .setDescription(2, Arrays.asList("§eLager: 12 stacks §f-> §e15 stacks", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)"))
+                .setDescription(2, Arrays.asList("§eLager: 12 stacks §f-> §e15 stacks", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)", "§eSlot overførsel: 1 -> 2"))
                 .setDescription(3, Arrays.asList("§eLager: 15 stacks §f-> §e22 stacks", "§eHastighed: " + ticksToMs(19) + "ms §f-> §e" + ticksToMs(18) + "ms §f(§e"+ getIncreaseDifference(20, 18, true) +"% hurtigere§f)"))
-                .setDescription(4, Arrays.asList("§eLager: 22 stacks §f-> §e32 stacks", "§eHastighed: " + ticksToMs(18) + "ms §f-> §e" + ticksToMs(16) + "ms §f(§e"+ getIncreaseDifference(20, 16, true) +"% hurtigere§f)"))
-                .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eHastighed: " + ticksToMs(17) + "ms §f-> §e" + ticksToMs(14) + "ms §f(§e"+ getIncreaseDifference(20, 14, true) +"% hurtigere§f)"))
+                .setDescription(4, Arrays.asList("§eLager: 22 stacks §f-> §e32 stacks", "§eHastighed: " + ticksToMs(18) + "ms §f-> §e" + ticksToMs(16) + "ms §f(§e"+ getIncreaseDifference(20, 16, true) +"% hurtigere§f)", "§eSlot overførsel: 2 -> 3"))
+                .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eHastighed: " + ticksToMs(17) + "ms §f-> §e" + ticksToMs(14) + "ms §f(§e"+ getIncreaseDifference(20, 14, true) +"% hurtigere§f)", "§eSlot overførsel: 3 -> 4"))
 
                 .mark(MechanicLevel.XP_REQUIRES_MARK, Array.fromData(1000d, 2500d, 5000d, 10000d))
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(4096d, 8384d, 18480d, 36200d))
 
                 .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 16, 14))
 
+                .mark(Constructor.UNIT_TRANSFER_AMOUNT_MARK, Array.fromData(1, 2, 2, 3, 4))
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(12, 15, 22, 32, 64))
                 .build();
     }

@@ -94,20 +94,26 @@ public class MechanicManager implements Listener {
             thinkingMechanics.add(tm);
         }
 
-        mechanics.put(BlockUtil.getVec(loc), mechanic);
+        for (Location part : Buildings.getLocations(mechanic)) {
+            if (!mechanic.getBuilding().getSign(mechanic).getLocation().equals(part)) {
+                this.mechanics.put(BlockUtil.getVec(part), mechanic);
+            }
+        }
+
         Bukkit.getPluginManager().registerEvents(mechanic, Factorio.get());
 
         return mechanic;
     }
 
     public void unload(Mechanic<?> mechanic) {
-        // unregister this mechanic from the lists
-        mechanics.remove(BlockUtil.getVec(mechanic.getLocation()));
+        for (Location loc : Buildings.getLocations(mechanic)) {
+            mechanics.remove(BlockUtil.getVec(loc));
+        }
+
         if (mechanic instanceof ThinkingMechanic) {
             thinkingMechanics.removeIf(m -> mechanic == m);
         }
 
-        // finally unload this mechanic
         mechanic.unload();
         for (HandlerList list : HandlerList.getHandlerLists()) {
             list.unregister(mechanic);
@@ -131,7 +137,7 @@ public class MechanicManager implements Listener {
         for (int x = -1; x <= 1; x++) {
             for (int y = -2; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
-                    BlockVector rel = (BlockVector) new BlockVector(ori).add(new Vector(x, y, z));
+                    BlockVector rel = new BlockVector(ori.clone().add(new Vector(x, y, z)));
                     if (this.mechanics.containsKey(rel)) {
                         mechanics.add(this.mechanics.get(rel));
                     }

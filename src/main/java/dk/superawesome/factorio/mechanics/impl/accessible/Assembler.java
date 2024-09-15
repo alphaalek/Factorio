@@ -31,7 +31,7 @@ import java.util.logging.Level;
 
 public class Assembler extends AbstractMechanic<Assembler> implements AccessibleMechanic, ThinkingMechanic, ItemContainer, MoneyCollection {
 
-    private final XPDist xpDist = new XPDist(100, 0.035, 0.115);
+    private final XPDist xpDist = new XPDist(100, 0.065, 0.115);
     private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
     private Type type;

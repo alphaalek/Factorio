@@ -104,11 +104,11 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
     public boolean onClickIn(InventoryClickEvent event) {
         if (event.getCurrentItem() != null) {
             Player player = (Player) event.getWhoClicked();
-            if (event.getCurrentItem().getType() == Material.BARRIER) {
+            if (event.getCurrentItem().getType() == Material.BARRIER && !player.isOp()) {
                 player.sendMessage("§cDu har ikke nok §bXP §ctil at opgradere maskinen.");
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
                 return true;
-            } else if (event.getCurrentItem().getType() == Material.EXPERIENCE_BOTTLE) {
+            } else if (event.getCurrentItem().getType() == Material.EXPERIENCE_BOTTLE || player.isOp()) {
                 int level = -1;
                 switch (event.getSlot()) {
                     case 46 -> level = 2;

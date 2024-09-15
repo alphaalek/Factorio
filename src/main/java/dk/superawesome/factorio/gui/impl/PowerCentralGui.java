@@ -131,33 +131,31 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
             for (int i = 0; i < WIDTH; i++) {
                 double state = states[COLLECT_WIDTH - WIDTH + i];
                 int grade = -1;
-                if (state != -1 && max - min >= diff) {
+                if (state != -1) {
                     double d = (state - min) / diff;
                     grade = (int) Math.floor(d);
                 }
 
                 // remove graph items for this column at last tick
-                setSlots(i, columns[i], null);
                 if (this.states[COLLECT_WIDTH - WIDTH - 1 + i] == -1) {
-                    setSlots(i, 3, null);
+                    setSlots(i, 1, null);
+                } else {
+                    setSlots(i, columns[i], null);
                 }
 
                 ItemStack item = this.item.apply(new Double[] { Math.max(0, state), Math.max(0, other) });
                 // smooth out graph
-                if (grade != -1 && i > 0 && Math.abs((columns[i - 1] & GRADE_MASK) - grade) > 1) {
+                if (grade != -1 && i > 0 && Math.abs(getHighestGrade(columns[i - 1]) - grade - 1) > 1) {
                     int lowestPrev = getLowestGrade(columns[i - 1]);
-                    int highestPrev = columns[i - 1] & GRADE_MASK;
+                    int highestPrev = getHighestGrade(columns[i - 1]);
 
                     grade++; // make 1-index based
-                    int g = 0;
-                    int current = grade;
-
-                    int prev = columns[i - 1];
+                    int g = 0, current = grade, prev = columns[i - 1];
                     // mask grades
                     for (;;) {
                         if (current < lowestPrev && current != grade) {
                             // mask prev grade if decrease
-                            columns[i - 1] = (columns[i - 1] << 4) | current;
+                            columns[i - 1] = (realify(columns[i - 1]) << 4) | current;
                         } else {
                             g = (g << 4) | current;
                         }
@@ -180,15 +178,17 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                     }
 
                     columns[i] = g > 0 ? g : grade;
-                } else {
+                } else if (grade != -1) {
                     columns[i] = grade + 1; // make 1-index based
+                } else {
+                    columns[i] = -1;
                 }
 
                 if (grade != -1) {
                     // finally set the graph slots for this column
                     setSlots(i, columns[i], item);
                 } else {
-                    setSlots(i, max - min >= diff ? 1 : 3, item);
+                    setSlots(i, 1, item);
                 }
 
                 prevItem = item;
@@ -196,6 +196,10 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
 
             // update new states after ticking
             this.states = states;
+        }
+
+        private int realify(int val) {
+            return val == -1 ? 1 : val;
         }
 
         private int getLowestGrade(int val) {
@@ -208,8 +212,12 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
             return prev;
         }
 
+        private int getHighestGrade(int val) {
+            return realify(val) & GRADE_MASK;
+        }
+
         private int getSlot(int i, int grade) {
-            return WIDTH * (4 - Math.min(4, grade)) + i;
+            return WIDTH * (4 - Math.min(4, grade - 1)) + i;
         }
 
         private void setSlots(int i, int column, ItemStack item) {
@@ -219,19 +227,10 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                 if (grade == 0) {
                     break;
                 }
-                grade--; // make 0-index based
                 g >>= 4;
 
-                // check if this slot is used by the graph if it's being removed
-                int slot = getSlot(i, grade);
-                ItemStack itemAt = inventory.getItem(slot);
-                if (item == null
-                        && itemAt != null
-                        && itemAt.getType() != this.item.apply(new Double[] {0d,0d}).getType()) {
-                    continue;
-                }
-
                 // set the item for this graph
+                int slot = getSlot(i, grade);
                 inventory.setItem(slot, item);
             }
         }

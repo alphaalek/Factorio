@@ -45,15 +45,15 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
     @Override
     public void think() {
         // night time
-        if (loc.getWorld().getTime() > 12000) {
+        if (this.loc.getWorld().getTime() > 12000) {
             return;
         }
 
-        if (loc.getBlock().getLightFromSky() == SUN_LIGHT && energy < MAX_ENERGY) {
-            energy += (Math.random() * 55 + 20) / 50; // 20 to 75 / 50 = 0.4 to 1.5
+        if (this.loc.getBlock().getLightFromSky() == SUN_LIGHT && energy < MAX_ENERGY) {
+            energy += (Math.random() * 35 + 15) / 45; // 20 to 75 / 50 = 0.4 to 1.5
         }
         if (energy > 0) {
-            Routes.startSignalRoute(loc.getBlock(), this, true, false);
+            Routes.startSignalRoute(this.loc.getBlock(), this, true, false);
         }
     }
 
