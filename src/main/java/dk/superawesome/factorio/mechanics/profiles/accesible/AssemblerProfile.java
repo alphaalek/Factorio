@@ -103,7 +103,7 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
                 .mark(MechanicLevel.THINK_DELAY_MARK, Array.fromData(20, 19, 18, 17, 15))
 
                 .mark(ItemCollection.CAPACITY_MARK, Array.fromData(7, 14, 20, 32, 64))
-                .mark(MoneyCollection.CAPACITY_MARK, Array.fromData(64 * 12d, 2000d, 5000, 10000, 25000))
+                .mark(MoneyCollection.CAPACITY_MARK, Array.fromData(64 * 12d, 2000d, 5000d, 10000d, 25000d))
                 .build();
     }
 
