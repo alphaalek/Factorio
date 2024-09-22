@@ -647,4 +647,11 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
 
         return highest;
     }
+
+    protected boolean isIllegalStack(ItemStack item) {
+        return item == null || // null item
+            item.getType() == Material.AIR || // air item
+            item.getAmount() <= 0 || // negative amount or zero
+            item.getAmount() > item.getMaxStackSize(); // the amount is above the max stack size
+    }
 }

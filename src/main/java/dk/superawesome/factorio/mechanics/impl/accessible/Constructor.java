@@ -117,7 +117,8 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
         for (int i = 0; i < 9; i++) {
             ItemStack craft = craftingGridItems[i];
-            if (craft == null || craft.getAmount() == craft.getMaxStackSize()) {
+            // if the item is null or the stack is full except for items that can only stack to 1
+            if (craft == null || (craft.getMaxStackSize() != 1 && craft.getAmount() == craft.getMaxStackSize())) {
                 continue;
             }
 
@@ -130,12 +131,18 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
                             && oCraft != null
                             && oCraft.isSimilar(craft)
                             && oCraft.getAmount() < craft.getAmount()
-                            && oCraft.getAmount() < oCraft.getMaxStackSize()) {
+                            // if the stack is not full or the stack can only stack to 1 and the amount is 1
+                            && (oCraft.getAmount() < oCraft.getMaxStackSize() || (oCraft.getMaxStackSize() == 1 && oCraft.getAmount() == 1))
+                    ) {
                         craft = oCraft;
                     }
                 }
 
-                List<ItemStack> stacks = collection.take(Math.min(level.getInt(UNIT_TRANSFER_AMOUNT_MARK), craft.getMaxStackSize() - craft.getAmount()));
+                // if the stack can only stack to 1,
+                // increase the max stack size by 1 to allow recipes with single stack to be crafted
+                int maxStackSize = craft.getMaxStackSize() == 1 ? 2 : craft.getMaxStackSize();
+
+                List<ItemStack> stacks = collection.take(Math.min(level.getInt(UNIT_TRANSFER_AMOUNT_MARK), maxStackSize - craft.getAmount()));
 
                 // loop through the stacks collected and try to put into the grid
                 for (ItemStack stack : stacks) {

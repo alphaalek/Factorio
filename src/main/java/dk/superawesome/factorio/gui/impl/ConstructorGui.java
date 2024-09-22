@@ -153,6 +153,11 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
                     updateCrafting();
 
                     return true;
+                } else if (CRAFTING_SLOTS.contains(event.getRawSlot())) {
+                    // check if the item is illegal to take (f.ex amount above max stack size, 2 of bows, etc.)
+                    if (isIllegalStack(event.getCurrentItem())) { // check if the item is illegal to take
+                        return true;
+                    }
                 }
             }
 
