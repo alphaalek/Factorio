@@ -285,7 +285,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         LAMP(Material.REDSTONE_LAMP, 9, 9),
         RAILS(Material.POWERED_RAIL, 9, 9),
         PISTON(Material.PISTON, 9, 9),
-        RABBIT_STEW(Material.RABBIT_STEW, 8, 64),
+        RABBIT_STEW(Material.RABBIT_STEW, 7, 56),
         TARGET(Material.TARGET, 9, 7.25),
         COOKIE(Material.COOKIE, 32, 2),
         DAYLIGHT(Material.DAYLIGHT_DETECTOR, 9, 9),
