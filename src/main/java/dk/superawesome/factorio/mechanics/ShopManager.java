@@ -30,6 +30,7 @@ public class ShopManager implements Listener {
         Mechanic<?> mechanic = Factorio.get().getMechanicManager(event.getSign().getWorld())
                 .getMechanicPartially(BlockUtil.getPointingBlock(event.getSign().getBlock(), true).getLocation());
 
+        // server-sync call
         recentContainer = null;
         recentOffer = null;
         recentContext = -1;

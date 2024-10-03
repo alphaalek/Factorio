@@ -212,23 +212,21 @@ public class Routes {
                     BlockVector rel = BlockUtil.getVec(BlockUtil.getRel(block.getLocation(), new BlockVector(x, y, z)));
                     List<AbstractRoute<?, ?>> relRoutes = new ArrayList<>(AbstractRoute.getCachedRoutes(block.getWorld(), rel));
 
-                    if (!relRoutes.isEmpty()) {
-                        for (AbstractRoute<?, ?> relRoute : relRoutes) {
-                            if (relRoute instanceof Pipe) {
-                                // ignore edge blocks for pipes
-                                if ((Math.abs(x) == 1 || Math.abs(z) == 1) && Math.abs(y) == 1) {
-                                    continue;
-                                }
-                            } else if (relRoute instanceof Signal) {
-                                // ignore up/down blocks for signal
-                                if (x == 0 && z == 0 && Math.abs(y) == 1) {
-                                    continue;
-                                }
+                    for (AbstractRoute<?, ?> relRoute : relRoutes) {
+                        if (relRoute instanceof Pipe) {
+                            // ignore edge blocks for pipes
+                            if ((Math.abs(x) == 1 || Math.abs(z) == 1) && Math.abs(y) == 1) {
+                                continue;
                             }
-
-                            AbstractRoute.removeRouteFromCache(relRoute);
-                            modifiedRoutes.add(relRoute);
+                        } else if (relRoute instanceof Signal) {
+                            // ignore up/down blocks for signal
+                            if (x == 0 && z == 0 && Math.abs(y) == 1) {
+                                continue;
+                            }
                         }
+
+                        AbstractRoute.removeRouteFromCache(relRoute);
+                        modifiedRoutes.add(relRoute);
                     }
                 }
             }

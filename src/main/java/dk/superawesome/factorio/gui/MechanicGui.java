@@ -66,7 +66,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         return mechanic;
     }
 
-    protected void openSignGuiAndCall(Player p, String total, Consumer<Double> function) {
+    protected void openSignGuiAndCall(Player p, String total, Consumer<Double> function, Runnable... post) {
         SignGUI gui = SignGUI.builder()
                 .setLines("", "/ " + total, "---------------", "Vælg antal")
                 // ensure synchronous call
@@ -90,8 +90,13 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
                     }
 
                     // return to the gui and reload view
-                    return Arrays.asList(
-                            SignGUIAction.openInventory(Factorio.get(), getInventory()), SignGUIAction.runSync(Factorio.get(), this::updateItems));
+                    List<SignGUIAction> actions = new ArrayList<>();
+                    actions.add(SignGUIAction.openInventory(Factorio.get(), getInventory()));
+                    actions.add(SignGUIAction.runSync(Factorio.get(), this::updateItems));
+                    for (Runnable postAction : post) {
+                        actions.add(SignGUIAction.runSync(Factorio.get(), postAction));
+                    }
+                    return actions;
                 })
                 .build();
         gui.open(p);
@@ -323,9 +328,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
         }
 
         // fix empty storage set for failed interaction
-        if (storage.getStored() != null && storage.getAmount() == 0) {
-            storage.setStored(null);
-        }
+        storage.ensureValidStorage();
 
         updateStorageInfo();
     }

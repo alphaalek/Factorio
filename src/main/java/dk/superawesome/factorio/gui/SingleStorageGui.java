@@ -30,7 +30,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
     public SingleStorageGui(M mechanic, AtomicReference<G> inUseReference, Supplier<Callback> initCallback) {
         super(mechanic, inUseReference, initCallback);
         this.slots = mechanic.getProfile().getStorageProvider().getSlots(getContext());
-        storage = mechanic.getProfile().getStorageProvider().createStorage(mechanic, getContext());
+        this.storage = mechanic.getProfile().getStorageProvider().createStorage(mechanic, getContext());
     }
     
     public abstract int getContext();
@@ -144,7 +144,7 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
                 amount -= at.getAmount();
             }
 
-            // check if the storage box does not have enough capacity for these items
+            // check if the storage does not have enough capacity for these items
             if (checkSize && amount > storage.getCapacity()) {
                 int subtract = amount - storage.getCapacity();
                 amount -= subtract;
@@ -229,6 +229,8 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
                 fixSlotsPut(event.getCurrentItem(), event.getClickedInventory(), slots);
             }
         }
+
+        storage.ensureValidStorage();
 
         fixPutSlots = false;
     }

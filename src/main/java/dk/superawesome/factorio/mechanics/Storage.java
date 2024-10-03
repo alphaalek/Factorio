@@ -19,4 +19,10 @@ public interface Storage {
     void setAmount(int amount);
 
     int getCapacity();
+
+    default void ensureValidStorage() {
+        if (getStored() != null && getAmount() > 0) {
+            setStored(null);
+        }
+    }
 }
