@@ -63,7 +63,7 @@ public class Management {
         }
     }
 
-    private final UUID owner;
+    private UUID owner;
     private final Set<UUID> members;
 
     public Management(UUID owner, Set<UUID> members) {
@@ -77,6 +77,10 @@ public class Management {
 
     public UUID getOwner() {
         return this.owner;
+    }
+
+    public void setOwner(UUID owner) {
+        this.owner = owner;
     }
 
     public Set<UUID> getMembers() {

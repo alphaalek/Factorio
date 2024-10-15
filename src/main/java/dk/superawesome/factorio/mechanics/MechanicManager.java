@@ -2,10 +2,7 @@ package dk.superawesome.factorio.mechanics;
 
 import com.google.common.collect.Sets;
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.api.events.MechanicBuildEvent;
-import dk.superawesome.factorio.api.events.MechanicMoveEvent;
-import dk.superawesome.factorio.api.events.MechanicLoadEvent;
-import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
+import dk.superawesome.factorio.api.events.*;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.routes.Routes;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -198,6 +195,17 @@ public class MechanicManager implements Listener {
                     mechanic.save();
                 }
             });
+        }
+    }
+
+    @EventHandler
+    public void onOwnerChange(MechanicChangeOwnerEvent event) {
+        if (this.world.equals(event.getMechanic().getLocation().getWorld())) {
+            if (event.getPlayer() == null || event.getNewOwner() == null) {
+                event.setCancelled(true);
+                return;
+            }
+            event.getMechanic().getManagement().setOwner(event.getNewOwner());
         }
     }
 
