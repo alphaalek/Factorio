@@ -25,6 +25,7 @@ public interface AccessibleMechanic {
         if (gui != null) {
             //Todo: remove this if we found a solution for a dupe bug then 2+ players is in the gui
             if (!gui.getInventory().getViewers().isEmpty()) {
+                player.sendMessage("§cDenne maskine er allerede åben af en anden spiller");
                 return false;
             }
 
