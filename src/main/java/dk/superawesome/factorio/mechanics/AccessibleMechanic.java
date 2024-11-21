@@ -23,6 +23,12 @@ public interface AccessibleMechanic {
     default <G extends BaseGui<G>> boolean openInventory(Mechanic<?> mechanic, Player player) {
         G gui = getOrCreateInventory(mechanic);
         if (gui != null) {
+            //Todo: remove this if we found a solution for a dupe bug then 2+ players is in the gui
+            if (!gui.getInventory().getViewers().isEmpty()) {
+                return false;
+            }
+
+
             // check if the player is already looking in this inventory
             if (gui.getInventory().getViewers().contains(player)) {
                 return false;
