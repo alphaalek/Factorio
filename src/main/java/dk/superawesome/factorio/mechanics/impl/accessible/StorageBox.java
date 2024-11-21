@@ -36,11 +36,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
         this.stored = context.getSerializer().readItemStack(str);
         this.amount = context.getSerializer().readInt(str);
 
-        if (this.stored == null && this.amount > 0) {
-            this.amount = 0;
-        } else if (this.stored != null && this.amount == 0) {
-            this.stored = null;
-        }
+        ensureValidStorage();
     }
 
     @Override
