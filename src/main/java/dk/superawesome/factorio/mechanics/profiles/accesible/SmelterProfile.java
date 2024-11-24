@@ -73,7 +73,7 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
                         return mechanic.getIngredientCapacity();
                     }
                 })
-                .set(SmelterGui.FUEL_CONTEXT, SmelterGui.FUEL_SLOTS, FuelMechanic::convertFuelStorage)
+                .set(SmelterGui.FUEL_CONTEXT, SmelterGui.FUEL_SLOTS, FuelMechanic::adaptFuelStorage)
                 .set(SmelterGui.STORED_CONTEXT, SmelterGui.STORAGE_SLOTS, mechanic -> new Storage() {
                     @Override
                     public ItemStack getStored() {

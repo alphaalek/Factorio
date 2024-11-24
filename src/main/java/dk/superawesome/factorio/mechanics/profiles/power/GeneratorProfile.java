@@ -41,7 +41,7 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
     @Override
     public StorageProvider<Generator> getStorageProvider() {
         return StorageProvider.Builder.<Generator>makeContext()
-                .set(SingleStorageGui.CONTEXT, GeneratorGui.STORAGE_SLOTS, FuelMechanic::convertFuelStorage)
+                .set(SingleStorageGui.CONTEXT, GeneratorGui.STORAGE_SLOTS, FuelMechanic::adaptFuelStorage)
                 .build();
     }
 

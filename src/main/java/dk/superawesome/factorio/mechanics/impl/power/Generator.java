@@ -240,6 +240,10 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     @Override
     public void setFuel(Fuel fuel) {
         this.fuel = fuel;
+
+        if (this.fuel == null) {
+            this.fuelAmount = 0;
+        }
     }
 
     @Override
@@ -252,7 +256,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
         this.fuelAmount = amount;
 
         if (this.fuelAmount == 0) {
-            fuel = null;
+            this.fuel = null;
         }
     }
 

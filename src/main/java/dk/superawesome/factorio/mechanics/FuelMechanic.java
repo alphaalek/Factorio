@@ -180,16 +180,21 @@ public interface FuelMechanic {
         }
     }
 
-    default Storage convertFuelStorage() {
+    default Storage adaptFuelStorage() {
         return new Storage() {
             @Override
             public ItemStack getStored() {
-                return Optional.ofNullable(getFuel()).map(Fuel::material).map(ItemStack::new).orElse(null);
+                return Optional.ofNullable(getFuel())
+                        .map(Fuel::material)
+                        .map(ItemStack::new)
+                        .orElse(null);
             }
 
             @Override
             public void setStored(ItemStack stored) {
-                setFuel(Optional.ofNullable(stored).map(i -> Fuel.getFuel(i.getType())).orElse(null));
+                setFuel(Optional.ofNullable(stored)
+                                .map(i -> Fuel.getFuel(i.getType()))
+                                .orElse(null));
             }
 
             @Override
@@ -215,6 +220,7 @@ public interface FuelMechanic {
     }
 
     enum FuelState {
+
         ABORT,
 
         SMELTING,

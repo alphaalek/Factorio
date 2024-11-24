@@ -230,7 +230,8 @@ public abstract class SingleStorageGui<G extends BaseGui<G>, M extends Mechanic<
             }
         }
 
-        storage.ensureValidStorage();
+        getMechanic().getTickThrottle().throttle();
+        Bukkit.getScheduler().runTask(Factorio.get(), storage::ensureValidStorage);
 
         fixPutSlots = false;
     }
