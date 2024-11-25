@@ -17,6 +17,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -25,6 +27,8 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     public static final int VOLUME_MARK = 1;
 
+    private final Storage volumeStorage = getProfile().getStorageProvider().createStorage(this, RefineryGui.VOLUME_CONTEXT);
+    private final Storage filledStorage = getProfile().getStorageProvider().createStorage(this, RefineryGui.FILLED_CONTEXT);
     private final XPDist xpDist = new XPDist(100, 0.3, 1.3);
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
@@ -47,19 +51,9 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
                     .map(Volume::getMat)
                     .map(ItemStack::new)
                     .orElse(null);
-            if ((item == null && collection.has(i -> Volume.getTypeFromMaterial(i.getType()).isPresent()) || item != null && collection.has(item))
-                    && volumeAmount < getVolumeCapacity()) {
-                int add = this.<RefineryGui>put(collection, getVolumeCapacity() - volumeAmount, getGuiInUse(), RefineryGui::updateAddedVolume, new HeapToStackAccess<>() {
-                    @Override
-                    public ItemStack get() {
-                        return Optional.ofNullable(volume).map(Volume::getMat).map(ItemStack::new).orElse(null);
-                    }
-
-                    @Override
-                    public void set(ItemStack stack) {
-                        volume = Volume.getTypeFromMaterial(stack.getType()).orElse(null);
-                    }
-                });
+            if (volumeAmount < getVolumeCapacity()
+                    && (item == null && collection.has(i -> Volume.getTypeFromMaterial(i.getType()).isPresent()) || item != null && collection.has(item))) {
+                int add = this.<RefineryGui>put(collection, getVolumeCapacity() - volumeAmount, getGuiInUse(), RefineryGui::updateAddedVolume, volumeStorage);
 
                 if (add > 0) {
                     volumeAmount += add;
@@ -207,6 +201,8 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public void pipePut(TransferCollection collection, PipePutEvent event) {
+        volumeStorage.ensureValidStorage();
+
         if (tickThrottle.isThrottled()) {
             return;
         }
@@ -265,17 +261,13 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public List<ItemStack> take(int amount) {
-        return this.<RefineryGui>take((int) Math.min(getMaxTransfer(), amount), filled.getOutputItemStack(), filledAmount, getGuiInUse(), RefineryGui::updateRemovedFilled, new HeapToStackAccess<>() {
-            @Override
-            public Integer get() {
-                return filledAmount;
-            }
+        filledStorage.ensureValidStorage();
 
-            @Override
-            public void set(Integer val) {
-                setFilledAmount(filledAmount - val);
-            }
-        });
+        if (tickThrottle.isThrottled() || filled == null || filledAmount == 0) {
+            return Collections.emptyList();
+        }
+
+        return this.<RefineryGui>take((int) Math.min(getMaxTransfer(), amount), filled.getOutputItemStack(), filledAmount, getGuiInUse(), RefineryGui::updateRemovedFilled, filledStorage);
     }
 
     public Volume getVolume() {

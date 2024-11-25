@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.impl.accessible;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.AssemblerTypeChangeEvent;
 import dk.superawesome.factorio.api.events.AssemblerTypeRequestEvent;
+import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.gui.impl.AssemblerGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -31,6 +32,7 @@ import java.util.logging.Level;
 
 public class Assembler extends AbstractMechanic<Assembler> implements AccessibleMechanic, ThinkingMechanic, ItemContainer, MoneyCollection {
 
+    private final Storage storage = getProfile().getStorageProvider().createStorage(this, SingleStorageGui.CONTEXT);
     private final XPDist xpDist = new XPDist(100, 0.065, 0.115);
     private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
@@ -119,26 +121,18 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public void pipePut(ItemCollection collection, PipePutEvent event) {
+        storage.ensureValidStorage();
+
+        if (tickThrottle.isThrottled()) {
+            return;
+        }
+
         ItemStack item = Optional.ofNullable(type)
                 .map(Type::getMat)
                 .map(ItemStack::new)
                 .orElse(null);
-        if ((item == null && collection.has(i -> Types.getTypeFromMaterial(i.getType()).isPresent()) || item != null && collection.has(item)) && ingredientAmount < getCapacity()) {
-            int add = this.<AssemblerGui>put(collection, getCapacity() - ingredientAmount, getGuiInUse(), AssemblerGui::updateAddedIngredients, new HeapToStackAccess<ItemStack>() {
-                @Override
-                public ItemStack get() {
-                    return item;
-                }
-
-                @Override
-                public void set(ItemStack val) {
-                    Types oldTypes = type != null ? type.getType() : null;
-                    Types newTypes = Types.getTypeFromMaterial(val.getType()).orElseThrow(IllegalArgumentException::new);
-                    type = Types.getLoadedType(newTypes);
-                    AssemblerTypeChangeEvent assemblerTypeChangeEvent = new AssemblerTypeChangeEvent(Assembler.this, oldTypes, newTypes);
-                    Bukkit.getPluginManager().callEvent(assemblerTypeChangeEvent);
-                }
-            });
+        if ((item != null && collection.has(item) || item == null && collection.has(i -> Types.getTypeFromMaterial(i.getType()).isPresent())) && ingredientAmount < getCapacity()) {
+            int add = this.<AssemblerGui>put(collection, getCapacity() - ingredientAmount, getGuiInUse(), AssemblerGui::updateAddedIngredients, storage);
 
             if (add > 0) {
                 ingredientAmount += add;
@@ -167,6 +161,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     public void setType(Types type) {
         Types oldTypes = this.type != null ? this.type.getType() : null;
         this.type = Types.getLoadedType(type);
+
         AssemblerTypeChangeEvent event = new AssemblerTypeChangeEvent(this, oldTypes, type);
         Bukkit.getPluginManager().callEvent(event);
 

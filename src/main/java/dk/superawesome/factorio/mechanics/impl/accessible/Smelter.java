@@ -54,6 +54,8 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         }
     }
 
+    private final Storage ingredientStorage = getProfile().getStorageProvider().createStorage(this, SmelterGui.INGREDIENT_CONTEXT);
+    private final Storage storedStorage = getProfile().getStorageProvider().createStorage(this, SmelterGui.STORED_CONTEXT);
     private final XPDist xpDist = new XPDist(100, 0.001, 0.01);
     private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
@@ -140,22 +142,14 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public void pipePut(ItemCollection collection, PipePutEvent event) {
+        ingredientStorage.ensureValidStorage();
+
         if (tickThrottle.isThrottled()) {
             return;
         }
 
         if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(this::canSmelt)) {
-            int add = this.<SmelterGui>put(collection, getIngredientCapacity() - ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, new HeapToStackAccess<>() {
-                @Override
-                public ItemStack get() {
-                    return ingredient;
-                }
-
-                @Override
-                public void set(ItemStack stack) {
-                    ingredient = stack;
-                }
-            });
+            int add = this.<SmelterGui>put(collection, getIngredientCapacity() - ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, ingredientStorage);
             if (add > 0) {
                 ingredientAmount += add;
                 event.setTransferred(true);
@@ -219,6 +213,8 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public void think() {
+        cachedSmeltResult = null;
+
         // check if the smelters storage has any previously smelted items which is not the
         // same as the current smelting result.
         // if it has any, we can't smelt the new items until all the previously smelted items are removed
@@ -245,8 +241,21 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
             }
         }
 
+        // update smelt result if it failed to do so
+        if (ingredient != null && smeltResult == null) {
+            canSmelt(ingredient);
+            smeltResult = cachedSmeltResult;
+
+            if (smeltResult == null) {
+                // this item can not be smelted, it shouldn't be in the smelter
+                ingredient = null;
+                ingredientAmount = 0;
+                return;
+            }
+        }
+
         // if there are no ingredients ready to be smelted, don't continue
-        if (ingredient == null || smeltResult == null
+        if (ingredient == null
                 // if there is no space left, don't continue
                 || storageAmount + smeltResult.getAmount() > getCapacity()) {
             return;
@@ -297,18 +306,13 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public List<ItemStack> take(int amount) {
+        storedStorage.ensureValidStorage();
 
-        return this.<SmelterGui>take((int) Math.min(getMaxTransfer(), amount), storageType, storageAmount, getGuiInUse(), SmelterGui::updateRemovedStorage, new HeapToStackAccess<>() {
-            @Override
-            public Integer get() {
-                return storageAmount;
-            }
+        if (tickThrottle.isThrottled() || storageType == null || storageAmount == 0) {
+            return Collections.emptyList();
+        }
 
-            @Override
-            public void set(Integer val) {
-                setStorageAmount(storageAmount - val);
-            }
-        });
+        return this.<SmelterGui>take((int) Math.min(getMaxTransfer(), amount), storageType, storageAmount, getGuiInUse(), SmelterGui::updateRemovedStorage, storedStorage);
     }
 
     @Override

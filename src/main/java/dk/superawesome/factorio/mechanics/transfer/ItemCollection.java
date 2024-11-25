@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics.transfer;
 
 import dk.superawesome.factorio.gui.BaseGui;
+import dk.superawesome.factorio.mechanics.Storage;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public interface ItemCollection extends TransferCollection {
 
     List<ItemStack> take(int amount);
 
-    default <G extends BaseGui<G>> List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, Container.HeapToStackAccess<Integer> updater) {
+    default <G extends BaseGui<G>> List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, Storage storage) {
         List<ItemStack> items = new ArrayList<>();
         int taken = 0;
         while (taken < amount && taken < storedAmount) {
@@ -35,7 +36,7 @@ public interface ItemCollection extends TransferCollection {
         if (gui != null) {
             doGui.accept(gui, taken);
         }
-        updater.set(taken);
+        storage.setAmount(storage.getAmount() - taken);
 
         return items;
     }

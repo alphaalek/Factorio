@@ -52,24 +52,16 @@ public interface FuelMechanic {
     Location getLocation();
 
     default <G extends BaseGui<G>> void putFuel(ItemCollection collection, ItemContainer container, PipePutEvent event, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui) {
-        if (getFuel() != null && collection.has(new ItemStack(getFuel().material())) || getFuel() == null && collection.has(i -> Fuel.getFuel(i.getType()) != null)) {
-            if (getFuelAmount() < getFuelCapacity()) {
-                int amount = container.put(collection, getFuelCapacity() - getFuelAmount(), inUse, doGui, new Container.HeapToStackAccess<>() {
-                    @Override
-                    public ItemStack get() {
-                        return Optional.ofNullable(getFuel()).map(Fuel::material).map(ItemStack::new).orElse(null);
-                    }
+        Storage storage = adaptFuelStorage();
+        storage.ensureValidStorage();
 
-                    @Override
-                    public void set(ItemStack stack) {
-                        setFuel(Fuel.getFuel(stack.getType()));
-                    }
-                });
+        if (getFuelAmount() < getFuelCapacity()
+                && (getFuel() != null && collection.has(new ItemStack(getFuel().material())) || getFuel() == null && collection.has(i -> Fuel.getFuel(i.getType()) != null))) {
+            int amount = container.put(collection, getFuelCapacity() - getFuelAmount(), inUse, doGui, storage);
 
-                if (amount > 0) {
-                    event.setTransferred(true);
-                    setFuelAmount(getFuelAmount() + amount);
-                }
+            if (amount > 0) {
+                event.setTransferred(true);
+                setFuelAmount(getFuelAmount() + amount);
             }
         }
     }

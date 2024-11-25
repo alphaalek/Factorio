@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.mechanics.profiles.accesible;
 
+import dk.superawesome.factorio.api.events.AssemblerTypeChangeEvent;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.GuiFactory;
@@ -10,6 +11,7 @@ import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.util.Array;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -61,8 +63,15 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
 
                     @Override
                     public void setStored(ItemStack stored) {
+                        Assembler.Types oldType = Optional.ofNullable(mechanic.getType()).map(Assembler.Type::getType).orElse(null);
                         Optional<Assembler.Types> type = Optional.ofNullable(stored).flatMap(i -> Assembler.Types.getTypeFromMaterial(i.getType()));
-                        type.ifPresent(mechanic::setType);
+
+                        type.ifPresent(newType -> {
+                            mechanic.setType(newType);
+
+                            AssemblerTypeChangeEvent assemblerTypeChangeEvent = new AssemblerTypeChangeEvent(mechanic, oldType, newType);
+                            Bukkit.getPluginManager().callEvent(assemblerTypeChangeEvent);
+                        });
                     }
 
                     @Override

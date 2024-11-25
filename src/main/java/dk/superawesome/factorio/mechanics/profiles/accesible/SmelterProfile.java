@@ -55,7 +55,7 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
 
                     @Override
                     public Predicate<ItemStack> getFilter() {
-                        return mechanic::canSmelt;
+                        return Smelter::canSmeltStatic;
                     }
 
                     @Override

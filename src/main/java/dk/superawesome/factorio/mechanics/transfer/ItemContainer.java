@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics.transfer;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.gui.MechanicStorageGui;
 import dk.superawesome.factorio.mechanics.Mechanic;
+import dk.superawesome.factorio.mechanics.Storage;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,16 +25,16 @@ public interface ItemContainer extends Container<ItemCollection> {
         );
     }
 
-    default <G extends BaseGui<G>> int put(ItemCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, HeapToStackAccess<ItemStack> access) {
+    default <G extends BaseGui<G>> int put(ItemCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, Storage storage) {
         List<ItemStack> items = from.take(take);
         int add = 0;
         for (ItemStack item : items) {
             add += item.getAmount();
 
-            if (access.get() == null) {
+            if (storage.getStored() == null) {
                 ItemStack type = item.clone();
                 type.setAmount(1);
-                access.set(type);
+                storage.setStored(type);
             }
         }
 

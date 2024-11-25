@@ -14,8 +14,10 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 public class StorageBox extends AbstractMechanic<StorageBox> implements AccessibleMechanic, ItemCollection, ItemContainer, Storage {
@@ -61,18 +63,27 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
 
         if ((stored == null || collection.has(stored)) && amount < getCapacity()) {
             event.setTransferred(true);
-            amount += this.<StorageBoxGui>put(collection, getCapacity() - amount, getGuiInUse(), StorageBoxGui::updateAddedItems, new HeapToStackAccess<ItemStack>() {
-                @Override
-                public ItemStack get() {
-                    return stored;
-                }
-
-                @Override
-                public void set(ItemStack stack) {
-                    stored = stack;
-                }
-            });
+            amount += this.<StorageBoxGui>put(collection, getCapacity() - amount, getGuiInUse(), StorageBoxGui::updateAddedItems, this);
         }
+    }
+
+    public int put(int amount) {
+        if (tickThrottle.isThrottled()) {
+            return 0;
+        }
+
+        int prev = this.amount;
+        this.amount = Math.min(getCapacity(), this.amount + amount);
+
+        int added = this.amount - prev;
+        if (added > 0) {
+            StorageBoxGui gui = this.<StorageBoxGui>getGuiInUse().get();
+            if (gui != null) {
+                gui.updateAddedItems(added);
+            }
+        }
+
+        return added;
     }
 
     @Override
@@ -102,17 +113,11 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
 
     @Override
     public List<ItemStack> take(int amount) {
-        return this.<StorageBoxGui>take((int) Math.min(getMaxTransfer(), amount), stored, this.amount, getGuiInUse(), StorageBoxGui::updateRemovedItems, new HeapToStackAccess<>() {
-            @Override
-            public Integer get() {
-                return StorageBox.this.amount;
-            }
+        if (tickThrottle.isThrottled() || stored == null || amount == 0) {
+            return Collections.emptyList();
+        }
 
-            @Override
-            public void set(Integer val) {
-                setAmount(StorageBox.this.amount - val);
-            }
-        });
+        return this.<StorageBoxGui>take((int) Math.min(getMaxTransfer(), amount), stored, amount, getGuiInUse(), StorageBoxGui::updateRemovedItems, this);
     }
 
     @Override

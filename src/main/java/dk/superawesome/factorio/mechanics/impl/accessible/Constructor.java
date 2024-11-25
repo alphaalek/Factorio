@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.mechanics.impl.accessible;
 
+import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.gui.impl.ConstructorGui;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
@@ -17,16 +18,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class Constructor extends AbstractMechanic<Constructor> implements AccessibleMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
 
     public static final int UNIT_TRANSFER_AMOUNT_MARK = 1;
 
+    private final Storage storage = getProfile().getStorageProvider().createStorage(this, SingleStorageGui.CONTEXT);
     private final XPDist xpDist = new XPDist(100, 0.0025, 0.01);
     private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
@@ -111,6 +110,8 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     @Override
     public void pipePut(ItemCollection collection, PipePutEvent event) {
+        storage.ensureValidStorage();
+
         if (tickThrottle.isThrottled()) {
             return;
         }
@@ -255,17 +256,13 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     @Override
     public List<ItemStack> take(int amount) {
-        return this.<ConstructorGui>take((int) Math.min(getMaxTransfer(), amount), storageType, storageAmount, getGuiInUse(), ConstructorGui::updateRemovedItems, new HeapToStackAccess<>() {
-            @Override
-            public Integer get() {
-                return storageAmount;
-            }
+        storage.ensureValidStorage();
 
-            @Override
-            public void set(Integer val) {
-                setStorageAmount(getStorageAmount() - val);
-            }
-        });
+        if (tickThrottle.isThrottled() || storageType == null || storageAmount == 0) {
+            return Collections.emptyList();
+        }
+
+        return this.<ConstructorGui>take((int) Math.min(getMaxTransfer(), amount), storageType, storageAmount, getGuiInUse(), ConstructorGui::updateRemovedItems, storage);
     }
 
     @Override
