@@ -79,10 +79,9 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
             int take = collection.take((int) Math.min(getMaxTransfer(), getCapacity() - fluidAmount));
 
             if (take > 0) {
+                fluid = takeFluid;
                 fluidAmount += take;
-                if (fluid == null) {
-                    fluid = takeFluid;
-                }
+
                 event.setTransferred(true);
 
                 LiquidTankGui gui = this.<LiquidTankGui>getGuiInUse().get();
@@ -96,11 +95,13 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     @Override
     public int take(int amount) {
         int take = Math.min(this.fluidAmount, amount);
-        setFluidAmount(this.fluidAmount - take); // can potentially be zero
+        if (take > 0) {
+            this.fluidAmount -= take;
 
-        LiquidTankGui gui = this.<LiquidTankGui>getGuiInUse().get();
-        if (gui != null) {
-            gui.updateItems();
+            LiquidTankGui gui = this.<LiquidTankGui>getGuiInUse().get();
+            if (gui != null) {
+                gui.updateItems();
+            }
         }
 
         return take;
