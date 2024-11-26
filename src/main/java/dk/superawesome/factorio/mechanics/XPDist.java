@@ -17,9 +17,9 @@ public class XPDist {
 
         amounts = new double[amount];
         Random rand = new Random();
-
-        for (int i = 0; i < amount; i++)
+        for (int i = 0; i < amount; i++) {
             amounts[i] = rand.nextDouble(rangeStart, rangeEnd);
+        }
     }
 
     public double poll() {

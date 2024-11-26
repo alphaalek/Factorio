@@ -57,6 +57,8 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
 
     @Override
     public void pipePut(ItemCollection collection, PipePutEvent event) {
+        ensureValidStorage();
+
         if (tickThrottle.isThrottled()) {
             return;
         }
@@ -117,6 +119,8 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
     }
 
     public List<ItemStack> take(int amount) {
+        ensureValidStorage();
+
         if (tickThrottle.isThrottled() || stored == null || amount == 0) {
             return Collections.emptyList();
         }

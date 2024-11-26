@@ -101,6 +101,7 @@ public interface FuelMechanic {
                 setFuel(null);
             }
         }
+
         if (getCurrentFuelAmount() > 0) {
             setCurrentFuelAmount(getCurrentFuelAmount() - getCurrentFuel().getFuelAmount());
             // due to working with floats, there can be calculation errors due to java binary encoding

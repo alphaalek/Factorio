@@ -106,7 +106,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
             }
         }
 
-        if ((energy == 0 || energy == prev) && turnedOn) {
+        if (energy == prev && turnedOn) {
             // the PC didn't use any energy, power off
             turnedOn = false;
             updateLight();
