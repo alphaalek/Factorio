@@ -305,7 +305,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     @Override
-    public List<ItemStack> take(int amount) {
+    public List<ItemStack> pipeTake(int amount) {
         storedStorage.ensureValidStorage();
 
         if (tickThrottle.isThrottled() || storageType == null || storageAmount == 0) {

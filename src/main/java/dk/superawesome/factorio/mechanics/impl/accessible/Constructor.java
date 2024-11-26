@@ -143,7 +143,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
                 // increase the max stack size by 1 to allow recipes with single stack to be crafted
                 int maxStackSize = craft.getMaxStackSize() == 1 ? 2 : craft.getMaxStackSize();
 
-                List<ItemStack> stacks = collection.take(Math.min(level.getInt(UNIT_TRANSFER_AMOUNT_MARK), maxStackSize - craft.getAmount()));
+                List<ItemStack> stacks = collection.pipeTake(Math.min(level.getInt(UNIT_TRANSFER_AMOUNT_MARK), maxStackSize - craft.getAmount()));
 
                 // loop through the stacks collected and try to put into the grid
                 for (ItemStack stack : stacks) {
@@ -255,7 +255,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     }
 
     @Override
-    public List<ItemStack> take(int amount) {
+    public List<ItemStack> pipeTake(int amount) {
         storage.ensureValidStorage();
 
         if (tickThrottle.isThrottled() || storageType == null || storageAmount == 0) {

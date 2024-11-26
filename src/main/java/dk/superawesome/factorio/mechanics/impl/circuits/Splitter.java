@@ -160,8 +160,8 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
                         }
 
                         @Override
-                        public List<ItemStack> take(int amount) {
-                            return itemCollection.take(Math.min(amount, each + Math.max(0, remainder.getAndDecrement())));
+                        public List<ItemStack> pipeTake(int amount) {
+                            return itemCollection.pipeTake(Math.min(amount, each + Math.max(0, remainder.getAndDecrement())));
                         }
 
                         @Override

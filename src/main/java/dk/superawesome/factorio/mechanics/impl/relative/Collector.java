@@ -48,7 +48,7 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
     }
 
     @Override
-    public List<ItemStack> take(int amount) {
+    public List<ItemStack> pipeTake(int amount) {
         ItemStack item = collected.clone();
         if (collected.getAmount() > amount) {
             item.setAmount(amount);

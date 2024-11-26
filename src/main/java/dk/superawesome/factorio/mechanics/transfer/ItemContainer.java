@@ -26,7 +26,7 @@ public interface ItemContainer extends Container<ItemCollection> {
     }
 
     default <G extends BaseGui<G>> int put(ItemCollection from, int take, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, Storage storage) {
-        List<ItemStack> items = from.take(take);
+        List<ItemStack> items = from.pipeTake(take);
         int add = 0;
         for (ItemStack item : items) {
             add += item.getAmount();

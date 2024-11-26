@@ -18,7 +18,7 @@ public interface ItemCollection extends TransferCollection {
 
     boolean has(Predicate<ItemStack> stack);
 
-    List<ItemStack> take(int amount);
+    List<ItemStack> pipeTake(int amount);
 
     default <G extends BaseGui<G>> List<ItemStack> take(int amount, ItemStack stored, int storedAmount, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui, Storage storage) {
         List<ItemStack> items = new ArrayList<>();

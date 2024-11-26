@@ -260,7 +260,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     }
 
     @Override
-    public List<ItemStack> take(int amount) {
+    public List<ItemStack> pipeTake(int amount) {
         filledStorage.ensureValidStorage();
 
         if (tickThrottle.isThrottled() || filled == null || filledAmount == 0) {

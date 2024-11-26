@@ -112,12 +112,17 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
     }
 
     @Override
+    public List<ItemStack> pipeTake(int amount) {
+        return take((int) Math.min(getMaxTransfer(), amount));
+    }
+
     public List<ItemStack> take(int amount) {
         if (tickThrottle.isThrottled() || stored == null || amount == 0) {
             return Collections.emptyList();
         }
 
-        return this.<StorageBoxGui>take((int) Math.min(getMaxTransfer(), amount), stored, amount, getGuiInUse(), StorageBoxGui::updateRemovedItems, this);
+        return this.<StorageBoxGui>take(amount, stored, this.amount, getGuiInUse(), StorageBoxGui::updateRemovedItems, this);
+
     }
 
     @Override
