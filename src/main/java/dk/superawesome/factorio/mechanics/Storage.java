@@ -21,11 +21,11 @@ public interface Storage {
     int getCapacity();
 
     default void ensureValidStorage() {
+        if (getAmount() < 0 || getStored() == null && getAmount() > 0) {
+            setAmount(0);
+        }
         if (getStored() != null && getAmount() == 0) {
             setStored(null);
-        }
-        if (getStored() == null && getAmount() > 0) {
-            setAmount(0);
         }
     }
 }
