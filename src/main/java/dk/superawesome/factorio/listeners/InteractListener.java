@@ -26,6 +26,10 @@ public class InteractListener implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if (event.getClickedBlock() != null) {
+            if (event.isCancelled()) {
+                return;
+            }
+
             MechanicManager manager = Factorio.get().getMechanicManager(event.getClickedBlock().getWorld());
             Mechanic<?> mechanic = manager.getMechanicPartially(event.getClickedBlock().getLocation());
             if (mechanic != null) {
