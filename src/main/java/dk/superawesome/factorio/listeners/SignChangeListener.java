@@ -58,9 +58,9 @@ public class SignChangeListener implements Listener {
                 BlockUtil.rotate(event.getBlock(), BlockUtil.getCartesianRotation(BlockUtil.getFacing(event.getBlock())));
             }
 
-            // try to build the mechanic in the next tick
-            Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-                MechanicBuildResponse response = manager.buildMechanic((Sign) event.getBlock().getState(), on, event.getPlayer());
+            // try to build the mechanic at the next tick
+            Bukkit.getScheduler().runTask(Factorio.get(), () ->
+                    manager.buildMechanic((Sign) event.getBlock().getState(), on, event.getPlayer(), response -> {
                 build: {
                     switch (response) {
                         case SUCCESS -> {
@@ -87,7 +87,7 @@ public class SignChangeListener implements Listener {
                     event.getBlock().setType(Material.AIR);
                     event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(event.getPlayer().getInventory().getItemInMainHand().getType()));
                 }
-            });
+            }));
         }
     }
 }

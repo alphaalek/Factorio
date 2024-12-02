@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 public interface Mechanic<M extends Mechanic<M>> extends Listener, Source {
 
@@ -17,9 +18,9 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener, Source {
         return getProfile().getBuilding(this);
     }
 
-    void unload();
+    boolean unload();
 
-    void save();
+    boolean save();
 
     void move(Location loc, BlockFace rot, Block sign);
 

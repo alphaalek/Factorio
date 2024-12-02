@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechanic<M> {
@@ -62,16 +63,16 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     }
 
     @Override
-    public void unload() {
-        save();
+    public boolean unload() {
         exists = false;
+        return save();
     }
 
     @Override
-    public void save() {
+    public boolean save() {
         try {
             if (!this.context.getController().validConnection()) {
-                return;
+                return false;
             }
 
             // ensure record exists
@@ -85,8 +86,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
             this.context.uploadManagement(this.management);
 
             save(this.context);
+
+            return true;
         } catch (Exception ex) {
             Factorio.get().getLogger().log(Level.SEVERE, "Failed to save mechanic " + this + ", " + getLocation(), ex);
+            return false;
         }
     }
 

@@ -85,7 +85,7 @@ public final class Factorio extends JavaPlugin implements Listener {
         // save all mechanics
         for (World world : Bukkit.getWorlds()) {
             for (Chunk chunk : world.getLoadedChunks()) {
-                Factorio.get().getMechanicManager(world).unloadMechanics(chunk);
+                Factorio.get().getMechanicManager(world).unloadMechanics(chunk, false);
             }
         }
 

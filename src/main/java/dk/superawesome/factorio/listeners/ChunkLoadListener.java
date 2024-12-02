@@ -14,14 +14,12 @@ public class ChunkLoadListener implements Listener {
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
         MechanicManager manager = Factorio.get().getMechanicManager(event.getWorld());
-        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-            manager.loadMechanics(event.getChunk());
-        });
+        Bukkit.getScheduler().runTask(Factorio.get(), () -> manager.loadMechanics(event.getChunk()));
     }
 
     @EventHandler
     public void onChunkUnload(ChunkUnloadEvent event) {
         World world = event.getWorld();
-        Factorio.get().getMechanicManager(world).unloadMechanics(event.getChunk());
+        Factorio.get().getMechanicManager(world).unloadMechanics(event.getChunk(), true);
     }
 }

@@ -29,9 +29,11 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
     private static final List<Recipe> commonRecipes = new ArrayList<>();
 
     static {
-        for (Assembler.Types type : Assembler.Types.values()) {
-            addRecipesFor(new ItemStack(type.getMat()));
-        }
+        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+            for (Assembler.Types type : Assembler.Types.values()) {
+                addRecipesFor(new ItemStack(type.getMat()));
+            }
+        });
     }
 
     private static void addRecipesFor(ItemStack stack) {

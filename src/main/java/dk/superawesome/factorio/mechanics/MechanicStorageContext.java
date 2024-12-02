@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics;
 
 
 import dk.superawesome.factorio.mechanics.db.MechanicController;
+import dk.superawesome.factorio.mechanics.db.StorageException;
 import dk.superawesome.factorio.util.db.Query;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -24,12 +25,20 @@ public class MechanicStorageContext {
             this.controller = controller;
         }
 
-        public MechanicStorageContext findAt(Location loc) throws SQLException, IOException {
-            return controller.findAt(loc);
+        public MechanicStorageContext findAt(Location loc) throws StorageException {
+            try {
+                return controller.findAt(loc);
+            } catch (SQLException | IOException ex) {
+                throw new StorageException(ex);
+            }
         }
 
-        public MechanicStorageContext create(Location loc, BlockFace rot, String type, UUID owner) throws SQLException, IOException {
-            return controller.create(loc, rot, type, owner);
+        public MechanicStorageContext create(Location loc, BlockFace rot, String type, UUID owner) throws StorageException {
+            try {
+                return controller.create(loc, rot, type, owner);
+            } catch (SQLException | IOException ex) {
+                throw new StorageException(ex);
+            }
         }
 
         public void deleteAt(Location loc) throws SQLException {
@@ -58,8 +67,8 @@ public class MechanicStorageContext {
         return IntStream.range(0, bytes.length).map(i -> bytes[i]).anyMatch(b -> b > 0);
     }
 
-    public static ByteArrayInputStream getData(Query.CheckedSupplier<String> data) throws SQLException {
-        return decode(data.<SQLException>sneaky());
+    public static ByteArrayInputStream getData(Query.CheckedSupplier<String, SQLException> data) throws SQLException {
+        return decode(data.sneaky());
     }
 
     private final MechanicController controller;

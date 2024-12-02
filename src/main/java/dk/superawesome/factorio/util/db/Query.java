@@ -73,11 +73,11 @@ public class Query {
     }
 
     @FunctionalInterface
-    public interface CheckedSupplier<T> {
+    public interface CheckedSupplier<T, E extends Exception> {
 
-        T get() throws Exception;
+        T get() throws E;
 
-        default <E extends Exception> T sneaky() throws E {
+        default T sneaky() throws E {
             try {
                 return get();
             } catch (Exception ex) {
