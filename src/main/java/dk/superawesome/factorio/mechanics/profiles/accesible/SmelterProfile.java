@@ -30,7 +30,7 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.SMELTER;
     }
 
@@ -40,7 +40,7 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
     }
 
     @Override
-    public StorageProvider<Smelter> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return StorageProvider.Builder.<Smelter>makeContext()
                 .set(SmelterGui.INGREDIENT_CONTEXT, SmelterGui.INGREDIENT_SLOTS, mechanic -> new Storage() {
                     @Override

@@ -25,7 +25,7 @@ public class LiquidTankProfile implements GuiMechanicProfile<LiquidTank> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.LIQUID_TANK;
     }
 
@@ -40,7 +40,7 @@ public class LiquidTankProfile implements GuiMechanicProfile<LiquidTank> {
     }
 
     @Override
-    public StorageProvider<LiquidTank> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

@@ -17,7 +17,7 @@ public class ComparatorProfile implements MechanicProfile<Comparator> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.COMPARATOR;
     }
 
@@ -27,7 +27,7 @@ public class ComparatorProfile implements MechanicProfile<Comparator> {
     }
 
     @Override
-    public StorageProvider<Comparator> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

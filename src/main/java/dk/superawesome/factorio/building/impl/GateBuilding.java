@@ -23,8 +23,8 @@ public class GateBuilding implements BuildingCollection {
     private final Top top = new Top();
 
     @Override
-    public Building get(Mechanic<?> forMechanic) {
-        return forMechanic.hasWallSign() ? side : top;
+    public Building get(boolean hasWallSign) {
+        return hasWallSign ? side : top;
     }
 
     static class Side implements Building, Matcher {

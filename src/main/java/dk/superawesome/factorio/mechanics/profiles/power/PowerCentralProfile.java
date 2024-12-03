@@ -27,7 +27,7 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.POWER_CENTRAL;
     }
 
@@ -37,7 +37,7 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
     }
 
     @Override
-    public StorageProvider<PowerCentral> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

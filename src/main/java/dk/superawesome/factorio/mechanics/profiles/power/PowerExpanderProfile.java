@@ -16,8 +16,8 @@ public class PowerExpanderProfile implements MechanicProfile<PowerExpander> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
-        return Buildings.GATE.get(forMechanic);
+    public Building getBuilding(boolean hasWallSign) {
+        return Buildings.GATE.get(hasWallSign);
     }
 
     @Override
@@ -26,7 +26,7 @@ public class PowerExpanderProfile implements MechanicProfile<PowerExpander> {
     }
 
     @Override
-    public StorageProvider<PowerExpander> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

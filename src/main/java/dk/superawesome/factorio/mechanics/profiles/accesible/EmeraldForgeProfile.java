@@ -25,7 +25,7 @@ public class EmeraldForgeProfile implements GuiMechanicProfile<EmeraldForge> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.EMERALD_FORGE;
     }
 
@@ -35,7 +35,7 @@ public class EmeraldForgeProfile implements GuiMechanicProfile<EmeraldForge> {
     }
 
     @Override
-    public StorageProvider<EmeraldForge> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

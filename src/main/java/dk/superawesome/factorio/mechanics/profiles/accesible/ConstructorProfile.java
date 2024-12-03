@@ -30,7 +30,7 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.CONSTRUCTOR;
     }
 
@@ -40,7 +40,7 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
     }
 
     @Override
-    public StorageProvider<Constructor> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return StorageProvider.Builder.<Constructor>makeContext()
                 .set(SingleStorageGui.CONTEXT, ConstructorGui.STORAGE_SLOTS, mechanic -> new Storage() {
                     @Override

@@ -30,7 +30,7 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.REFINERY;
     }
 
@@ -40,7 +40,7 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
     }
 
     @Override
-    public StorageProvider<Refinery> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return StorageProvider.Builder.<Refinery>makeContext()
             .set(RefineryGui.VOLUME_CONTEXT, RefineryGui.VOLUME_SLOTS, mechanic -> new Storage() {
                 @Override

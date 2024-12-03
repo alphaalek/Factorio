@@ -22,7 +22,7 @@ public class AssemblerTriggerProfile implements MechanicProfile<AssemblerTrigger
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.ASSEMBLER_TRIGGER;
     }
 
@@ -32,7 +32,7 @@ public class AssemblerTriggerProfile implements MechanicProfile<AssemblerTrigger
     }
 
     @Override
-    public StorageProvider<AssemblerTrigger> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

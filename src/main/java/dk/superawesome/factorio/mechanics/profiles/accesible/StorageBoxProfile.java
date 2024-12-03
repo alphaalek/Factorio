@@ -28,7 +28,7 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.STORAGE_BOX;
     }
 
@@ -38,7 +38,7 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
     }
 
     @Override
-    public StorageProvider<StorageBox> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return StorageProvider.Builder.<StorageBox>makeContext()
                 .set(SingleStorageGui.CONTEXT, IntStream.range(0, StorageBoxGui.STORED_SIZE).boxed().collect(Collectors.toList()), m -> m)
                 .build();

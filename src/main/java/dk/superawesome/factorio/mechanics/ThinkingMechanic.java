@@ -5,5 +5,4 @@ public interface ThinkingMechanic {
     DelayHandler getThinkDelayHandler();
 
     void think();
-
 }

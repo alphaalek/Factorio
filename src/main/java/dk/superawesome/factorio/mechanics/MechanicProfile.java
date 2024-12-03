@@ -11,11 +11,11 @@ public interface MechanicProfile<M extends Mechanic<M>> extends Identifiable {
         return getName();
     }
 
-    Building getBuilding(Mechanic<?> forMechanic);
+    Building getBuilding(boolean hasWallSign);
 
     MechanicFactory<M> getFactory();
 
-    StorageProvider<M> getStorageProvider();
+    StorageProvider getStorageProvider();
 
     MechanicLevel.Registry getLevelRegistry();
 

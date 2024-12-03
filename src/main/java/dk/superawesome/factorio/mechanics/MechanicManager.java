@@ -3,6 +3,7 @@ package dk.superawesome.factorio.mechanics;
 import com.google.common.collect.Sets;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.*;
+import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.db.StorageException;
 import dk.superawesome.factorio.mechanics.routes.Routes;
@@ -48,10 +49,11 @@ public class MechanicManager implements Listener {
 
         Bukkit.getPluginManager().registerEvents(this, Factorio.get());
 
-        Bukkit.getScheduler().runTaskTimer(Factorio.get(), this::handleThinking, 0L, 1L);
+        Bukkit.getScheduler().runTaskTimer(Factorio.get(), this::handleThinking, 0L, 500L);
     }
 
     private final Map<BlockVector, Mechanic<?>> mechanics = new HashMap<>();
+    private final Map<BlockVector, MechanicProfile<?>> loadingMechanics = new HashMap<>();
     private final Queue<ThinkingMechanic> thinkingMechanics = new LinkedList<>();
 
     public void loadMechanics() {
@@ -62,19 +64,40 @@ public class MechanicManager implements Listener {
 
     public void loadMechanics(Chunk chunk) {
         for (BlockState state : chunk.getTileEntities()) {
-            if (state instanceof Sign
-                    && (Tag.WALL_SIGNS.isTagged(state.getType()) || Tag.STANDING_SIGNS.isTagged(state.getType()))
-                    && getProfileFrom((Sign) state).isPresent()) {
+            BlockVector vec = BlockUtil.getVec(state.getLocation());
+            if (!mechanics.containsKey(vec) && !loadingMechanics.containsKey(vec)
+                    && state instanceof Sign sign
+                    && (Tag.WALL_SIGNS.isTagged(state.getType()) || Tag.STANDING_SIGNS.isTagged(state.getType()))) {
 
-                // load this mechanic
-                loadMechanic((Sign) state, loaded -> {
-                    if (!loaded) {
-                        // unable to load mechanic properly due to corrupt data
-                        state.getBlock().setType(Material.AIR);
+                Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
+                if (profile.isPresent()) {
+                    // add this profile to loading mechanics
+                    Building building = profile.get().getBuilding(Tag.WALL_SIGNS.isTagged(state.getType()));
+                    List<Location> locations = Buildings.getLocations(building, getBlockOn(sign).getLocation(), BlockUtil.getFacing(state.getBlock()));
+                    for (Location loc : locations) {
+                        loadingMechanics.put(BlockUtil.getVec(loc), profile.get());
                     }
 
-                    Routes.removeNearbyRoutes(state.getBlock());
-                });
+                    // load this mechanic
+                    loadMechanic(sign, loaded -> {
+                        if (!loaded) {
+                            // unable to load mechanic properly due to corrupt data
+                            state.getBlock().setType(Material.AIR);
+
+                            Mechanic<?> mechanic = getMechanicPartially(state.getLocation());
+                            if (mechanic != null) {
+                                unload(mechanic, true);
+                            }
+                        }
+
+                        Routes.removeNearbyRoutes(state.getBlock());
+
+                        // remove from loading mechanics
+                        for (Location loc : locations) {
+                            loadingMechanics.remove(BlockUtil.getVec(loc));
+                        }
+                    });
+                }
             }
         }
     }
@@ -177,6 +200,10 @@ public class MechanicManager implements Listener {
         }
 
         return null;
+    }
+
+    public MechanicProfile<?> getLoadingMechanic(Location loc) {
+        return loadingMechanics.get(BlockUtil.getVec(loc));
     }
 
     public Mechanic<?> getMechanicAt(Location loc) {
@@ -401,14 +428,13 @@ public class MechanicManager implements Listener {
             if (on != null && profile.isPresent()) {
                 // check if there is already a mechanic at this location
                 if (getMechanicPartially(on.getLocation()) != null) {
-                    callback.accept(false);
+                    callback.accept(true);
                     return;
                 }
 
-                // load the mechanic
                 BlockFace face = BlockUtil.getFacing(sign.getBlock());
-
                 Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier = () -> contextProvider.findAt(on.getLocation());
+                // load the mechanic
                 loadMechanicFromSign(profile.get(), contextSupplier, sign, on, face, mechanic -> {
                     // ensure only standing signs for buildings that allow it
                     if (Tag.STANDING_SIGNS.isTagged(sign.getType()) && mechanic.getBuilding().deniesStandingSign()) {

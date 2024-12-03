@@ -17,7 +17,7 @@ public class CauldronProfile implements MechanicProfile<Cauldron> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.CAULDRON;
     }
 
@@ -27,7 +27,7 @@ public class CauldronProfile implements MechanicProfile<Cauldron> {
     }
 
     @Override
-    public StorageProvider<Cauldron> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

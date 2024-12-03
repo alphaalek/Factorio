@@ -17,7 +17,7 @@ public class HopperProfile implements MechanicProfile<Hopper> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.COLLECTOR;
     }
 
@@ -27,7 +27,7 @@ public class HopperProfile implements MechanicProfile<Hopper> {
     }
 
     @Override
-    public StorageProvider<Hopper> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

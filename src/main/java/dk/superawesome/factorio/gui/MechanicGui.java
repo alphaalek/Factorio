@@ -130,7 +130,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
     }
 
     public Storage getStorage(int context) {
-        StorageProvider<M> provider = mechanic.getProfile().getStorageProvider();
+        StorageProvider provider = mechanic.getProfile().getStorageProvider();
         if (provider != null) {
             return provider.createStorage(mechanic, context);
         }

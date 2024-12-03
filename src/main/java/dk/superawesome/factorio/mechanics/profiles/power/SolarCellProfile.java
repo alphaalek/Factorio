@@ -17,7 +17,7 @@ public class SolarCellProfile implements MechanicProfile<SolarCell> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.SOLAR_CELL;
     }
 
@@ -27,7 +27,7 @@ public class SolarCellProfile implements MechanicProfile<SolarCell> {
     }
 
     @Override
-    public StorageProvider<SolarCell> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

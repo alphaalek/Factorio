@@ -17,7 +17,7 @@ public class PowerLifterProfile implements MechanicProfile<PowerLifter> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.POWER_LIFTER;
     }
 
@@ -27,7 +27,7 @@ public class PowerLifterProfile implements MechanicProfile<PowerLifter> {
     }
 
     @Override
-    public StorageProvider<PowerLifter> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

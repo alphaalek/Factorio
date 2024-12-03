@@ -29,7 +29,7 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.GENERATOR;
     }
 
@@ -39,7 +39,7 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
     }
 
     @Override
-    public StorageProvider<Generator> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return StorageProvider.Builder.<Generator>makeContext()
                 .set(SingleStorageGui.CONTEXT, GeneratorGui.STORAGE_SLOTS, FuelMechanic::adaptFuelStorage)
                 .build();

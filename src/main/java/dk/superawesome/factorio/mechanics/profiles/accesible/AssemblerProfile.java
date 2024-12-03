@@ -35,7 +35,7 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.ASSEMBLER;
     }
 
@@ -45,7 +45,7 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
     }
 
     @Override
-    public StorageProvider<Assembler> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return StorageProvider.Builder.<Assembler>makeContext()
                 .set(SingleStorageGui.CONTEXT, AssemblerGui.STORAGE_SLOTS, mechanic -> new Storage() {
                     @Override

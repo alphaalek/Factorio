@@ -31,7 +31,7 @@ public class MechanicMoveEvent extends MechanicEvent {
     }
 
     public List<Location> getLocations() {
-        return Buildings.getLocations(mechanic, to, rotation);
+        return Buildings.getLocations(mechanic.getBuilding(), to, rotation);
     }
 
     @Override

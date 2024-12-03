@@ -333,12 +333,16 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         private static void requestTypes() {
             LAST_UPDATE = System.currentTimeMillis();
             for (Types type : Types.values()) {
-                try {
-                    Factorio.get().getMechanicController().registerTransformed(type, type.getTransformed());
-                    type.setTransformed(0);
-                } catch (SQLException ex) {
-                    Bukkit.getLogger().log(Level.SEVERE, "Failed to register transformed amount for type " + type, ex);
-                }
+                double transformed = type.getTransformed();
+                type.setTransformed(0);
+                Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), () -> {
+                    try {
+                        Factorio.get().getMechanicController().registerTransformed(type, transformed);
+                    } catch (SQLException ex) {
+                        Bukkit.getLogger().log(Level.SEVERE, "Failed to register transformed amount for type " + type, ex);
+
+                    }
+                });
 
                 AssemblerTypeRequestEvent requestEvent = new AssemblerTypeRequestEvent(type);
                 Bukkit.getPluginManager().callEvent(requestEvent);

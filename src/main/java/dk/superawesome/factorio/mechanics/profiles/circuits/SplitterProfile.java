@@ -17,8 +17,8 @@ public class SplitterProfile implements MechanicProfile<Splitter> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
-        return Buildings.GATE.get(forMechanic);
+    public Building getBuilding(boolean hasWallSign) {
+        return Buildings.GATE.get(hasWallSign);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class SplitterProfile implements MechanicProfile<Splitter> {
     }
 
     @Override
-    public StorageProvider<Splitter> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

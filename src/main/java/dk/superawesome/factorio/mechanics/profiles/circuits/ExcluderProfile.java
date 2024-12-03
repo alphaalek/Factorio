@@ -17,8 +17,8 @@ public class ExcluderProfile implements MechanicProfile<Excluder> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
-        return Buildings.GATE.get(forMechanic);
+    public Building getBuilding(boolean hasWallSign) {
+        return Buildings.GATE.get(hasWallSign);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class ExcluderProfile implements MechanicProfile<Excluder> {
     }
 
     @Override
-    public StorageProvider<Excluder> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

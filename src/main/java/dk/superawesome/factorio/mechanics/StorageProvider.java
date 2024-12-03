@@ -5,7 +5,7 @@ import dk.superawesome.factorio.util.Array;
 import java.util.List;
 import java.util.function.Function;
 
-public interface StorageProvider<M extends Mechanic<M>> {
+public interface StorageProvider {
 
     interface StorageContext<M extends Mechanic<M>> {
 
@@ -38,8 +38,10 @@ public interface StorageProvider<M extends Mechanic<M>> {
             return this;
         }
 
-        public StorageProvider<M> build() {
-            return new StorageProvider<>() {
+        public StorageProvider build() {
+            return new StorageProvider() {
+
+                @SuppressWarnings("unchecked")
                 @Override
                 public Storage createStorage(Mechanic<?> mechanic, int context) {
                     return contexts.get(context).createStorage((M) mechanic);

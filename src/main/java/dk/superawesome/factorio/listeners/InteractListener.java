@@ -23,17 +23,18 @@ public class InteractListener implements Listener {
 
     private final TickValue<List<UUID>> interactedPlayers = new TickValue<>(ArrayList::new);
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
         if (event.getClickedBlock() != null) {
-            if (event.isCancelled()) {
+            MechanicManager manager = Factorio.get().getMechanicManager(event.getClickedBlock().getWorld());
+            if (manager.getLoadingMechanic(event.getClickedBlock().getLocation()) != null) {
+                event.setCancelled(true);
+                event.getPlayer().sendMessage("§cEn maskine er igang med at blive indlæst på denne block!");
                 return;
             }
 
-            MechanicManager manager = Factorio.get().getMechanicManager(event.getClickedBlock().getWorld());
             Mechanic<?> mechanic = manager.getMechanicPartially(event.getClickedBlock().getLocation());
             if (mechanic != null) {
-
                 if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.WOODEN_AXE)) {
                     event.setCancelled(true);
                     moveMechanic(event.getPlayer(), mechanic);
@@ -64,6 +65,12 @@ public class InteractListener implements Listener {
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         MechanicManager manager = Factorio.get().getMechanicManager(event.getBlock().getWorld());
+        if (manager.getLoadingMechanic(event.getBlock().getLocation()) != null) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage("§cEn maskine er igang med at blive indlæst på denne block!");
+            return;
+        }
+
         Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
         if (mechanic != null) {
             if (event.getPlayer().getInventory().getItemInMainHand().equals(Material.WOODEN_AXE)) {

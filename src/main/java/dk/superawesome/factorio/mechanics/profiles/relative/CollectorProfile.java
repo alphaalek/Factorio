@@ -17,7 +17,7 @@ public class CollectorProfile implements MechanicProfile<Collector> {
     }
 
     @Override
-    public Building getBuilding(Mechanic<?> forMechanic) {
+    public Building getBuilding(boolean hasWallSign) {
         return Buildings.COLLECTOR;
     }
 
@@ -27,7 +27,7 @@ public class CollectorProfile implements MechanicProfile<Collector> {
     }
 
     @Override
-    public StorageProvider<Collector> getStorageProvider() {
+    public StorageProvider getStorageProvider() {
         return null;
     }
 

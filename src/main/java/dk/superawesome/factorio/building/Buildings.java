@@ -69,9 +69,9 @@ public class Buildings {
         return buildings;
     }
 
-    public static List<Location> getLocations(Mechanic<?> mechanic, Location rel, BlockFace rot) {
+    public static List<Location> getLocations(Building building, Location rel, BlockFace rot) {
         List<Location> locs = new ArrayList<>();
-        for (BlockVector relVec : mechanic.getBuilding().getRelatives()) {
+        for (BlockVector relVec : building.getRelatives()) {
             Location loc = BlockUtil.getRel(rel, BlockUtil.rotateVec(relVec, Building.DEFAULT_ROTATION, rot));
             locs.add(loc);
         }
@@ -80,7 +80,7 @@ public class Buildings {
     }
 
     public static List<Location> getLocations(Mechanic<?> mechanic) {
-        return getLocations(mechanic, mechanic.getLocation(), mechanic.getRotation());
+        return getLocations(mechanic.getBuilding(), mechanic.getLocation(), mechanic.getRotation());
     }
 
     public static boolean intersects(Location loc, Mechanic<?> mechanic) {
@@ -94,7 +94,7 @@ public class Buildings {
     }
 
     public static boolean canMoveTo(Location to, BlockFace rotation, Mechanic<?> mechanic) {
-        for (Location relLoc : getLocations(mechanic, to, rotation)) {
+        for (Location relLoc : getLocations(mechanic.getBuilding(), to, rotation)) {
             // check if this block can be placed in the world
             if (relLoc.getBlock().getType() != Material.AIR && !getLocations(mechanic).contains(relLoc)) {
                 return false;
@@ -159,10 +159,10 @@ public class Buildings {
 
     public static void copy(World fromWorld, World toWorld, Location from, BlockFace fromRot, Location to, BlockFace toRot, Mechanic<?> mechanic) {
         int i = 0;
-        List<Location> locations = getLocations(mechanic, from, fromRot);
+        List<Location> locations = getLocations(mechanic.getBuilding(), from, fromRot);
 
         ChainRunnable runnable = ChainRunnable.empty();
-        for (Location relLoc : getLocations(mechanic, to, toRot)) {
+        for (Location relLoc : getLocations(mechanic.getBuilding(), to, toRot)) {
             Block relBlock = fromWorld.getBlockAt(relLoc);
             Block fromBlock = toWorld.getBlockAt(locations.get(i++));
 
@@ -203,7 +203,7 @@ public class Buildings {
     }
 
     public static void destroy(Mechanic<?> mechanic, Location loc, BlockFace rot, List<Location> ignore) {
-        for (Location relLoc : getLocations(mechanic, loc, rot)) {
+        for (Location relLoc : getLocations(mechanic.getBuilding(), loc, rot)) {
             if (!ignore.contains(relLoc)) {
                 loc.getWorld().getBlockAt(relLoc).setType(Material.AIR, false); // don't apply physics
             }

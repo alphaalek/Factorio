@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 public interface Mechanic<M extends Mechanic<M>> extends Listener, Source {
 
     default Building getBuilding() {
-        return getProfile().getBuilding(this);
+        return getProfile().getBuilding(hasWallSign());
     }
 
     boolean unload();
