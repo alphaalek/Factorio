@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public class Types {
 
-    public static Type<Location> LOCATION = new Type<Location>() {
+    public static Type<Location> LOCATION = new Type<>() {
         @Override
         public Location from(String text) {
             String[] split = text.split(";");

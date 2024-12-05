@@ -7,6 +7,7 @@ import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.TickThrottle;
+import dk.superawesome.factorio.util.db.Query;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
@@ -145,13 +146,10 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     }
 
     public void save(MechanicStorageContext context) throws Exception {
-
-
         // to be overridden if needed
     }
 
     protected Sign getSign() {
-        Bukkit.broadcastMessage("Get sign " + loc);
         return (Sign) getBuilding().getSign(this).getState();
     }
 

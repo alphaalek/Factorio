@@ -68,8 +68,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
         lever = getLocation().getBlock().getRelative(this.rot.getOppositeFace());
         if (lever.getType() != Material.LEVER) {
             // invalid power central
-            Factorio.get().getMechanicManager(getLocation().getWorld()).unload(this);
-            Buildings.remove(this, this.loc, this.rot, true);
+            Factorio.get().getMechanicManagerFor(this).deleteMechanic(this);
         } else {
             // update block state
             updateLight();

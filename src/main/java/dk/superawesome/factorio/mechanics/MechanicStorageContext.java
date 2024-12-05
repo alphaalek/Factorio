@@ -4,6 +4,7 @@ package dk.superawesome.factorio.mechanics;
 import dk.superawesome.factorio.mechanics.db.MechanicController;
 import dk.superawesome.factorio.mechanics.db.StorageException;
 import dk.superawesome.factorio.util.db.Query;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
@@ -41,8 +42,12 @@ public class MechanicStorageContext {
             }
         }
 
-        public void deleteAt(Location loc) throws SQLException {
-            controller.deleteAt(loc);
+        public boolean deleteAt(Location loc) throws StorageException {
+            try {
+                return controller.deleteAt(loc);
+            } catch (SQLException ex) {
+                throw new StorageException(ex);
+            }
         }
     }
 
@@ -74,20 +79,24 @@ public class MechanicStorageContext {
     private final MechanicController controller;
     private final Management fallbackManagement;
 
-    private Location location;
+    private Location loc;
 
     public MechanicStorageContext(MechanicController controller, Location location, Management fallbackManagement) {
         this.controller = controller;
-        this.location = location;
+        this.loc = location;
         this.fallbackManagement = fallbackManagement;
+    }
+
+    public Location getLocation() {
+        return this.loc;
     }
 
     public void move(Location loc, BlockFace rot) throws SQLException {
         if (hasContext() && this.controller.validConnection()) {
-            this.controller.move(this.location, loc, rot);
+            this.controller.move(this.loc, loc, rot);
         }
 
-        this.location = loc;
+        this.loc = loc;
     }
 
     public MechanicController getController() {
@@ -99,11 +108,11 @@ public class MechanicStorageContext {
     }
 
     public ByteArrayInputStream getData() throws SQLException {
-        return getData(() -> this.controller.getData(this.location));
+        return getData(() -> this.controller.getData(this.loc));
     }
 
     public Management getManagement() throws SQLException, IOException {
-        ByteArrayInputStream stream = getData(() -> this.controller.getManagement(this.location));
+        ByteArrayInputStream stream = getData(() -> this.controller.getManagement(this.loc));
         if (stream.available() == 0) {
             // return fallback management if it failed to poll from db
             return fallbackManagement;
@@ -113,31 +122,36 @@ public class MechanicStorageContext {
     }
 
     public void uploadData(ByteArrayOutputStream stream) throws SQLException {
-        upload(stream, base64 -> this.controller.setData(this.location, base64), this.controller.getData(this.location));
+        upload(stream, base64 -> this.controller.setData(this.loc, base64), this.controller.getData(this.loc));
     }
 
     public void uploadManagement(Management management) throws SQLException, IOException {
         ByteArrayOutputStream stream = this.controller.getManagementSerializer().serialize(management);
-        upload(stream, base64 -> this.controller.setManagement(this.location, base64), this.controller.getManagement(this.location));
+        upload(stream, base64 -> this.controller.setManagement(this.loc, base64), this.controller.getManagement(this.loc));
     }
 
     public boolean hasContext() throws SQLException {
-        return this.controller.exists(this.location);
+        return this.controller.exists(this.loc);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T get(String column) throws SQLException {
+        return (T) this.controller.get(this.loc, column, result -> result.getObject(column));
     }
 
     public int getLevel() throws SQLException {
-        return this.controller.getLevel(this.location);
+        return this.controller.getLevel(this.loc);
     }
 
     public void setLevel(int level) throws SQLException {
-        this.controller.setLevel(this.location, level);
+        this.controller.setLevel(this.loc, level);
     }
 
     public double getXP() throws SQLException {
-        return this.controller.getXP(this.location);
+        return this.controller.getXP(this.loc);
     }
 
     public void setXP(double xp) throws SQLException {
-        this.controller.setXP(this.location, xp);
+        this.controller.setXP(this.loc, xp);
     }
 }

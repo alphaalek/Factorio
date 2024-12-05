@@ -40,20 +40,20 @@ public class MechanicController {
                 "level INT DEFAULT 1, " +
                 "xp DOUBLE(16, 2) DEFAULT 0, " +
                 "management TEXT, " +
-                "data TEXT);");
+                "data TEXT)");
 
         Query createDefaultMembers = new Query(
                 "CREATE TABLE IF NOT EXISTS mechanics_defaultMembers (" +
                 "playerUUID VARCHAR(36) NOT NULL, " +
                 "defaultMemberPlayerUUID VARCHAR(36) NOT NULL, " +
                 "PRIMARY KEY (playerUUID, defaultMemberPlayerUUID)" +
-                ");");
+                ")");
 
         Query createAssemblerTransformed = new Query(
                 "CREATE TABLE IF NOT EXISTS mechanics_assembler_transformed (" +
                 "type VARCHAR(32) PRIMARY KEY NOT NULL, " +
                 "transformed DOUBLE(32, 2)" +
-                ");"
+                ")"
         );
 
         try {
@@ -71,6 +71,10 @@ public class MechanicController {
 
     public boolean validConnection() throws SQLException {
         return this.connection.validConnection();
+    }
+
+    public DatabaseConnection getConnection() {
+        return this.connection;
     }
 
     public Serializer<Management> getManagementSerializer() {
@@ -127,7 +131,7 @@ public class MechanicController {
                 .add(uuid.toString())
                 .add(member.toString());
 
-        query.execute(this.connection);
+        query.executeUpdate(this.connection);
     }
 
     public void move(Location from, Location to, BlockFace rot) throws SQLException {
@@ -139,16 +143,16 @@ public class MechanicController {
                 .add(rot.name())
                 .add(Types.LOCATION.convert(from));
 
-        query.execute(this.connection);
+        query.executeUpdate(this.connection);
     }
 
-    public void deleteAt(Location location) throws SQLException {
+    public boolean deleteAt(Location location) throws SQLException {
         Query query = new Query(
                 "DELETE FROM mechanics " +
                 "WHERE location = ?"
                 ).add(Types.LOCATION.convert(location));
 
-        query.execute(this.connection);
+        return query.executeUpdate(this.connection) > 0;
     }
 
     public MechanicStorageContext findAt(Location loc) throws SQLException, IOException {
@@ -161,9 +165,7 @@ public class MechanicController {
     }
 
     public MechanicStorageContext create(Location loc, BlockFace rot, String type, UUID owner) throws SQLException, IOException {
-        if (exists(loc)) {
-            deleteAt(loc);
-        }
+        deleteAt(loc);
 
         Management management = new Management(owner);
 
@@ -182,7 +184,7 @@ public class MechanicController {
 
     public boolean exists(Location loc) throws SQLException {
         Query query = new Query(
-                "SELECT * from mechanics " +
+                "SELECT * FROM mechanics " +
                 "WHERE location = ? " +
                 "LIMIT 1"
                 )
@@ -194,7 +196,7 @@ public class MechanicController {
 
     public <T> T get(Location loc, String column, Query.CheckedFunction<ResultSet, T> function) throws SQLException {
         Query query = new Query(
-                "SELECT " + column + " from mechanics " +
+                "SELECT " + column + " FROM mechanics " +
                 "WHERE location = ? " +
                 "LIMIT 1"
                 )

@@ -99,8 +99,7 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
         campfire = this.loc.getBlock().getRelative(0, 2, 0);
         if (lever.getType() != Material.LEVER || campfire.getType() != Material.CAMPFIRE) {
             // invalid generator
-            Factorio.get().getMechanicManager(this.loc.getWorld()).unload(this);
-            Buildings.remove(this, this.loc, this.rot, true);
+            Factorio.get().getMechanicManagerFor(this).deleteMechanic(this);
             return;
         }
 

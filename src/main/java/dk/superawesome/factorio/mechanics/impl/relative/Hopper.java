@@ -52,8 +52,7 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
         Block hopper = this.loc.getBlock().getRelative(BlockFace.DOWN);
         if (hopper.getType() != Material.HOPPER) {
             // invalid hopper
-            manager.unload(this);
-            Buildings.remove(this, this.loc, this.rot, true);
+            manager.deleteMechanic(this);
             return;
         }
 

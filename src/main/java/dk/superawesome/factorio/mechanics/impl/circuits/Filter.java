@@ -58,8 +58,7 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
         filter.removeAll(Collections.singletonList(null));
 
         if (filter.isEmpty()) {
-            Factorio.get().getMechanicManagerFor(mechanic).unload(mechanic);
-            Buildings.remove(mechanic, mechanic.getLocation(), mechanic.getRotation(), true);
+            Factorio.get().getMechanicManagerFor(mechanic).deleteMechanic(mechanic);
 
             if (by != null) {
                 by.sendMessage("§cUgyldig item valgt!");

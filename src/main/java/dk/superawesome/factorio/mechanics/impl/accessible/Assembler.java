@@ -340,7 +340,6 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
                         Factorio.get().getMechanicController().registerTransformed(type, transformed);
                     } catch (SQLException ex) {
                         Bukkit.getLogger().log(Level.SEVERE, "Failed to register transformed amount for type " + type, ex);
-
                     }
                 });
 

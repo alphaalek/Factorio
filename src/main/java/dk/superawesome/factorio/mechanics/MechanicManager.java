@@ -30,7 +30,6 @@ import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -49,7 +48,7 @@ public class MechanicManager implements Listener {
 
         Bukkit.getPluginManager().registerEvents(this, Factorio.get());
 
-        Bukkit.getScheduler().runTaskTimer(Factorio.get(), this::handleThinking, 0L, 500L);
+        Bukkit.getScheduler().runTaskTimer(Factorio.get(), this::handleThinking, 0L, 1L);
     }
 
     private final Map<BlockVector, Mechanic<?>> mechanics = new HashMap<>();
@@ -86,7 +85,7 @@ public class MechanicManager implements Listener {
 
                             Mechanic<?> mechanic = getMechanicPartially(state.getLocation());
                             if (mechanic != null) {
-                                unload(mechanic, true);
+                                deleteMechanic(mechanic);
                             }
                         }
 
@@ -119,28 +118,30 @@ public class MechanicManager implements Listener {
             try {
                 Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, contextSupplier.get(), hasWallSign);
 
-                Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-                    if (mechanic instanceof ThinkingMechanic tm) {
-                        thinkingMechanics.add(tm);
-                    }
-
-                    for (Location part : Buildings.getLocations(mechanic)) {
-                        if (!mechanic.getBuilding().getSign(mechanic).getLocation().equals(part)) {
-                            this.mechanics.put(BlockUtil.getVec(part), mechanic);
+                if (Factorio.get().isEnabled()) {
+                    Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+                        if (mechanic instanceof ThinkingMechanic tm) {
+                            thinkingMechanics.add(tm);
                         }
-                    }
 
-                    Bukkit.getPluginManager().registerEvents(mechanic, Factorio.get());
+                        for (Location part : Buildings.getLocations(mechanic)) {
+                            if (!mechanic.getBuilding().getSign(mechanic).getLocation().equals(part)) {
+                                this.mechanics.put(BlockUtil.getVec(part), mechanic);
+                            }
+                        }
 
-                    callback.accept(mechanic);
-                });
+                        Bukkit.getPluginManager().registerEvents(mechanic, Factorio.get());
+
+                        callback.accept(mechanic);
+                    });
+                }
             } catch (StorageException ex) {
-                Bukkit.getLogger().log(Level.SEVERE, "Failed to load mecahnic at " + loc, ex);
+                Bukkit.getLogger().log(Level.SEVERE, "Failed to load mechanic at " + loc, ex);
             }
         });
     }
 
-    public void unload(Mechanic<?> mechanic, boolean async) {
+    public void unregister(Mechanic<?> mechanic) {
         for (Location loc : Buildings.getLocations(mechanic)) {
             mechanics.remove(BlockUtil.getVec(loc));
         }
@@ -152,6 +153,10 @@ public class MechanicManager implements Listener {
         for (HandlerList list : HandlerList.getHandlerLists()) {
             list.unregister(mechanic);
         }
+    }
+
+    public void unload(Mechanic<?> mechanic, boolean async) {
+        unregister(mechanic);
 
         if (async) {
             Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), mechanic::unload);
@@ -359,104 +364,99 @@ public class MechanicManager implements Listener {
             return;
         }
 
-        try {
-            BlockFace rotation = BlockUtil.getFacing(sign.getBlock());
+        BlockFace rotation = BlockUtil.getFacing(sign.getBlock());
 
-            Query.CheckedSupplier<MechanicStorageContext, StorageException> context = () -> contextProvider.create(on.getLocation(), rotation, profile.get().getName(), owner.getUniqueId());
-            loadMechanicFromSign(profile.get(), context, sign, on, rotation, mechanic -> {
-                if (mechanic == null) {
-                    callback.accept(MechanicBuildResponse.NO_SUCH);
-                    return;
-                }
+        Query.CheckedSupplier<MechanicStorageContext, StorageException> context = () -> {
+            // delete any previous mechanics on this location
+            contextProvider.deleteAt(on.getLocation());
 
-                MechanicBuildEvent event = new MechanicBuildEvent(owner, mechanic);
-                verify: {
-                    MechanicBuildResponse response;
-                    if (!Buildings.checkCanBuild(mechanic)
-                            || Tag.STANDING_SIGNS.isTagged(sign.getType()) && mechanic.getBuilding().deniesStandingSign()) {
-                        response = MechanicBuildResponse.NOT_PLACED_BLOCKS;
-                    } else if (!Buildings.hasSpaceFor(sign.getBlock(), mechanic)) {
-                        response = MechanicBuildResponse.NOT_ENOUGH_SPACE;
+            // create context for this mechanic
+            return contextProvider.create(on.getLocation(), rotation, profile.get().getName(), owner.getUniqueId());
+        };
+        loadMechanicFromSign(profile.get(), context, sign, on, rotation, mechanic -> {
+            if (mechanic == null) {
+                callback.accept(MechanicBuildResponse.NO_SUCH);
+                return;
+            }
+
+            MechanicBuildEvent event = new MechanicBuildEvent(owner, mechanic);
+            verify: {
+                MechanicBuildResponse response;
+                if (!Buildings.checkCanBuild(mechanic)
+                        || Tag.STANDING_SIGNS.isTagged(sign.getType()) && mechanic.getBuilding().deniesStandingSign()) {
+                    response = MechanicBuildResponse.NOT_PLACED_BLOCKS;
+                } else if (!Buildings.hasSpaceFor(sign.getBlock(), mechanic)) {
+                    response = MechanicBuildResponse.NOT_ENOUGH_SPACE;
+                } else {
+                    Bukkit.getPluginManager().callEvent(event);
+                    if (event.isCancelled()) {
+                        response = MechanicBuildResponse.ABORT;
                     } else {
-                        Bukkit.getPluginManager().callEvent(event);
-                        if (event.isCancelled()) {
-                            response = MechanicBuildResponse.ABORT;
-                        } else {
-                            break verify;
-                        }
+                        break verify;
                     }
+                }
 
-                    unload(mechanic);
-                    callback.accept(response);
+                unload(mechanic);
+                callback.accept(response);
+                return;
+            }
+
+            // place the blocks for this mechanic
+            Buildings.build(sign.getWorld(), mechanic, Collections.singletonList(sign.getLocation()));
+            mechanic.onBlocksLoaded(owner);
+
+            Routes.removeNearbyRoutes(on);
+
+            // add default members
+            try {
+                for (UUID defaultMember : Factorio.get().getMechanicController().getDefaultMembersFor(owner.getUniqueId())) {
+                    mechanic.getManagement().getMembers().add(defaultMember);
+                }
+            } catch (SQLException ex) {
+                Bukkit.getLogger().log(Level.SEVERE, "A SQL error occurred!", ex);
+                owner.sendMessage("§cDer opstod en fejl ved tilføjelse af standard medlemmer.");
+            }
+
+            MechanicLoadEvent postEvent = new MechanicLoadEvent(mechanic);
+            Bukkit.getPluginManager().callEvent(postEvent);
+
+            sign.getWorld().playSound(sign.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.475f, 1f);
+
+            callback.accept(MechanicBuildResponse.SUCCESS);
+        });
+    }
+
+    public void loadMechanic(Sign sign, Consumer<Boolean> callback) {
+        Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
+        Block on = getBlockOn(sign);
+        if (on != null && profile.isPresent()) {
+            // check if there is already a mechanic at this location
+            if (getMechanicPartially(on.getLocation()) != null) {
+                callback.accept(true);
+                return;
+            }
+
+            BlockFace face = BlockUtil.getFacing(sign.getBlock());
+            Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier = () -> contextProvider.findAt(on.getLocation());
+            // load the mechanic
+            loadMechanicFromSign(profile.get(), contextSupplier, sign, on, face, mechanic -> {
+                // ensure only standing signs for buildings that allow it
+                if (Tag.STANDING_SIGNS.isTagged(sign.getType()) && mechanic.getBuilding().deniesStandingSign()) {
+                    callback.accept(false);
                     return;
                 }
 
-                // place the blocks for this mechanic
-                Buildings.build(sign.getWorld(), mechanic, Collections.singletonList(sign.getLocation()));
-                mechanic.onBlocksLoaded(owner);
-
-                Routes.removeNearbyRoutes(on);
-
-                try {
-                    for (UUID defaultMember : Factorio.get().getMechanicController().getDefaultMembersFor(owner.getUniqueId())) {
-                        mechanic.getManagement().getMembers().add(defaultMember);
-                    }
-                } catch (SQLException ex) {
-                    Bukkit.getLogger().log(Level.SEVERE, "A SQL error occurred!", ex);
-                    owner.sendMessage("§cDer opstod en fejl ved tilføjelse af standard medlemmer.");
-                }
+                mechanic.onBlocksLoaded(null);
 
                 MechanicLoadEvent postEvent = new MechanicLoadEvent(mechanic);
                 Bukkit.getPluginManager().callEvent(postEvent);
 
-                // play sound
-                sign.getWorld().playSound(sign.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.475f, 1f);
-
-                callback.accept(MechanicBuildResponse.SUCCESS);
+                callback.accept(true);
             });
-
-        } catch (SQLException | IOException ex) {
-            Factorio.get().getLogger().log(Level.SEVERE, "Failed to create mechanic at location " + sign.getLocation(), ex);
-            callback.accept(MechanicBuildResponse.ERROR);
         }
     }
 
-    public void loadMechanic(Sign sign, Consumer<Boolean> callback) {
-        try {
-            Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
-            Block on = getBlockOn(sign);
-            if (on != null && profile.isPresent()) {
-                // check if there is already a mechanic at this location
-                if (getMechanicPartially(on.getLocation()) != null) {
-                    callback.accept(true);
-                    return;
-                }
-
-                BlockFace face = BlockUtil.getFacing(sign.getBlock());
-                Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier = () -> contextProvider.findAt(on.getLocation());
-                // load the mechanic
-                loadMechanicFromSign(profile.get(), contextSupplier, sign, on, face, mechanic -> {
-                    // ensure only standing signs for buildings that allow it
-                    if (Tag.STANDING_SIGNS.isTagged(sign.getType()) && mechanic.getBuilding().deniesStandingSign()) {
-                        callback.accept(false);
-                        return;
-                    }
-
-                    mechanic.onBlocksLoaded(null);
-
-                    MechanicLoadEvent postEvent = new MechanicLoadEvent(mechanic);
-                    Bukkit.getPluginManager().callEvent(postEvent);
-
-                    callback.accept(true);
-                });
-            }
-        } catch (SQLException | IOException ex) {
-            Factorio.get().getLogger().log(Level.SEVERE, "Failed to load mechanic at location " + sign.getLocation(), ex);
-            callback.accept(false);
-        }
-    }
-
-    private void loadMechanicFromSign(MechanicProfile<?> profile, Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier, Sign sign, Block on, BlockFace rotation, Consumer<Mechanic<?>> callback) throws IOException, SQLException {
+    private void loadMechanicFromSign(MechanicProfile<?> profile, Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier, Sign sign, Block on, BlockFace rotation, Consumer<Mechanic<?>> callback) {
         // load this mechanic
         load(profile, contextSupplier, on.getLocation(), rotation, Tag.WALL_SIGNS.isTagged(sign.getType()), mechanic -> {
             if (mechanic instanceof AccessibleMechanic) {
@@ -468,32 +468,60 @@ public class MechanicManager implements Listener {
         });
     }
 
-
     public void removeMechanic(Player player, Mechanic<?> mechanic) {
         // call mechanic remove event to event handlers
         MechanicRemoveEvent removeEvent = new MechanicRemoveEvent(player, mechanic);
         Bukkit.getPluginManager().callEvent(removeEvent);
         if (removeEvent.isCancelled()) {
-            // this event was cancelled. (why though?)
+            player.sendMessage("§cDer opstod en fejl! Kontakt en udvikler.");
+            return;
+        }
+
+        Movement.removeMechanic(player, mechanic);
+
+        deleteMechanic(mechanic, b -> {
+            if (!b) {
+                player.sendMessage("§cDer opstod en fejl! Kontakt en udvikler.");
+                return;
+            }
+
+            // player stuff
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 0.5f, 0.6f);
+            player.sendMessage("§eDu fjernede maskinen " + mechanic + " ved " + Types.LOCATION.convert(mechanic.getLocation()) + ".");
+        });
+    }
+
+    public void deleteMechanic(Mechanic<?> mechanic) {
+        deleteMechanic(mechanic, b -> {});
+    }
+
+    public void deleteMechanic(Mechanic<?> mechanic, Consumer<Boolean> callback) {
+        // call mechanic delete event to event handlers
+        MechanicDeleteEvent deleteEvent = new MechanicDeleteEvent(mechanic);
+        Bukkit.getPluginManager().callEvent(deleteEvent);
+        if (deleteEvent.isCancelled()) {
+            callback.accept(false);
             return;
         }
 
         // unload and delete this mechanic
-        unload(mechanic);
-        try {
-            Factorio.get().getContextProvider().deleteAt(mechanic.getLocation());
-        } catch (SQLException ex) {
-            player.sendMessage("§cDer opstod en fejl! Kontakt en udvikler.");
-            Factorio.get().getLogger().log(Level.SEVERE, "Failed to delete mechanic at location " + mechanic.getLocation(), ex);
-            return;
-        }
-        Buildings.remove(mechanic, mechanic.getLocation(), mechanic.getRotation(), true);
-        Movement.removeMechanic(player, mechanic);
+        unregister(mechanic);
+        Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), () -> {
+            try {
+                if (!Factorio.get().getContextProvider().deleteAt(mechanic.getLocation()))  {
+                    callback.accept(false);
+                } else {
+                    Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+                        Buildings.remove(mechanic, mechanic.getLocation(), mechanic.getRotation(), true);
+                        Routes.removeNearbyRoutes(mechanic.getLocation().getBlock());
 
-        Routes.removeNearbyRoutes(mechanic.getLocation().getBlock());
-
-        // player stuff
-        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 0.5f, 0.6f);
-        player.sendMessage("§eDu fjernede maskinen " + mechanic + " ved " + Types.LOCATION.convert(mechanic.getLocation()) + ".");
+                        callback.accept(true);
+                    });
+                }
+            } catch (StorageException ex) {
+                Factorio.get().getLogger().log(Level.SEVERE, "Failed to delete mechanic at location " + mechanic.getLocation(), ex);
+                callback.accept(false);
+            }
+        });
     }
 }

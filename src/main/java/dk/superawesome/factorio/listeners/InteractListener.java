@@ -29,7 +29,9 @@ public class InteractListener implements Listener {
             MechanicManager manager = Factorio.get().getMechanicManager(event.getClickedBlock().getWorld());
             if (manager.getLoadingMechanic(event.getClickedBlock().getLocation()) != null) {
                 event.setCancelled(true);
-                event.getPlayer().sendMessage("§cEn maskine er igang med at blive indlæst på denne block!");
+                if (!checkDoubleAccess(event.getPlayer())) {
+                    event.getPlayer().sendMessage("§cEn maskine er igang med at blive indlæst på denne block!");
+                }
                 return;
             }
 

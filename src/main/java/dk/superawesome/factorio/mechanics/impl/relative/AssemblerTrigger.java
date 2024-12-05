@@ -172,8 +172,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
         // check if no valid filter found for this line
         if (!usePrice && !usePercentage) {
-            Factorio.get().getMechanicManager(this.loc.getWorld()).unload(this);
-            Buildings.remove(this, this.loc, this.rot, true);
+            Factorio.get().getMechanicManagerFor(this).deleteMechanic(this);
 
             if (by != null) {
                 by.sendMessage("§cUgyldig pris eller procent!");

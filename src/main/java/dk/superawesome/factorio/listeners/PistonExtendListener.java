@@ -19,7 +19,8 @@ public class PistonExtendListener implements Listener {
     private boolean disallowPiston(BlockPistonEvent event, List<Block> blocks) {
         MechanicManager manager = Factorio.get().getMechanicManager(event.getBlock().getWorld());
         for (Block block : blocks) {
-            if (manager.getMechanicPartially(block.getLocation()) != null) {
+            if (manager.getMechanicPartially(block.getLocation()) != null
+                    || manager.getLoadingMechanic(block.getLocation()) != null) {
                 return true;
             }
         }

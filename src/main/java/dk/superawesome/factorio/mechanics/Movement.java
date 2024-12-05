@@ -60,7 +60,7 @@ public class Movement {
                 iterator.remove();
 
                 Player selectionPlayer = Bukkit.getPlayer(e.getKey());
-                if (selectionPlayer != null && selectionPlayer != by) {
+                if (selectionPlayer != null && by != null && selectionPlayer != by) {
                     selectionPlayer.sendMessage("§cMaskinen du var i gang med at flytte er blevet fjernet af " + by.getName() + "!");
                 }
                 break;
