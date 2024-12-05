@@ -24,7 +24,7 @@ public class Query {
     }
 
     private <T> T create(DatabaseConnection connection, CheckedFunction<PreparedStatement, T> function) throws SQLException {
-        if (connection.hasConnection()) {
+        if (connection.validConnection()) {
             try (PreparedStatement statement = connection.getConnection().prepareStatement(this.query)) {
                 for (int i = 0; i < values.size(); i++) {
                     statement.setObject(i + 1, values.get(i));
