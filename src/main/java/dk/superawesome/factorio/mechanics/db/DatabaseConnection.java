@@ -2,36 +2,31 @@ package dk.superawesome.factorio.mechanics.db;
 
 import dk.superawesome.factorio.Factorio;
 import org.bukkit.configuration.ConfigurationSection;
+import org.mariadb.jdbc.MariaDbPoolDataSource;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 import java.util.logging.Level;
 
 public class DatabaseConnection {
 
-    private final String host;
-    private final int port;
-
-    private final String database;
-    private final String username;
-    private final String password;
-
-    private Connection connection;
+    private final MariaDbPoolDataSource dataSource = new MariaDbPoolDataSource();
 
     public DatabaseConnection(ConfigurationSection section) {
-        this.host = section.getString("host");
-        this.port = section.getInt("port");
+        String host = section.getString("host");
+        int port = section.getInt("port");
 
-        this.database = section.getString("database");
+        String database = section.getString("database");
 
-        this.username = section.getString("username");
-        this.password = section.getString("password");
+        String username = section.getString("username");
+        String password = section.getString("password");
 
-        if (this.host != null && !this.host.isEmpty()) {
+        if (host != null && !host.isEmpty()) {
             try {
-                tryConnect();
+                this.dataSource.setUser(username);
+                this.dataSource.setPassword(password);
+                this.dataSource.setUrl("jdbc:mariadb://" + host + ":" + port + "/" + database + "?maxPoolSize=10");
+
             } catch (Exception ex) {
                 Factorio.get().getLogger().log(Level.SEVERE, "Failed to connect to database!", ex);
             }
@@ -39,39 +34,10 @@ public class DatabaseConnection {
     }
 
     public boolean validConnection() throws SQLException {
-        return connection != null && !connection.isClosed();
+        return dataSource != null && !dataSource.getConnection().isClosed();
     }
 
-    private boolean loadDriver() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            return true;
-        } catch (Exception ex) {
-            Factorio.get().getLogger().log(Level.SEVERE, "Failed to load jdbc driver", ex);
-        }
-
-        return false;
-    }
-
-    public void tryConnect() throws SQLException {
-        if (!loadDriver()) {
-            return;
-        }
-
-        Properties properties = new Properties();
-        properties.setProperty("user", this.username);
-        properties.setProperty("password", this.password);
-        properties.setProperty("autoReconnect", "true");
-
-        this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, properties);
-        Factorio.get().getLogger().info("Successfully connected to database!");
-    }
-
-    public boolean hasConnection() throws SQLException {
-        return this.connection != null && !this.connection.isClosed();
-    }
-
-    public Connection getConnection() {
-        return this.connection;
+    public Connection getConnection() throws SQLException {
+        return this.dataSource.getConnection();
     }
 }

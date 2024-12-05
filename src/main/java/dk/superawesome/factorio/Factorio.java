@@ -89,6 +89,7 @@ public final class Factorio extends JavaPlugin implements Listener {
             }
         }
 
+        // TODO Fix
         try {
             mechanicController.close();
         } catch (SQLException ex) {

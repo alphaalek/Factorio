@@ -95,6 +95,12 @@
             <version>7.0.9</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.2.0</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>me.wiefferink</groupId>

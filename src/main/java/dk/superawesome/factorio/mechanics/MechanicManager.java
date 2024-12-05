@@ -118,23 +118,21 @@ public class MechanicManager implements Listener {
             try {
                 Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, contextSupplier.get(), hasWallSign);
 
-                if (Factorio.get().isEnabled()) {
-                    Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-                        if (mechanic instanceof ThinkingMechanic tm) {
-                            thinkingMechanics.add(tm);
+                Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+                    if (mechanic instanceof ThinkingMechanic tm) {
+                        thinkingMechanics.add(tm);
+                    }
+
+                    for (Location part : Buildings.getLocations(mechanic)) {
+                        if (!mechanic.getBuilding().getSign(mechanic).getLocation().equals(part)) {
+                            this.mechanics.put(BlockUtil.getVec(part), mechanic);
                         }
+                    }
 
-                        for (Location part : Buildings.getLocations(mechanic)) {
-                            if (!mechanic.getBuilding().getSign(mechanic).getLocation().equals(part)) {
-                                this.mechanics.put(BlockUtil.getVec(part), mechanic);
-                            }
-                        }
+                    Bukkit.getPluginManager().registerEvents(mechanic, Factorio.get());
 
-                        Bukkit.getPluginManager().registerEvents(mechanic, Factorio.get());
-
-                        callback.accept(mechanic);
-                    });
-                }
+                    callback.accept(mechanic);
+                });
             } catch (StorageException ex) {
                 Bukkit.getLogger().log(Level.SEVERE, "Failed to load mechanic at " + loc, ex);
             }
@@ -408,14 +406,16 @@ public class MechanicManager implements Listener {
             Routes.removeNearbyRoutes(on);
 
             // add default members
-            try {
-                for (UUID defaultMember : Factorio.get().getMechanicController().getDefaultMembersFor(owner.getUniqueId())) {
-                    mechanic.getManagement().getMembers().add(defaultMember);
+            Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), () -> {
+                try {
+                    for (UUID defaultMember : Factorio.get().getMechanicController().getDefaultMembersFor(owner.getUniqueId())) {
+                        mechanic.getManagement().getMembers().add(defaultMember);
+                    }
+                } catch (SQLException ex) {
+                    Bukkit.getLogger().log(Level.SEVERE, "A SQL error occurred!", ex);
+                    owner.sendMessage("§cDer opstod en fejl ved tilføjelse af standard medlemmer.");
                 }
-            } catch (SQLException ex) {
-                Bukkit.getLogger().log(Level.SEVERE, "A SQL error occurred!", ex);
-                owner.sendMessage("§cDer opstod en fejl ved tilføjelse af standard medlemmer.");
-            }
+            });
 
             MechanicLoadEvent postEvent = new MechanicLoadEvent(mechanic);
             Bukkit.getPluginManager().callEvent(postEvent);
