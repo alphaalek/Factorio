@@ -44,8 +44,8 @@ public class GateProfile implements MechanicProfile<Gate> {
     private static class GateMechanicFactory implements MechanicFactory<Gate> {
 
         @Override
-        public Gate create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Gate(loc, rotation, context, hasWallSign);
+        public Gate create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Gate(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 }

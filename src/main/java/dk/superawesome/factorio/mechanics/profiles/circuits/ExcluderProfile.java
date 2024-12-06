@@ -49,8 +49,8 @@ public class ExcluderProfile implements MechanicProfile<Excluder> {
     private static class ExcluderMechanicFactory implements MechanicFactory<Excluder> {
 
         @Override
-        public Excluder create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Excluder(loc, rotation, context, hasWallSign);
+        public Excluder create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Excluder(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 }

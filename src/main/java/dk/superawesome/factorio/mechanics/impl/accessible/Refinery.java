@@ -124,8 +124,8 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
         }
     };
 
-    public Refinery(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public Refinery(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
         loadFromStorage();
     }
 

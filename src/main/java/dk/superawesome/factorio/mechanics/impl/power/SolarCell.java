@@ -18,8 +18,8 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
 
     private double energy;
 
-    public SolarCell(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public SolarCell(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
     }
 
     @Override

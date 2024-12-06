@@ -79,6 +79,10 @@ public class MechanicStorageContext {
     private final MechanicController controller;
     private final Management fallbackManagement;
 
+    private int lastLevel;
+    private double lastXP;
+    private Management lastManagement;
+
     private Location loc;
 
     public MechanicStorageContext(MechanicController controller, Location location, Management fallbackManagement) {
@@ -92,7 +96,7 @@ public class MechanicStorageContext {
     }
 
     public void move(Location loc, BlockFace rot) throws SQLException {
-        if (hasContext() && this.controller.validConnection()) {
+        if (hasContext()) {
             this.controller.move(this.loc, loc, rot);
         }
 
@@ -111,14 +115,18 @@ public class MechanicStorageContext {
         return getData(() -> this.controller.getData(this.loc));
     }
 
+    public Management getFallbackManagement() {
+        return this.fallbackManagement;
+    }
+
     public Management getManagement() throws SQLException, IOException {
         ByteArrayInputStream stream = getData(() -> this.controller.getManagement(this.loc));
         if (stream.available() == 0) {
             // return fallback management if it failed to poll from db
-            return fallbackManagement;
+            return this.fallbackManagement;
         }
 
-        return this.controller.getManagementSerializer().deserialize(stream);
+        return this.lastManagement = this.controller.getManagementSerializer().deserialize(stream);
     }
 
     public void uploadData(ByteArrayOutputStream stream) throws SQLException {
@@ -126,6 +134,10 @@ public class MechanicStorageContext {
     }
 
     public void uploadManagement(Management management) throws SQLException, IOException {
+        if (this.lastManagement != null && this.lastManagement.equals(management)) {
+            return;
+        }
+
         ByteArrayOutputStream stream = this.controller.getManagementSerializer().serialize(management);
         upload(stream, base64 -> this.controller.setManagement(this.loc, base64), this.controller.getManagement(this.loc));
     }
@@ -140,18 +152,24 @@ public class MechanicStorageContext {
     }
 
     public int getLevel() throws SQLException {
-        return this.controller.getLevel(this.loc);
+        return this.lastLevel = this.controller.getLevel(this.loc);
     }
 
     public void setLevel(int level) throws SQLException {
+        if (this.lastLevel == level) {
+            return;
+        }
         this.controller.setLevel(this.loc, level);
     }
 
     public double getXP() throws SQLException {
-        return this.controller.getXP(this.loc);
+        return this.lastXP = this.controller.getXP(this.loc);
     }
 
     public void setXP(double xp) throws SQLException {
+        if (this.lastXP == xp) {
+            return;
+        }
         this.controller.setXP(this.loc, xp);
     }
 }

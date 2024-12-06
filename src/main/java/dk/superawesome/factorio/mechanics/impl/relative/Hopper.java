@@ -24,8 +24,8 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
     private ItemCollection takeMechanic;
     private ItemContainer putMechanic;
 
-    public Hopper(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public Hopper(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
     }
 
     @Override

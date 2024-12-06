@@ -102,4 +102,15 @@ public class Management {
             return false;
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Management management) {
+            return this.owner.equals(management.getOwner())
+                    && this.members.size() == management.getMembers().size()
+                    && this.members.containsAll(management.getMembers());
+        }
+
+        return false;
+    }
 }

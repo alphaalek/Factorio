@@ -44,8 +44,8 @@ public class HopperProfile implements MechanicProfile<Hopper> {
     private static class HopperMechanicFactory implements MechanicFactory<Hopper> {
 
         @Override
-        public Hopper create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Hopper(loc, rotation, context, hasWallSign);
+        public Hopper create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Hopper(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 }

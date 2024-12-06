@@ -44,8 +44,8 @@ public class StationProfile implements MechanicProfile<Station> {
     private static class StationMechanicFactory implements MechanicFactory<Station> {
 
         @Override
-        public Station create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Station(loc, rotation, context, hasWallSign);
+        public Station create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Station(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 }

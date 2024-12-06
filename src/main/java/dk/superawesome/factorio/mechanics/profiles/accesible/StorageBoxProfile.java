@@ -72,8 +72,8 @@ public class StorageBoxProfile implements GuiMechanicProfile<StorageBox> {
     private static class StorageBoxMechanicFactory implements MechanicFactory<StorageBox> {
 
         @Override
-        public StorageBox create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new StorageBox(loc, rotation, context, hasWallSign);
+        public StorageBox create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new StorageBox(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 

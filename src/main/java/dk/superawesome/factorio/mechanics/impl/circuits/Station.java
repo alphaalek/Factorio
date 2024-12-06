@@ -12,8 +12,8 @@ import org.bukkit.block.BlockFace;
 
 public class Station extends Circuit<Station, TransferCollection> implements Container<TransferCollection> {
 
-    public Station(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public Station(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
     }
 
     @Override

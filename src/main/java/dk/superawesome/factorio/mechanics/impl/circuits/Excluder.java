@@ -25,8 +25,8 @@ public class Excluder extends Circuit<Excluder, ItemCollection> implements ItemC
 
     private final List<Predicate<ItemStack>> filter = new ArrayList<>();
 
-    public Excluder(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public Excluder(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
     }
 
     @Override

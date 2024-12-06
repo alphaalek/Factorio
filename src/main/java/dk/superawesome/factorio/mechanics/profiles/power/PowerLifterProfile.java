@@ -44,8 +44,8 @@ public class PowerLifterProfile implements MechanicProfile<PowerLifter> {
     private static class PowerLifterMechanicFactory implements MechanicFactory<PowerLifter> {
 
         @Override
-        public PowerLifter create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new PowerLifter(loc, rotation, context, hasWallSign);
+        public PowerLifter create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new PowerLifter(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 }

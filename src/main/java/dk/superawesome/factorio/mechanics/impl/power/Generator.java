@@ -58,8 +58,8 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     private double availableEnergy;
     private boolean turnedOn;
 
-    public Generator(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public Generator(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
         loadFromStorage();
     }
 

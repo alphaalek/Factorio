@@ -36,8 +36,8 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     private boolean turnedOn;
     private double recentMax;
 
-    public PowerCentral(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public PowerCentral(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
         loadFromStorage();
     }
 

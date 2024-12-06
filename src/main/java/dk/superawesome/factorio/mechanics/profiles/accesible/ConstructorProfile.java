@@ -103,8 +103,8 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
     private static class ConstructorMechanicFactory implements MechanicFactory<Constructor> {
 
         @Override
-        public Constructor create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Constructor(loc, rotation, context, hasWallSign);
+        public Constructor create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Constructor(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 

@@ -113,10 +113,10 @@ public class MechanicManager implements Listener {
         return mechanics.values();
     }
 
-    public void load(MechanicProfile<?> profile, Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier, Location loc, BlockFace rotation, boolean hasWallSign, Consumer<Mechanic<?>> callback) {
+    public void load(MechanicProfile<?> profile, Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier, Location loc, BlockFace rotation, boolean hasWallSign, boolean isBuild, Consumer<Mechanic<?>> callback) {
         Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), () -> {
             try {
-                Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, contextSupplier.get(), hasWallSign);
+                Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, contextSupplier.get(), hasWallSign, isBuild);
 
                 Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                     if (mechanic instanceof ThinkingMechanic tm) {
@@ -371,7 +371,7 @@ public class MechanicManager implements Listener {
             // create context for this mechanic
             return contextProvider.create(on.getLocation(), rotation, profile.get().getName(), owner.getUniqueId());
         };
-        loadMechanicFromSign(profile.get(), context, sign, on, rotation, mechanic -> {
+        loadMechanicFromSign(profile.get(), context, sign, on, rotation, true, mechanic -> {
             if (mechanic == null) {
                 callback.accept(MechanicBuildResponse.NO_SUCH);
                 return;
@@ -439,7 +439,7 @@ public class MechanicManager implements Listener {
             BlockFace face = BlockUtil.getFacing(sign.getBlock());
             Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier = () -> contextProvider.findAt(on.getLocation());
             // load the mechanic
-            loadMechanicFromSign(profile.get(), contextSupplier, sign, on, face, mechanic -> {
+            loadMechanicFromSign(profile.get(), contextSupplier, sign, on, face, false, mechanic -> {
                 // ensure only standing signs for buildings that allow it
                 if (Tag.STANDING_SIGNS.isTagged(sign.getType()) && mechanic.getBuilding().deniesStandingSign()) {
                     callback.accept(false);
@@ -456,9 +456,9 @@ public class MechanicManager implements Listener {
         }
     }
 
-    private void loadMechanicFromSign(MechanicProfile<?> profile, Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier, Sign sign, Block on, BlockFace rotation, Consumer<Mechanic<?>> callback) {
+    private void loadMechanicFromSign(MechanicProfile<?> profile, Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier, Sign sign, Block on, BlockFace rotation, boolean isBuild, Consumer<Mechanic<?>> callback) {
         // load this mechanic
-        load(profile, contextSupplier, on.getLocation(), rotation, Tag.WALL_SIGNS.isTagged(sign.getType()), mechanic -> {
+        load(profile, contextSupplier, on.getLocation(), rotation, Tag.WALL_SIGNS.isTagged(sign.getType()), isBuild, mechanic -> {
             if (mechanic instanceof AccessibleMechanic) {
                 sign.getSide(Side.FRONT).setLine(1, "Lvl " + mechanic.getLevel().lvl());
                 sign.update();

@@ -39,24 +39,28 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     protected double xp;
     protected boolean exists = true;
 
-    public AbstractMechanic(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
+    public AbstractMechanic(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
         this.loc = loc;
         this.rot = rotation;
         this.context = context;
         this.hasWallSign = hasWallSign;
 
-        try {
-            this.level = MechanicLevel.from(this, context.getLevel());
-            this.xp = context.getXP();
-            this.management = context.getManagement();
-        } catch (SQLException | IOException ex) {
-            throw new RuntimeException("Failed to load mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
+        if (!isBuild) {
+            try {
+                this.level = MechanicLevel.from(this, context.getLevel());
+                this.xp = context.getXP();
+                this.management = context.getManagement();
+            } catch (SQLException | IOException ex) {
+                throw new RuntimeException("Failed to load mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
+            }
+        } else {
+            this.management = context.getFallbackManagement();
         }
     }
 
     protected void loadFromStorage() {
         try  {
-            if (this.context.getController().validConnection() && this.context.hasContext()) {
+            if (this.context.hasContext()) {
                 load(this.context);
             }
         } catch (Exception ex) {
@@ -73,10 +77,6 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     @Override
     public boolean save() {
         try {
-            if (!this.context.getController().validConnection()) {
-                return false;
-            }
-
             // ensure record exists
             if (!this.context.hasContext()) {
                 Factorio.get().getContextProvider().create(this.loc, this.rot, getProfile().getName(), this.management.getOwner());

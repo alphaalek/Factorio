@@ -19,8 +19,8 @@ public class Comparator extends SignalTrigger<Comparator> implements ThinkingMec
 
     private TransferCollection collectionTrigger;
 
-    public Comparator(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public Comparator(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
     }
 
     @Override

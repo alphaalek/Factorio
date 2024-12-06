@@ -44,8 +44,8 @@ public class CollectorProfile implements MechanicProfile<Collector> {
     private static class CollectorMechanicFactory implements MechanicFactory<Collector> {
 
         @Override
-        public Collector create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Collector(loc, rotation, context, hasWallSign);
+        public Collector create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Collector(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 }

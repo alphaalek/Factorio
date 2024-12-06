@@ -67,8 +67,8 @@ public class LiquidTankProfile implements GuiMechanicProfile<LiquidTank> {
     private static class LiquidTankMechanicFactory implements MechanicFactory<LiquidTank> {
 
         @Override
-        public LiquidTank create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new LiquidTank(loc, rotation, context, hasWallSign);
+        public LiquidTank create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new LiquidTank(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 

@@ -49,8 +49,8 @@ public class FilterProfile implements MechanicProfile<Filter> {
     private static class FilterMechanicFactory implements MechanicFactory<Filter> {
 
         @Override
-        public Filter create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Filter(loc, rotation, context, hasWallSign);
+        public Filter create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Filter(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 }

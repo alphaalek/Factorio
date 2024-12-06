@@ -54,8 +54,8 @@ public class AssemblerTriggerProfile implements MechanicProfile<AssemblerTrigger
     private static class AssemblerTriggerMechanicFactory implements MechanicFactory<AssemblerTrigger> {
 
         @Override
-        public AssemblerTrigger create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new AssemblerTrigger(loc, rotation, context, hasWallSign);
+        public AssemblerTrigger create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new AssemblerTrigger(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 }

@@ -43,8 +43,8 @@ public class PowerExpanderProfile implements MechanicProfile<PowerExpander> {
     private static class PowerExpanderMechanicFactory implements MechanicFactory<PowerExpander> {
 
         @Override
-        public PowerExpander create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new PowerExpander(loc, rotation, context, hasWallSign);
+        public PowerExpander create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new PowerExpander(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 }

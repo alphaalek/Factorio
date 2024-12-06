@@ -17,8 +17,8 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
 
     private ItemStack collected;
 
-    public Collector(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public Collector(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
     }
 
     @Override

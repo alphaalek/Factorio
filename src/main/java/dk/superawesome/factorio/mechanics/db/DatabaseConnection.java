@@ -15,26 +15,17 @@ public class DatabaseConnection {
     public DatabaseConnection(ConfigurationSection section) {
         String host = section.getString("host");
         int port = section.getInt("port");
-
         String database = section.getString("database");
-
         String username = section.getString("username");
         String password = section.getString("password");
 
-        if (host != null && !host.isEmpty()) {
-            try {
-                this.dataSource.setUser(username);
-                this.dataSource.setPassword(password);
-                this.dataSource.setUrl("jdbc:mariadb://" + host + ":" + port + "/" + database + "?maxPoolSize=10");
-
-            } catch (Exception ex) {
-                Factorio.get().getLogger().log(Level.SEVERE, "Failed to connect to database!", ex);
-            }
+        try {
+            this.dataSource.setUser(username);
+            this.dataSource.setPassword(password);
+            this.dataSource.setUrl("jdbc:mariadb://" + host + ":" + port + "/" + database + "?maxPoolSize=10");
+        } catch (SQLException ex) {
+            Factorio.get().getLogger().log(Level.SEVERE, "Failed to connect to database!", ex);
         }
-    }
-
-    public boolean validConnection() throws SQLException {
-        return dataSource != null && !dataSource.getConnection().isClosed();
     }
 
     public Connection getConnection() throws SQLException {

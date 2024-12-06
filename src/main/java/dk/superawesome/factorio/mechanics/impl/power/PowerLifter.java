@@ -49,8 +49,8 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     private boolean isRoot;
     private int poweredBy;
 
-    public PowerLifter(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public PowerLifter(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
     }
 
     @Override

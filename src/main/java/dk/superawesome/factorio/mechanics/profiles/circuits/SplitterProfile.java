@@ -44,8 +44,8 @@ public class SplitterProfile implements MechanicProfile<Splitter> {
     private static class SplitterMechanicFactory implements MechanicFactory<Splitter> {
 
         @Override
-        public Splitter create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Splitter(loc, rotation, context, hasWallSign);
+        public Splitter create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Splitter(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 }

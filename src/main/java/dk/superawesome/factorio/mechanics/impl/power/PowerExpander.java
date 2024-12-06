@@ -22,8 +22,8 @@ public class PowerExpander extends AbstractMechanic<PowerExpander> implements Si
 
     private boolean invoked;
 
-    public PowerExpander(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public PowerExpander(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
     }
 
     @Override

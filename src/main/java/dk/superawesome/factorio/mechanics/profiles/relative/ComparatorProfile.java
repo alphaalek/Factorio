@@ -44,8 +44,8 @@ public class ComparatorProfile implements MechanicProfile<Comparator> {
     private static class ComparatorMechanicFactory implements MechanicFactory<Comparator> {
 
         @Override
-        public Comparator create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Comparator(loc, rotation, context, hasWallSign);
+        public Comparator create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Comparator(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 }

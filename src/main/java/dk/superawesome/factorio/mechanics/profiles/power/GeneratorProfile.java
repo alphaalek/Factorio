@@ -75,8 +75,8 @@ public class GeneratorProfile implements GuiMechanicProfile<Generator> {
     private static class GeneratorMechanicFactory implements MechanicFactory<Generator> {
 
         @Override
-        public Generator create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Generator(loc, rotation, context, hasWallSign);
+        public Generator create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Generator(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 

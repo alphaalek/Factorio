@@ -2,6 +2,7 @@ package dk.superawesome.factorio.util.db;
 
 import dk.superawesome.factorio.mechanics.db.DatabaseConnection;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,17 +25,17 @@ public class Query {
     }
 
     private <T> T create(DatabaseConnection connection, CheckedFunction<PreparedStatement, T> function) throws SQLException {
-        if (connection.validConnection()) {
-            try (PreparedStatement statement = connection.getConnection().prepareStatement(this.query)) {
-                for (int i = 0; i < values.size(); i++) {
-                    statement.setObject(i + 1, values.get(i));
-                }
-
-                return function.sneaky(statement);
-            }
+        Connection conn = connection.getConnection();
+        if (conn.isClosed()) {
+            return null;
         }
+        try (PreparedStatement statement = conn.prepareStatement(this.query)) {
+            for (int i = 0; i < values.size(); i++) {
+                statement.setObject(i + 1, values.get(i));
+            }
 
-        return null;
+            return function.sneaky(statement);
+        }
     }
 
     public void executeQuery(DatabaseConnection connection, CheckedConsumer<ResultSet> function) throws SQLException {

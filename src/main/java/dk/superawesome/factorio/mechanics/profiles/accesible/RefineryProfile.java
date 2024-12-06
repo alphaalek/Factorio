@@ -136,8 +136,8 @@ public class RefineryProfile implements GuiMechanicProfile<Refinery> {
     private static class RefineryMechanicFactory implements MechanicFactory<Refinery> {
 
         @Override
-        public Refinery create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Refinery(loc, rotation, context, hasWallSign);
+        public Refinery create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Refinery(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 

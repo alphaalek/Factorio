@@ -25,8 +25,8 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     private Fluid fluid;
     private int fluidAmount;
 
-    public LiquidTank(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public LiquidTank(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
         loadFromStorage();
     }
 

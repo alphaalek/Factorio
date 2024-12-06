@@ -32,8 +32,8 @@ public class Splitter extends Circuit<Splitter, TransferCollection> implements C
 
     private boolean validating;
 
-    public Splitter(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-        super(loc, rotation, context, hasWallSign);
+    public Splitter(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+        super(loc, rotation, context, hasWallSign, isBuild);
     }
 
     public MechanicProfile<Splitter> getProfile() {

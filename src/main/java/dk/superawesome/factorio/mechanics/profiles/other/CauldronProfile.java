@@ -44,8 +44,8 @@ public class CauldronProfile implements MechanicProfile<Cauldron> {
     private static class CauldronMechanicFactory implements MechanicFactory<Cauldron> {
 
         @Override
-        public Cauldron create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new Cauldron(loc, rotation, context, hasWallSign);
+        public Cauldron create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new Cauldron(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 

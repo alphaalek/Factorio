@@ -69,10 +69,6 @@ public class MechanicController {
         this.connection.getConnection().close();
     }
 
-    public boolean validConnection() throws SQLException {
-        return this.connection.validConnection();
-    }
-
     public DatabaseConnection getConnection() {
         return this.connection;
     }

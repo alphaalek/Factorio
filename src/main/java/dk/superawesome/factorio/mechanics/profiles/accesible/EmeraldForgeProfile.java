@@ -67,8 +67,8 @@ public class EmeraldForgeProfile implements GuiMechanicProfile<EmeraldForge> {
     private static class EmeraldForgeMechanicFactory implements MechanicFactory<EmeraldForge> {
 
         @Override
-        public EmeraldForge create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign) {
-            return new EmeraldForge(loc, rotation, context, hasWallSign);
+        public EmeraldForge create(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
+            return new EmeraldForge(loc, rotation, context, hasWallSign, isBuild);
         }
     }
 
