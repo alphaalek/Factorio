@@ -32,6 +32,8 @@ import org.bukkit.util.Vector;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -39,8 +41,10 @@ import java.util.logging.Level;
 
 public class MechanicManager implements Listener {
 
+    private static final ExecutorService LOADING_SERVICE = Executors.newSingleThreadExecutor();
     private final World world;
     private final MechanicStorageContext.Provider contextProvider;
+
 
     public MechanicManager(World world, MechanicStorageContext.Provider contextProvider) {
         this.world = world;
@@ -114,7 +118,7 @@ public class MechanicManager implements Listener {
     }
 
     public void load(MechanicProfile<?> profile, Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier, Location loc, BlockFace rotation, boolean hasWallSign, boolean isBuild, Consumer<Mechanic<?>> callback) {
-        Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), () -> {
+        LOADING_SERVICE.submit(() -> {
             try {
                 Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, contextSupplier.get(), hasWallSign, isBuild);
 
@@ -157,7 +161,7 @@ public class MechanicManager implements Listener {
         unregister(mechanic);
 
         if (async) {
-            Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), mechanic::unload);
+            LOADING_SERVICE.submit(mechanic::unload);
         } else {
             mechanic.unload();
         }
@@ -506,7 +510,7 @@ public class MechanicManager implements Listener {
 
         // unload and delete this mechanic
         unregister(mechanic);
-        Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), () -> {
+        LOADING_SERVICE.submit(() -> {
             try {
                 if (!Factorio.get().getContextProvider().deleteAt(mechanic.getLocation()))  {
                     callback.accept(false);

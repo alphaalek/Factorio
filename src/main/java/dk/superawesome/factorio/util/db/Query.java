@@ -25,17 +25,14 @@ public class Query {
     }
 
     private <T> T create(DatabaseConnection connection, CheckedFunction<PreparedStatement, T> function) throws SQLException {
-        Connection conn = connection.getConnection();
-        if (conn.isClosed()) {
-            return null;
-        }
-        try (PreparedStatement statement = conn.prepareStatement(this.query)) {
-            for (int i = 0; i < values.size(); i++) {
-                statement.setObject(i + 1, values.get(i));
-            }
+        try (Connection conn = connection.getConnection();
+            PreparedStatement statement = conn.prepareStatement(this.query)) {
+                for (int i = 0; i < values.size(); i++) {
+                    statement.setObject(i + 1, values.get(i));
+                }
 
-            return function.sneaky(statement);
-        }
+                return function.sneaky(statement);
+            }
     }
 
     public void executeQuery(DatabaseConnection connection, CheckedConsumer<ResultSet> function) throws SQLException {
@@ -50,10 +47,13 @@ public class Query {
             ResultSet set = s.executeQuery();
             V val = null;
             if (set != null) {
-                if (set.next()) {
-                    val = function.apply(set);
+                try {
+                    if (set.next()) {
+                        val = function.apply(set);
+                    }
+                } finally {
+                    set.close();
                 }
-                set.close();
             }
             return val;
         });

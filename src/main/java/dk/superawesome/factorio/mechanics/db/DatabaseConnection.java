@@ -20,6 +20,8 @@ public class DatabaseConnection {
         String password = section.getString("password");
 
         try {
+            Factorio.get().getLogger().info("Connecting to database " + host + ":" + port + "/" + database + " with user \"" + username + "\" and password \"" + "*".repeat(password.length()) + "\"");
+
             this.dataSource.setUser(username);
             this.dataSource.setPassword(password);
             this.dataSource.setUrl("jdbc:mariadb://" + host + ":" + port + "/" + database + "?maxPoolSize=10");

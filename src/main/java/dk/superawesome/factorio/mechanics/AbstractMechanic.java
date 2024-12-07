@@ -4,6 +4,7 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.BaseGui;
+import dk.superawesome.factorio.mechanics.db.StorageException;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.TickThrottle;
@@ -47,13 +48,12 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
         if (!isBuild) {
             try {
-                this.level = MechanicLevel.from(this, context.getLevel());
-                this.xp = context.getXP();
-                this.management = context.getManagement();
+                this.management = context.load(this);
             } catch (SQLException | IOException ex) {
                 throw new RuntimeException("Failed to load mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
             }
         } else {
+            this.level = MechanicLevel.from(this, 1);
             this.management = context.getFallbackManagement();
         }
     }
@@ -199,6 +199,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
         }
 
         return true;
+    }
+
+    @Override
+    public void setXP(double xp) {
+        this.xp = xp;
     }
 
     @Override

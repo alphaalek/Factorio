@@ -29,7 +29,7 @@ public class MechanicStorageContext {
         public MechanicStorageContext findAt(Location loc) throws StorageException {
             try {
                 return controller.findAt(loc);
-            } catch (SQLException | IOException ex) {
+            } catch (IOException | SQLException ex) {
                 throw new StorageException(ex);
             }
         }
@@ -72,7 +72,7 @@ public class MechanicStorageContext {
         return IntStream.range(0, bytes.length).map(i -> bytes[i]).anyMatch(b -> b > 0);
     }
 
-    public static ByteArrayInputStream getData(Query.CheckedSupplier<String, SQLException> data) throws SQLException {
+    public static <E extends Exception> ByteArrayInputStream getData(Query.CheckedSupplier<String, E> data) throws E {
         return decode(data.sneaky());
     }
 
@@ -89,6 +89,10 @@ public class MechanicStorageContext {
         this.controller = controller;
         this.loc = location;
         this.fallbackManagement = fallbackManagement;
+    }
+
+    public Management load(Mechanic<?> mechanic) throws SQLException, IOException {
+        return this.controller.load(mechanic);
     }
 
     public Location getLocation() {
@@ -120,7 +124,7 @@ public class MechanicStorageContext {
     }
 
     public Management getManagement() throws SQLException, IOException {
-        ByteArrayInputStream stream = getData(() -> this.controller.getManagement(this.loc));
+        ByteArrayInputStream stream = getData(() -> this.controller.getManagementData(this.loc));
         if (stream.available() == 0) {
             // return fallback management if it failed to poll from db
             return this.fallbackManagement;
@@ -139,7 +143,7 @@ public class MechanicStorageContext {
         }
 
         ByteArrayOutputStream stream = this.controller.getManagementSerializer().serialize(management);
-        upload(stream, base64 -> this.controller.setManagement(this.loc, base64), this.controller.getManagement(this.loc));
+        upload(stream, base64 -> this.controller.setManagement(this.loc, base64), this.controller.getManagementData(this.loc));
     }
 
     public boolean hasContext() throws SQLException {

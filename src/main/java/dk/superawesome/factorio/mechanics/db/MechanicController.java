@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.db;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.mechanics.Management;
+import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.MechanicSerializer;
 import dk.superawesome.factorio.mechanics.MechanicStorageContext;
 import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
@@ -81,6 +82,20 @@ public class MechanicController {
         return this.mechanicSerializer;
     }
 
+    public Management load(Mechanic<?> mechanic) throws SQLException, IOException {
+        Query query = new Query(
+                "SELECT level, xp, management " +
+                "FROM mechanics " +
+                "WHERE location = ?")
+                .add(Types.LOCATION.convert(mechanic.getLocation()));
+
+        return query.executeQueryCall(this.connection, r -> {
+            mechanic.setLevel(r.getInt("level"));
+            mechanic.setXP(r.getDouble("xp"));
+            return this.managementSerializer.deserialize(MechanicStorageContext.decode(r.getString("management")));
+        });
+    }
+
     public void registerTransformed(Assembler.Types type, double amount) throws SQLException {
         Query query = new Query(
                 "INSERT INTO mechanics_assembler_transformed " +
@@ -145,14 +160,14 @@ public class MechanicController {
     public boolean deleteAt(Location location) throws SQLException {
         Query query = new Query(
                 "DELETE FROM mechanics " +
-                "WHERE location = ?"
-                ).add(Types.LOCATION.convert(location));
+                "WHERE location = ?")
+                .add(Types.LOCATION.convert(location));
 
         return query.executeUpdate(this.connection) > 0;
     }
 
     public MechanicStorageContext findAt(Location loc) throws SQLException, IOException {
-        Management management = managementSerializer.deserialize(MechanicStorageContext.decode(getManagement(loc)));
+        Management management = this.managementSerializer.deserialize(MechanicStorageContext.decode(getManagementData(loc)));
         if (management == null) {
             throw new IOException("Failed to get management");
         }
@@ -167,12 +182,11 @@ public class MechanicController {
 
         Query query = new Query(
                 "INSERT INTO mechanics (type, location, rotation, management) " +
-                "VALUES (?, ?, ?, ?)"
-                )
+                "VALUES (?, ?, ?, ?)")
                 .add(type)
                 .add(Types.LOCATION.convert(loc))
                 .add(rot.name())
-                .add(MechanicStorageContext.encode(managementSerializer.serialize(management)));
+                .add(MechanicStorageContext.encode(this.managementSerializer.serialize(management)));
         query.execute(this.connection);
 
         return new MechanicStorageContext(this, loc, management);
@@ -182,8 +196,7 @@ public class MechanicController {
         Query query = new Query(
                 "SELECT * FROM mechanics " +
                 "WHERE location = ? " +
-                "LIMIT 1"
-                )
+                "LIMIT 1")
                 .add(Types.LOCATION.convert(loc));
 
         return Boolean.TRUE.equals(
@@ -194,8 +207,7 @@ public class MechanicController {
         Query query = new Query(
                 "SELECT " + column + " FROM mechanics " +
                 "WHERE location = ? " +
-                "LIMIT 1"
-                )
+                "LIMIT 1")
                 .add(Types.LOCATION.convert(loc));
 
         return query.<T>executeQueryCall(this.connection, function::sneaky);
@@ -206,7 +218,11 @@ public class MechanicController {
                 .orElse("");
     }
 
-    public String getManagement(Location loc) throws SQLException {
+    public Management getManagement(Location loc) throws SQLException, IOException {
+        return this.managementSerializer.deserialize(MechanicStorageContext.decode(getManagementData(loc)));
+    }
+
+    public String getManagementData(Location loc) throws SQLException {
         return Optional.ofNullable(get(loc, "management", result -> result.getString("management")))
                 .orElse("");
     }
@@ -226,8 +242,7 @@ public class MechanicController {
                 "UPDATE mechanics " +
                 "SET " + column + " = ? " +
                 "WHERE location = ? " +
-                "LIMIT 1"
-                )
+                "LIMIT 1")
                 .add(val)
                 .add(Types.LOCATION.convert(loc));
 

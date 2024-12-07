@@ -36,6 +36,8 @@ public interface Mechanic<M extends Mechanic<M>> extends Listener, Source {
 
     boolean hasWallSign();
 
+    void setXP(double xp);
+
     double getXP();
 
     TickThrottle getTickThrottle();
