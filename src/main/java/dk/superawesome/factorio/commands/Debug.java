@@ -38,7 +38,6 @@ public class Debug extends AbstractCommand {
                     }
                 }
             }
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }

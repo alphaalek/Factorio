@@ -15,15 +15,15 @@ import java.util.Set;
 
 public class ChunkLoadListener implements Listener {
 
-    private static final Set<Integer> loadedChunks = new HashSet<>();
+    private static final Set<Long> loadedChunks = new HashSet<>();
 
-    private static int getChunkIndex(Chunk chunk) {
-        return chunk.getX() | chunk.getZ() << 16;
+    private static long getChunkIndex(Chunk chunk) {
+        return (chunk.getX() & Integer.MAX_VALUE) | ((long) chunk.getZ() & Integer.MAX_VALUE) << 32;
     }
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
-        int index = getChunkIndex(event.getChunk());
+        long index = getChunkIndex(event.getChunk());
         if (loadedChunks.contains(index)) {
             // already loaded
             return;
