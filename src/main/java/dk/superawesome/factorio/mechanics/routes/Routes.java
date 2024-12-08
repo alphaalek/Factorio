@@ -65,7 +65,7 @@ public class Routes {
     }
 
     public static boolean invokeEnergySourceOutput(Block start, Location loc, EnergyCollection energySource, SignalSource signal) {
-        Mechanic<?> mechanic = Factorio.get().getMechanicManager(start.getWorld()).getMechanicPartially(loc);
+        Mechanic<?> mechanic = Factorio.get().getMechanicManager(start.getWorld()).getMechanicAt(loc);
         if (mechanic instanceof SignalInvoker signalInvoker) {
             return signalInvoker.invoke(signal);
         } else if (mechanic instanceof PowerCentral powerCentral) {

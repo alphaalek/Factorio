@@ -85,7 +85,7 @@ public class Signal extends AbstractRoute<Signal, Signal.SignalOutputEntry> {
             add(relVec);
 
             Block facing = BlockUtil.getPointingBlock(rel, true);
-            Mechanic<?> mechanic = Factorio.get().getMechanicManager(rel.getWorld()).getMechanicPartially(facing.getLocation());
+            Mechanic<?> mechanic = Factorio.get().getMechanicManager(rel.getWorld()).getMechanicAt(facing.getLocation());
             if (mechanic instanceof PowerCentral) {
                 addOutput(rel.getWorld(), BlockUtil.getVec(facing), BlockUtil.getVec(rel), SignalSource.TO_POWER_CENTRAL);
             }

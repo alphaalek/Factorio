@@ -130,8 +130,8 @@ public interface FuelMechanic {
             Block block = loc.getBlock();
             if (block.getType() == Material.HOPPER) {
                 // check if the hopper is facing towards the mechanic
-                if (manager.getMechanicPartially(BlockUtil.getPointingBlock(block, false).getLocation()) == this) {
-                    Mechanic<?> mechanic = manager.getMechanicPartially(loc);
+                if (manager.getMechanicAt(BlockUtil.getPointingBlock(block, false).getLocation()) == this) {
+                    Mechanic<?> mechanic = manager.getMechanicAt(loc);
                     if (mechanic instanceof Collector collector) {
                         if (collector.handleInput(waste)) {
                             // the collector took the waste, just break

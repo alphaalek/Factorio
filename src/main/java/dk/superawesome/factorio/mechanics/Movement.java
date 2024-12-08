@@ -21,14 +21,14 @@ public class Movement {
     private static final Map<UUID, Mechanic<?>> selections = new HashMap<>();
 
     public static void registerMovement(Player player, Mechanic<?> mechanic) {
-        if (selections.containsKey(player.getUniqueId()) && selections.get(player.getUniqueId()) == mechanic) {
+        if (selections.get(player.getUniqueId()) == mechanic) {
             return;
         }
 
         selections.put(player.getUniqueId(), mechanic);
         player.playSound(player.getLocation(), Sound.BLOCK_STONE_PLACE, 0.3f, 0.5f);
         player.sendMessage("§eDu er nu i gang med at flytte maskinen " + mechanic + " ved " + Types.LOCATION.convert(mechanic.getLocation()) + ".");
-        player.sendMessage("§eVenstreklik på den block du ønsker at flytte maskinen over på. Højreklik for at annullere.");
+        player.sendMessage("§eHøjreklik på den block du ønsker at flytte maskinen over på. Venstreklik for at annullere.");
     }
 
     public static void unregisterMovement(Player player) {

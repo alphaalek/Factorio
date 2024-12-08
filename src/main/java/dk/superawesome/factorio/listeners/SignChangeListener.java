@@ -27,7 +27,7 @@ public class SignChangeListener implements Listener {
     public void onSignUpdate(SignChangeEvent event) {
         MechanicManager manager = Factorio.get().getMechanicManager(event.getBlock().getWorld());
 
-        Mechanic<?> partiallyAt = manager.getMechanicPartially(event.getBlock().getLocation());
+        Mechanic<?> partiallyAt = manager.getMechanicAt(event.getBlock().getLocation());
         if (partiallyAt != null) {
             // check access
             if (!partiallyAt.getManagement().hasAccess(event.getPlayer(), Management.MODIFY_SIGN)) {
@@ -65,7 +65,7 @@ public class SignChangeListener implements Listener {
                     switch (response) {
                         case SUCCESS -> {
                             // Success!
-                            Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
+                            Mechanic<?> mechanic = manager.getMechanicAt(event.getBlock().getLocation());
                             if (mechanic != null) {
                                 event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
                             } else{

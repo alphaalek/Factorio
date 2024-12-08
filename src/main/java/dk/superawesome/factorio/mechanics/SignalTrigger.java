@@ -52,7 +52,7 @@ public abstract class SignalTrigger<M extends Mechanic<M>> extends AbstractMecha
                 findBlock.accept(block);
             }
 
-            Mechanic<?> at = manager.getMechanicPartially(block.getLocation());
+            Mechanic<?> at = manager.getMechanicAt(block.getLocation());
             if (at != null) {
                 findMechanic.accept(at);
             }

@@ -78,7 +78,7 @@ public class Comparator extends SignalTrigger<Comparator> implements ThinkingMec
     @EventHandler
     public void onMechanicBuild(MechanicBuildEvent event) {
         if (this.collectionTrigger == null && event.getMechanic() instanceof TransferCollection collection) {
-            if (Factorio.get().getMechanicManagerFor(this).getMechanicPartially(
+            if (Factorio.get().getMechanicManagerFor(this).getMechanicAt(
                     BlockUtil.getPointingBlock(loc.getBlock(), true).getLocation()) == collection) {
                 this.collectionTrigger = collection;
             }

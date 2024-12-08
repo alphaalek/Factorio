@@ -35,7 +35,7 @@ public class InteractListener implements Listener {
                 return;
             }
 
-            Mechanic<?> mechanic = manager.getMechanicPartially(event.getClickedBlock().getLocation());
+            Mechanic<?> mechanic = manager.getMechanicAt(event.getClickedBlock().getLocation());
             if (mechanic != null) {
                 if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.WOODEN_AXE)) {
                     event.setCancelled(true);
@@ -73,9 +73,9 @@ public class InteractListener implements Listener {
             return;
         }
 
-        Mechanic<?> mechanic = manager.getMechanicPartially(event.getBlock().getLocation());
+        Mechanic<?> mechanic = manager.getMechanicAt(event.getBlock().getLocation());
         if (mechanic != null) {
-            if (event.getPlayer().getInventory().getItemInMainHand().equals(Material.WOODEN_AXE)) {
+            if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.WOODEN_AXE)) {
                 event.setCancelled(true);
                 moveMechanic(event.getPlayer(), mechanic);
             } else if (mechanic.getBuilding() instanceof Matcher) {

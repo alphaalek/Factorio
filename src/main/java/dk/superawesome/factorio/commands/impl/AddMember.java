@@ -30,7 +30,7 @@ public class AddMember extends AbstractCommand {
             player.sendMessage("§cDu skal kigge på en maskine!");
             return null;
         }
-        Mechanic<?> mechanic = Factorio.get().getMechanicManager(player.getWorld()).getMechanicPartially(targetBlock.getLocation());
+        Mechanic<?> mechanic = Factorio.get().getMechanicManager(player.getWorld()).getMechanicAt(targetBlock.getLocation());
         if (mechanic == null) {
             player.sendMessage("§cDu skal kigge på en maskine!");
             return null;

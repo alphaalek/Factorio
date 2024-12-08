@@ -152,7 +152,7 @@ public class Debug extends AbstractCommand {
             return;
         }
 
-        Mechanic<?> mechanic = Factorio.get().getMechanicManager(player.getWorld()).getMechanicPartially(block.getLocation());
+        Mechanic<?> mechanic = Factorio.get().getMechanicManager(player.getWorld()).getMechanicAt(block.getLocation());
         if (mechanic == null) {
             Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), () -> {
                 try {

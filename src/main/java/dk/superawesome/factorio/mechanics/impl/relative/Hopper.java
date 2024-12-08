@@ -57,12 +57,12 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
         }
 
         Block up = this.loc.getBlock().getRelative(BlockFace.UP);
-        Mechanic<?> takeMechanic = manager.getMechanicPartially(up.getLocation());
+        Mechanic<?> takeMechanic = manager.getMechanicAt(up.getLocation());
         if (takeMechanic instanceof ItemCollection) {
             this.takeMechanic = (ItemCollection) takeMechanic;
         }
 
-        Mechanic<?> putMechanic = manager.getMechanicPartially(BlockUtil.getPointingBlock(hopper, false).getLocation());
+        Mechanic<?> putMechanic = manager.getMechanicAt(BlockUtil.getPointingBlock(hopper, false).getLocation());
         if (putMechanic instanceof ItemContainer) {
             this.putMechanic = (ItemContainer) putMechanic;
         }

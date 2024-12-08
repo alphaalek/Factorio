@@ -28,7 +28,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.util.BlockVector;
-import org.bukkit.util.Vector;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -41,7 +40,7 @@ import java.util.logging.Level;
 
 public class MechanicManager implements Listener {
 
-    private static final ExecutorService LOADING_SERVICE = Executors.newSingleThreadExecutor();
+    private static final ExecutorService LOADING_THREAD = Executors.newSingleThreadExecutor();
     private final World world;
     private final MechanicStorageContext.Provider contextProvider;
 
@@ -87,7 +86,7 @@ public class MechanicManager implements Listener {
                             // unable to load mechanic properly due to corrupt data
                             state.getBlock().setType(Material.AIR);
 
-                            Mechanic<?> mechanic = getMechanicPartially(state.getLocation());
+                            Mechanic<?> mechanic = getMechanicAt(state.getLocation());
                             if (mechanic != null) {
                                 deleteMechanic(mechanic);
                             }
@@ -118,7 +117,7 @@ public class MechanicManager implements Listener {
     }
 
     public void load(MechanicProfile<?> profile, Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier, Location loc, BlockFace rotation, boolean hasWallSign, boolean isBuild, Consumer<Mechanic<?>> callback) {
-        LOADING_SERVICE.submit(() -> {
+        LOADING_THREAD.submit(() -> {
             try {
                 Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, contextSupplier.get(), hasWallSign, isBuild);
 
@@ -161,7 +160,7 @@ public class MechanicManager implements Listener {
         unregister(mechanic);
 
         if (async) {
-            LOADING_SERVICE.submit(mechanic::unload);
+            LOADING_THREAD.submit(mechanic::unload);
         } else {
             mechanic.unload();
         }
@@ -178,35 +177,6 @@ public class MechanicManager implements Listener {
                 unload(mechanic, async);
             }
         }
-    }
-
-    public List<Mechanic<?>> getNearbyMechanics(Location loc) {
-        List<Mechanic<?>> mechanics = new ArrayList<>();
-
-        BlockVector ori = BlockUtil.getVec(loc);
-        // iterate over the nearby blocks and check if there is any root mechanic block
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -2; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    BlockVector rel = new BlockVector(ori.clone().add(new Vector(x, y, z)));
-                    if (this.mechanics.containsKey(rel)) {
-                        mechanics.add(this.mechanics.get(rel));
-                    }
-                }
-            }
-        }
-
-        return mechanics;
-    }
-
-    public Mechanic<?> getMechanicPartially(Location loc) {
-        for (Mechanic<?> nearby : getNearbyMechanics(loc)) {
-            if (Buildings.intersects(loc, nearby)) {
-                return nearby;
-            }
-        }
-
-        return null;
     }
 
     public MechanicProfile<?> getLoadingMechanic(Location loc) {
@@ -245,12 +215,20 @@ public class MechanicManager implements Listener {
     public void onWorldSave(WorldSaveEvent event) {
         if (event.getWorld().equals(this.world)) {
             for (Mechanic<?> mechanic : new ArrayList<>(mechanics.values())) {
-                mechanic.onUpdate();
+                try {
+                    mechanic.onUpdate();
+                } catch (Exception ex) {
+                    Bukkit.getLogger().log(Level.SEVERE, "Error updating mechanic: " + mechanic.getLocation(), ex);
+                }
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(Factorio.get(), () -> {
                 for (Mechanic<?> mechanic : new ArrayList<>(mechanics.values())) {
-                    mechanic.save();
+                    try {
+                        mechanic.save();
+                    } catch (Exception ex) {
+                        Bukkit.getLogger().log(Level.SEVERE, "Error saving mechanic: " + mechanic.getLocation(), ex);
+                    }
                 }
             });
         }
@@ -331,11 +309,16 @@ public class MechanicManager implements Listener {
 
         Routes.removeNearbyRoutes(mechanic.getLocation().getBlock());
 
-        this.mechanics.remove(BlockUtil.getVec(mechanic.getLocation()));
-        this.mechanics.put(BlockUtil.getVec(to), mechanic);
+        for (Location loc : Buildings.getLocations(mechanic)) {
+            this.mechanics.remove(BlockUtil.getVec(loc));
+        }
 
         mechanic.move(to, rot, sign);
         mechanic.onBlocksLoaded(player);
+
+        for (Location loc : Buildings.getLocations(mechanic)) {
+            this.mechanics.put(BlockUtil.getVec(loc), mechanic);
+        }
 
         // player stuff
         to.getWorld().playSound(to, Sound.BLOCK_ANVIL_PLACE, 0.375f, 1f);
@@ -361,7 +344,7 @@ public class MechanicManager implements Listener {
             return;
         }
 
-        if (getMechanicPartially(on.getLocation()) != null) {
+        if (getMechanicAt(on.getLocation()) != null) {
             callback.accept(MechanicBuildResponse.ALREADY_EXISTS);
             return;
         }
@@ -435,7 +418,7 @@ public class MechanicManager implements Listener {
         Block on = getBlockOn(sign);
         if (on != null && profile.isPresent()) {
             // check if there is already a mechanic at this location
-            if (getMechanicPartially(on.getLocation()) != null) {
+            if (getMechanicAt(on.getLocation()) != null) {
                 callback.accept(true);
                 return;
             }
@@ -510,7 +493,7 @@ public class MechanicManager implements Listener {
 
         // unload and delete this mechanic
         unregister(mechanic);
-        LOADING_SERVICE.submit(() -> {
+        LOADING_THREAD.submit(() -> {
             try {
                 if (!Factorio.get().getContextProvider().deleteAt(mechanic.getLocation()))  {
                     callback.accept(false);

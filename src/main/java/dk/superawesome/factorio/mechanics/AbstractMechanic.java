@@ -150,7 +150,12 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     }
 
     protected Sign getSign() {
-        return (Sign) getBuilding().getSign(this).getState();
+        try {
+            return (Sign) getBuilding().getSign(this).getState();
+        } catch (ClassCastException ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Sign block is not sign: " + this.loc, ex);
+            return null;
+        }
     }
 
     @Override

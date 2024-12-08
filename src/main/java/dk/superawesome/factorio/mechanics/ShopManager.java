@@ -28,7 +28,7 @@ public class ShopManager implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPreTransaction(PreTransactionEvent event) {
         Mechanic<?> mechanic = Factorio.get().getMechanicManager(event.getSign().getWorld())
-                .getMechanicPartially(BlockUtil.getPointingBlock(event.getSign().getBlock(), true).getLocation());
+                .getMechanicAt(BlockUtil.getPointingBlock(event.getSign().getBlock(), true).getLocation());
 
         // server-sync call
         recentContainer = null;
@@ -44,7 +44,10 @@ public class ShopManager implements Listener {
                 TransactionEvent.TransactionType type = event.getTransactionType();
                 boolean isInput = checkInput(storageGui, type);
 
-                recentOffer = Arrays.stream(event.getStock()).filter(Objects::nonNull).findFirst().orElse(new ItemStack(Material.AIR));
+                recentOffer = Arrays.stream(event.getStock())
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(new ItemStack(Material.AIR));
 
                 // check if the related item can be sold/bought
                 ItemStack stored = mechanic.getProfile().getStorageProvider().createStorage(mechanic, recentContext).getStored();
