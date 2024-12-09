@@ -44,7 +44,6 @@ public class MechanicManager implements Listener {
     private final World world;
     private final MechanicStorageContext.Provider contextProvider;
 
-
     public MechanicManager(World world, MechanicStorageContext.Provider contextProvider) {
         this.world = world;
         this.contextProvider = contextProvider;
@@ -105,7 +104,7 @@ public class MechanicManager implements Listener {
     }
 
     public void handleThinking() {
-        for (ThinkingMechanic thinking : thinkingMechanics) {
+        for (ThinkingMechanic thinking : this.thinkingMechanics) {
             if (thinking.getThinkDelayHandler().ready()) {
                 thinking.think();
             }
@@ -123,13 +122,11 @@ public class MechanicManager implements Listener {
 
                 Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                     if (mechanic instanceof ThinkingMechanic tm) {
-                        thinkingMechanics.add(tm);
+                        this.thinkingMechanics.add(tm);
                     }
 
                     for (Location part : Buildings.getLocations(mechanic)) {
-                        if (!mechanic.getBuilding().getSign(mechanic).getLocation().equals(part)) {
-                            this.mechanics.put(BlockUtil.getVec(part), mechanic);
-                        }
+                        this.mechanics.put(BlockUtil.getVec(part), mechanic);
                     }
 
                     Bukkit.getPluginManager().registerEvents(mechanic, Factorio.get());
@@ -144,11 +141,11 @@ public class MechanicManager implements Listener {
 
     public void unregister(Mechanic<?> mechanic) {
         for (Location loc : Buildings.getLocations(mechanic)) {
-            mechanics.remove(BlockUtil.getVec(loc));
+            this.mechanics.remove(BlockUtil.getVec(loc));
         }
 
         if (mechanic instanceof ThinkingMechanic) {
-            thinkingMechanics.removeIf(m -> mechanic == m);
+            this.thinkingMechanics.removeIf(m -> mechanic == m);
         }
 
         for (HandlerList list : HandlerList.getHandlerLists()) {
@@ -344,7 +341,8 @@ public class MechanicManager implements Listener {
             return;
         }
 
-        if (getMechanicAt(on.getLocation()) != null) {
+        Mechanic<?> at = getMechanicAt(on.getLocation());
+        if (at != null && !at.getBuilding().getSign(at).getLocation().equals(sign.getLocation())) {
             callback.accept(MechanicBuildResponse.ALREADY_EXISTS);
             return;
         }

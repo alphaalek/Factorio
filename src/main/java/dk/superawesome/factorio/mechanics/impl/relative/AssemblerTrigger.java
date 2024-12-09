@@ -1,10 +1,7 @@
 package dk.superawesome.factorio.mechanics.impl.relative;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.api.events.AssemblerTypeChangeEvent;
-import dk.superawesome.factorio.api.events.AssemblerTypeRequestEvent;
-import dk.superawesome.factorio.api.events.MechanicBuildEvent;
-import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
+import dk.superawesome.factorio.api.events.*;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
@@ -21,9 +18,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements ThinkingMechanic {
 
@@ -31,7 +26,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     private boolean usePrice, usePercentage;
     private double minPrice, minPercentage;
-    private final List<Assembler> assemblers = new ArrayList<>();
+    private final Set<Assembler> assemblers = new HashSet<>();
 
     public AssemblerTrigger(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
         super(loc, rotation, context, hasWallSign, isBuild);
@@ -191,7 +186,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     }
 
     @EventHandler
-    public void onMechanicBuild(MechanicBuildEvent event) {
+    public void onMechanicLoad(MechanicLoadEvent event) {
         if (event.getMechanic() instanceof Assembler assembler) {
             MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
             BlockUtil.forRelative(loc.getBlock(), block -> {

@@ -65,9 +65,9 @@ public class SignChangeListener implements Listener {
                     switch (response) {
                         case SUCCESS -> {
                             // Success!
-                            Mechanic<?> mechanic = manager.getMechanicAt(event.getBlock().getLocation());
+                            Mechanic<?> mechanic = manager.getMechanicAt(on.getLocation());
                             if (mechanic != null) {
-                                event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(event.getBlock().getLocation()) + ".");
+                                event.getPlayer().sendMessage("§eDu oprettede maskinen " + mechanic.getProfile().getName() + " ved " + Types.LOCATION.convert(on.getLocation()) + ".");
                             } else{
                                 event.getPlayer().sendMessage("§cNoget gik galt!");
                             }
