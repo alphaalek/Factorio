@@ -40,7 +40,6 @@ public class Profiles {
     public static final MechanicProfile<PowerLifter> POWER_LIFTER;
     public static final MechanicProfile<Refinery> REFINERY;
     public static final MechanicProfile<Smelter> SMELTER;
-    public static final MechanicProfile<Splitter> SPLITTER;
     public static final MechanicProfile<StorageBox> STORAGE_BOX;
 
     static {
@@ -66,7 +65,6 @@ public class Profiles {
         STATION           = loadProfile(new StationProfile());
         SOLAR_CELL        = loadProfile(new SolarCellProfile());
         SMELTER           = loadProfile(new SmelterProfile());
-        SPLITTER          = loadProfile(new SplitterProfile());
         STORAGE_BOX       = loadProfile(new StorageBoxProfile());
     }
 

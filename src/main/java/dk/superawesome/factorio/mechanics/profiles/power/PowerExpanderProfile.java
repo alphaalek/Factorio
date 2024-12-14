@@ -37,7 +37,7 @@ public class PowerExpanderProfile implements MechanicProfile<PowerExpander> {
 
     @Override
     public int getID() {
-        return 21;
+        return 10;
     }
 
     private static class PowerExpanderMechanicFactory implements MechanicFactory<PowerExpander> {
