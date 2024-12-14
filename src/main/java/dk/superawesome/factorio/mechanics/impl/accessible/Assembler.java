@@ -320,7 +320,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
         static {
             addDefaultTypes();
-            requestTypes();
+            Bukkit.getScheduler().runTask(Factorio.get(), Types::requestTypes);
             Bukkit.getScheduler().runTaskTimer(Factorio.get(), Assembler.Types::requestTypes, ONE_HOUR_DELAY_TICKS, ONE_HOUR_DELAY_TICKS);
         }
 
