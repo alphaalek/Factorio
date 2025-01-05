@@ -25,12 +25,10 @@ public interface AccessibleMechanic {
         G gui = getOrCreateInventory(mechanic);
         if (gui != null) {
             // Todo: remove this if we found a solution for a dupe bug when multiple players interact in the gui
-            if (!gui.getInventory().getViewers().isEmpty()) {
-                if (!gui.getInventory().getViewers().stream()
-                        .map(HumanEntity::getName)
-                        .allMatch(player.getName()::equals)) {
-                    player.sendMessage("§cDenne maskine er allerede åben af en anden spiller");
-                }
+            if (!gui.getInventory().getViewers().stream()
+                    .map(HumanEntity::getName)
+                    .allMatch(player.getName()::equals)) {
+                player.sendMessage("§cDenne maskine er allerede åben af en anden spiller");
                 return false;
             }
 

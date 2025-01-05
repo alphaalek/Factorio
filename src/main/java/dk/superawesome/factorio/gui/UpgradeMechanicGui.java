@@ -2,6 +2,7 @@ package dk.superawesome.factorio.gui;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicUpgradeEvent;
+import dk.superawesome.factorio.mechanics.AccessibleMechanic;
 import dk.superawesome.factorio.mechanics.GuiMechanicProfile;
 import dk.superawesome.factorio.mechanics.Mechanic;
 import dk.superawesome.factorio.mechanics.MechanicLevel;
@@ -136,7 +137,7 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
     public void onClose(Player player, boolean anyViewersLeft) {
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
             if (player.isOnline() && !player.getOpenInventory().getType().isCreatable()) {
-                player.openInventory(((GuiMechanicProfile<M>)mechanic.getProfile()).getGuiFactory().create(mechanic, mechanic.getGuiInUse()).getInventory());
+                ((AccessibleMechanic)mechanic).openInventory(mechanic, player);
             }
         });
     }
