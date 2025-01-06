@@ -287,7 +287,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         HOPPER(Material.HOPPER, 4, 9),
         FISH(Material.COOKED_SALMON, 5, 6.65),
         BOOKSHELF(Material.BOOKSHELF, 9, 9),
-        BEETROOT_SOUP(Material.BEETROOT_SOUP, 7, 4.75),
+        BEETROOT_SOUP(Material.BEETROOT_SOUP, 7, 5.4),
         TNT(Material.TNT, 9, 9),
         DISPENSER(Material.DISPENSER, 4, 9),
         ENDER_CHEST(Material.ENDER_CHEST, 3, 30),
