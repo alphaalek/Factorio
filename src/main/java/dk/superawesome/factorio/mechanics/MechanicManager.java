@@ -286,20 +286,21 @@ public class MechanicManager implements Listener {
             return false;
         }
 
-        MechanicMoveEvent event = new MechanicMoveEvent(player, mechanic, to, rot);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            player.sendMessage("§cDu kan ikke flytte maskinen hertil!");
-            return false;
-        }
         // check for WorldGuard access
         if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
-            for (Location loc : event.getLocations()) {
+            for (Location loc : Buildings.getLocations(mechanic.getBuilding(), to, rot)) {
                 if (!WorldGuard.canBuild(player, loc)) {
                     player.sendMessage("§cDu kan ikke flytte maskinen hertil!");
                     return false;
                 }
             }
+        }
+
+        MechanicMoveEvent event = new MechanicMoveEvent(player, mechanic, to, rot);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            player.sendMessage("§cDu kan ikke flytte maskinen hertil!");
+            return false;
         }
 
         Routes.removeNearbyRoutes(mechanic.getLocation().getBlock());
