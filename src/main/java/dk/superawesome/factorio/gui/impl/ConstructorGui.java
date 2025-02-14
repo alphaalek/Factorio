@@ -4,6 +4,7 @@ import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.MechanicGui;
 import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
 import dk.superawesome.factorio.mechanics.impl.accessible.Constructor;
+import dk.superawesome.factorio.recipes.SuspicousStewRecipe;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;
@@ -30,10 +31,17 @@ public class ConstructorGui extends MechanicGui<ConstructorGui, Constructor> {
 
     static {
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+            loadCustomRecipes();
+
             for (Assembler.Types type : Assembler.Types.values()) {
                 addRecipesFor(new ItemStack(type.getMat()));
             }
         });
+    }
+
+    private static void loadCustomRecipes() {
+        Recipe recipe = new SuspicousStewRecipe();
+        commonRecipes.add(recipe);
     }
 
     private static void addRecipesFor(ItemStack stack) {
