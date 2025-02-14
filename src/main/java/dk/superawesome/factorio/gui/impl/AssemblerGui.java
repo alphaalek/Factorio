@@ -3,6 +3,7 @@ package dk.superawesome.factorio.gui.impl;
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.gui.PaginatedGui;
+import dk.superawesome.factorio.gui.RecipeGui;
 import dk.superawesome.factorio.gui.SingleStorageGui;
 import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
 import dk.superawesome.factorio.util.DurationFormatter;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 
 import java.util.Arrays;
 import java.util.List;
@@ -75,18 +77,26 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
         if (getMechanic().getType() != null) {
             Assembler.Type type = getMechanic().getType();
             getInventory().setItem(16,
-                    new ItemBuilder(getAssemblerTypeItem(type))
+                    new ItemBuilder(getAssemblerTypeItem(type, false))
                             .makeGlowing()
                             .build());
         }
     }
 
-    private ItemStack getAssemblerTypeItem(Assembler.Type type) {
-        return new ItemBuilder(type.getType().getMat())
-                .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + StringUtil.formatDecimals(type.getProduces(), 2) + " §8(§f$" + (StringUtil.formatDecimals(type.getPricePerItem(), 2)) + " §epr. item§8)")
-                .addLore(format(type) + " §8Sidst opdateret " + DurationFormatter.toDuration(System.currentTimeMillis() - Assembler.Types.LAST_UPDATE) + " siden")
-                .addFlags(ItemFlag.HIDE_ATTRIBUTES)
-                .build();
+    private ItemStack getAssemblerTypeItem(Assembler.Type type, boolean isChooseAssembler) {
+        ItemBuilder itemBuilder = new ItemBuilder(type.getType().getMat())
+            .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + StringUtil.formatDecimals(type.getProduces(), 2) + " §8(§f$" + (StringUtil.formatDecimals(type.getPricePerItem(), 2)) + " §epr. item§8)")
+            .addLore(format(type) + " §8Sidst opdateret " + DurationFormatter.toDuration(System.currentTimeMillis() - Assembler.Types.LAST_UPDATE) + " siden")
+            .addFlags(ItemFlag.HIDE_ATTRIBUTES);
+
+        if (isChooseAssembler) {
+            boolean hasRecipe = Bukkit.getRecipesFor(new ItemStack(type.getType().getMat())).stream().findFirst().isPresent();
+            if (hasRecipe) {
+                itemBuilder.addLore("").addLore("").addLore("§7§oHøjreklik for at se opskrift");
+            }
+        }
+
+        return itemBuilder.build();
     }
 
     public static String format(Assembler.Type type) {
@@ -120,8 +130,14 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
                 initCallback.call();
             }
 
+            private boolean isRecipeView = false;
+
             @Override
             public void onClose(Player player, boolean anyViewersLeft) {
+                if (isRecipeView) {
+                    super.onClose(player, anyViewersLeft);
+                    return;
+                }
                 Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                     if (player.isOnline()) {
                         getMechanic().openInventory(getMechanic(), player);
@@ -145,7 +161,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
             @Override
             public ItemStack getItemFrom(Assembler.Type type) {
-                ItemStack item = getAssemblerTypeItem(type);
+                ItemStack item = getAssemblerTypeItem(type, true);
                 if (getMechanic().getType() != null && getMechanic().getType().equals(type)) {
                     return new ItemBuilder(item)
                             .makeGlowing()
@@ -161,6 +177,18 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
                     Optional<Assembler.Types> typeOptional = Assembler.Types.getTypeFromMaterial(event.getCurrentItem().getType());
                     Player player = (Player) event.getWhoClicked();
                     if (typeOptional.isPresent()) {
+                        // check if the player right-clicked to view the recipe
+                        if (event.isRightClick()) {
+                            Recipe recipe = Bukkit.getRecipesFor(event.getCurrentItem()).stream().findFirst().orElse(null);
+                            if (recipe != null) {
+                                player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.5f, 1);
+                                isRecipeView = true;
+                                RecipeGui<Recipe> recipeRecipeGui = new RecipeGui<>(recipe);
+                                player.openInventory(recipeRecipeGui.getInventory());
+                                return true;
+                            }
+                        }
+
                         // do not allow to change the assembler type if the assembler still have items
                         if (getMechanic().getIngredientAmount() > 0) {
                             player.sendMessage("§cRyd maskinens inventar før du ændrer sammensætning.");
