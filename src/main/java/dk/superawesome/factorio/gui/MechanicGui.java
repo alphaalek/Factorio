@@ -574,7 +574,14 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
             if (stored == null && storage.getStored() != null) {
                 stored = storage.getStored().getType();
             } else if (stored != null && storage.getStored() == null) {
-                storage.setStored(new ItemStack(stored));
+                Material storedCopy = stored;
+                Consumer<Double> putCopy = put;
+                put = i -> {
+                    if (storage.getStored() == null) {
+                        storage.setStored(new ItemStack(storedCopy));
+                    }
+                    putCopy.accept(i);
+                };
             }
 
             if (stored != null) {
