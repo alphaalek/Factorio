@@ -114,8 +114,20 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
         this.initCallback = initCallback.get();
         this.initCallback.add(this::loadItems);
         this.loaded = true;
-
         this.inUseReference = inUseReference;
+
+        if (inUseReference != null) {
+            this.inUseReference.set((G) this);
+        }
+    }
+
+    public BaseGui(Supplier<Callback> initCallback, AtomicReference<G> inUseReference, InventoryType inventoryType, String title) {
+        this.inventory = Bukkit.createInventory(this, inventoryType, title);
+        this.initCallback = initCallback.get();
+        this.initCallback.add(this::loadItems);
+        this.loaded = true;
+        this.inUseReference = inUseReference;
+
         if (inUseReference != null) {
             this.inUseReference.set((G) this);
         }

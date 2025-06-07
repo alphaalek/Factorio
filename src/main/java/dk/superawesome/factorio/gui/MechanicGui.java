@@ -3,10 +3,7 @@ package dk.superawesome.factorio.gui;
 import de.rapha149.signgui.SignGUI;
 import de.rapha149.signgui.SignGUIAction;
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.mechanics.FuelMechanic;
-import dk.superawesome.factorio.mechanics.Mechanic;
-import dk.superawesome.factorio.mechanics.Storage;
-import dk.superawesome.factorio.mechanics.StorageProvider;
+import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.util.Callback;
 import dk.superawesome.factorio.util.helper.ItemBuilder;
 import org.bukkit.Bukkit;
@@ -91,7 +88,14 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
 
                     // return to the gui and reload view
                     List<SignGUIAction> actions = new ArrayList<>();
-                    actions.add(SignGUIAction.openInventory(Factorio.get(), getInventory()));
+                    if (mechanic instanceof AccessibleMechanic accessible) {
+                        actions.add(SignGUIAction.runSync(Factorio.get(), () -> {
+                            if (accessible.openInventory(mechanic, player)) {
+                                return;
+                            }
+                            player.closeInventory();
+                        }));
+                    }
                     actions.add(SignGUIAction.runSync(Factorio.get(), this::updateItems));
                     for (Runnable postAction : post) {
                         actions.add(SignGUIAction.runSync(Factorio.get(), postAction));
@@ -570,7 +574,14 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
             if (stored == null && storage.getStored() != null) {
                 stored = storage.getStored().getType();
             } else if (stored != null && storage.getStored() == null) {
-                storage.setStored(new ItemStack(stored));
+                Material storedCopy = stored;
+                Consumer<Double> putCopy = put;
+                put = i -> {
+                    if (storage.getStored() == null) {
+                        storage.setStored(new ItemStack(storedCopy));
+                    }
+                    putCopy.accept(i);
+                };
             }
 
             if (stored != null) {

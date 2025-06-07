@@ -1,8 +1,6 @@
 package dk.superawesome.factorio.listeners;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.building.Building;
-import dk.superawesome.factorio.building.Matcher;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.BlockUtil;
@@ -11,10 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.block.TileState;
-import org.bukkit.block.data.Directional;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -48,7 +43,7 @@ public class SignChangeListener implements Listener {
             if (on == null) {
                 event.getPlayer().sendMessage("§cDu kan ikke placere en maskine på denne block!");
                 event.setCancelled(true);
-                event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(event.getPlayer().getInventory().getItemInMainHand().getType()));
+                event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), event.getBlock().getDrops().stream().findFirst().orElseThrow().clone());
                 event.getBlock().setType(Material.AIR);
                 return;
             }
@@ -84,8 +79,8 @@ public class SignChangeListener implements Listener {
                     }
 
                     event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+                    event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), event.getBlock().getDrops().stream().findFirst().orElseThrow().clone());
                     event.getBlock().setType(Material.AIR);
-                    event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(event.getPlayer().getInventory().getItemInMainHand().getType()));
                 }
             }));
         }
