@@ -488,6 +488,8 @@ public class MechanicManager implements Listener {
             return;
         }
 
+        Movement.removeMechanic(null, mechanic);
+
         // unload and delete this mechanic
         unregister(mechanic);
         LOADING_THREAD.submit(() -> {
