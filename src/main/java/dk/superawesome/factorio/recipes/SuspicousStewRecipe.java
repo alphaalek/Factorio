@@ -39,7 +39,7 @@ public class SuspicousStewRecipe extends ShapelessRecipe {
 
     @Override
     public List<RecipeChoice> getChoiceList() {
-        List<RecipeChoice> result = new ArrayList(recipeChoices.size());
+        List<RecipeChoice> result = new ArrayList<>(recipeChoices.size());
 
         for (RecipeChoice ingredient : recipeChoices) {
             result.add(ingredient.clone());

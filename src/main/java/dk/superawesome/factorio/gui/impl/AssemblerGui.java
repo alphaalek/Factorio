@@ -127,14 +127,14 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
             {
                 // call init callback when loaded
-                initCallback.call();
+                this.initCallback.call();
             }
 
             private boolean isRecipeView = false;
 
             @Override
             public void onClose(Player player, boolean anyViewersLeft) {
-                if (isRecipeView) {
+                if (this.isRecipeView) {
                     super.onClose(player, anyViewersLeft);
                     return;
                 }
@@ -182,7 +182,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
                             Recipe recipe = Bukkit.getRecipesFor(event.getCurrentItem()).stream().findFirst().orElse(null);
                             if (recipe != null) {
                                 player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.5f, 1);
-                                isRecipeView = true;
+                                this.isRecipeView = true;
                                 RecipeGui<Recipe> recipeRecipeGui = new RecipeGui<>(recipe);
                                 player.openInventory(recipeRecipeGui.getInventory());
                                 return true;

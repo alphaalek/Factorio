@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, Listener {
@@ -110,25 +111,22 @@ public abstract class BaseGui<G extends BaseGui<G>> implements InventoryHolder, 
     private final AtomicReference<G> inUseReference;
 
     public BaseGui(Supplier<Callback> initCallback, AtomicReference<G> inUseReference, int size, String title) {
-        this.inventory = Bukkit.createInventory(this, size, title);
-        this.initCallback = initCallback.get();
-        this.initCallback.add(this::loadItems);
-        this.loaded = true;
-        this.inUseReference = inUseReference;
-
-        if (inUseReference != null) {
-            this.inUseReference.set((G) this);
-        }
+        this(initCallback, inUseReference, ins -> Bukkit.createInventory(ins, size, title));
     }
 
     public BaseGui(Supplier<Callback> initCallback, AtomicReference<G> inUseReference, InventoryType inventoryType, String title) {
-        this.inventory = Bukkit.createInventory(this, inventoryType, title);
+        this(initCallback, inUseReference, ins -> Bukkit.createInventory(ins, inventoryType, title));
+    }
+
+    @SuppressWarnings("unchecked")
+    public BaseGui(Supplier<Callback> initCallback, AtomicReference<G> inUseReference, Function<BaseGui<G>, Inventory> inventory) {
+        this.inventory = inventory.apply(this);
         this.initCallback = initCallback.get();
         this.initCallback.add(this::loadItems);
         this.loaded = true;
         this.inUseReference = inUseReference;
 
-        if (inUseReference != null) {
+        if (this.inUseReference != null) {
             this.inUseReference.set((G) this);
         }
     }

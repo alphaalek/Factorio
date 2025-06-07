@@ -560,7 +560,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
                         put = i -> {
                             if (storage.getStored() == null) {
                                 // the stored type has not changed while the player was editing the sign
-                                // just assume the highest item count is the same as when the sign was opened
+                                // just assume the highest item count is the same as when the sign was open
                                 storage.setStored(new ItemStack(highest));
                             }
                             putCopy.accept(i);
