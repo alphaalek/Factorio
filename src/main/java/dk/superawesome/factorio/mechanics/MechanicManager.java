@@ -237,7 +237,7 @@ public class MechanicManager implements Listener {
                 return;
             }
             event.getMechanic().getManagement().setOwner(event.getNewOwner());
-            event.getMechanic().getManagement().getMembers().removeIf(event.getPlayer().getUniqueId()::equals);
+            event.getMechanic().getManagement().getMembers().clear();
         }
     }
 

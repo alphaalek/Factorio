@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.CraftingRecipe;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -179,7 +180,10 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
                     if (typeOptional.isPresent()) {
                         // check if the player right-clicked to view the recipe
                         if (event.isRightClick()) {
-                            Recipe recipe = Bukkit.getRecipesFor(event.getCurrentItem()).stream().findFirst().orElse(null);
+                            Recipe recipe = Bukkit.getRecipesFor(event.getCurrentItem()).stream()
+                                    .filter(r -> r instanceof CraftingRecipe)
+                                    .findFirst()
+                                    .orElse(null);
                             if (recipe != null) {
                                 player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.5f, 1);
                                 this.isRecipeView = true;
