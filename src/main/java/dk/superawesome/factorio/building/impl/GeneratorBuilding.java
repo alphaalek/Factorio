@@ -28,8 +28,14 @@ public class GeneratorBuilding implements Building, Buildable {
 
     private final List<BiConsumer<Block, BlockFace>> blocks = Arrays.asList(
             (b, r) -> b.setType(Material.BRICKS),
-            (b, r) -> b.setType(Material.SMOKER),
-            (b, r) -> b.setType(Material.CAMPFIRE),
+            (b, r) -> {
+                b.setType(Material.SMOKER);
+                BlockUtil.rotate(b, r);
+            },
+            (b, r) -> {
+                b.setType(Material.CAMPFIRE);
+                BlockUtil.rotate(b, r);
+            },
             (b, r) -> {},
             (b, r) -> setLever(b, BlockUtil.getRotationRelative(DEFAULT_ROTATION, DEFAULT_ROTATION.getOppositeFace(), r))
     );
