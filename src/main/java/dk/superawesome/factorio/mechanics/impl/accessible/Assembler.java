@@ -307,6 +307,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         BLUE_GLASS(Material.BLUE_STAINED_GLASS, 8, 1),
         BROWN_GLASS(Material.BROWN_STAINED_GLASS, 8, 1),
         BEACON(Material.BEACON, 2, 500),
+        LODESTONE(Material.LODESTONE, 2, 200),
         COMPASS(Material.COMPASS, 7, 11.25),
         SOUL_CAMPFIRE(Material.SOUL_CAMPFIRE, 13, 4),
         MILK_BUCKET(Material.MILK_BUCKET, 4, 5.5),
