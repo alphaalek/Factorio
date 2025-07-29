@@ -16,15 +16,15 @@ public abstract class Circuit<M extends Mechanic<M>, C extends TransferCollectio
 
     @Override
     public void pipePut(C collection, PipePutEvent event) {
-        if (calledInput) { // ensure no loop
+        if (this.calledInput) { // ensure no loop
             return;
         }
 
-        calledInput = true;
+        this.calledInput = true;
         if (pipePut(collection)) {
             event.setTransferred(true);
         }
-        calledInput = false;
+        this.calledInput = false;
     }
 
     public abstract boolean pipePut(C collection);
