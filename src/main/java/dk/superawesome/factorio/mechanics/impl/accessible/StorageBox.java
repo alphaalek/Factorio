@@ -32,21 +32,20 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws Exception {
-        ByteArrayInputStream str = context.getData();
-        this.stored = context.getSerializer().readItemStack(str);
-        this.amount = context.getSerializer().readInt(str);
+    public void loadData(ByteArrayInputStream data) throws Exception {
+        this.stored = this.context.getSerializer().readItemStack(data);
+        this.amount = this.context.getSerializer().readInt(data);
 
         ensureValidStorage();
     }
 
     @Override
-    public void save(MechanicStorageContext context) throws Exception {
-        ByteArrayOutputStream str = new ByteArrayOutputStream();
-        context.getSerializer().writeItemStack(str, this.stored);
-        context.getSerializer().writeInt(str, this.amount);
+    public Optional<ByteArrayOutputStream> saveData() throws Exception {
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        this.context.getSerializer().writeItemStack(data, this.stored);
+        this.context.getSerializer().writeInt(data, this.amount);
 
-        context.uploadData(str);
+        return Optional.of(data);
     }
 
     @Override

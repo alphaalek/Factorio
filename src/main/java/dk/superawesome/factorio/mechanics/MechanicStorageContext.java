@@ -51,37 +51,20 @@ public class MechanicStorageContext {
         }
     }
 
+    private static final Base64.Decoder DECODER = Base64.getDecoder();
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
     public static String encode(ByteArrayOutputStream stream) {
         byte[] bytes = stream.toByteArray();
-        return Base64.getEncoder().encodeToString(bytes);
+        return ENCODER.encodeToString(bytes);
     }
 
     public static ByteArrayInputStream decode(String data) {
-        return new ByteArrayInputStream(Base64.getDecoder().decode(data));
-    }
-
-    public static void upload(ByteArrayOutputStream stream, Query.CheckedConsumer<String> data, String currentData) throws SQLException {
-        // check if either new or current data is valid
-        // if none of them are, don't allow this upload because it doesn't matter anyway
-        if (hasData(stream.toByteArray()) || hasData(decode(currentData).readAllBytes())) {
-            data.<SQLException>sneaky(encode(stream));
-        }
-    }
-
-    public static boolean hasData(byte[] bytes) {
-        return IntStream.range(0, bytes.length).map(i -> bytes[i]).anyMatch(b -> b > 0);
-    }
-
-    public static <E extends Exception> ByteArrayInputStream getData(Query.CheckedSupplier<String, E> data) throws E {
-        return decode(data.sneaky());
+        return new ByteArrayInputStream(DECODER.decode(data));
     }
 
     private final MechanicController controller;
     private final Management fallbackManagement;
-
-    private int lastLevel;
-    private double lastXP;
-    private Management lastManagement;
 
     private Location loc;
 
@@ -91,12 +74,16 @@ public class MechanicStorageContext {
         this.fallbackManagement = fallbackManagement;
     }
 
-    public Management load(Mechanic<?> mechanic) throws SQLException, IOException {
-        return this.controller.load(mechanic);
+    public Snapshot load() throws SQLException, IOException {
+        return this.controller.load(this.loc);
     }
 
-    public Location getLocation() {
-        return this.loc;
+    public void save(Snapshot snapshot) throws SQLException, IOException {
+        this.controller.save(this.loc, snapshot);
+    }
+
+    public boolean hasContext() throws SQLException {
+        return this.controller.exists(this.loc);
     }
 
     public void move(Location loc, BlockFace rot) throws SQLException {
@@ -112,65 +99,11 @@ public class MechanicStorageContext {
         return getController().getMechanicSerializer();
     }
 
-    public ByteArrayInputStream getData() throws SQLException {
-        return getData(() -> this.controller.getData(this.loc));
-    }
-
     public Management getFallbackManagement() {
         return this.fallbackManagement;
     }
 
-    public Management getManagement() throws SQLException, IOException {
-        ByteArrayInputStream stream = getData(() -> this.controller.getManagementData(this.loc));
-        if (stream.available() == 0) {
-            // return fallback management if it failed to poll from db
-            return this.fallbackManagement;
-        }
-
-        return this.lastManagement = this.controller.getManagementSerializer().deserialize(stream);
-    }
-
-    public void uploadData(ByteArrayOutputStream stream) throws SQLException {
-        upload(stream, base64 -> this.controller.setData(this.loc, base64), this.controller.getData(this.loc));
-    }
-
-    public void uploadManagement(Management management) throws SQLException, IOException {
-        if (this.lastManagement != null && this.lastManagement.equals(management)) {
-            return;
-        }
-
-        ByteArrayOutputStream stream = this.controller.getManagementSerializer().serialize(management);
-        upload(stream, base64 -> this.controller.setManagement(this.loc, base64), this.controller.getManagementData(this.loc));
-    }
-
-    public boolean hasContext() throws SQLException {
-        return this.controller.exists(this.loc);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T get(String column) throws SQLException {
-        return (T) this.controller.get(this.loc, column, result -> result.getObject(column));
-    }
-
-    public int getLevel() throws SQLException {
-        return this.lastLevel = this.controller.getLevel(this.loc);
-    }
-
-    public void setLevel(int level) throws SQLException {
-        if (this.lastLevel == level) {
-            return;
-        }
-        this.controller.setLevel(this.loc, level);
-    }
-
-    public double getXP() throws SQLException {
-        return this.lastXP = this.controller.getXP(this.loc);
-    }
-
-    public void setXP(double xp) throws SQLException {
-        if (this.lastXP == xp) {
-            return;
-        }
-        this.controller.setXP(this.loc, xp);
+    public Location getLocation() {
+        return this.loc;
     }
 }

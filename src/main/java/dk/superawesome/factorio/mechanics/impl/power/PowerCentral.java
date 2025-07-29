@@ -17,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class PowerCentral extends AbstractMechanic<PowerCentral> implements AccessibleMechanic, ThinkingMechanic, SignalSource, Lightable {
 
@@ -41,19 +42,18 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws IOException, SQLException {
-        ByteArrayInputStream str = context.getData();
-        this.energy = context.getSerializer().readDouble(str);
-        this.activated = !context.getSerializer().readBoolean(str);
+    public void loadData(ByteArrayInputStream data) throws IOException {
+        this.energy = this.context.getSerializer().readDouble(data);
+        this.activated = !this.context.getSerializer().readBoolean(data);
     }
 
     @Override
-    public void save(MechanicStorageContext context) throws IOException, SQLException {
-        ByteArrayOutputStream str = new ByteArrayOutputStream();
-        context.getSerializer().writeDouble(str, this.energy);
-        context.getSerializer().writeBoolean(str, !this.activated);
+    public Optional<ByteArrayOutputStream> saveData() throws IOException {
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        this.context.getSerializer().writeDouble(data, this.energy);
+        this.context.getSerializer().writeBoolean(data, !this.activated);
 
-        context.uploadData(str);
+        return Optional.of(data);
     }
 
     @Override

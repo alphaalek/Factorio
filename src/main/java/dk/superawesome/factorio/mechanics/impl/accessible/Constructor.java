@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -60,15 +59,14 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws Exception {
-        ByteArrayInputStream str = context.getData();
+    public void loadData(ByteArrayInputStream data) throws Exception {
         for (int i = 0; i < 9; i++) {
-            this.craftingGridItems[i] = context.getSerializer().readItemStack(str);
+            this.craftingGridItems[i] = this.context.getSerializer().readItemStack(data);
         }
 
-        this.recipeResult = context.getSerializer().readItemStack(str);
-        this.storageType = context.getSerializer().readItemStack(str);
-        this.storageAmount = context.getSerializer().readInt(str);
+        this.recipeResult = this.context.getSerializer().readItemStack(data);
+        this.storageType = this.context.getSerializer().readItemStack(data);
+        this.storageAmount = this.context.getSerializer().readInt(data);
 
         if (this.storageAmount > 0 && this.storageType == null) {
             this.storageAmount = 0;
@@ -83,17 +81,17 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     }
 
     @Override
-    public void save(MechanicStorageContext context) throws SQLException, IOException {
-        ByteArrayOutputStream str = new ByteArrayOutputStream();
+    public Optional<ByteArrayOutputStream> saveData() throws IOException {
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
         for (int i = 0; i < 9; i++) {
-            context.getSerializer().writeItemStack(str, this.craftingGridItems[i]);
+            this.context.getSerializer().writeItemStack(data, this.craftingGridItems[i]);
         }
 
-        context.getSerializer().writeItemStack(str, this.recipeResult);
-        context.getSerializer().writeItemStack(str, this.storageType);
-        context.getSerializer().writeInt(str, this.storageAmount);
+        this.context.getSerializer().writeItemStack(data, this.recipeResult);
+        this.context.getSerializer().writeItemStack(data, this.storageType);
+        this.context.getSerializer().writeInt(data, this.storageAmount);
 
-        context.uploadData(str);
+        return Optional.of(data);
     }
 
     @Override
@@ -238,7 +236,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         if (gui != null) {
             gui.updateAddedItems(this.recipeResult.getAmount());
             for (HumanEntity player : gui.getInventory().getViewers()) {
-                ((Player)player).playSound(getLocation(), Sound.BLOCK_WOOD_HIT, 0.5f, 1f);
+                ((Player) player).playSound(getLocation(), Sound.BLOCK_WOOD_HIT, 0.5f, 1f);
             }
         }
     }

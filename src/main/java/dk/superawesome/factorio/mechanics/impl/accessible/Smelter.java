@@ -79,16 +79,15 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws Exception {
-        ByteArrayInputStream str = context.getData();
-        this.ingredient = context.getSerializer().readItemStack(str);
-        this.smeltResult = context.getSerializer().readItemStack(str);
-        setIngredientAmount(context.getSerializer().readInt(str)); // ensure no zero if ingredient set
+    public void loadData(ByteArrayInputStream data) throws Exception {
+        this.ingredient = this.context.getSerializer().readItemStack(data);
+        this.smeltResult = this.context.getSerializer().readItemStack(data);
+        setIngredientAmount(this.context.getSerializer().readInt(data)); // ensure no zero if ingredient set
 
-        loadFuel(context, str);
+        loadFuel(this.context, data);
 
-        this.storageType = context.getSerializer().readItemStack(str);
-        setStorageAmount(context.getSerializer().readInt(str)); // ensure no zero if storage set
+        this.storageType = this.context.getSerializer().readItemStack(data);
+        setStorageAmount(this.context.getSerializer().readInt(data)); // ensure no zero if storage set
 
         clearSmeltResult: {
             if (this.ingredientAmount > 0 && this.ingredient == null) {
@@ -113,18 +112,18 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     @Override
-    public void save(MechanicStorageContext context) throws IOException, SQLException {
-        ByteArrayOutputStream str = new ByteArrayOutputStream();
-        context.getSerializer().writeItemStack(str, this.ingredient);
-        context.getSerializer().writeItemStack(str, this.smeltResult);
-        context.getSerializer().writeInt(str, this.ingredientAmount);
+    public Optional<ByteArrayOutputStream> saveData() throws IOException {
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        this.context.getSerializer().writeItemStack(data, this.ingredient);
+        this.context.getSerializer().writeItemStack(data, this.smeltResult);
+        this.context.getSerializer().writeInt(data, this.ingredientAmount);
 
-        saveFuel(context, str);
+        saveFuel(this.context, data);
 
-        context.getSerializer().writeItemStack(str, this.storageType);
-        context.getSerializer().writeInt(str, this.storageAmount);
+        this.context.getSerializer().writeItemStack(data, this.storageType);
+        this.context.getSerializer().writeInt(data, this.storageAmount);
 
-        context.uploadData(str);
+        return Optional.of(data);
     }
 
     @Override

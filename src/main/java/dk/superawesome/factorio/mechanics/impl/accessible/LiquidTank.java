@@ -35,13 +35,12 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws IOException, SQLException {
-        ByteArrayInputStream str = context.getData();
-        int fluidOrdinal = str.read();
+    public void loadData(ByteArrayInputStream data) throws IOException {
+        int fluidOrdinal = data.read();
         if (fluidOrdinal <= Fluid.values().length && fluidOrdinal >= 0) {
             this.fluid = Fluid.values()[fluidOrdinal];
         }
-        this.fluidAmount = context.getSerializer().readInt(str);
+        this.fluidAmount = this.context.getSerializer().readInt(data);
 
         if (this.fluidAmount > 0 && fluid == null) {
             this.fluidAmount = 0;
@@ -51,18 +50,18 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     }
 
     @Override
-    public void save(MechanicStorageContext context) throws IOException, SQLException {
-        ByteArrayOutputStream str = new ByteArrayOutputStream();
-        str.write(Optional.ofNullable(this.fluid).map(Enum::ordinal).orElse(-1));
-        context.getSerializer().writeInt(str, this.fluidAmount);
+    public Optional<ByteArrayOutputStream> saveData() throws IOException {
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        data.write(Optional.ofNullable(this.fluid).map(Enum::ordinal).orElse(-1));
+        this.context.getSerializer().writeInt(data, this.fluidAmount);
 
-        context.uploadData(str);
+        return Optional.of(data);
     }
 
     @Override
     public void onUpdate() {
         Sign sign = getSign();
-        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(((double)this.fluidAmount) / getCapacity() * 100, 2) + "% fyldt");
+        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(((double) this.fluidAmount) / getCapacity() * 100, 2) + "% fyldt");
         sign.update();
     }
 

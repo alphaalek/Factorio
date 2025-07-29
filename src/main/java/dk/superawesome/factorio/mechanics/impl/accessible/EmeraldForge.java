@@ -14,7 +14,7 @@ import org.bukkit.block.sign.Side;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.sql.SQLException;
+import java.util.Optional;
 
 public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements AccessibleMechanic, MoneyContainer {
 
@@ -25,17 +25,16 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws SQLException, IOException {
-        ByteArrayInputStream data = context.getData();
-        this.moneyAmount = context.getSerializer().readDouble(data);
+    public void loadData(ByteArrayInputStream data) throws IOException {
+        this.moneyAmount = this.context.getSerializer().readDouble(data);
     }
 
     @Override
-    public void save(MechanicStorageContext context) throws SQLException, IOException {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        context.getSerializer().writeDouble(stream, this.moneyAmount);
+    public Optional<ByteArrayOutputStream> saveData() throws IOException {
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        this.context.getSerializer().writeDouble(data, this.moneyAmount);
 
-        context.uploadData(stream);
+        return Optional.of(data);
     }
 
     @Override

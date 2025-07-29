@@ -63,11 +63,9 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws IOException, SQLException, ClassNotFoundException {
-        ByteArrayInputStream str = context.getData();
-
-        loadFuel(context, str);
-        this.availableEnergy = context.getSerializer().readDouble(str);
+    public void loadData(ByteArrayInputStream data) throws IOException, ClassNotFoundException {
+        loadFuel(this.context, data);
+        this.availableEnergy = this.context.getSerializer().readDouble(data);
 
         if (this.fuelAmount > 0 && this.fuel == null) {
             this.fuelAmount = 0;
@@ -77,13 +75,13 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     }
 
     @Override
-    public void save(MechanicStorageContext context) throws IOException, SQLException {
-        ByteArrayOutputStream str = new ByteArrayOutputStream();
+    public Optional<ByteArrayOutputStream> saveData() throws IOException {
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
 
-        saveFuel(context, str);
-        context.getSerializer().writeDouble(str, this.availableEnergy);
+        saveFuel(this.context, data);
+        this.context.getSerializer().writeDouble(data, this.availableEnergy);
 
-        context.uploadData(str);
+        return Optional.of(data);
     }
 
     @Override

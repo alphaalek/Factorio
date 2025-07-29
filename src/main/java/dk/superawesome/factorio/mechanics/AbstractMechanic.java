@@ -1,14 +1,12 @@
 package dk.superawesome.factorio.mechanics;
 
 import dk.superawesome.factorio.Factorio;
-import dk.superawesome.factorio.building.Building;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.gui.BaseGui;
 import dk.superawesome.factorio.mechanics.db.StorageException;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
 import dk.superawesome.factorio.util.TickThrottle;
-import dk.superawesome.factorio.util.db.Query;
 import dk.superawesome.factorio.util.db.Types;
 import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
@@ -19,10 +17,12 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechanic<M> {
@@ -33,6 +33,7 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     protected final Management management;
     protected final boolean hasWallSign;
 
+    protected Snapshot lastSnapshot;
     protected Location loc;
     protected BlockFace rot;
 
@@ -48,15 +49,19 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
 
         if (!isBuild) {
             try {
-                this.management = context.load(this);
+                this.lastSnapshot = context.load();
+
+                this.management = this.lastSnapshot.management();
+                this.xp = this.lastSnapshot.xp();
+                this.level = MechanicLevel.from(this, this.lastSnapshot.level());
             } catch (SQLException | IOException ex) {
                 throw new RuntimeException("Failed to load mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
             }
 
             try {
-                load(this.context);
+                loadData(MechanicStorageContext.decode(this.lastSnapshot.strData()));
             } catch (Exception ex) {
-                Factorio.get().getLogger().log(Level.SEVERE, "Failed to load data for mechanic " + this  + ", " + getLocation(), ex);
+                Factorio.get().getLogger().log(Level.SEVERE, "Failed to load data for mechanic " + this  + " at " + getLocation(), ex);
             }
         } else {
             this.level = MechanicLevel.from(this, 1);
@@ -67,6 +72,8 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
             } catch (StorageException ex) {
                 throw new RuntimeException("Failed to initialize mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
             }
+
+            this.lastSnapshot = new Snapshot(1, 0, this.management.copy(), "");
         }
     }
 
@@ -80,11 +87,11 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     public boolean save() {
         try {
             // save data for this mechanic
-            this.context.setLevel(this.level.lvl());
-            this.context.setXP(this.xp);
-            this.context.uploadManagement(this.management);
-
-            save(this.context);
+            Snapshot snapshot = Snapshot.create(this);
+            if (!snapshot.equals(this.lastSnapshot)) {
+                this.lastSnapshot = snapshot;
+                this.context.save(this.lastSnapshot);
+            }
 
             return true;
         } catch (Exception ex) {
@@ -138,12 +145,13 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
         return exists;
     }
 
-    public void load(MechanicStorageContext context) throws Exception {
+    public void loadData(ByteArrayInputStream data) throws Exception {
         // to be overridden if needed
     }
 
-    public void save(MechanicStorageContext context) throws Exception {
+    public Optional<ByteArrayOutputStream> saveData() throws Exception {
         // to be overridden if needed
+        return Optional.empty();
     }
 
     protected Sign getSign() {

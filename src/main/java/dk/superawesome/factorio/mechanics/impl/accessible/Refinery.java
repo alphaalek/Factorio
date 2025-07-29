@@ -129,17 +129,15 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws Exception {
-        ByteArrayInputStream str = context.getData();
-
-        this.volumeAmount = context.getSerializer().readInt(str);
-        ItemStack volume = context.getSerializer().readItemStack(str);
+    public void loadData(ByteArrayInputStream data) throws Exception {
+        this.volumeAmount = this.context.getSerializer().readInt(data);
+        ItemStack volume = this.context.getSerializer().readItemStack(data);
         if (volume != null && this.volumeAmount > 0) {
             this.volume = Volume.getTypeFromMaterial(volume.getType()).orElse(null);
         }
 
-        this.filledAmount = context.getSerializer().readInt(str);
-        ItemStack filledStack = context.getSerializer().readItemStack(str);
+        this.filledAmount = this.context.getSerializer().readInt(data);
+        ItemStack filledStack = this.context.getSerializer().readItemStack(data);
         if (filledStack != null && this.filledAmount > 0) {
             this.filled = Filled.getFilledStateByStack(filledStack).orElse(null);
         }
@@ -157,23 +155,23 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     }
 
     @Override
-    public void save(MechanicStorageContext context) throws IOException, SQLException {
-        ByteArrayOutputStream str = new ByteArrayOutputStream();
+    public Optional<ByteArrayOutputStream> saveData() throws IOException {
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
 
-        context.getSerializer().writeInt(str, this.volumeAmount);
-        context.getSerializer().writeItemStack(str,
+        this.context.getSerializer().writeInt(data, this.volumeAmount);
+        this.context.getSerializer().writeItemStack(data,
                 Optional.ofNullable(this.volume)
                         .map(Volume::getMat)
                         .map(ItemStack::new)
                         .orElse(null));
 
-        context.getSerializer().writeInt(str, this.filledAmount);
-        context.getSerializer().writeItemStack(str,
+        this.context.getSerializer().writeInt(data, this.filledAmount);
+        this.context.getSerializer().writeItemStack(data,
                 Optional.ofNullable(this.filled)
                         .map(Filled::getOutputItemStack)
                         .orElse(null));
 
-        context.uploadData(str);
+        return Optional.of(data);
     }
 
     @Override

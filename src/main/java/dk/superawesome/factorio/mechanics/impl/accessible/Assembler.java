@@ -45,27 +45,26 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
     }
 
     @Override
-    public void load(MechanicStorageContext context) throws SQLException, IOException, ClassNotFoundException {
-        ByteArrayInputStream data = context.getData();
-        ItemStack item = context.getSerializer().readItemStack(data);
+    public void loadData(ByteArrayInputStream data) throws IOException, ClassNotFoundException {
+        ItemStack item = this.context.getSerializer().readItemStack(data);
         if (item != null) {
             this.type = Types.getLoadedType(Types.getTypeFromMaterial(item.getType()).orElseThrow(IllegalArgumentException::new));
         }
-        this.ingredientAmount = context.getSerializer().readInt(data);
-        this.moneyAmount = context.getSerializer().readDouble(data);
+        this.ingredientAmount = this.context.getSerializer().readInt(data);
+        this.moneyAmount = this.context.getSerializer().readDouble(data);
     }
 
-    public void save(MechanicStorageContext context) throws SQLException, IOException {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        context.getSerializer().writeItemStack(stream,
+    public Optional<ByteArrayOutputStream> saveData() throws IOException {
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        this.context.getSerializer().writeItemStack(data,
                 Optional.ofNullable(this.type)
                         .map(Type::getMat)
                         .map(ItemStack::new)
                         .orElse(null));
-        context.getSerializer().writeInt(stream, this.ingredientAmount);
-        context.getSerializer().writeDouble(stream, this.moneyAmount);
+        this.context.getSerializer().writeInt(data, this.ingredientAmount);
+        this.context.getSerializer().writeDouble(data, this.moneyAmount);
 
-        context.uploadData(stream);
+        return Optional.of(data);
     }
 
     @Override
@@ -108,7 +107,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
             gui.setDisplayedMoney(this.moneyAmount);
 
             for (HumanEntity player : gui.getInventory().getViewers()) {
-                ((Player)player).playSound(getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.25f, 1f);
+                ((Player) player).playSound(getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.25f, 1f);
             }
         }
     }
@@ -188,7 +187,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public boolean isTransferEmpty() {
-        return ((int)this.moneyAmount) == 0;
+        return ((int) this.moneyAmount) == 0;
     }
 
     @Override
@@ -366,7 +365,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
         private double transformed;
 
-        Types (Material mat, int requires, double produces) {
+        Types(Material mat, int requires, double produces) {
             this.mat = mat;
             this.requires = requires;
             this.produces = produces;

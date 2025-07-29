@@ -78,6 +78,7 @@ public class Debug extends AbstractCommand {
                 player.teleport(loc);
                 return;
             }
+
             if (args[0].equalsIgnoreCase("find")) {
                 Query query = new Query("SELECT * FROM mechanics");
 
@@ -145,6 +146,8 @@ public class Debug extends AbstractCommand {
                 return;
             }
         }
+
+        /*
 
         Block block = player.getTargetBlockExact(5);
         if (block == null) {
@@ -228,6 +231,8 @@ public class Debug extends AbstractCommand {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        */
     }
 
     public static String locationToString(Location loc) {
