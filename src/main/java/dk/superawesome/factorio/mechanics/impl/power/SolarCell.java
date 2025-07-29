@@ -39,7 +39,7 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
 
     @Override
     public DelayHandler getThinkDelayHandler() {
-        return thinkHandler;
+        return this.thinkHandler;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
         if (this.loc.getBlock().getLightFromSky() == SUN_LIGHT && energy < MAX_ENERGY) {
             energy += (Math.random() * 35 + 15) / 45; // 20 to 75 / 50 = 0.4 to 1.5
         }
-        if (energy > 0) {
+        if (this.energy > 0) {
             Routes.startSignalRoute(this.loc.getBlock(), this, true, false);
         }
     }
@@ -64,14 +64,14 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
 
     @Override
     public double take(double amount) {
-        double take = Math.min(energy, amount);
-        energy -= take;
+        double take = Math.min(this.energy, amount);
+        this.energy -= take;
         return take;
     }
 
     @Override
     public boolean isTransferEmpty() {
-        return energy == 0;
+        return this.energy == 0;
     }
 
     @Override
@@ -86,7 +86,7 @@ public class SolarCell extends AbstractMechanic<SolarCell> implements ThinkingMe
 
     @Override
     public double getTransferAmount() {
-        return energy;
+        return this.energy;
     }
 
     @Override

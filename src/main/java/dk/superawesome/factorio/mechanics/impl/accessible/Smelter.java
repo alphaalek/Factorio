@@ -76,7 +76,6 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     public Smelter(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
         super(loc, rotation, context, hasWallSign, isBuild);
-        loadFromStorage();
     }
 
     @Override
@@ -142,21 +141,21 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public void pipePut(ItemCollection collection, PipePutEvent event) {
-        ingredientStorage.ensureValidStorage();
+        this.ingredientStorage.ensureValidStorage();
 
-        if (tickThrottle.isThrottled()) {
+        if (this.tickThrottle.isThrottled()) {
             return;
         }
 
-        if (ingredient != null && collection.has(ingredient) || ingredient == null && collection.has(this::canSmelt)) {
-            int add = this.<SmelterGui>put(collection, getIngredientCapacity() - ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, ingredientStorage);
+        if (this.ingredient != null && collection.has(this.ingredient) || this.ingredient == null && collection.has(this::canSmelt)) {
+            int add = this.<SmelterGui>put(collection, getIngredientCapacity() - this.ingredientAmount, getGuiInUse(), SmelterGui::updateAddedIngredients, ingredientStorage);
             if (add > 0) {
-                ingredientAmount += add;
+                this.ingredientAmount += add;
                 event.setTransferred(true);
             }
 
-            if (smeltResult == null) {
-                smeltResult = cachedSmeltResult;
+            if (this.smeltResult == null) {
+                this.smeltResult = this.cachedSmeltResult;
             }
         }
 
@@ -165,24 +164,24 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public int getCapacity() {
-        return getCapacitySlots(level) *
-                Optional.ofNullable(storageType)
+        return getCapacitySlots(this.level) *
+                Optional.ofNullable(this.storageType)
                         .map(ItemStack::getMaxStackSize)
                         .orElse(64);
     }
 
     @Override
     public int getFuelCapacity() {
-        return level.getInt(FUEL_CAPACITY_MARK) *
-                Optional.ofNullable(fuel)
+        return this.level.getInt(FUEL_CAPACITY_MARK) *
+                Optional.ofNullable(this.fuel)
                         .map(Fuel::material)
                         .map(Material::getMaxStackSize)
                         .orElse(64);
     }
 
     public int getIngredientCapacity() {
-        return level.getInt(INGREDIENT_CAPACITY_MARK) *
-                Optional.ofNullable(ingredient)
+        return this.level.getInt(INGREDIENT_CAPACITY_MARK) *
+                Optional.ofNullable(this.ingredient)
                         .map(ItemStack::getMaxStackSize)
                         .orElse(64);
     }
@@ -192,15 +191,15 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         return WASTE_OUTPUT_RELATIVES;
     }
 
-    public static boolean canSmeltStatic(ItemStack item) {
-        return FURNACE_RECIPES.stream().anyMatch(r -> r.getInputChoice().test(item));
+    public static boolean canSmeltStatic(ItemStack stack) {
+        return FURNACE_RECIPES.stream().anyMatch(r -> r.getInputChoice().test(stack));
     }
 
-    public boolean canSmelt(ItemStack item) {
-        boolean can = FURNACE_RECIPES.stream().peek(r -> cachedSmeltResult = r.getResult()).anyMatch(r -> r.getInputChoice().test(item));
+    public boolean canSmelt(ItemStack stack) {
+        boolean can = FURNACE_RECIPES.stream().peek(r -> this.cachedSmeltResult = r.getResult()).anyMatch(r -> r.getInputChoice().test(stack));
 
         if (!can) {
-            cachedSmeltResult = null;
+            this.cachedSmeltResult = null;
         }
 
         return can;
@@ -213,16 +212,16 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public void think() {
-        cachedSmeltResult = null;
+        this.cachedSmeltResult = null;
 
         // check if the smelters storage has any previously smelted items which is not the
         // same as the current smelting result.
         // if it has any, we can't smelt the new items until all the previously smelted items are removed
         // from the storage.
-        if (storageType != null && smeltResult != null && !storageType.isSimilar(smeltResult)) {
+        if (this.storageType != null && this.smeltResult != null && !this.storageType.isSimilar(this.smeltResult)) {
             // set declined state and notify the user that this smelting is not possible yet
-            if (!declinedState) {
-                declinedState = true;
+            if (!this.declinedState) {
+                this.declinedState = true;
                 SmelterGui gui = this.<SmelterGui>getGuiInUse().get();
                 if (gui != null) {
                     gui.updateDeclinedState(true);
@@ -233,8 +232,8 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         }
 
         // remove declined state if set and smelting is available
-        if (declinedState) {
-            declinedState = false;
+        if (this.declinedState) {
+            this.declinedState = false;
             SmelterGui gui = this.<SmelterGui>getGuiInUse().get();
             if (gui != null) {
                 gui.updateDeclinedState(false);
@@ -242,22 +241,22 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         }
 
         // update smelt result if it failed to do so
-        if (ingredient != null && smeltResult == null) {
-            canSmelt(ingredient);
-            smeltResult = cachedSmeltResult;
+        if (this.ingredient != null && this.smeltResult == null) {
+            canSmelt(this.ingredient);
+            this.smeltResult = this.cachedSmeltResult;
 
-            if (smeltResult == null) {
+            if (this.smeltResult == null) {
                 // this item can not be smelted, it shouldn't be in the smelter
-                ingredient = null;
-                ingredientAmount = 0;
+                this.ingredient = null;
+                this.ingredientAmount = 0;
                 return;
             }
         }
 
         // if there are no ingredients ready to be smelted, don't continue
-        if (ingredient == null
+        if (this.ingredient == null
                 // if there is no space left, don't continue
-                || storageAmount + smeltResult.getAmount() > getCapacity()) {
+                || this.storageAmount + this.smeltResult.getAmount() > getCapacity()) {
             return;
         }
 
@@ -267,77 +266,77 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         }
 
         // update storage type if not set
-        if (storageType == null) {
+        if (this.storageType == null) {
             ItemStack stored = smeltResult;
             stored.setAmount(1);
             storageType = stored;
         }
 
         // do the smelting
-        ingredientAmount -= 1;
-        storageAmount += smeltResult.getAmount();
+        this.ingredientAmount -= 1;
+        this.storageAmount += this.smeltResult.getAmount();
 
-        xp += xpDist.poll();
+        this.xp += this.xpDist.poll();
 
         SmelterGui gui = this.<SmelterGui>getGuiInUse().get();
         if (gui != null) {
             gui.updateRemovedIngredients(1);
-            gui.updateAddedStorage(smeltResult.getAmount());
+            gui.updateAddedStorage(this.smeltResult.getAmount());
             gui.updateFuelState();
         }
 
         // the smelter does not have any ingredients left, clear up
-        if (ingredientAmount == 0) {
-            ingredient = null;
-            cachedSmeltResult = null;
-            smeltResult = null;
+        if (this.ingredientAmount == 0) {
+            this.ingredient = null;
+            this.cachedSmeltResult = null;
+            this.smeltResult = null;
         }
     }
 
     @Override
     public boolean has(ItemStack stack) {
-        return has(i -> i.isSimilar(stack) && storageAmount >= stack.getAmount());
+        return has(i -> i.isSimilar(stack) && this.storageAmount >= stack.getAmount());
     }
 
     @Override
     public boolean has(Predicate<ItemStack> stack) {
-        return storageType != null && stack.test(storageType);
+        return this.storageType != null && stack.test(this.storageType);
     }
 
     @Override
     public List<ItemStack> pipeTake(int amount) {
-        storedStorage.ensureValidStorage();
+        this.storedStorage.ensureValidStorage();
 
-        if (tickThrottle.isThrottled() || storageType == null || storageAmount == 0) {
+        if (this.tickThrottle.isThrottled() || this.storageType == null || this.storageAmount == 0) {
             return Collections.emptyList();
         }
 
-        return this.<SmelterGui>take((int) Math.min(getMaxTransfer(), amount), storageType, storageAmount, getGuiInUse(), SmelterGui::updateRemovedStorage, storedStorage);
+        return this.<SmelterGui>take((int) Math.min(getMaxTransfer(), amount), this.storageType, this.storageAmount, getGuiInUse(), SmelterGui::updateRemovedStorage, this.storedStorage);
     }
 
     @Override
     public boolean isTransferEmpty() {
-        return storageType == null;
+        return this.storageType == null;
     }
 
     @Override
     public DelayHandler getTransferDelayHandler() {
-        return transferDelayHandler;
+        return this.transferDelayHandler;
     }
 
     @Override
     public double getMaxTransfer() {
-        return storageType.getMaxStackSize();
+        return this.storageType.getMaxStackSize();
     }
 
     @Override
     public double getTransferAmount() {
-        return storageAmount;
+        return this.storageAmount;
     }
 
     @Override
     public boolean isContainerEmpty() {
-        return fuel == null && ingredient == null;
+        return this.fuel == null && this.ingredient == null;
     }
 
     @Override
@@ -346,7 +345,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     public ItemStack getIngredient() {
-        return ingredient;
+        return this.ingredient;
     }
 
     public void setIngredient(ItemStack stack) {
@@ -354,22 +353,22 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     public int getIngredientAmount() {
-        return ingredientAmount;
+        return this.ingredientAmount;
     }
 
     public void setIngredientAmount(int amount) {
         this.ingredientAmount = amount;
 
         if (this.ingredientAmount == 0) {
-            ingredient = null;
-            cachedSmeltResult = null;
-            smeltResult = null;
+            this.ingredient = null;
+            this.cachedSmeltResult = null;
+            this.smeltResult = null;
         }
     }
 
     @Override
     public Fuel getFuel() {
-        return fuel;
+        return this.fuel;
     }
 
     @Override
@@ -383,7 +382,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
     @Override
     public int getFuelAmount() {
-        return fuelAmount;
+        return this.fuelAmount;
     }
 
     @Override
@@ -391,13 +390,13 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         this.fuelAmount = amount;
 
         if (this.fuelAmount == 0) {
-            fuel = null;
+            this.fuel = null;
         }
     }
 
     @Override
     public Fuel getCurrentFuel() {
-        return currentFuel;
+        return this.currentFuel;
     }
 
     @Override
@@ -410,7 +409,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     public ItemStack getSmeltResult() {
-        return smeltResult;
+        return this.smeltResult;
     }
 
     public void setSmeltResult(ItemStack stack) {
@@ -418,7 +417,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     public ItemStack getStorageType() {
-        return storageType;
+        return this.storageType;
     }
 
     public void setStorageType(ItemStack stack) {
@@ -430,20 +429,20 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     public int getStorageAmount() {
-        return storageAmount;
+        return this.storageAmount;
     }
 
     public void setStorageAmount(int amount) {
         this.storageAmount = amount;
 
         if (this.storageAmount == 0) {
-            storageType = null;
+            this.storageType = null;
         }
     }
 
     @Override
     public float getCurrentFuelAmount() {
-        return currentFuelAmount;
+        return this.currentFuelAmount;
     }
 
     @Override
@@ -460,10 +459,10 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
     }
 
     public boolean isDeclined() {
-        return declinedState;
+        return this.declinedState;
     }
 
     public ItemStack getCachedSmeltResult() {
-        return cachedSmeltResult;
+        return this.cachedSmeltResult;
     }
 }

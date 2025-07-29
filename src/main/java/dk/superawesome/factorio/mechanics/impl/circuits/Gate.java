@@ -36,9 +36,9 @@ public class Gate extends Circuit<Gate, TransferCollection> implements Container
     private void checkSignal() {
         this.open = true;
         for (BlockFace face : Routes.SIGNAL_EXPAND_DIRECTIONS) {
-            Block block = loc.getBlock().getRelative(face);
+            Block block = this.loc.getBlock().getRelative(face);
             if (block.getType() == Material.REPEATER &&
-                    BlockUtil.getPointingBlock(block, true).getLocation().equals(loc)
+                    BlockUtil.getPointingBlock(block, true).getLocation().equals(this.loc)
                     && ((Repeater)block.getBlockData()).isPowered()) {
                 this.open = false;
             }
@@ -53,14 +53,14 @@ public class Gate extends Circuit<Gate, TransferCollection> implements Container
     @EventHandler
     public void onRedstoneInput(BlockRedstoneEvent event) {
         if (event.getBlock().getType() == Material.REPEATER
-                && BlockUtil.getPointingBlock(event.getBlock(), true).getLocation().equals(loc)) {
+                && BlockUtil.getPointingBlock(event.getBlock(), true).getLocation().equals(this.loc)) {
             this.open = event.getNewCurrent() == 0;
         }
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        if (BlockUtil.isRelativeFast(event.getBlock(), loc.getBlock())) {
+        if (BlockUtil.isRelativeFast(event.getBlock(), this.loc.getBlock())) {
             Bukkit.getScheduler().runTask(Factorio.get(), this::checkSignal);
         }
     }
@@ -77,7 +77,7 @@ public class Gate extends Circuit<Gate, TransferCollection> implements Container
 
     @Override
     public boolean pipePut(TransferCollection collection) {
-        return open && Routes.startTransferRoute(loc.getBlock(), collection, this, false);
+        return this.open && Routes.startTransferRoute(this.loc.getBlock(), collection, this, false);
     }
 
     @Override

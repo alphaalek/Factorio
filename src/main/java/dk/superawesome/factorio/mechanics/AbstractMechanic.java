@@ -52,19 +52,21 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
             } catch (SQLException | IOException ex) {
                 throw new RuntimeException("Failed to load mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
             }
+
+            try {
+                load(this.context);
+            } catch (Exception ex) {
+                Factorio.get().getLogger().log(Level.SEVERE, "Failed to load data for mechanic " + this  + ", " + getLocation(), ex);
+            }
         } else {
             this.level = MechanicLevel.from(this, 1);
             this.management = context.getFallbackManagement();
-        }
-    }
 
-    protected void loadFromStorage() {
-        try  {
-            if (this.context.hasContext()) {
-                load(this.context);
+            try {
+                Factorio.get().getContextProvider().create(this.loc, this.rot, getProfile().getName(), this.management.getOwner());
+            } catch (StorageException ex) {
+                throw new RuntimeException("Failed to initialize mechanic " + this  + " at " + Types.LOCATION.convert(loc), ex);
             }
-        } catch (Exception ex) {
-            Factorio.get().getLogger().log(Level.SEVERE, "Failed to load data for mechanic " + this  + ", " + getLocation(), ex);
         }
     }
 
@@ -77,11 +79,6 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
     @Override
     public boolean save() {
         try {
-            // ensure record exists
-            if (!this.context.hasContext()) {
-                Factorio.get().getContextProvider().create(this.loc, this.rot, getProfile().getName(), this.management.getOwner());
-            }
-
             // save data for this mechanic
             this.context.setLevel(this.level.lvl());
             this.context.setXP(this.xp);

@@ -30,14 +30,14 @@ public class Comparator extends SignalTrigger<Comparator> implements ThinkingMec
 
     @Override
     public void think() {
-        if (collectionTrigger != null) {
-            if (collectionTrigger.isTransferEmpty() && powered) {
-                powered = false;
-            } else if (!collectionTrigger.isTransferEmpty() && !powered) {
-                powered = true;
+        if (this.collectionTrigger != null) {
+            if (this.collectionTrigger.isTransferEmpty() && this.powered) {
+                this.powered = false;
+            } else if (!this.collectionTrigger.isTransferEmpty() && !this.powered) {
+                this.powered = true;
             } else return;
-        } else if (powered) {
-            powered = false;
+        } else if (this.powered) {
+            this.powered = false;
         } else return;
 
         triggerLevers();
@@ -79,7 +79,7 @@ public class Comparator extends SignalTrigger<Comparator> implements ThinkingMec
     public void onMechanicBuild(MechanicBuildEvent event) {
         if (this.collectionTrigger == null && event.getMechanic() instanceof TransferCollection collection) {
             if (Factorio.get().getMechanicManagerFor(this).getMechanicAt(
-                    BlockUtil.getPointingBlock(loc.getBlock(), true).getLocation()) == collection) {
+                    BlockUtil.getPointingBlock(this.loc.getBlock(), true).getLocation()) == collection) {
                 this.collectionTrigger = collection;
             }
         }

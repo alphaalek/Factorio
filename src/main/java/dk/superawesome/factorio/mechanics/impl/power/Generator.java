@@ -60,7 +60,6 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     public Generator(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
         super(loc, rotation, context, hasWallSign, isBuild);
-        loadFromStorage();
     }
 
     @Override
@@ -89,15 +88,15 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public void onUpgrade(int newLevel) {
-        thinkDelayHandler.setDelay(level.getInt(MechanicLevel.THINK_DELAY_MARK));
+        this.thinkDelayHandler.setDelay(this.level.getInt(MechanicLevel.THINK_DELAY_MARK));
         super.onUpgrade(newLevel);
     }
 
     @Override
     public void onBlocksLoaded(Player by) {
-        lever = this.loc.getBlock().getRelative(this.rot.getOppositeFace());
-        campfire = this.loc.getBlock().getRelative(0, 2, 0);
-        if (lever.getType() != Material.LEVER || campfire.getType() != Material.CAMPFIRE) {
+        this.lever = this.loc.getBlock().getRelative(this.rot.getOppositeFace());
+        this.campfire = this.loc.getBlock().getRelative(0, 2, 0);
+        if (this.lever.getType() != Material.LEVER || this.campfire.getType() != Material.CAMPFIRE) {
             // invalid generator
             Factorio.get().getMechanicManagerFor(this).deleteMechanic(this);
             return;
@@ -114,23 +113,23 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public DelayHandler getThinkDelayHandler() {
-        return thinkDelayHandler;
+        return this.thinkDelayHandler;
     }
 
     @Override
     public void think() {
         // check if the generator does not have any energy available for a power central
-        if (availableEnergy <= getTransferEnergyCost() * 2) {
+        if (this.availableEnergy <= getTransferEnergyCost() * 2) {
             // ... use fuel and generate energy if not
-            Fuel prevFuel = fuel;
-            Fuel prevCurrentFuel = currentFuel;
+            Fuel prevFuel = this.fuel;
+            Fuel prevCurrentFuel = this.currentFuel;
 
             FuelState state = useFuel();
             if (state != FuelState.ABORT) {
                 Fuel useFuel = prevCurrentFuel != null ? prevCurrentFuel : prevFuel; // both can't be null, but has to check current fuel first
-                availableEnergy += useFuel.getEnergyAmount();
+                this.availableEnergy += useFuel.getEnergyAmount();
 
-                xp += xpDist.poll();
+                this.xp += this.xpDist.poll();
 
                 GeneratorGui gui = this.<GeneratorGui>getGuiInUse().get();
                 if (gui != null) {
@@ -140,25 +139,25 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
         }
 
         // try to transfer energy if the generator has any energy available
-        if (availableEnergy > 0) {
-            double prevProvideEnergy = availableEnergy;
-            Routes.startSignalRoute(lever, this, true, false);
+        if (this.availableEnergy > 0) {
+            double prevProvideEnergy = this.availableEnergy;
+            Routes.startSignalRoute(this.lever, this, true, false);
 
-            if (availableEnergy == prevProvideEnergy && turnedOn) {
+            if (this.availableEnergy == prevProvideEnergy && this.turnedOn) {
                 // the generator was not able to transfer any energy, although it has energy to provide, so turn off
-                turnedOn = false;
+                this.turnedOn = false;
                 updateLight();
             }
-        } else if (turnedOn) {
+        } else if (this.turnedOn) {
             // turn off after all energy has been transferred to a power central
-            turnedOn = false;
+            this.turnedOn = false;
             updateLight();
         }
     }
 
     @Override
     public void updateLight() {
-        if (loc.getWorld() != null) {
+        if (this.loc.getWorld() != null) {
             BlockData data = this.campfire.getBlockData();
             if (data instanceof Campfire) {
                 ((Campfire)data).setLit(this.turnedOn);
@@ -166,14 +165,14 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
             }
 
             Switch lever = (Switch) this.lever.getBlockData();
-            lever.setPowered(turnedOn);
+            lever.setPowered(this.turnedOn);
             this.lever.setBlockData(lever);
         }
     }
 
     @Override
     public void pipePut(ItemCollection collection, PipePutEvent event) {
-        if (tickThrottle.isThrottled()) {
+        if (this.tickThrottle.isThrottled()) {
             return;
         }
 
@@ -188,10 +187,10 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
     @Override
     public boolean handleOutput(Block block, Location loc, Block from) {
         boolean transferred = Routes.invokeEnergySourceOutput(block, loc, this, this);
-        if (transferred && !turnedOn) {
+        if (transferred && !this.turnedOn) {
             // update light state if the generator was able to transfer energy, and it's currently not turned on
             // we don't have to check the other way around because that is just handled in the next self tick
-            turnedOn = true;
+            this.turnedOn = true;
             updateLight();
         }
 
@@ -200,13 +199,13 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public boolean isContainerEmpty() {
-        return fuelAmount == 0;
+        return this.fuelAmount == 0;
     }
 
     @Override
     public int getCapacity() {
-        return getCapacitySlots(level) *
-                Optional.ofNullable(fuel)
+        return getCapacitySlots(this.level) *
+                Optional.ofNullable(this.fuel)
                         .map(Fuel::material)
                         .map(Material::getMaxStackSize)
                         .orElse(64);
@@ -300,8 +299,8 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public double take(double amount) {
-        double take = Math.min(availableEnergy, amount);
-        availableEnergy -= take;
+        double take = Math.min(this.availableEnergy, amount);
+        this.availableEnergy -= take;
         return take;
     }
 
@@ -312,22 +311,22 @@ public class Generator extends AbstractMechanic<Generator> implements FuelMechan
 
     @Override
     public boolean isTransferEmpty() {
-        return availableEnergy == 0;
+        return this.availableEnergy == 0;
     }
 
     @Override
     public DelayHandler getTransferDelayHandler() {
-        return thinkDelayHandler;
+        return this.thinkDelayHandler;
     }
 
     @Override
     public double getMaxTransfer() {
-        return availableEnergy;
+        return this.availableEnergy;
     }
 
     @Override
     public double getTransferAmount() {
-        return availableEnergy;
+        return this.availableEnergy;
     }
 
     @Override

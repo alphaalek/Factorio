@@ -131,94 +131,94 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
     }
 
     public boolean invokeChild(SignalSource source) {
-        if (invoked) {
+        if (this.invoked) {
             return false;
         }
 
         boolean transferred = false;
-        invoked = true;
-        for (Block lever : levers) {
+        this.invoked = true;
+        for (Block lever : this.levers) {
             boolean did = Routes.startSignalRoute(lever, source, false, false);
             if (did) {
                 transferred = true;
             }
         }
-        invoked = false;
+        this.invoked = false;
 
         return transferred;
     }
 
     @EventHandler
     public void onSignal(BlockRedstoneEvent event) {
-        if (BlockUtil.isDiagonal2DFast(event.getBlock(), loc.getBlock()) && event.getBlock().getType() == Material.REPEATER) {
+        if (BlockUtil.isDiagonal2DFast(event.getBlock(), this.loc.getBlock()) && event.getBlock().getType() == Material.REPEATER) {
             Block point = BlockUtil.getPointingBlock(event.getBlock(), true);
-            if (point != null && point.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(point, false).equals(loc.getBlock())) {
-                boolean prev = powered;
+            if (point != null && point.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(point, false).equals(this.loc.getBlock())) {
+                boolean prev = this.powered;
                 double xDiff = this.loc.getX() - event.getBlock().getX();
                 double zDiff = this.loc.getZ() - event.getBlock().getZ();
                 // mask relative signals
                 if (xDiff > 0 && zDiff == 0) {
                     if (event.getNewCurrent() > 0) {
-                        poweredBy |= 1;
+                        this.poweredBy |= 1;
                     } else {
-                        poweredBy &= ~1;
+                        this.poweredBy &= ~1;
                     }
                 } else if (xDiff < 0 && zDiff == 0) {
                     if (event.getNewCurrent() > 0) {
-                        poweredBy |= 2;
+                        this.poweredBy |= 2;
                     } else {
-                        poweredBy &= ~2;
+                        this.poweredBy &= ~2;
                     }
                 } else if (zDiff > 0 && xDiff == 0) {
                     if (event.getNewCurrent() > 0) {
-                        poweredBy |= 4;
+                        this.poweredBy |= 4;
                     } else {
-                        poweredBy &= ~4;
+                        this.poweredBy &= ~4;
                     }
                 } else if (zDiff < 0 && xDiff == 0) {
                     if (event.getNewCurrent() > 0) {
-                        poweredBy |= 8;
+                        this.poweredBy |= 8;
                     } else {
-                        poweredBy &= ~8;
+                        this.poweredBy &= ~8;
                     }
                 }
-                powered = poweredBy > 0;
+                this.powered = this.poweredBy > 0;
 
-                if (powered != prev) {
-                    startLift(lifter -> lifter.triggerLevers(powered));
+                if (this.powered != prev) {
+                    startLift(lifter -> lifter.triggerLevers(this.powered));
                 }
             }
         }
     }
 
     private void invokeRoot(List<Block> unpowered) {
-        if (invokeThrottle.tryThrottle()) {
+        if (this.invokeThrottle.tryThrottle()) {
             return;
         }
 
-        isRoot = false;
+        this.isRoot = false;
         // only used for root anyway, so we can clear these without any consequences
-        powered = false;
-        poweredBy = 0;
+        this.powered = false;
+        this.poweredBy = 0;
         // check for root lifter
         BlockUtil.forRelative(this.loc.getBlock(), b -> {
             if (b.getType() == Material.STICKY_PISTON && BlockUtil.getPointingBlock(b, false).equals(this.loc.getBlock())) {
                 BlockUtil.forRelative(b, b2 -> {
                     if (b2.getType() == Material.REPEATER && BlockUtil.getPointingBlock(b2, true).equals(b) && ((Powerable)b2.getBlockData()).isPowered()) {
-                        isRoot = true;
+                        this.isRoot = true;
 
                         if (!unpowered.contains(b2)) {
                             double xDiff = this.loc.getX() - b2.getX();
                             double zDiff = this.loc.getZ() - b2.getZ();
                             // mask relative signals
                             if (xDiff > 0 && zDiff == 0) {
-                                poweredBy |= 1;
+                                this.poweredBy |= 1;
                             } else if (xDiff < 0 && zDiff == 0) {
-                                poweredBy |= 2;
+                                this.poweredBy |= 2;
                             } else if (zDiff > 0 && xDiff == 0) {
-                                poweredBy |= 4;
+                                this.poweredBy |= 4;
                             } else if (zDiff < 0 && xDiff == 0) {
-                                poweredBy |= 8;
+                                this.poweredBy |= 8;
                             }
                         }
                     }
@@ -226,9 +226,9 @@ public class PowerLifter extends SignalTrigger<PowerLifter> implements SignalInv
             }
         });
 
-        if (isRoot) {
-            powered = poweredBy > 0;
-            startLift(lifter -> lifter.triggerLevers(powered));
+        if (this.isRoot) {
+            this.powered = this.poweredBy > 0;
+            startLift(lifter -> lifter.triggerLevers(this.powered));
         }
     }
 

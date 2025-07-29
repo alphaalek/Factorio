@@ -22,7 +22,6 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
 
     public EmeraldForge(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
         super(loc, rotation, context, hasWallSign, isBuild);
-        loadFromStorage();
     }
 
     @Override
@@ -42,7 +41,7 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
     @Override
     public void onUpdate() {
         Sign sign = getSign();
-        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(moneyAmount / getCapacity() * 100, 2) + "% fyldt");
+        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(this.moneyAmount / getCapacity() * 100, 2) + "% fyldt");
         sign.update();
     }
 
@@ -53,15 +52,15 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
 
     @Override
     public boolean isContainerEmpty() {
-        return moneyAmount < .01; // can't be formatted with 2 decimals
+        return this.moneyAmount < .01; // can't be formatted with 2 decimals
     }
 
     @Override
     public void pipePut(MoneyCollection collection, PipePutEvent event) {
-        double take = Math.min(64, getCapacity() - moneyAmount);
+        double take = Math.min(64, getCapacity() - this.moneyAmount);
         double amount = collection.take(take);
         if (amount > 0) {
-            moneyAmount += amount;
+            this.moneyAmount += amount;
             event.setTransferred(true);
 
             EmeraldForgeGui gui = this.<EmeraldForgeGui>getGuiInUse().get();
@@ -73,7 +72,7 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
 
     @Override
     public int getCapacity() {
-        return level.getInt(MoneyCollection.CAPACITY_MARK);
+        return this.level.getInt(MoneyCollection.CAPACITY_MARK);
     }
 
     public double getMoneyAmount() {

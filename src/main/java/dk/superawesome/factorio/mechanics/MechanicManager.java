@@ -132,7 +132,7 @@ public class MechanicManager implements Listener {
                     callback.accept(mechanic);
                 });
             } catch (StorageException ex) {
-                Bukkit.getLogger().log(Level.SEVERE, "Failed to load mechanic at " + loc, ex);
+                throw new RuntimeException(ex);
             }
         });
     }
@@ -334,6 +334,15 @@ public class MechanicManager implements Listener {
     }
 
     public void buildMechanic(Sign sign, Block on, Player owner, Consumer<MechanicBuildResponse> callback) {
+        try {
+            buildMechanic0(sign, on, owner, callback);
+        } catch (Exception ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Failed to build mechanic at " + sign.getBlock().getLocation(), ex);
+            callback.accept(MechanicBuildResponse.ERROR);
+        }
+    }
+
+    private void buildMechanic0(Sign sign, Block on, Player owner, Consumer<MechanicBuildResponse> callback) {
         Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
         if (profile.isEmpty()) {
             callback.accept(MechanicBuildResponse.NO_SUCH);
@@ -397,7 +406,7 @@ public class MechanicManager implements Listener {
                     }
                 } catch (SQLException ex) {
                     Bukkit.getLogger().log(Level.SEVERE, "A SQL error occurred!", ex);
-                    owner.sendMessage("§cDer opstod en fejl ved tilføjelse af standard medlemmer.");
+                    owner.sendMessage("§cDer opstod en fejl ved tilføjelse af standard medlemmer. Kontakt en udvikler.");
                 }
             });
 
@@ -411,6 +420,14 @@ public class MechanicManager implements Listener {
     }
 
     public void loadMechanic(Sign sign, Consumer<Boolean> callback) {
+        try {
+            loadMechanic0(sign, callback);
+        } catch (Exception ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Failed to load mechanic at " + sign.getBlock());
+        }
+    }
+
+    private void loadMechanic0(Sign sign, Consumer<Boolean> callback) {
         Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
         Block on = getBlockOn(sign);
         if (on != null && profile.isPresent()) {

@@ -33,21 +33,21 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
         this.fluid = null;
         this.amount = 0;
         if (loc.getBlock().getType() == Material.WATER_CAULDRON) {
-            Levelled cauldron = (Levelled) loc.getBlock().getBlockData();
-            amount = cauldron.getLevel();
-            fluid = Fluid.WATER;
+            Levelled cauldron = (Levelled) this.loc.getBlock().getBlockData();
+            this.amount = cauldron.getLevel();
+            this.fluid = Fluid.WATER;
         } else {
-            amount = 3;
-            switch (loc.getBlock().getType()) {
-                case LAVA_CAULDRON -> fluid = Fluid.LAVA;
-                case POWDER_SNOW_CAULDRON -> fluid = Fluid.SNOW;
+            this.amount = 3;
+            switch (this.loc.getBlock().getType()) {
+                case LAVA_CAULDRON -> this.fluid = Fluid.LAVA;
+                case POWDER_SNOW_CAULDRON -> this.fluid = Fluid.SNOW;
             }
         }
     }
 
     @EventHandler
     public void onCauldronLevelChange(CauldronLevelChangeEvent event) {
-        if (event.getBlock().equals(loc.getBlock())) {
+        if (event.getBlock().equals(this.loc.getBlock())) {
             Bukkit.getScheduler().runTask(Factorio.get(), this::checkCauldron);
         }
     }
@@ -64,7 +64,7 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
 
     @Override
     public DelayHandler getTransferDelayHandler() {
-        return transferDelayHandler;
+        return this.transferDelayHandler;
     }
 
     @Override
@@ -97,18 +97,18 @@ public class Cauldron extends AbstractMechanic<Cauldron> implements FluidCollect
         int take = Math.min(this.amount, amount);
 
         // if its trying to transfer less than the minimum, then return zero
-        if (take < fluid.getMinTransfer()) {
+        if (take < this.fluid.getMinTransfer()) {
             return 0;
         }
 
         this.amount -= take;
         if (this.amount == 0) {
             this.fluid = null;
-            loc.getBlock().setType(Material.CAULDRON);
+            this.loc.getBlock().setType(Material.CAULDRON);
         } else {
-            Levelled cauldron = (Levelled) loc.getBlock().getBlockData();
+            Levelled cauldron = (Levelled) this.loc.getBlock().getBlockData();
             cauldron.setLevel(this.amount);
-            loc.getBlock().setBlockData(cauldron);
+            this.loc.getBlock().setBlockData(cauldron);
         }
 
         return take;

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Management {
 
@@ -101,6 +102,10 @@ public class Management {
         } else {
             return false;
         }
+    }
+
+    public Management copy() {
+        return new Management(this.owner, new HashSet<>(this.members));
     }
 
     @Override

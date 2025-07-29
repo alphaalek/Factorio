@@ -35,16 +35,16 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     @Override
     public void think() {
         // if all assembler prices are above the minPrice or minPercentage, power is off
-        powered = false;
+        this.powered = false;
 
-        for (Assembler assembler : assemblers) {
+        for (Assembler assembler : this.assemblers) {
             if (assembler.getType() != null) {
                 Assembler.Type type = assembler.getType();
 
-                if (usePrice && type.getPricePerItem() < minPrice) {
-                    powered = true;
+                if (this.usePrice && type.getPricePerItem() < this.minPrice) {
+                    this.powered = true;
                     break;
-                } else if (usePercentage) {
+                } else if (this.usePercentage) {
                     double percentage = 0;
                     if (type.getProduces() > type.getType().getProduces()) {
                         percentage = (type.getProduces() / type.getType().getProduces() - 1) * 100;
@@ -52,8 +52,8 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
                         percentage = (type.getType().getProduces() / type.getProduces() - 1) * 100 * -1;
                     }
 
-                    if (percentage < minPercentage) {
-                        powered = true;
+                    if (percentage < this.minPercentage) {
+                        this.powered = true;
                         break;
                     }
                 }
@@ -65,7 +65,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     @EventHandler
     public void onPriceUpdate(AssemblerTypeRequestEvent event) {
-        for (Assembler assembler : assemblers) {
+        for (Assembler assembler : this.assemblers) {
             if (assembler.getType() != null && assembler.getType().isTypesEquals(event.getType())) {
                 think();
                 break;
@@ -75,7 +75,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     @EventHandler
     public void onAssemblerTypeChange(AssemblerTypeChangeEvent event) {
-        for (Assembler assembler : assemblers) {
+        for (Assembler assembler : this.assemblers) {
             if (assembler.getType() != null && assembler.getType().isTypesEquals(event.getNewType())) {
                 think();
                 break;
@@ -104,13 +104,13 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
     @Override
     public void onBlocksLoaded(Player by) {
-        assemblers.clear();
+        this.assemblers.clear();
         loadPrice(getSign(), by);
 
         Bukkit.getScheduler().runTask(Factorio.get(), () -> {
             setupRelativeBlocks(at -> triggerLever(at, true), at -> {
                 if (at instanceof Assembler assembler) {
-                    assemblers.add(assembler);
+                    this.assemblers.add(assembler);
                 }
             });
 
@@ -129,20 +129,20 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     }
 
     private void loadPrice(Sign sign, Player by) {
-        usePercentage = false;
-        usePrice = false;
+        this.usePercentage = false;
+        this.usePrice = false;
         int i = 0;
         for (String line : Arrays.copyOfRange(sign.getSide(Side.FRONT).getLines(), 1, 4)) {
             try {
                 // check for absolute price
-                minPrice = Double.parseDouble(line);
-                usePrice = true;
+                this.minPrice = Double.parseDouble(line);
+                this.usePrice = true;
             } catch (NumberFormatException e) {
                 if (line.endsWith("%")) {
                     try {
                         // check for percentage
-                        minPercentage = Double.parseDouble(line.substring(0, line.length() - 1));
-                        usePercentage = true;
+                        this.minPercentage = Double.parseDouble(line.substring(0, line.length() - 1));
+                        this.usePercentage = true;
                     } catch (NumberFormatException ignored) {
                     }
                 }
@@ -150,7 +150,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
             i++;
 
-            if (usePrice || usePercentage) {
+            if (this.usePrice || this.usePercentage) {
                 // clear all other lines
                 for (int j = 1; j < 4; j++) {
                     if (j != i) {
@@ -166,7 +166,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
 
 
         // check if no valid filter found for this line
-        if (!usePrice && !usePercentage) {
+        if (!this.usePrice && !this.usePercentage) {
             Factorio.get().getMechanicManagerFor(this).deleteMechanic(this);
 
             if (by != null) {
@@ -189,9 +189,9 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     public void onMechanicLoad(MechanicLoadEvent event) {
         if (event.getMechanic() instanceof Assembler assembler) {
             MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
-            BlockUtil.forRelative(loc.getBlock(), block -> {
+            BlockUtil.forRelative(this.loc.getBlock(), block -> {
                 if (manager.getMechanicAt(block.getLocation()) == event.getMechanic()) {
-                    assemblers.add(assembler);
+                    this.assemblers.add(assembler);
                 }
             });
         }
@@ -200,7 +200,7 @@ public class AssemblerTrigger extends SignalTrigger<AssemblerTrigger> implements
     @EventHandler
     public void onMechanicRemove(MechanicRemoveEvent event) {
         if (event.getMechanic() instanceof Assembler assembler) {
-            assemblers.remove(assembler);
+            this.assemblers.remove(assembler);
         }
     }
 }

@@ -135,7 +135,7 @@ public class Filter extends Circuit<Filter, ItemCollection> implements ItemConta
     public boolean pipePut(ItemCollection collection) {
         for (Predicate<ItemStack> filter : this.filter) {
             if (collection.has(filter)) {
-                return Routes.startTransferRoute(loc.getBlock(), collection, this, false);
+                return Routes.startTransferRoute(this.loc.getBlock(), collection, this, false);
             }
         }
 

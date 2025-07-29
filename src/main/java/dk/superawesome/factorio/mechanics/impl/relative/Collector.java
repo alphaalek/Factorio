@@ -28,35 +28,35 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
 
     public boolean handleInput(Material item) {
         Block above = getLocation().getBlock().getRelative(BlockFace.UP);
-        collected = new ItemStack(item);
+        this.collected = new ItemStack(item);
         Routes.startTransferRoute(above, this, this, true);
 
         // if the collected field is null, it means that the item was collected by some container
-        boolean didCollect = collected == null;
-        collected = null;
+        boolean didCollect = this.collected == null;
+        this.collected = null;
         return didCollect;
     }
 
     @Override
     public boolean has(ItemStack stack) {
-        return has(i -> i.isSimilar(stack)) && collected.getAmount() >= stack.getAmount();
+        return has(i -> i.isSimilar(stack)) && this.collected.getAmount() >= stack.getAmount();
     }
 
     @Override
     public boolean has(Predicate<ItemStack> stack) {
-        return collected != null && stack.test(collected);
+        return this.collected != null && stack.test(this.collected);
     }
 
     @Override
     public List<ItemStack> pipeTake(int amount) {
-        ItemStack item = collected.clone();
-        if (collected.getAmount() > amount) {
+        ItemStack item = this.collected.clone();
+        if (this.collected.getAmount() > amount) {
             item.setAmount(amount);
         }
 
-        collected.setAmount(Math.max(0, collected.getAmount() - item.getAmount()));
-        if (collected.getAmount() == 0) {
-            collected = null;
+        this.collected.setAmount(Math.max(0, this.collected.getAmount() - item.getAmount()));
+        if (this.collected.getAmount() == 0) {
+            this.collected = null;
         }
 
         return Collections.singletonList(item);
@@ -64,7 +64,7 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
 
     @Override
     public boolean isTransferEmpty() {
-        return collected == null;
+        return this.collected == null;
     }
 
     @Override
@@ -74,12 +74,12 @@ public class Collector extends AbstractMechanic<Collector> implements ItemCollec
 
     @Override
     public double getMaxTransfer() {
-        return collected.getMaxStackSize();
+        return this.collected.getMaxStackSize();
     }
 
     @Override
     public double getTransferAmount() {
-        return collected.getAmount();
+        return this.collected.getAmount();
     }
 
     @Override

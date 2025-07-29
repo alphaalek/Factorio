@@ -42,7 +42,6 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     public Assembler(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
         super(loc, rotation, context, hasWallSign, isBuild);
-        loadFromStorage();
     }
 
     @Override
@@ -82,31 +81,31 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public DelayHandler getThinkDelayHandler() {
-        return thinkDelayHandler;
+        return this.thinkDelayHandler;
     }
 
     @Override
     public void think() {
         // check if an assembler type is chosen, if not, don't continue
-        if (type == null
+        if (this.type == null
                 // check if the assembler has enough ingredients to assemble, if not, don't continue
-                || ingredientAmount < type.getRequires()
+                || this.ingredientAmount < this.type.getRequires()
                 // check if the assembler has enough space for money, if not, don't continue
-                || moneyAmount + type.getProduces() > getMoneyCapacity()) {
+                || this.moneyAmount + this.type.getProduces() > getMoneyCapacity()) {
             return;
         }
 
         // do the assembling
-        ingredientAmount -= type.getRequires();
-        moneyAmount += type.getProduces();
-        xp += xpDist.poll();
+        this.ingredientAmount -= this.type.getRequires();
+        this.moneyAmount += this.type.getProduces();
+        this.xp += xpDist.poll();
 
-        type.getType().setTransformed(type.getType().getTransformed() + type.getProduces());
+        this.type.getType().setTransformed(this.type.getType().getTransformed() + this.type.getProduces());
 
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
-            gui.updateRemovedIngredients(type.getRequires());
-            gui.setDisplayedMoney(moneyAmount);
+            gui.updateRemovedIngredients(this.type.getRequires());
+            gui.setDisplayedMoney(this.moneyAmount);
 
             for (HumanEntity player : gui.getInventory().getViewers()) {
                 ((Player)player).playSound(getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.25f, 1f);
@@ -116,14 +115,14 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public boolean isContainerEmpty() {
-        return ingredientAmount == 0;
+        return this.ingredientAmount == 0;
     }
 
     @Override
     public void pipePut(ItemCollection collection, PipePutEvent event) {
-        storage.ensureValidStorage();
+        this.storage.ensureValidStorage();
 
-        if (tickThrottle.isThrottled()) {
+        if (this.tickThrottle.isThrottled()) {
             return;
         }
 
@@ -131,11 +130,11 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
                 .map(Type::getMat)
                 .map(ItemStack::new)
                 .orElse(null);
-        if ((item != null && collection.has(item) || item == null && collection.has(i -> Types.getTypeFromMaterial(i.getType()).isPresent())) && ingredientAmount < getCapacity()) {
-            int add = this.<AssemblerGui>put(collection, getCapacity() - ingredientAmount, getGuiInUse(), AssemblerGui::updateAddedIngredients, storage);
+        if ((item != null && collection.has(item) || item == null && collection.has(i -> Types.getTypeFromMaterial(i.getType()).isPresent())) && this.ingredientAmount < getCapacity()) {
+            int add = this.<AssemblerGui>put(collection, getCapacity() - this.ingredientAmount, getGuiInUse(), AssemblerGui::updateAddedIngredients, this.storage);
 
             if (add > 0) {
-                ingredientAmount += add;
+                this.ingredientAmount += add;
                 event.setTransferred(true);
             }
         }
@@ -143,15 +142,15 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public int getCapacity() {
-        return getCapacitySlots(level) *
-                Optional.ofNullable(type)
+        return getCapacitySlots(this.level) *
+                Optional.ofNullable(this.type)
                         .map(Type::getMat)
                         .map(Material::getMaxStackSize)
                         .orElse(64);
     }
 
     public double getMoneyCapacity() {
-        return level.getDouble(MoneyCollection.CAPACITY_MARK);
+        return this.level.getDouble(MoneyCollection.CAPACITY_MARK);
     }
 
     public Type getType() {
@@ -189,22 +188,22 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public boolean isTransferEmpty() {
-        return ((int)moneyAmount) == 0;
+        return ((int)this.moneyAmount) == 0;
     }
 
     @Override
     public DelayHandler getTransferDelayHandler() {
-        return transferDelayHandler;
+        return this.transferDelayHandler;
     }
 
     @Override
     public double getMaxTransfer() {
-        return type.getType().getMat().getMaxStackSize();
+        return this.type.getType().getMat().getMaxStackSize();
     }
 
     @Override
     public double getTransferAmount() {
-        return ingredientAmount;
+        return this.ingredientAmount;
     }
 
     @Override
@@ -214,12 +213,12 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
 
     @Override
     public double take(double amount) {
-        double take = Math.min(amount, moneyAmount);
-        moneyAmount -= take;
+        double take = Math.min(amount, this.moneyAmount);
+        this.moneyAmount -= take;
 
         AssemblerGui gui = this.<AssemblerGui>getGuiInUse().get();
         if (gui != null) {
-            gui.setDisplayedMoney(moneyAmount);
+            gui.setDisplayedMoney(this.moneyAmount);
         }
 
         return take;
@@ -243,19 +242,19 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         }
 
         public double getProduces() {
-            return produces;
+            return this.produces;
         }
 
         public int getRequires() {
-            return requires;
+            return this.requires;
         }
 
         public Types getType() {
-            return type;
+            return this.type;
         }
 
         public Material getMat() {
-            return type.getMat();
+            return this.type.getMat();
         }
 
         public boolean isTypesEquals(Types type) {
@@ -263,7 +262,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         }
 
         public double getPricePerItem() {
-            return produces / requires;
+            return this.produces / this.requires;
         }
 
         public void setProduces(double produces) {
@@ -374,19 +373,19 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         }
 
         public Material getMat() {
-            return mat;
+            return this.mat;
         }
 
         public int getRequires() {
-            return requires;
+            return this.requires;
         }
 
         public double getProduces() {
-            return produces;
+            return this.produces;
         }
 
         public double getTransformed() {
-            return transformed;
+            return this.transformed;
         }
 
         public void setTransformed(double amount) {

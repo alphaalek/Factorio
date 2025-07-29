@@ -29,7 +29,6 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
 
     public StorageBox(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
         super(loc, rotation, context, hasWallSign, isBuild);
-        loadFromStorage();
     }
 
     @Override
@@ -59,18 +58,18 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
     public void pipePut(ItemCollection collection, PipePutEvent event) {
         ensureValidStorage();
 
-        if (tickThrottle.isThrottled()) {
+        if (this.tickThrottle.isThrottled()) {
             return;
         }
 
-        if ((stored == null || collection.has(stored)) && amount < getCapacity()) {
+        if ((this.stored == null || collection.has(this.stored)) && this.amount < getCapacity()) {
             event.setTransferred(true);
-            amount += this.<StorageBoxGui>put(collection, getCapacity() - amount, getGuiInUse(), StorageBoxGui::updateAddedItems, this);
+            this.amount += this.<StorageBoxGui>put(collection, getCapacity() - this.amount, getGuiInUse(), StorageBoxGui::updateAddedItems, this);
         }
     }
 
     public int put(int amount) {
-        if (tickThrottle.isThrottled()) {
+        if (this.tickThrottle.isThrottled()) {
             return 0;
         }
 
@@ -90,8 +89,8 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
 
     @Override
     public int getCapacity() {
-        return getCapacitySlots(level) *
-                Optional.ofNullable(stored)
+        return getCapacitySlots(this.level) *
+                Optional.ofNullable(this.stored)
                         .map(ItemStack::getMaxStackSize)
                         .orElse(64);
     }
@@ -110,7 +109,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
 
     @Override
     public boolean has(Predicate<ItemStack> stack) {
-        return stored != null && stack.test(stored);
+        return this.stored != null && stack.test(this.stored);
     }
 
     @Override
@@ -121,32 +120,32 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
     public List<ItemStack> take(int amount) {
         ensureValidStorage();
 
-        if (tickThrottle.isThrottled() || stored == null || amount == 0) {
+        if (this.tickThrottle.isThrottled() || this.stored == null || amount == 0) {
             return Collections.emptyList();
         }
 
-        return this.<StorageBoxGui>take(amount, stored, this.amount, getGuiInUse(), StorageBoxGui::updateRemovedItems, this);
+        return this.<StorageBoxGui>take(amount, this.stored, this.amount, getGuiInUse(), StorageBoxGui::updateRemovedItems, this);
 
     }
 
     @Override
     public boolean isTransferEmpty() {
-        return stored == null;
+        return this.stored == null;
     }
 
     @Override
     public DelayHandler getTransferDelayHandler() {
-        return transferDelayHandler;
+        return this.transferDelayHandler;
     }
 
     @Override
     public double getMaxTransfer() {
-        return stored.getMaxStackSize();
+        return this.stored.getMaxStackSize();
     }
 
     @Override
     public boolean isContainerEmpty() {
-        return stored == null;
+        return this.stored == null;
     }
 
     @Override
@@ -156,7 +155,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
 
     @Override
     public ItemStack getStored() {
-        return stored;
+        return this.stored;
     }
 
     @Override
@@ -170,12 +169,12 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
 
     @Override
     public int getAmount() {
-        return amount;
+        return this.amount;
     }
 
     @Override
     public double getTransferAmount() {
-        return amount;
+        return this.amount;
     }
 
     @Override
@@ -183,7 +182,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
         this.amount = amount;
 
         if (this.amount == 0) {
-            stored = null;
+            this.stored = null;
         }
     }
 }

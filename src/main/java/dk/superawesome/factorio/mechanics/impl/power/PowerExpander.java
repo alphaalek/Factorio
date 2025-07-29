@@ -33,13 +33,13 @@ public class PowerExpander extends AbstractMechanic<PowerExpander> implements Si
 
     @Override
     public boolean invoke(SignalSource source) {
-        if (invoked) {
+        if (this.invoked) {
             return false;
         }
 
         if (source instanceof PowerCentral pc) {
             AtomicBoolean transferred = new AtomicBoolean();
-            invoked = true;
+            this.invoked = true;
 
             BlockUtil.forRelative(this.loc.getBlock(), new Action<>() {
 

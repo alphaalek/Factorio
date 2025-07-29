@@ -30,8 +30,8 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
 
     @Override
     public void onBlocksLoaded(Player by) {
-        takeMechanic = null;
-        putMechanic = null;
+        this.takeMechanic = null;
+        this.putMechanic = null;
         // check IO after all other mechanics has been loaded
         Bukkit.getScheduler().runTask(Factorio.get(), this::checkIO);
     }
@@ -43,7 +43,7 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
 
     @Override
     public DelayHandler getThinkDelayHandler() {
-        return thinkDelayHandler;
+        return this.thinkDelayHandler;
     }
 
     public void checkIO() {
@@ -75,13 +75,13 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
 
     @EventHandler
     public void onMechanicRemove(MechanicRemoveEvent event) {
-        if (event.getMechanic() == takeMechanic || event.getMechanic() == putMechanic) {
+        if (event.getMechanic() == this.takeMechanic || event.getMechanic() == this.putMechanic) {
             Bukkit.getScheduler().runTask(Factorio.get(), () -> {
                 if (!event.getMechanic().exists()) {
-                    if (event.getMechanic() == takeMechanic) {
+                    if (event.getMechanic() == this.takeMechanic) {
                         takeMechanic = null;
-                    } else if (event.getMechanic() == putMechanic) {
-                        putMechanic = null;
+                    } else if (event.getMechanic() == this.putMechanic) {
+                        this.putMechanic = null;
                     }
                 }
             });
@@ -90,8 +90,8 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
 
     @Override
     public void think() {
-        if (takeMechanic != null && putMechanic != null && !takeMechanic.isTransferEmpty()) {
-            putMechanic.pipePut(takeMechanic, new PipePutEvent(null, takeMechanic, this));
+        if (this.takeMechanic != null && this.putMechanic != null && !this.takeMechanic.isTransferEmpty()) {
+            this.putMechanic.pipePut(this.takeMechanic, new PipePutEvent(null, this.takeMechanic, this));
         }
     }
 }

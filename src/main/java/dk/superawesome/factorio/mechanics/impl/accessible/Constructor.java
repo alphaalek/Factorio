@@ -40,7 +40,6 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     public Constructor(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
         super(loc, rotation, context, hasWallSign, isBuild);
-        loadFromStorage();
         makeNewState();
     }
 
@@ -54,7 +53,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
                 if (gridItem != null) {
                     ItemStack unit = gridItem.clone();
                     unit.setAmount(1);
-                    unitStacks[i] = unit;
+                    this.unitStacks[i] = unit;
                 }
             }
         }
@@ -110,24 +109,24 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     @Override
     public void pipePut(ItemCollection collection, PipePutEvent event) {
-        storage.ensureValidStorage();
+        this.storage.ensureValidStorage();
 
-        if (tickThrottle.isThrottled()) {
+        if (this.tickThrottle.isThrottled()) {
             return;
         }
 
         for (int i = 0; i < 9; i++) {
-            ItemStack craft = craftingGridItems[i];
+            ItemStack craft = this.craftingGridItems[i];
             // if the item is null or the stack is full except for items that can only stack to 1
             if (craft == null || (craft.getMaxStackSize() != 1 && craft.getAmount() == craft.getMaxStackSize())) {
                 continue;
             }
 
-            ItemStack unit = state.unitStacks[i];
+            ItemStack unit = this.state.unitStacks[i];
             if (collection.has(unit)) {
                 // find an item which has a lower amount than the currently checked item
                 // this is done to ensure evenly distribution among the items in the crafting grid
-                for (ItemStack oCraft : craftingGridItems) {
+                for (ItemStack oCraft : this.craftingGridItems) {
                     if (oCraft != craft
                             && oCraft != null
                             && oCraft.isSimilar(craft)
@@ -143,7 +142,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
                 // increase the max stack size by 1 to allow recipes with single stack to be crafted
                 int maxStackSize = craft.getMaxStackSize() == 1 ? 2 : craft.getMaxStackSize();
 
-                List<ItemStack> stacks = collection.pipeTake(Math.min(level.getInt(UNIT_TRANSFER_AMOUNT_MARK), maxStackSize - craft.getAmount()));
+                List<ItemStack> stacks = collection.pipeTake(Math.min(this.level.getInt(UNIT_TRANSFER_AMOUNT_MARK), maxStackSize - craft.getAmount()));
 
                 // loop through the stacks collected and try to put into the grid
                 for (ItemStack stack : stacks) {
@@ -158,15 +157,15 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     @Override
     public int getCapacity() {
-        return getCapacitySlots(level) *
-                Optional.ofNullable(storageType)
+        return getCapacitySlots(this.level) *
+                Optional.ofNullable(this.storageType)
                         .map(ItemStack::getMaxStackSize)
                         .orElse(64);
     }
 
     @Override
     public DelayHandler getThinkDelayHandler() {
-        return thinkDelayHandler;
+        return this.thinkDelayHandler;
     }
 
     @Override
@@ -175,10 +174,10 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         // not the same as the current recipe.
         // if it has any, we can't craft the new recipe until all the previously crafted items are removed
         // from the storage.
-        if (storageType != null && recipeResult != null && !storageType.isSimilar(recipeResult)) {
+        if (this.storageType != null && this.recipeResult != null && !this.storageType.isSimilar(this.recipeResult)) {
             // set declined state and notify the user that this crafting is not possible yet
-            if (!declinedState) {
-                declinedState = true;
+            if (!this.declinedState) {
+                this.declinedState = true;
                 ConstructorGui gui = this.<ConstructorGui>getGuiInUse().get();
                 if (gui != null) {
                     gui.updateDeclinedState(true);
@@ -189,8 +188,8 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         }
 
         // remove declined state if set and crafting is available
-        if (declinedState) {
-            declinedState = false;
+        if (this.declinedState) {
+            this.declinedState = false;
             ConstructorGui gui = this.<ConstructorGui>getGuiInUse().get();
             if (gui != null) {
                 gui.updateDeclinedState(false);
@@ -198,20 +197,20 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
         }
 
         // if there are not any recipe in the crafting grid, don't continue
-        if (recipeResult == null
+        if (this.recipeResult == null
                 // if there is no space left, don't continue
-                || storageAmount + recipeResult.getAmount() > getCapacity()) {
+                || this.storageAmount + this.recipeResult.getAmount() > getCapacity()) {
             return;
         }
 
         // remove one amount from all items in the crafting grid and simulate the crafting
         int a = 0;
         for (int i = 0; i < 9; i++) {
-            ItemStack crafting = craftingGridItems[i];
+            ItemStack crafting = this.craftingGridItems[i];
             if (crafting != null && crafting.getAmount() == 1) {
                 // re-set the amounts if the constructor did not have enough items for the recipe
                 for (int j = 0; j < i; j++) {
-                    ItemStack reSetCrafting = craftingGridItems[j];
+                    ItemStack reSetCrafting = this.craftingGridItems[j];
                     if (reSetCrafting != null) {
                         reSetCrafting.setAmount(reSetCrafting.getAmount() + 1);
                     }
@@ -225,19 +224,19 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
             }
         }
 
-        xp += xpDist.poll() * a;
+        this.xp += this.xpDist.poll() * a;
 
         // update the storage type if not set
-        if (storageType == null) {
-            storageType = recipeResult.clone();
-            storageType.setAmount(1);
+        if (this.storageType == null) {
+            this.storageType = this.recipeResult.clone();
+            this.storageType.setAmount(1);
         }
 
-        storageAmount += recipeResult.getAmount();
+        this.storageAmount += this.recipeResult.getAmount();
 
         ConstructorGui gui = this.<ConstructorGui>getGuiInUse().get();
         if (gui != null) {
-            gui.updateAddedItems(recipeResult.getAmount());
+            gui.updateAddedItems(this.recipeResult.getAmount());
             for (HumanEntity player : gui.getInventory().getViewers()) {
                 ((Player)player).playSound(getLocation(), Sound.BLOCK_WOOD_HIT, 0.5f, 1f);
             }
@@ -246,48 +245,48 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     @Override
     public boolean has(ItemStack stack) {
-        return has(i -> i.isSimilar(stack) && storageAmount >= stack.getAmount());
+        return has(i -> i.isSimilar(stack) && this.storageAmount >= stack.getAmount());
     }
 
     @Override
     public boolean has(Predicate<ItemStack> stack) {
-        return storageType != null && stack.test(storageType);
+        return this.storageType != null && stack.test(this.storageType);
     }
 
     @Override
     public List<ItemStack> pipeTake(int amount) {
-        storage.ensureValidStorage();
+        this.storage.ensureValidStorage();
 
-        if (tickThrottle.isThrottled() || storageType == null || storageAmount == 0) {
+        if (this.tickThrottle.isThrottled() || this.storageType == null || this.storageAmount == 0) {
             return Collections.emptyList();
         }
 
-        return this.<ConstructorGui>take((int) Math.min(getMaxTransfer(), amount), storageType, storageAmount, getGuiInUse(), ConstructorGui::updateRemovedItems, storage);
+        return this.<ConstructorGui>take((int) Math.min(getMaxTransfer(), amount), this.storageType, this.storageAmount, getGuiInUse(), ConstructorGui::updateRemovedItems, this.storage);
     }
 
     @Override
     public boolean isTransferEmpty() {
-        return storageType == null;
+        return this.storageType == null;
     }
 
     @Override
     public DelayHandler getTransferDelayHandler() {
-        return transferDelayHandler;
+        return this.transferDelayHandler;
     }
 
     @Override
     public double getMaxTransfer() {
-        return storageType.getMaxStackSize();
+        return this.storageType.getMaxStackSize();
     }
 
     @Override
     public double getTransferAmount() {
-        return storageAmount;
+        return this.storageAmount;
     }
 
     @Override
     public boolean isContainerEmpty() {
-        return Arrays.stream(craftingGridItems).filter(Objects::nonNull).allMatch(i -> i.getType() == Material.AIR);
+        return Arrays.stream(this.craftingGridItems).filter(Objects::nonNull).allMatch(i -> i.getType() == Material.AIR);
     }
 
     @Override
@@ -296,15 +295,15 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     }
 
     public boolean isDeclined() {
-        return declinedState;
+        return this.declinedState;
     }
 
     public ItemStack[] getCraftingGridItems() {
-        return craftingGridItems;
+        return this.craftingGridItems;
     }
 
     public ItemStack getRecipeResult() {
-        return recipeResult;
+        return this.recipeResult;
     }
 
     public void setRecipeResult(ItemStack result) {
@@ -312,7 +311,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     }
 
     public ItemStack getStorageType() {
-        return storageType;
+        return this.storageType;
     }
 
     public void setStorageType(ItemStack stack) {
@@ -324,7 +323,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     }
 
     public int getStorageAmount() {
-        return storageAmount;
+        return this.storageAmount;
     }
 
     public void setStorageAmount(int amount) {

@@ -100,10 +100,7 @@ public class MechanicStorageContext {
     }
 
     public void move(Location loc, BlockFace rot) throws SQLException {
-        if (hasContext()) {
-            this.controller.move(this.loc, loc, rot);
-        }
-
+        this.controller.move(this.loc, loc, rot);
         this.loc = loc;
     }
 

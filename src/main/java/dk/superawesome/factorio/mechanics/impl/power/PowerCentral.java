@@ -38,7 +38,6 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     public PowerCentral(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
         super(loc, rotation, context, hasWallSign, isBuild);
-        loadFromStorage();
     }
 
     @Override
@@ -65,8 +64,8 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
     @Override
     public void onBlocksLoaded(Player by) {
-        lever = getLocation().getBlock().getRelative(this.rot.getOppositeFace());
-        if (lever.getType() != Material.LEVER) {
+        this.lever = getLocation().getBlock().getRelative(this.rot.getOppositeFace());
+        if (this.lever.getType() != Material.LEVER) {
             // invalid power central
             Factorio.get().getMechanicManagerFor(this).deleteMechanic(this);
         } else {
@@ -83,9 +82,9 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     @Override
     public void think() {
         // check if the PC is activated or not
-        if (!activated) {
-            if (turnedOn) {
-                turnedOn = false;
+        if (!this.activated) {
+            if (this.turnedOn) {
+                this.turnedOn = false;
                 updateLight();
             }
 
@@ -93,42 +92,42 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
             return;
         }
 
-        double prev = energy;
-        if (energy > 0) {
+        double prev = this.energy;
+        if (this.energy > 0) {
             // send signal through the PC
-            Routes.startSignalRoute(lever, this, true, false);
+            Routes.startSignalRoute(this.lever, this, true, false);
 
-            if (!turnedOn && energy < prev) {
+            if (!this.turnedOn && this.energy < prev) {
                 // the PC used energy, power on
-                turnedOn = true;
+                this.turnedOn = true;
                 updateLight();
             }
         }
 
-        if (energy == prev && turnedOn) {
+        if (this.energy == prev && this.turnedOn) {
             // the PC didn't use any energy, power off
-            turnedOn = false;
+            this.turnedOn = false;
             updateLight();
         }
     }
 
     @Override
     public void updateLight() {
-        Block block = loc.getBlock().getRelative(BlockFace.UP);
-        Lightable.setLit(block, turnedOn);
+        Block block = this.loc.getBlock().getRelative(BlockFace.UP);
+        Lightable.setLit(block, this.turnedOn);
 
         Switch lever = (Switch) this.lever.getBlockData();
-        lever.setPowered(turnedOn);
+        lever.setPowered(this.turnedOn);
         this.lever.setBlockData(lever);
     }
 
     @Override
     public DelayHandler getThinkDelayHandler() {
-        return thinkDelayHandler;
+        return this.thinkDelayHandler;
     }
 
     public double getEnergy() {
-        return energy;
+        return this.energy;
     }
 
     public void setEnergy(double energy) {
@@ -147,7 +146,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     public double pollRecentProduction() {
-        if (!hasGraph) {
+        if (!this.hasGraph) {
             throw new UnsupportedOperationException();
         }
 
@@ -157,7 +156,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     public double pollRecentConsumption() {
-        if (!hasGraph) {
+        if (!this.hasGraph) {
             throw new UnsupportedOperationException();
         }
 
@@ -167,7 +166,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     public double getCapacity() {
-        return level.get(CAPACITY);
+        return this.level.get(CAPACITY);
     }
 
     public void setHasGraph(boolean hasGraph) {
@@ -177,22 +176,22 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     public boolean hasGraph() {
-        return hasGraph;
+        return this.hasGraph;
     }
 
     @Override
     public boolean preSignal(Signal signal, boolean firstCall) {
         double signalCost = (signal.getLocations().size() - 1) * SIGNAL_COST;
         if (this.energy < signalCost) {
-            if (recentMax == 0) {
-                recentMax = signalCost;
+            if (this.recentMax == 0) {
+                this.recentMax = signalCost;
             }
 
             return false;
         }
 
         if (firstCall) {
-            recentMax = signalCost;
+            this.recentMax = signalCost;
         }
         setEnergy(getEnergy() - signalCost);
         return true;
@@ -205,8 +204,8 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
 
         double back = signalCost * ratio;
 
-        energy += back;
-        recentConsumption -= back;
+        this.energy += back;
+        this.recentConsumption -= back;
     }
 
     @Override
@@ -220,7 +219,7 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     public double getRecentMax() {
-        return recentMax;
+        return this.recentMax;
     }
 
     public void setRecentMax(double recentMax) {
@@ -232,6 +231,6 @@ public class PowerCentral extends AbstractMechanic<PowerCentral> implements Acce
     }
 
     public boolean isActivated() {
-        return activated;
+        return this.activated;
     }
 }

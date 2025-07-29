@@ -126,7 +126,6 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     public Refinery(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
         super(loc, rotation, context, hasWallSign, isBuild);
-        loadFromStorage();
     }
 
     @Override
@@ -183,8 +182,8 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     }
 
     public int getVolumeCapacity() {
-        return level.getInt(VOLUME_MARK) *
-                Optional.ofNullable(volume)
+        return this.level.getInt(VOLUME_MARK) *
+                Optional.ofNullable(this.volume)
                         .map(Volume::getMat)
                         .map(Material::getMaxStackSize)
                         .orElse(64);
@@ -192,8 +191,8 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public int getCapacity() {
-        return getCapacitySlots(level) *
-                Optional.ofNullable(filled)
+        return getCapacitySlots(this.level) *
+                Optional.ofNullable(this.filled)
                         .map(Filled::getOutputItemStack)
                         .map(ItemStack::getMaxStackSize)
                         .orElse(64);
@@ -201,37 +200,37 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public void pipePut(TransferCollection collection, PipePutEvent event) {
-        volumeStorage.ensureValidStorage();
+        this.volumeStorage.ensureValidStorage();
 
-        if (tickThrottle.isThrottled()) {
+        if (this.tickThrottle.isThrottled()) {
             return;
         }
 
         if (collection instanceof ItemCollection itemCollection) {
-            delegatedItemContainer.pipePut(itemCollection, event);
+            this.delegatedItemContainer.pipePut(itemCollection, event);
         } else if (collection instanceof FluidCollection fluidCollection) {
-            delegatedFluidContainer.pipePut(fluidCollection, event);
+            this.delegatedFluidContainer.pipePut(fluidCollection, event);
         }
     }
 
     @Override
     public boolean isTransferEmpty() {
-        return filledAmount == 0;
+        return this.filledAmount == 0;
     }
 
     @Override
     public DelayHandler getTransferDelayHandler() {
-        return transferDelayHandler;
+        return this.transferDelayHandler;
     }
 
     @Override
     public double getMaxTransfer() {
-        return filled.getOutputItemStack().getMaxStackSize();
+        return this.filled.getOutputItemStack().getMaxStackSize();
     }
 
     @Override
     public double getTransferAmount() {
-        return filledAmount;
+        return this.filledAmount;
     }
 
     @Override
@@ -241,7 +240,7 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public boolean isContainerEmpty() {
-        return delegatedFluidContainer.isContainerEmpty() && delegatedItemContainer.isContainerEmpty();
+        return this.delegatedFluidContainer.isContainerEmpty() && this.delegatedItemContainer.isContainerEmpty();
     }
 
     @Override
@@ -251,27 +250,27 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
 
     @Override
     public boolean has(ItemStack stack) {
-        return has(i -> i.isSimilar(stack) && filledAmount >= stack.getAmount());
+        return has(i -> i.isSimilar(stack) && this.filledAmount >= stack.getAmount());
     }
 
     @Override
     public boolean has(Predicate<ItemStack> stack) {
-        return filled != null && stack.test(filled.getOutputItemStack());
+        return this.filled != null && stack.test(this.filled.getOutputItemStack());
     }
 
     @Override
     public List<ItemStack> pipeTake(int amount) {
-        filledStorage.ensureValidStorage();
+        this.filledStorage.ensureValidStorage();
 
-        if (tickThrottle.isThrottled() || filled == null || filledAmount == 0) {
+        if (this.tickThrottle.isThrottled() || this.filled == null || this.filledAmount == 0) {
             return Collections.emptyList();
         }
 
-        return this.<RefineryGui>take((int) Math.min(getMaxTransfer(), amount), filled.getOutputItemStack(), filledAmount, getGuiInUse(), RefineryGui::updateRemovedFilled, filledStorage);
+        return this.<RefineryGui>take((int) Math.min(getMaxTransfer(), amount), this.filled.getOutputItemStack(), this.filledAmount, getGuiInUse(), RefineryGui::updateRemovedFilled, this.filledStorage);
     }
 
     public Volume getVolume() {
-        return volume;
+        return this.volume;
     }
 
     public void setVolume(Volume volume) {
@@ -283,38 +282,38 @@ public class Refinery extends AbstractMechanic<Refinery> implements AccessibleMe
     }
 
     public Filled getFilled() {
-        return filled;
+        return this.filled;
     }
 
     public void setFilled(Filled filled) {
         this.filled = filled;
 
         if (this.filled == null) {
-            filledAmount = 0;
+            this.filledAmount = 0;
         }
     }
 
     public int getFilledAmount() {
-        return filledAmount;
+        return this.filledAmount;
     }
 
     public void setFilledAmount(int amount) {
         this.filledAmount = amount;
 
         if (this.filledAmount == 0) {
-            filled = null;
+            this.filled = null;
         }
     }
 
     public int getVolumeAmount() {
-        return volumeAmount;
+        return this.volumeAmount;
     }
 
     public void setVolumeAmount(int amount) {
         this.volumeAmount = amount;
 
         if (this.volumeAmount == 0) {
-            volume = null;
+            this.volume = null;
         }
     }
 }
