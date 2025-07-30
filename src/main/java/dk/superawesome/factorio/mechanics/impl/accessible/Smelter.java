@@ -272,7 +272,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
         }
 
         // do the smelting
-        this.ingredientAmount -= 1;
+        this.ingredientAmount--;
         this.storageAmount += this.smeltResult.getAmount();
 
         this.xp += this.xpDist.poll();
