@@ -266,7 +266,7 @@ public class Smelter extends AbstractMechanic<Smelter> implements FuelMechanic, 
 
         // update storage type if not set
         if (this.storageType == null) {
-            ItemStack stored = smeltResult;
+            ItemStack stored = smeltResult.clone();
             stored.setAmount(1);
             storageType = stored;
         }
