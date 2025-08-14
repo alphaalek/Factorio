@@ -300,7 +300,7 @@ public class Assembler extends AbstractMechanic<Assembler> implements Accessible
         FLINT_AND_STEAL(Material.FLINT_AND_STEEL, 5, 2.65),
         BOOK_AND_QUILL(Material.WRITABLE_BOOK, 7, 7.45),
         CROSSBOW(Material.CROSSBOW, 7, 7),
-        PUMPKIN_PIE(Material.PUMPKIN_PIE, 13, 6),
+        PUMPKIN_PIE(Material.PUMPKIN_PIE, 13, 7.5),
         WHITE_GLASS(Material.WHITE_STAINED_GLASS, 8, 1),
         BLUE_GLASS(Material.BLUE_STAINED_GLASS, 8, 1),
         BROWN_GLASS(Material.BROWN_STAINED_GLASS, 8, 1),
