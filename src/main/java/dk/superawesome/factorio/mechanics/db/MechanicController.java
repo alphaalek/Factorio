@@ -9,6 +9,7 @@ import dk.superawesome.factorio.util.db.Types;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -97,13 +98,16 @@ public class MechanicController {
     }
 
     public void save(Location loc, Snapshot snapshot) throws SQLException, IOException {
+        ByteArrayOutputStream managementBytes = this.managementSerializer.serialize(snapshot.management());
+        String managementEncoded = MechanicStorageContext.encode(managementBytes);
+
         Query query = new Query(
                 "UPDATE mechanics " +
                 "SET level = ?, xp = ?, management = ?, data = ? " +
                 "WHERE location = ?")
                 .add(snapshot.level())
                 .add(snapshot.xp())
-                .add(this.managementSerializer.serialize(snapshot.management()))
+                .add(managementEncoded)
                 .add(snapshot.strData())
                 .add(Types.LOCATION.convert(loc));
 
