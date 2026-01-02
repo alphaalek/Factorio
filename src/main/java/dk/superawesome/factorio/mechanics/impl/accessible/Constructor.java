@@ -29,7 +29,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     private final DelayHandler thinkDelayHandler = new DelayHandler(level.get(MechanicLevel.THINK_DELAY_MARK));
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
 
-    private final ItemStack[] craftingGridItems = new ItemStack[9];
+    private ItemStack[] craftingGridItems; // super is not initialized yet and we trying to access it in loadData.
     private ItemStack recipeResult;
     private ItemStack storageType;
     private int storageAmount;
@@ -39,6 +39,9 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     public Constructor(Location loc, BlockFace rotation, MechanicStorageContext context, boolean hasWallSign, boolean isBuild) {
         super(loc, rotation, context, hasWallSign, isBuild);
+        if (this.craftingGridItems == null) {
+            this.craftingGridItems = new ItemStack[9];
+        }
         makeNewState();
     }
 
@@ -60,6 +63,9 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
     @Override
     public void loadData(ByteArrayInputStream data) throws Exception {
+        if (this.craftingGridItems == null) {
+            this.craftingGridItems = new ItemStack[9];
+        }
         for (int i = 0; i < 9; i++) {
             this.craftingGridItems[i] = this.context.getSerializer().readItemStack(data);
         }
