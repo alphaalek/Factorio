@@ -60,6 +60,9 @@ public class MechanicStorageContext {
     }
 
     public static ByteArrayInputStream decode(String data) {
+        if (data == null || data.isEmpty()) {
+            return new ByteArrayInputStream(new byte[0]);
+        }
         return new ByteArrayInputStream(DECODER.decode(data));
     }
 

@@ -1,6 +1,7 @@
 package dk.superawesome.factorio.mechanics;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Objects;
 import java.util.Optional;
 
 public record Snapshot(int level, double xp, Management management, String strData) {
@@ -21,8 +22,8 @@ public record Snapshot(int level, double xp, Management management, String strDa
         if (o instanceof Snapshot(int level_, double xp_, Management management_, String strData_)) {
             return level_ == this.level
                     && xp_ == this.xp
-                    && management_.equals(this.management)
-                    && strData_.equals(this.strData);
+                    && Objects.equals(management_, this.management)
+                    && Objects.equals(strData_, this.strData);
         }
         return false;
     }
