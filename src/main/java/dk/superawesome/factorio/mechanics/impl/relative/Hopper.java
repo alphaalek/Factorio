@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.impl.relative;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicBuildEvent;
+import dk.superawesome.factorio.api.events.MechanicLoadEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.building.Buildings;
 import dk.superawesome.factorio.mechanics.*;
@@ -70,6 +71,11 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
 
     @EventHandler
     public void onMechanicBuild(MechanicBuildEvent event) {
+        Bukkit.getScheduler().runTask(Factorio.get(), this::checkIO);
+    }
+
+    @EventHandler
+    public void onMechanicLoad(MechanicLoadEvent event) {
         Bukkit.getScheduler().runTask(Factorio.get(), this::checkIO);
     }
 
