@@ -71,12 +71,24 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
 
     @EventHandler
     public void onMechanicBuild(MechanicBuildEvent event) {
-        Bukkit.getScheduler().runTask(Factorio.get(), this::checkIO);
+        if (isRelevantMechanic(event.getMechanic())) {
+            Bukkit.getScheduler().runTask(Factorio.get(), this::checkIO);
+        }
     }
 
     @EventHandler
     public void onMechanicLoad(MechanicLoadEvent event) {
-        Bukkit.getScheduler().runTask(Factorio.get(), this::checkIO);
+        if (isRelevantMechanic(event.getMechanic())) {
+            Bukkit.getScheduler().runTask(Factorio.get(), this::checkIO);
+        }
+    }
+
+    private boolean isRelevantMechanic(Mechanic<?> mechanic) {
+        Block up = this.loc.getBlock().getRelative(BlockFace.UP);
+        Block hopper = this.loc.getBlock().getRelative(BlockFace.DOWN);
+        Block target = BlockUtil.getPointingBlock(hopper, false);
+        Location mechLoc = mechanic.getLocation();
+        return mechLoc.getBlock().equals(up) || mechLoc.getBlock().equals(target);
     }
 
     @EventHandler
