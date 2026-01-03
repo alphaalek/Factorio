@@ -84,9 +84,9 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
     }
 
     private boolean isRelevantMechanic(Mechanic<?> mechanic) {
-        Block up = this.loc.getBlock().getRelative(BlockFace.UP);
+        Block up = this.loc.getBlock().getRelative(BlockFace.UP); // take mechanic
         Block hopper = this.loc.getBlock().getRelative(BlockFace.DOWN);
-        Block target = BlockUtil.getPointingBlock(hopper, false);
+        Block target = BlockUtil.getPointingBlock(hopper, false); // put mechanic
         Location mechLoc = mechanic.getLocation();
         return mechLoc.getBlock().equals(up) || mechLoc.getBlock().equals(target);
     }

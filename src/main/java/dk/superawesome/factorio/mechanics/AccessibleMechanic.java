@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 public interface AccessibleMechanic {
 
+    @SuppressWarnings("unchecked")
     default <G extends BaseGui<G>, M extends Mechanic<M>> G getOrCreateInventory(Mechanic<?> mechanic) {
         G inUse = (G) mechanic.getGuiInUse().get();
         if (inUse != null) {
