@@ -79,6 +79,36 @@ public class Debug extends AbstractCommand {
                 return;
             }
 
+            if (args[0].equalsIgnoreCase("fields")) {
+                Block block = player.getTargetBlockExact(5);
+                if (block == null) {
+                    player.sendMessage("§cDu kigger ikke på en block!");
+                    return;
+                }
+
+                Mechanic<?> mechanic = Factorio.get().getMechanicManager(player.getWorld()).getMechanicAt(block.getLocation());
+                if (mechanic == null) {
+                    player.sendMessage("§cDu skal kigge på en maskine!");
+                    return;
+                }
+
+                player.sendMessage("§e" + mechanic.getProfile().getName() + " Lvl " + mechanic.getLevel());
+                Class<?> clazz = mechanic.getClass();
+                try {
+                    while (clazz != Object.class) {
+                        for (Field field : clazz.getDeclaredFields()) {
+                            field.setAccessible(true);
+                            Object val = field.get(mechanic);
+                            player.sendMessage(field.getName() + ": §e" + (val instanceof Object[] ? Arrays.toString((Object[]) val) : val));
+                        }
+                        clazz = clazz.getSuperclass();
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                return;
+            }
+
             if (args[0].equalsIgnoreCase("find")) {
                 Query query = new Query("SELECT * FROM mechanics");
 
