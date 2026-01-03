@@ -87,8 +87,7 @@ public class Hopper extends AbstractMechanic<Hopper> implements ThinkingMechanic
         Block up = this.loc.getBlock().getRelative(BlockFace.UP); // take mechanic
         Block hopper = this.loc.getBlock().getRelative(BlockFace.DOWN);
         Block target = BlockUtil.getPointingBlock(hopper, false); // put mechanic
-        Location mechLoc = mechanic.getLocation();
-        return mechLoc.getBlock().equals(up) || mechLoc.getBlock().equals(target);
+        return mechanic.getLocation().getBlock().equals(up)  || Buildings.intersects(target.getLocation(), mechanic);
     }
 
     @EventHandler
