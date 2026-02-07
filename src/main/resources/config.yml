@@ -4,3 +4,28 @@ database:
   database: ""
   username: "user"
   password: "pass"
+
+# Enable or disable individual mechanics.
+# Set to false to prevent a mechanic from being built or loaded on this server.
+mechanics:
+  assembler: true
+  assembler-trigger: true
+  cauldron: true
+  collector: true
+  comparator: true
+  constructor: true
+  emerald-forge: true
+  excluder: true
+  filter: true
+  gate: true
+  generator: true
+  hopper: true
+  liquid-tank: true
+  power-central: true
+  power-expander: true
+  power-lifter: true
+  refinery: true
+  smelter: true
+  solar-cell: true
+  station: true
+  storage-box: true

@@ -18,7 +18,27 @@ import dk.superawesome.factorio.mechanics.profiles.relative.ComparatorProfile;
 import dk.superawesome.factorio.mechanics.profiles.relative.HopperProfile;
 import dk.superawesome.factorio.util.Array;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Profiles {
+
+    private static final Set<String> disabledMechanics = new HashSet<>();
+
+    public static String normalizeKey(String name) {
+        return name.toLowerCase().replace(" ", "-");
+    }
+
+    public static void setDisabledMechanics(Set<String> disabled) {
+        disabledMechanics.clear();
+        for (String name : disabled) {
+            disabledMechanics.add(normalizeKey(name));
+        }
+    }
+
+    public static boolean isEnabled(MechanicProfile<?> profile) {
+        return !disabledMechanics.contains(normalizeKey(profile.getName()));
+    }
 
     public static final MechanicProfile<Assembler> ASSEMBLER;
     public static final MechanicProfile<AssemblerTrigger> ASSEMBLER_TRIGGER;
@@ -76,6 +96,10 @@ public class Profiles {
     }
 
     public static Array<MechanicProfile<?>> getProfiles() {
+        return profiles.with(p -> p != null && isEnabled(p));
+    }
+
+    public static Array<MechanicProfile<?>> getAllProfiles() {
         return profiles;
     }
 }

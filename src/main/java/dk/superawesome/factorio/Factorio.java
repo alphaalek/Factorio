@@ -18,7 +18,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
@@ -37,6 +39,21 @@ public final class Factorio extends JavaPlugin implements Listener {
         instance = this;
 
         saveDefaultConfig();
+
+        ConfigurationSection mechanicsSec = getConfig().getConfigurationSection("mechanics");
+        if (mechanicsSec != null) {
+            Set<String> disabled = new HashSet<>();
+            for (String key : mechanicsSec.getKeys(false)) {
+                if (!mechanicsSec.getBoolean(key, true)) {
+                    disabled.add(key);
+                }
+            }
+            Profiles.setDisabledMechanics(disabled);
+            if (!disabled.isEmpty()) {
+                getLogger().info("Disabled mechanics: " + String.join(", ", disabled));
+            }
+        }
+
         ConfigurationSection sec = getConfig().getConfigurationSection("database");
         if (sec == null) {
             throw new RuntimeException("Could not find database configuration section");
