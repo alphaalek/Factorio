@@ -11,6 +11,7 @@ import dk.superawesome.factorio.mechanics.impl.accessible.Assembler;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.MoneyCollection;
 import dk.superawesome.factorio.util.Array;
+import dk.superawesome.factorio.util.statics.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -23,6 +24,7 @@ import java.util.function.Predicate;
 
 import static dk.superawesome.factorio.util.statics.MathUtil.getIncreaseDifference;
 import static dk.superawesome.factorio.util.statics.MathUtil.ticksToMs;
+import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
 
 public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
 
@@ -101,10 +103,10 @@ public class AssemblerProfile implements GuiMechanicProfile<Assembler> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .setDescription(2, Arrays.asList("§eLager: 7 stacks §f-> §e14 stacks", "§eEmeraldlager: 768 emeralder §f-> §e2000 emeralder", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)"))
-                .setDescription(3, Arrays.asList("§eLager: 14 stacks §f-> §e20 stacks", "§eEmeraldlager: 2000 emeralder §f-> §e5000 emeralder", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(18) + "ms §f(§e"+ getIncreaseDifference(20, 18, true) +"% hurtigere§f)"))
-                .setDescription(4, Arrays.asList("§eLager: 20 stacks §f-> §e32 stacks", "§eEmeraldlager: 5000 emeralder §f-> §e10000 emeralder", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(17) + "ms §f(§e"+ getIncreaseDifference(20, 17, true) +"% hurtigere§f)"))
-                .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eEmeraldlager: 10000 emeralder §f-> §e25000 emeralder", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(15) + "ms §f(§e"+ getIncreaseDifference(20, 15, true) +"% hurtigere§f)"))
+                .setDescription(2, Arrays.asList("§eLager: 7 stacks §f-> §e14 stacks", "§eEmeraldlager: 768 emeralder §f-> §e2.000 emeralder", "§eHastighed: " + formatNumber(ticksToMs(20)) + "ms §f-> §e" + formatNumber(ticksToMs(19)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(20, 19)*100) +"% hurtigere§f)"))
+                .setDescription(3, Arrays.asList("§eLager: 14 stacks §f-> §e20 stacks", "§eEmeraldlager: 2.000 emeralder §f-> §e5.000 emeralder", "§eHastighed: " + formatNumber(ticksToMs(20)) + "ms §f-> §e" + formatNumber(ticksToMs(18)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(20, 18)*100) +"% hurtigere§f)"))
+                .setDescription(4, Arrays.asList("§eLager: 20 stacks §f-> §e32 stacks", "§eEmeraldlager: 5.000 emeralder §f-> §e10.000 emeralder", "§eHastighed: " + formatNumber(ticksToMs(20)) + "ms §f-> §e" + formatNumber(ticksToMs(17)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(20, 17)*100) +"% hurtigere§f)"))
+                .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eEmeraldlager: 10.000 emeralder §f-> §e25.000 emeralder", "§eHastighed: " + formatNumber(ticksToMs(20)) + "ms §f-> §e" + formatNumber(ticksToMs(15)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(20, 15)*100) +"% hurtigere§f)"))
 
                 .mark(MechanicLevel.XP_REQUIRES_MARK, Array.fromData(1500d, 3000d, 7500d, 12500d))
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(4192d, 10288d, 18480d, 31200d))

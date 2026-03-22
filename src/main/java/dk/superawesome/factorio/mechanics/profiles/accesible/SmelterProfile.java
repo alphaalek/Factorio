@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 
 import static dk.superawesome.factorio.util.statics.MathUtil.getIncreaseDifference;
 import static dk.superawesome.factorio.util.statics.MathUtil.ticksToMs;
+import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
 
 public class SmelterProfile implements GuiMechanicProfile<Smelter> {
 
@@ -112,10 +113,10 @@ public class SmelterProfile implements GuiMechanicProfile<Smelter> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .setDescription(2, Arrays.asList("§eLager: 11 stacks §f-> §e15 stacks", "§eBrændstof: 9 stacks §f-> §e16 stacks", "§eIngredienser: 9 stacks §f-> §e16 stacks", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) +"% hurtigere§f)"))
-                .setDescription(3, Arrays.asList("§eLager: 15 stacks §f-> §e22 stacks", "§eBrændstof: 16 stacks §f-> §e24 stacks", "§eIngredienser: 16 stacks §f-> §e24 stacks", "§eHastighed: " + ticksToMs(19) + "ms §f-> §e" + ticksToMs(18) + "ms §f(§e"+ getIncreaseDifference(19, 18, true) +"% hurtigere§f)"))
-                .setDescription(4, Arrays.asList("§eLager: 22 stacks §f-> §e32 stacks", "§eBrændstof: 24 stacks §f-> §e36 stacks", "§eIngredienser: 24 stacks §f-> §e36 stacks", "§eHastighed: " + ticksToMs(18) + "ms §f-> §e" + ticksToMs(16) + "ms §f(§e"+ getIncreaseDifference(18, 16, true) +"% hurtigere§f)"))
-                .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eBrændstof: 36 stacks §f-> §e54 stacks", "§eIngredienser: 36 stacks §f-> §e54 stacks", "§eHastighed: " + ticksToMs(16) + "ms §f-> §e" + ticksToMs(14) + "ms §f(§e"+ getIncreaseDifference(16, 14, true) +"% hurtigere§f)"))
+                .setDescription(2, Arrays.asList("§eLager: 11 stacks §f-> §e15 stacks", "§eBrændstof: 9 stacks §f-> §e16 stacks", "§eIngredienser: 9 stacks §f-> §e16 stacks", "§eHastighed: " + formatNumber(ticksToMs(20)) + "ms §f-> §e" + formatNumber(ticksToMs(19)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(20, 19)*100) +"% hurtigere§f)"))
+                .setDescription(3, Arrays.asList("§eLager: 15 stacks §f-> §e22 stacks", "§eBrændstof: 16 stacks §f-> §e24 stacks", "§eIngredienser: 16 stacks §f-> §e24 stacks", "§eHastighed: " + formatNumber(ticksToMs(19)) + "ms §f-> §e" + formatNumber(ticksToMs(18)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(19, 18)*100) +"% hurtigere§f)"))
+                .setDescription(4, Arrays.asList("§eLager: 22 stacks §f-> §e32 stacks", "§eBrændstof: 24 stacks §f-> §e36 stacks", "§eIngredienser: 24 stacks §f-> §e36 stacks", "§eHastighed: " + formatNumber(ticksToMs(18)) + "ms §f-> §e" + formatNumber(ticksToMs(16)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(18, 16)*100) +"% hurtigere§f)"))
+                .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eBrændstof: 36 stacks §f-> §e54 stacks", "§eIngredienser: 36 stacks §f-> §e54 stacks", "§eHastighed: " + formatNumber(ticksToMs(16)) + "ms §f-> §e" + formatNumber(ticksToMs(14)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(16, 14)*100) +"% hurtigere§f)"))
 
                 .mark(MechanicLevel.XP_REQUIRES_MARK, Array.fromData(1000d, 2500d, 5000d, 10000d))
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(4096d, 8384d, 18480d, 36200d))

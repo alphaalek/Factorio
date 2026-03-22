@@ -16,6 +16,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Optional;
 
+import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
+
 public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements AccessibleMechanic, MoneyContainer {
 
     private double moneyAmount;
@@ -40,7 +42,7 @@ public class EmeraldForge extends AbstractMechanic<EmeraldForge> implements Acce
     @Override
     public void onUpdate() {
         Sign sign = getSign();
-        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(this.moneyAmount / getCapacity() * 100, 2) + "% fyldt");
+        sign.getSide(Side.FRONT).setLine(2, formatNumber(this.moneyAmount / getCapacity() * 100) + "% fyldt");
         sign.update();
     }
 

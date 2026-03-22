@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static dk.superawesome.factorio.util.statics.MathUtil.getIncreaseDifference;
 import static dk.superawesome.factorio.util.statics.MathUtil.ticksToMs;
+import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
 
 public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
 
@@ -50,10 +51,10 @@ public class PowerCentralProfile implements GuiMechanicProfile<PowerCentral> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .setDescription(2, Arrays.asList("§eKapacitet: 1000J §f-> §e5000J", "§eHastighed: " + ticksToMs(20) + "ms §f-> §e" + ticksToMs(19) + "ms §f(§e"+ getIncreaseDifference(20, 19, true) + "% hurtigere§f)"))
-                .setDescription(3, Arrays.asList("§eKapacitet: 5000J §f-> §e15000J", "§eHastighed: " + ticksToMs(19) + "ms §f-> §e" + ticksToMs(18) + "ms §f(§e"+ getIncreaseDifference(19, 18, true) + "% hurtigere§f)"))
-                .setDescription(4, Arrays.asList("§eKapacitet: 15000J §f-> §e30000J", "§eHastighed: " + ticksToMs(18) + "ms §f-> §e" + ticksToMs(17) + "ms §f(§e"+ getIncreaseDifference(18, 17, true) + "% hurtigere§f)"))
-                .setDescription(5, Arrays.asList("§eKapacitet: 30000J §f-> §e50000J", "§eHastighed: " + ticksToMs(17) + "ms §f-> §e" + ticksToMs(16) + "ms §f(§e"+ getIncreaseDifference(17, 16, true) + "% hurtigere§f)"))
+                .setDescription(2, Arrays.asList("§eKapacitet: 1000J §f-> §e5000J", "§eHastighed: " + formatNumber(ticksToMs(20)) + "ms §f-> §e" + formatNumber(ticksToMs(19)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(20, 19)*100) + "% hurtigere§f)"))
+                .setDescription(3, Arrays.asList("§eKapacitet: 5000J §f-> §e15000J", "§eHastighed: " + formatNumber(ticksToMs(19)) + "ms §f-> §e" + formatNumber(ticksToMs(18)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(19, 18)*100) + "% hurtigere§f)"))
+                .setDescription(4, Arrays.asList("§eKapacitet: 15000J §f-> §e30000J", "§eHastighed: " + formatNumber(ticksToMs(18)) + "ms §f-> §e" + formatNumber(ticksToMs(17)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(18, 17)*100) + "% hurtigere§f)"))
+                .setDescription(5, Arrays.asList("§eKapacitet: 30000J §f-> §e50000J", "§eHastighed: " + formatNumber(ticksToMs(17)) + "ms §f-> §e" + formatNumber(ticksToMs(16)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(17, 16)*100) + "% hurtigere§f)"))
 
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(6144d, 12288d, 23008d, 46972d))
 

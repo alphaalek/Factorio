@@ -20,6 +20,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
+import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
+
 public class StorageBox extends AbstractMechanic<StorageBox> implements AccessibleMechanic, ItemCollection, ItemContainer, Storage {
 
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
@@ -97,7 +99,7 @@ public class StorageBox extends AbstractMechanic<StorageBox> implements Accessib
     @Override
     public void onUpdate() {
         Sign sign = getSign();
-        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(((double)amount) / getCapacity() * 100, 2) + "% fyldt");
+        sign.getSide(Side.FRONT).setLine(2, formatNumber(((double)amount) / getCapacity() * 100) + "% fyldt");
         sign.update();
     }
 

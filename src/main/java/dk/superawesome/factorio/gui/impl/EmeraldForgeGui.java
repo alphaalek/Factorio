@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
+
 public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> {
 
     private static final List<Integer> STORAGE_SLOTS = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34);
@@ -41,7 +43,7 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
 
     private void updateMoneyAmount() {
         getInventory().setItem(49, new ItemBuilder(Material.MINECART)
-                .setName("§eFå emeralder §8(§e" + StringUtil.formatDecimals(getMechanic().getMoneyAmount(), 2) + "/" + ((double)getMechanic().getCapacity()) + " i alt§8)")
+                .setName("§eFå emeralder §8(§e" + formatNumber(getMechanic().getMoneyAmount()) + "/" + formatNumber(getMechanic().getCapacity()) + " i alt§8)")
                 .addLore("")
                 .addLore("§eKlik for at tage ud. §8(§e§oShift for alt§8)")
                 .build());
@@ -92,16 +94,16 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
 
             MoneyCollectEvent collectEvent = new MoneyCollectEvent(player, moneyAmount, getMechanic());
             Bukkit.getPluginManager().callEvent(collectEvent);
-            if (collectEvent.isCancelled() || !collectEvent.isCollected()) {
+            /*if (collectEvent.isCancelled() || !collectEvent.isCollected()) {
                 player.sendMessage("§cKunne ikke tage fra maskinens inventar. Kontakt en udvikler.");
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
                 return;
-            }
+            } Så man kan tage ting ud af emerald forgen */
 
             getMechanic().setMoneyAmount(getMechanic().getMoneyAmount() - moneyAmount);
             updateItems();
 
-            player.sendMessage("§eDu tog §f" + StringUtil.formatDecimals(moneyAmount, 2) + "§e emeralder fra maskinens inventar.");
+            player.sendMessage("§eDu tog §f" + formatNumber(moneyAmount) + "§e emeralder fra maskinens inventar.");
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1f);
         };
 
