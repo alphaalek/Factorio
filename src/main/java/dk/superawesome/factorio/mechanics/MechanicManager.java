@@ -349,13 +349,17 @@ public class MechanicManager implements Listener {
             return;
         }
 
-        Mechanic<?> at = getMechanicAt(on.getLocation());
-        if (at != null && !at.getBuilding().getSign(at).getLocation().equals(sign.getLocation())) {
-            callback.accept(MechanicBuildResponse.ALREADY_EXISTS);
-            return;
-        }
-
         BlockFace rotation = BlockUtil.getFacing(sign.getBlock());
+
+        // Check all block locations of the new mechanic for overlap with existing mechanics
+        Building building = profile.get().getBuilding(Tag.WALL_SIGNS.isTagged(sign.getType()));
+        for (Location loc : Buildings.getLocations(building, on.getLocation(), rotation)) {
+            Mechanic<?> existing = getMechanicAt(loc);
+            if (existing != null) {
+                callback.accept(MechanicBuildResponse.ALREADY_EXISTS);
+                return;
+            }
+        }
 
         Query.CheckedSupplier<MechanicStorageContext, StorageException> context = () -> {
             // delete any previous mechanics on this location
@@ -431,13 +435,16 @@ public class MechanicManager implements Listener {
         Optional<MechanicProfile<?>> profile = getProfileFrom(sign);
         Block on = getBlockOn(sign);
         if (on != null && profile.isPresent()) {
-            // check if there is already a mechanic at this location
-            if (getMechanicAt(on.getLocation()) != null) {
-                callback.accept(true);
-                return;
-            }
-
             BlockFace face = BlockUtil.getFacing(sign.getBlock());
+
+            // check if there is already a mechanic at any of this mechanic's locations
+            Building building = profile.get().getBuilding(Tag.WALL_SIGNS.isTagged(sign.getType()));
+            for (Location loc : Buildings.getLocations(building, on.getLocation(), face)) {
+                if (getMechanicAt(loc) != null) {
+                    callback.accept(true);
+                    return;
+                }
+            }
             Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier = () -> contextProvider.findAt(on.getLocation());
             // load the mechanic
             loadMechanicFromSign(profile.get(), contextSupplier, sign, on, face, false, mechanic -> {
