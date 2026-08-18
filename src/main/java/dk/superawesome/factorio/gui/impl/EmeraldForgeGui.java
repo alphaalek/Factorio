@@ -1,5 +1,6 @@
 package dk.superawesome.factorio.gui.impl;
 
+import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MoneyCollectEvent;
 import dk.superawesome.factorio.gui.Elements;
 import dk.superawesome.factorio.gui.GuiElement;
@@ -94,11 +95,13 @@ public class EmeraldForgeGui extends MechanicGui<EmeraldForgeGui, EmeraldForge> 
 
             MoneyCollectEvent collectEvent = new MoneyCollectEvent(player, moneyAmount, getMechanic());
             Bukkit.getPluginManager().callEvent(collectEvent);
-            /*if (collectEvent.isCancelled() || !collectEvent.isCollected()) {
-                player.sendMessage("§cKunne ikke tage fra maskinens inventar. Kontakt en udvikler.");
-                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
-                return;
-            } Så man kan tage ting ud af emerald forgen */
+            if (!Factorio.get().getConfig().getBoolean("emerald-forge.bypass-collect-check", false)) {
+                if (collectEvent.isCancelled() || !collectEvent.isCollected()) {
+                    player.sendMessage("§cKunne ikke tage fra maskinens inventar. Kontakt en udvikler.");
+                    player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+                    return;
+                }
+            }
 
             getMechanic().setMoneyAmount(getMechanic().getMoneyAmount() - moneyAmount);
             updateItems();
