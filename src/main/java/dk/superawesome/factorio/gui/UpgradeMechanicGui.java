@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
+
 public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<UpgradeMechanicGui<M>> {
 
     private final M mechanic;
@@ -49,8 +51,8 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                     desc.addAll(mechanic.getLevel().getRegistry().getDescription(i));
                     desc.addAll(
                             Arrays.asList("",
-                                    "§e§oKræver §b§o" + mechanic.getLevel().getRegistry().get(i - 1).getOr(MechanicLevel.XP_REQUIRES_MARK, () -> 0d) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)",
-                                    "§e§oKoster " + mechanic.getLevel().getRegistry().get(i - 1).get(MechanicLevel.LEVEL_COST_MARK) + " emeralder")
+                                    "§e§oKræver §b§o" + formatNumber((double)mechanic.getLevel().getRegistry().get(i - 1).getOr(MechanicLevel.XP_REQUIRES_MARK, () -> 0d)) + " XP §8§o(§b§o" + formatNumber(mechanic.getXP()) + " XP§8§o)",
+                                    "§e§oKoster " + formatNumber((double)mechanic.getLevel().getRegistry().get(i - 1).get(MechanicLevel.LEVEL_COST_MARK)) + " emeralder")
                     );
                 } else {
                     desc.add("§c§o???");
@@ -85,7 +87,7 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                                 .setName("§aOpgrader")
                                 .addLore("§eOpgrader maskinen til §6Level §l" + i)
                                 .addLore("")
-                                .addLore("§e§oKoster " + mechanic.getLevel().getRegistry().get(i - 1).get(MechanicLevel.LEVEL_COST_MARK) + " emeralder")
+                                .addLore("§e§oKoster " + formatNumber((double)mechanic.getLevel().getRegistry().get(i - 1).get(MechanicLevel.LEVEL_COST_MARK)) + " emeralder")
                                 .addLore("")
                                 .addLore("§c§oVær opmærksom på, at du kun")
                                 .addLore("§c§ofår 75% af prisen tilbage.")
@@ -93,7 +95,7 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                     } else {
                         inventory.setItem(buySlot, new ItemBuilder(Material.BARRIER)
                                 .setName("§cIkke nok §bXP")
-                                .addLore("§c§oOpgradering kræver §b§o" + mechanic.getLevel().getRegistry().get(i - 1).getOr(MechanicLevel.XP_REQUIRES_MARK, () -> 0d) + " XP §8§o(§b§o" + mechanic.getXP() + " XP§8§o)")
+                                .addLore("§c§oOpgradering kræver §b§o" + formatNumber((double)mechanic.getLevel().getRegistry().get(i - 1).getOr(MechanicLevel.XP_REQUIRES_MARK, () -> 0d)) + " XP §8§o(§b§o" + formatNumber(mechanic.getXP()) + " XP§8§o)")
                                 .build());
                     }
                 }

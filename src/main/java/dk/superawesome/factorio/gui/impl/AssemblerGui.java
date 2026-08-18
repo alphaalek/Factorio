@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
+
 public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
     public static final List<Integer> STORAGE_SLOTS = Arrays.asList(1, 2, 3, 4, 10, 11, 12);//, 13);
@@ -86,7 +88,7 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
     private ItemStack getAssemblerTypeItem(Assembler.Type type, boolean isChooseAssembler) {
         ItemBuilder itemBuilder = new ItemBuilder(type.getType().getMat())
-            .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + StringUtil.formatDecimals(type.getProduces(), 2) + " §8(§f$" + (StringUtil.formatDecimals(type.getPricePerItem(), 2)) + " §epr. item§8)")
+            .addLore("").addLore("§eSammensætter §fx" + type.getRequires() + " §etil §f$" + formatNumber(type.getProduces()) + " §8(§f$" + (formatNumber(type.getPricePerItem())) + " §epr. item§8)")
             .addLore(format(type) + " §8Sidst opdateret " + DurationFormatter.toDuration(System.currentTimeMillis() - Assembler.Types.LAST_UPDATE) + " siden")
             .addFlags(ItemFlag.HIDE_ATTRIBUTES);
 
@@ -102,9 +104,9 @@ public class AssemblerGui extends SingleStorageGui<AssemblerGui, Assembler> {
 
     public static String format(Assembler.Type type) {
         if (type.getProduces() > type.getType().getProduces()) {
-            return "§a+" + (StringUtil.formatDecimals((type.getProduces() / type.getType().getProduces() - 1) * 100, 2)) + "%";
+            return "§a+" + (formatNumber((type.getProduces() / type.getType().getProduces() - 1) * 100)) + "%";
         } else if (type.getProduces() < type.getType().getProduces()) {
-            return "§c-" + (StringUtil.formatDecimals((type.getType().getProduces() / type.getProduces() - 1) * 100, 2)) + "%";
+            return "§c-" + (formatNumber((type.getType().getProduces() / type.getProduces() - 1) * 100)) + "%";
         } else {
             return "§e~0%";
         }

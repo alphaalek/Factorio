@@ -4,3 +4,6 @@ database:
   database: ""
   username: "user"
   password: "pass"
+
+emerald-forge:
+  bypass-collect-check: false

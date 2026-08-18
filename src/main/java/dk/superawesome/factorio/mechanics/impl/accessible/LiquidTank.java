@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 
+import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
+
 public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCollection, FluidContainer, AccessibleMechanic {
 
     private final DelayHandler transferDelayHandler = new DelayHandler(10);
@@ -61,7 +63,7 @@ public class LiquidTank extends AbstractMechanic<LiquidTank> implements FluidCol
     @Override
     public void onUpdate() {
         Sign sign = getSign();
-        sign.getSide(Side.FRONT).setLine(2, StringUtil.formatDecimals(((double) this.fluidAmount) / getCapacity() * 100, 2) + "% fyldt");
+        sign.getSide(Side.FRONT).setLine(2, formatNumber(((double) this.fluidAmount) / getCapacity() * 100) + "% fyldt");
         sign.update();
     }
 

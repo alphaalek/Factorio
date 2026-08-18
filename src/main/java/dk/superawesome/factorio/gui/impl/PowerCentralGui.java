@@ -23,6 +23,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
+import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
+
 public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> {
 
     private static Graph getConsumptionGraph(Inventory inventory, PowerCentral mechanic) {
@@ -33,11 +35,11 @@ public class PowerCentralGui extends MechanicGui<PowerCentralGui, PowerCentral> 
                 },
                 e -> {
                     ItemStack itemStack = new ItemBuilder(Material.LIGHT_GRAY_WOOL)
-                        .setName("§eForbrug: " + StringUtil.formatDecimals(e[0], 2) + "W")
-                        .addLore("§ePotentiel forbrug: " + StringUtil.formatDecimals(mechanic.getRecentMax(), 2) + "W")
-                        .addLore("§eProduktion: " + StringUtil.formatDecimals(e[1], 2) + "W")
-                        .addLore("§eEnergi: " + StringUtil.formatDecimals(mechanic.getEnergy(), 2) + "J")
-                        .addLore("§eKapacitet: " + StringUtil.formatDecimals(mechanic.getCapacity(), 2) + "J")
+                        .setName("§eForbrug: " + formatNumber(e[0]) + "W")
+                        .addLore("§ePotentiel forbrug: " + formatNumber(mechanic.getRecentMax()) + "W")
+                        .addLore("§eProduktion: " + formatNumber(e[1]) + "W")
+                        .addLore("§eEnergi: " + formatNumber(mechanic.getEnergy()) + "J")
+                        .addLore("§eKapacitet: " + formatNumber(mechanic.getCapacity()) + "J")
                         .build();
                     PowerCentralGui gui = mechanic.<PowerCentralGui>getGuiInUse().get();
                     if (gui != null) {

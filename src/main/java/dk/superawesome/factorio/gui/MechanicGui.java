@@ -22,6 +22,8 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
+
 public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> extends BaseGuiAdapter<G> {
 
     private final M mechanic;
@@ -484,7 +486,7 @@ public abstract class MechanicGui<G extends BaseGui<G>, M extends Mechanic<M>> e
     private Supplier<ItemStack> getStorageInfoBuilder(Storage storage, Material material, boolean canPut, boolean canTake) {
         return () -> {
             ItemBuilder itemBuilder = new ItemBuilder(material)
-                    .setName("§e" + (canPut ? "Indsætte" : "") + (canPut && canTake ? "/" : "") + (canTake ? "Tage" : "") + " imellem inventar §8(§e" + storage.getAmount() + "/" + storage.getCapacity() + " items i alt§8)")
+                    .setName("§e" + (canPut ? "Indsætte" : "") + (canPut && canTake ? "/" : "") + (canTake ? "Tage" : "") + " imellem inventar §8(§e" + formatNumber(storage.getAmount()) + "/" + formatNumber(storage.getCapacity()) + " items i alt§8)")
                     .addLore("");
             if (canTake) {
                 itemBuilder.addLore("§eHøjreklik for at tage ud. §8(§e§oShift for alt§8)");
