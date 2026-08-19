@@ -126,6 +126,7 @@ public class Routes {
 
             // the origin vector was not added to the route, stop expanding
             if (!route.getLocations().contains(fromVec) && onlyExpandIfOriginValid) {
+                route.drainSearches();
                 return;
             }
 
@@ -133,6 +134,7 @@ public class Routes {
         }
 
         expandRoute(route, from, from, true);
+        route.drainSearches();
     }
 
     public static void expandRoute(AbstractRoute<?, ?> route, Block from, Block ignore) {
@@ -153,7 +155,7 @@ public class Routes {
                 }
 
                 route.visit(fromVec, relVec);
-                route.search(from, relVec, rel, isFromOrigin);
+                route.enqueueSearch(from, relVec, rel, isFromOrigin);
             }
         }
     }
@@ -165,7 +167,7 @@ public class Routes {
             Block rel = BlockUtil.getBlock(from.getWorld(), relVec);
 
             route.visit(fromVec, relVec);
-            route.search(from, relVec, rel, false);
+            route.enqueueSearch(from, relVec, rel, false);
         }
     }
 

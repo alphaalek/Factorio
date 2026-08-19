@@ -19,7 +19,44 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.util.BlockVector;
 
+import java.util.ArrayDeque;
 import java.util.*;
+
+/**
+ * Holds the parameters of a pending block search to be processed by {@link AbstractRoute#drainSearches()}.
+ * Using a queue instead of recursion keeps route expansion iterative, so large pipe networks
+ * cannot overflow the call stack.
+ */
+class SearchJob {
+
+    private final Block from;
+    private final BlockVector relVec;
+    private final Block rel;
+    private final boolean isFromOrigin;
+
+    public SearchJob(Block from, BlockVector relVec, Block rel, boolean isFromOrigin) {
+        this.from = from;
+        this.relVec = relVec;
+        this.rel = rel;
+        this.isFromOrigin = isFromOrigin;
+    }
+
+    public Block getFrom() {
+        return from;
+    }
+
+    public BlockVector getRelVec() {
+        return relVec;
+    }
+
+    public Block getRel() {
+        return rel;
+    }
+
+    public boolean isFromOrigin() {
+        return isFromOrigin;
+    }
+}
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractRoute<R extends AbstractRoute<R, O>, O> {
@@ -118,6 +155,19 @@ public abstract class AbstractRoute<R extends AbstractRoute<R, O>, O> {
 
     public void addOutput(World world, BlockVector vec, BlockVector from) {
         addOutput(world, vec, from, Routes.DEFAULT_CONTEXT);
+    }
+
+    private final ArrayDeque<SearchJob> pendingSearches = new ArrayDeque<>();
+
+    public void enqueueSearch(Block from, BlockVector relVec, Block rel, boolean isFromOrigin) {
+        pendingSearches.add(new SearchJob(from, relVec, rel, isFromOrigin));
+    }
+
+    public void drainSearches() {
+        SearchJob job;
+        while ((job = pendingSearches.poll()) != null) {
+            search(job.getFrom(), job.getRelVec(), job.getRel(), job.isFromOrigin());
+        }
     }
 
     public abstract RouteFactory<R> getFactory();
