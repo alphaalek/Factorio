@@ -2,6 +2,7 @@ package dk.superawesome.factorio.mechanics.impl.relative;
 
 import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.api.events.MechanicBuildEvent;
+import dk.superawesome.factorio.api.events.MechanicLoadEvent;
 import dk.superawesome.factorio.api.events.MechanicRemoveEvent;
 import dk.superawesome.factorio.mechanics.*;
 import dk.superawesome.factorio.mechanics.transfer.TransferCollection;
@@ -46,15 +47,29 @@ public class Comparator extends SignalTrigger<Comparator> implements ThinkingMec
     @Override
     public void onBlocksLoaded(Player by) {
         this.collectionTrigger = null;
-        Bukkit.getScheduler().runTask(Factorio.get(), () -> {
-            setupRelativeBlocks(at -> triggerLever(at, true), at -> {
-                if (at instanceof TransferCollection collection) {
+        Bukkit.getScheduler().runTask(Factorio.get(), this::scanRelativeBlocks);
+    }
+
+    private void scanRelativeBlocks() {
+        setupRelativeBlocks(at -> triggerLever(at, true), at -> {
+            if (at instanceof TransferCollection collection) {
+                this.collectionTrigger = collection;
+            }
+        });
+
+        think();
+    }
+
+    @EventHandler
+    public void onMechanicLoad(MechanicLoadEvent event) {
+        if (this.collectionTrigger == null && event.getMechanic() instanceof TransferCollection collection) {
+            MechanicManager manager = Factorio.get().getMechanicManagerFor(this);
+            BlockUtil.forRelative(this.loc.getBlock(), block -> {
+                if (manager.getMechanicAt(block.getLocation()) == event.getMechanic()) {
                     this.collectionTrigger = collection;
                 }
             });
-
-            think();
-        });
+        }
     }
 
     @EventHandler

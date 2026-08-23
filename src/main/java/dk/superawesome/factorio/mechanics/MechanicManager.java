@@ -33,6 +33,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
 import java.util.logging.Level;
 
@@ -54,6 +55,9 @@ public class MechanicManager implements Listener {
     private final Map<BlockVector, Mechanic<?>> mechanics = new HashMap<>();
     private final Map<BlockVector, MechanicProfile<?>> loadingMechanics = new HashMap<>();
     private final Queue<ThinkingMechanic> thinkingMechanics = new LinkedList<>();
+    private final AtomicInteger pendingLoads = new AtomicInteger();
+    private final Set<Mechanic<?>> batchMechanics = new HashSet<>();
+    private boolean reconnectScheduled;
 
     public void loadMechanics() {
         for (Chunk chunk : world.getLoadedChunks()) {
@@ -114,6 +118,7 @@ public class MechanicManager implements Listener {
     }
 
     public void load(MechanicProfile<?> profile, Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier, Location loc, BlockFace rotation, boolean hasWallSign, boolean isBuild, Consumer<Mechanic<?>> callback) {
+        this.pendingLoads.incrementAndGet();
         LOADING_THREAD.submit(() -> {
             try {
                 Mechanic<?> mechanic = profile.getFactory().create(loc, rotation, contextSupplier.get(), hasWallSign, isBuild);
@@ -130,11 +135,44 @@ public class MechanicManager implements Listener {
                     Bukkit.getPluginManager().registerEvents(mechanic, Factorio.get());
 
                     callback.accept(mechanic);
+                    onLoadCompleted(mechanic);
                 });
-            } catch (StorageException ex) {
-                throw new RuntimeException(ex);
+            } catch (Exception ex) {
+                Factorio.get().getLogger().log(Level.SEVERE, "Failed to load mechanic at " + Types.LOCATION.convert(loc), ex);
+
+                // always finish the callback chain on the main thread, so loading
+                // mechanics are cleaned up and the load can be retried later
+                Bukkit.getScheduler().runTask(Factorio.get(), () -> {
+                    callback.accept(null);
+                    onLoadCompleted(null);
+                });
             }
         });
+    }
+
+    private void onLoadCompleted(Mechanic<?> mechanic) {
+        if (mechanic != null) {
+            this.batchMechanics.add(mechanic);
+        }
+
+        if (this.pendingLoads.decrementAndGet() == 0 && !this.batchMechanics.isEmpty() && !this.reconnectScheduled) {
+            this.reconnectScheduled = true;
+            Bukkit.getScheduler().runTaskLater(Factorio.get(), this::reconnectLoadedMechanics, 2);
+        }
+    }
+
+    private void reconnectLoadedMechanics() {
+        this.reconnectScheduled = false;
+
+        for (Mechanic<?> mechanic : this.batchMechanics) {
+            if (this.mechanics.containsValue(mechanic) && mechanic.exists()) {
+                // re-announce the load so relative/circuit mechanics can pick up
+                // neighbors that were only registered after their own load
+                Bukkit.getPluginManager().callEvent(new MechanicLoadEvent(mechanic));
+            }
+        }
+
+        this.batchMechanics.clear();
     }
 
     public void unregister(Mechanic<?> mechanic) {
@@ -448,6 +486,11 @@ public class MechanicManager implements Listener {
             Query.CheckedSupplier<MechanicStorageContext, StorageException> contextSupplier = () -> contextProvider.findAt(on.getLocation());
             // load the mechanic
             loadMechanicFromSign(profile.get(), contextSupplier, sign, on, face, false, mechanic -> {
+                if (mechanic == null) {
+                    callback.accept(false);
+                    return;
+                }
+
                 // ensure only standing signs for buildings that allow it
                 if (Tag.STANDING_SIGNS.isTagged(sign.getType()) && mechanic.getBuilding().deniesStandingSign()) {
                     callback.accept(false);
@@ -461,6 +504,8 @@ public class MechanicManager implements Listener {
 
                 callback.accept(true);
             });
+        } else {
+            callback.accept(false);
         }
     }
 
