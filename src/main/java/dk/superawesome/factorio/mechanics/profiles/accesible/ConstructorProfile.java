@@ -81,10 +81,10 @@ public class ConstructorProfile implements GuiMechanicProfile<Constructor> {
     public MechanicLevel.Registry getLevelRegistry() {
         return MechanicLevel.Registry.Builder
                 .make(5)
-                .setDescription(2, Arrays.asList("§eLager: 12 stacks §f-> §e15 stacks", "§eHastighed: " + formatNumber(ticksToMs(20)) + "ms §f-> §e" + formatNumber(ticksToMs(19)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(20, 19)*100) +"% hurtigere§f)", "§eSlot overførsel: 1 -> 2"))
+                .setDescription(2, Arrays.asList("§eLager: 12 stacks §f-> §e15 stacks", "§eHastighed: " + formatNumber(ticksToMs(20)) + "ms §f-> §e" + formatNumber(ticksToMs(19)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(20, 19)*100) +"% hurtigere§f)", "§eSlot overførsel: 1 §f-> §e2"))
                 .setDescription(3, Arrays.asList("§eLager: 15 stacks §f-> §e22 stacks", "§eHastighed: " + formatNumber(ticksToMs(19)) + "ms §f-> §e" + formatNumber(ticksToMs(18)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(19, 18)*100) +"% hurtigere§f)"))
-                .setDescription(4, Arrays.asList("§eLager: 22 stacks §f-> §e32 stacks", "§eHastighed: " + formatNumber(ticksToMs(18)) + "ms §f-> §e" + formatNumber(ticksToMs(16)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(18, 16)*100) +"% hurtigere§f)", "§eSlot overførsel: 2 -> 3"))
-                .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eHastighed: " + formatNumber(ticksToMs(17)) + "ms §f-> §e" + formatNumber(ticksToMs(14)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(16, 14)*100) +"% hurtigere§f)", "§eSlot overførsel: 3 -> 4"))
+                .setDescription(4, Arrays.asList("§eLager: 22 stacks §f-> §e32 stacks", "§eHastighed: " + formatNumber(ticksToMs(18)) + "ms §f-> §e" + formatNumber(ticksToMs(16)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(18, 16)*100) +"% hurtigere§f)", "§eSlot overførsel: 2 §f-> §e3"))
+                .setDescription(5, Arrays.asList("§eLager: 32 stacks §f-> §e64 stacks", "§eHastighed: " + formatNumber(ticksToMs(16)) + "ms §f-> §e" + formatNumber(ticksToMs(14)) + "ms §f(§e"+ formatNumber(getIncreaseDifference(16, 14)*100) +"% hurtigere§f)", "§eSlot overførsel: 3 §f-> §e4"))
 
                 .mark(MechanicLevel.XP_REQUIRES_MARK, Array.fromData(1000d, 2500d, 5000d, 10000d))
                 .mark(MechanicLevel.LEVEL_COST_MARK, Array.fromData(4096d, 8384d, 18480d, 36200d))
