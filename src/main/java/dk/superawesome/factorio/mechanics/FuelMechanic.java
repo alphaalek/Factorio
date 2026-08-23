@@ -1,31 +1,24 @@
 package dk.superawesome.factorio.mechanics;
 
-import dk.superawesome.factorio.Factorio;
 import dk.superawesome.factorio.gui.BaseGui;
-import dk.superawesome.factorio.mechanics.impl.relative.Collector;
 import dk.superawesome.factorio.mechanics.routes.events.pipe.PipePutEvent;
 import dk.superawesome.factorio.mechanics.stackregistry.Fuel;
 import dk.superawesome.factorio.mechanics.transfer.Container;
 import dk.superawesome.factorio.mechanics.transfer.ItemCollection;
 import dk.superawesome.factorio.mechanics.transfer.ItemContainer;
-import dk.superawesome.factorio.util.statics.BlockUtil;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.BlockVector;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
-public interface FuelMechanic {
+public interface FuelMechanic extends WasteOutputMechanic {
 
     Fuel getFuel();
 
@@ -46,10 +39,6 @@ public interface FuelMechanic {
     void removeFuel(int amount);
 
     int getFuelCapacity();
-
-    List<BlockVector> getWasteOutputs();
-
-    Location getLocation();
 
     default <G extends BaseGui<G>> void putFuel(ItemCollection collection, ItemContainer container, PipePutEvent event, AtomicReference<G> inUse, BiConsumer<G, Integer> doGui) {
         Storage storage = adaptFuelStorage();
@@ -119,28 +108,6 @@ public interface FuelMechanic {
         }
 
         return FuelState.SMELTING;
-    }
-
-    default void handleWaste(Location def, Material waste) {
-        MechanicManager manager =  Factorio.get().getMechanicManager(def.getWorld());
-
-        for (BlockVector vec : getWasteOutputs()) {
-            // search for collectors to take the fuel waste
-            Location loc = BlockUtil.getRel(def, vec);
-            Block block = loc.getBlock();
-            if (block.getType() == Material.HOPPER) {
-                // check if the hopper is facing towards the mechanic
-                if (manager.getMechanicAt(BlockUtil.getPointingBlock(block, false).getLocation()) == this) {
-                    Mechanic<?> mechanic = manager.getMechanicAt(loc);
-                    if (mechanic instanceof Collector collector) {
-                        if (collector.handleInput(waste)) {
-                            // the collector took the waste, just break
-                            break;
-                        }
-                    }
-                }
-            }
-        }
     }
 
     default void loadFuel(MechanicStorageContext context, ByteArrayInputStream str) throws IOException, ClassNotFoundException {

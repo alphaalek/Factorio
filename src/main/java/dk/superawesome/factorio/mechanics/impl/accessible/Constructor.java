@@ -13,6 +13,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BlockVector;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,9 +21,23 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class Constructor extends AbstractMechanic<Constructor> implements AccessibleMechanic, ThinkingMechanic, ItemCollection, ItemContainer {
+public class Constructor extends AbstractMechanic<Constructor> implements AccessibleMechanic, ThinkingMechanic, ItemCollection, ItemContainer, WasteOutputMechanic {
 
     public static final int UNIT_TRANSFER_AMOUNT_MARK = 1;
+
+    private static final List<BlockVector> WASTE_OUTPUT_RELATIVES = Arrays.asList(
+            new BlockVector(0, 2, 0),
+
+            new BlockVector(0, 1, 1),
+            new BlockVector(0, 1, -1),
+            new BlockVector(1, 1, 0),
+            new BlockVector(-1, 1, 0),
+
+            new BlockVector(0, 0, 1),
+            new BlockVector(0, 0, -1),
+            new BlockVector(1, 0, 0),
+            new BlockVector(-1, 0, 0)
+    );
 
     private final Storage storage = getProfile().getStorageProvider().createStorage(this, SingleStorageGui.CONTEXT);
     private final XPDist xpDist = new XPDist(100, 0.0025, 0.01);
@@ -209,6 +224,7 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
         // remove one amount from all items in the crafting grid and simulate the crafting
         int a = 0;
+        List<Material> waste = new ArrayList<>();
         for (int i = 0; i < 9; i++) {
             ItemStack crafting = this.craftingGridItems[i];
             if (crafting != null && crafting.getAmount() == 1) {
@@ -224,8 +240,17 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
 
             if (crafting != null) {
                 a++;
+                Material remainder = crafting.getType().getCraftingRemainingItem();
                 crafting.setAmount(crafting.getAmount() - 1);
+                if (remainder != null) {
+                    waste.add(remainder);
+                }
             }
+        }
+
+        // the craft succeeded, now output the remaining items
+        for (Material remainder : waste) {
+            handleWaste(getLocation(), remainder);
         }
 
         this.xp += this.xpDist.poll() * a;
@@ -296,6 +321,11 @@ public class Constructor extends AbstractMechanic<Constructor> implements Access
     @Override
     public double getTransferEnergyCost() {
         return 2d / 3d;
+    }
+
+    @Override
+    public List<BlockVector> getWasteOutputs() {
+        return WASTE_OUTPUT_RELATIVES;
     }
 
     public boolean isDeclined() {
