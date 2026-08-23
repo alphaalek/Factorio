@@ -16,18 +16,31 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static dk.superawesome.factorio.util.statics.StringUtil.formatNumber;
 
 public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<UpgradeMechanicGui<M>> {
 
+    private static final int LEVELS_PER_PAGE = 4;
+    private static final int PREV_SLOT = 45;
+    private static final int NEXT_SLOT = 53;
+
     private final M mechanic;
+    private final int page;
+    private final Map<Integer, Integer> upgradeSlotLevels = new HashMap<>();
 
     public UpgradeMechanicGui(M mechanic) {
+        this(mechanic, 0);
+    }
+
+    public UpgradeMechanicGui(M mechanic, int page) {
         super(new InitCallbackHolder(), null, BaseGui.DOUBLE_CHEST, "Opgradering: " + mechanic.toString(), true);
         this.mechanic = mechanic;
+        this.page = page;
         initCallback.call();
     }
 
@@ -44,8 +57,13 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
         MechanicLevel level = mechanic.getLevel();
         if (level.getMax() > 1) {
             double xp = mechanic.getXP();
-            for (int i = 2; i <= Math.min(5, level.getMax()); i++) {
-                int slot = 1 + (i - 2) * 2;
+            int startLevel = 2 + page * LEVELS_PER_PAGE;
+            int endLevel = Math.min(startLevel + LEVELS_PER_PAGE - 1, level.getMax());
+
+            upgradeSlotLevels.clear();
+
+            for (int i = startLevel; i <= endLevel; i++) {
+                int slot = 1 + (i - startLevel) * 2;
                 List<String> desc = new ArrayList<>();
                 if (level.lvl() + 1 >= i) {
                     desc.addAll(mechanic.getLevel().getRegistry().getDescription(i));
@@ -82,6 +100,7 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
 
                 if (level.lvl() + 1 == i) {
                     int buySlot = slot + 5 * 9;
+                    upgradeSlotLevels.put(buySlot, i);
                     if (has == 4) {
                         inventory.setItem(buySlot, new ItemBuilder(Material.EXPERIENCE_BOTTLE)
                                 .setName("§aOpgrader")
@@ -100,6 +119,17 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
                     }
                 }
             }
+
+            if (page > 0) {
+                inventory.setItem(PREV_SLOT, new ItemBuilder(Material.ARROW)
+                        .setName("§eForrige side")
+                        .build());
+            }
+            if (startLevel + LEVELS_PER_PAGE <= level.getMax()) {
+                inventory.setItem(NEXT_SLOT, new ItemBuilder(Material.ARROW)
+                        .setName("§eNæste side")
+                        .build());
+            }
         }
     }
 
@@ -107,26 +137,34 @@ public class UpgradeMechanicGui<M extends Mechanic<M>> extends BaseGuiAdapter<Up
     public boolean onClickIn(InventoryClickEvent event) {
         if (event.getCurrentItem() != null) {
             Player player = (Player) event.getWhoClicked();
-            if (event.getCurrentItem().getType() == Material.BARRIER && !player.isOp()) {
+            ItemStack item = event.getCurrentItem();
+
+            if (item.getType() == Material.ARROW) {
+                int startLevel = 2 + page * LEVELS_PER_PAGE;
+                if (event.getSlot() == PREV_SLOT && page > 0) {
+                    player.openInventory(new UpgradeMechanicGui<>(mechanic, page - 1).getInventory());
+                } else if (event.getSlot() == NEXT_SLOT && startLevel + LEVELS_PER_PAGE <= mechanic.getLevel().getMax()) {
+                    player.openInventory(new UpgradeMechanicGui<>(mechanic, page + 1).getInventory());
+                }
+                return true;
+            }
+
+            if (item.getType() == Material.BARRIER && !player.isOp()) {
                 player.sendMessage("§cDu har ikke nok §bXP §ctil at opgradere maskinen.");
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 0.5f);
                 return true;
-            } else if (event.getCurrentItem().getType() == Material.EXPERIENCE_BOTTLE || player.isOp()) {
-                int level = -1;
-                switch (event.getSlot()) {
-                    case 46 -> level = 2;
-                    case 48 -> level = 3;
-                    case 50 -> level = 4;
-                    case 52 -> level = 5;
-                }
-                if (level != -1) {
+            }
+
+            if (item.getType() == Material.EXPERIENCE_BOTTLE || player.isOp()) {
+                Integer level = upgradeSlotLevels.get(event.getSlot());
+                if (level != null) {
                     MechanicUpgradeEvent upgradeEvent = new MechanicUpgradeEvent(player, mechanic, level, (double) mechanic.getLevel().getRegistry().get(level - 1).get(MechanicLevel.LEVEL_COST_MARK));
                     Bukkit.getPluginManager().callEvent(upgradeEvent);
                     if (!upgradeEvent.isCancelled()) {
                         mechanic.setLevel(level);
 
                         // when closing and opening right after each other, we won't trigger the onClose logic
-                        player.openInventory(new UpgradeMechanicGui<>(mechanic).getInventory());
+                        player.openInventory(new UpgradeMechanicGui<>(mechanic, page).getInventory());
                     }
                 }
             }
