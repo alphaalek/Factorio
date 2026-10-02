@@ -54,7 +54,8 @@ public abstract class AbstractMechanic<M extends Mechanic<M>> implements Mechani
                     throw new RuntimeException("No stored data found for mechanic at " + Types.LOCATION.convert(loc));
                 }
 
-                this.management = this.lastSnapshot.management();
+                Management loaded = this.lastSnapshot.management();
+                this.management = loaded != null ? loaded.copy() : null;
                 this.xp = this.lastSnapshot.xp();
                 this.level = MechanicLevel.from(this, this.lastSnapshot.level());
             } catch (SQLException | IOException ex) {
